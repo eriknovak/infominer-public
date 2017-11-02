@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g"
+    "preinstall": "npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g",
+    "ember:serve": "cd website/ember-source && ember serve"
   },
   "repository": {
     "type": "git",
