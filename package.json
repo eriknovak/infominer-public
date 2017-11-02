@@ -1,0 +1,20 @@
+{
+  "name": "infominer",
+  "version": "1.0.0",
+  "description": "OntoGen++",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ErikNovak/InfoMiner.git"
+  },
+  "author": "Erik Novak <erik.novak@ijs.si>",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/ErikNovak/InfoMiner/issues"
+  },
+  "homepage": "https://github.com/ErikNovak/InfoMiner#readme"
+}
