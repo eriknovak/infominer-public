@@ -57,7 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
-# Ember Ignore files
+# ember ignore files
 
 # compiled output
 /src/website/ember-source/dist
