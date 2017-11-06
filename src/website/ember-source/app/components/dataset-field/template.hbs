@@ -1,0 +1,18 @@
+<div class="col-sm-4">
+  field-name: <b>{{field}}</b>
+</div>
+
+<div class="col-sm-4">
+  type:
+  <div class="form-group">
+    <select class="form-control" id="sel1">
+      {{#each fieldTypes as |type|}}
+        <option>{{type}}</option>
+      {{/each}}
+    </select>
+  </div>
+</div>
+
+
+
+{{yield}}

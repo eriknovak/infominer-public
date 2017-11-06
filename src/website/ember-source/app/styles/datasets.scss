@@ -16,7 +16,7 @@
     -webkit-transition: .4s;
     transition: .4s;
     &:hover {
-        background-color: rgba($quaternary-color,.3);
+        background-color: rgba($quaternary-color,.1);
     }
     &.add-new {
         border: 2px dashed $tertiary-color;
@@ -27,10 +27,12 @@
         }
     }
 }
-#addNewDataset {
-    font-family: $main-font;
-    .dropzone {
-        padding: 5% 0;
-        margin: 0;
-    }
+
+
+.dropzone {
+    @extend .dataset;
+    padding: 5% 0;
+    margin: 20px 0;
+    border: 2px dashed $tertiary-color;
+    label { margin-bottom: 0; }
 }

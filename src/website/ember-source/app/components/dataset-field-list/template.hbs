@@ -1,0 +1,7 @@
+<h4>{{filename}}</h4>
+
+{{#each fieldValues as |fldVal|}}
+  {{dataset-field field=fldVal.field type=fldVal.type}}
+{{/each}}
+
+{{yield}}
