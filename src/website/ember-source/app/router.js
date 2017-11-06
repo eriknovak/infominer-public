@@ -7,6 +7,8 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
+  this.route('datasets', function() {});
+  this.route('dataset', { path: '/dataset/:dataset_id' });
 });
 
 export default Router;

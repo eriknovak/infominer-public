@@ -1,0 +1,17 @@
+// colors
+$primary-color: #e7e7e7;
+$secondary-color: #003399;
+$tertiary-color: #3366CC;
+$quaternary-color: #6699FF;
+// fonts
+$light-font-color: #e7e7e7;
+$dark-font-color: #2C3539;
+$main-font: 'Open Sans';
+
+// bootstrap & navigation
+@import "ember-bootstrap/bootstrap";
+@import 'ember-burger-menu';
+// component style
+@import 'common.scss';
+@import 'datasets.scss';
+

@@ -1,0 +1,36 @@
+#database-container {
+    a {
+        &:hover {
+            background-color: $quaternary-color;
+        }
+    }
+}
+.dataset {
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    width: 100%;
+    font-size: 16px;
+    border: 2px solid $tertiary-color;
+    -webkit-transition: .4s;
+    transition: .4s;
+    &:hover {
+        background-color: rgba($quaternary-color,.3);
+    }
+    &.add-new {
+        border: 2px dashed $tertiary-color;
+        &:hover { border: 2px solid $tertiary-color; }
+        .fa {
+            padding: 20px;
+            font-size: 40px;
+        }
+    }
+}
+#addNewDataset {
+    font-family: $main-font;
+    .dropzone {
+        padding: 5% 0;
+        margin: 0;
+    }
+}
