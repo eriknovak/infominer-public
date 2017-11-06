@@ -1,0 +1,4 @@
+title|description
+Star Wars|People in space are fighting with light swords and shooting lazers. Most soldiers can't hit.
+Harry Potter|Kid survives magic attack and becomes popular.
+Game of Thrones|War and drinks. Ice and fire. Dragons and zombies. Everything really.
