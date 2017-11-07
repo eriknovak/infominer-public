@@ -1,21 +1,23 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const multer  = require('multer');
 let app = express();
 
-app.use(bodyParser.text());
+app.use(cors());
 app.use(bodyParser.json());       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+app.use(bodyParser.urlencoded({   // to support URL-encoded bodies
   extended: true
 }));
 
+let upload = multer();
 
-app.use(cors());
 
-app.post('/api/dataset/new', (req, res) => {
+app.post('/api/dataset/new', upload.single('file'), (req, res) => {
+
     let body = req.body;
+    let file = req.file;
 
-    console.log(body);
     res.end();
 });
 

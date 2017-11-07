@@ -8,9 +8,8 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        // get field type
+        // get field type and possible field types
         let type = this.get('type');
-        // get possible types
         let fieldTypes = this.get('fieldTypes');
         // find and set field type to the start of the array
         let index = fieldTypes.indexOf(type);
@@ -20,5 +19,29 @@ export default Component.extend({
         }
         // set field types
         this.set('fieldTypes', fieldTypes);
+    },
+
+
+    actions: {
+        /**
+         * Changes the model field value.
+         */
+        changeFieldName() {
+            this.set("field", Ember.$(`#field-name-${this.get('index')}`).val());
+        },
+
+        /**
+         * Changes the field type value.
+         */
+        changeFieldType() {
+            this.set("type", Ember.$(`#field-type-${this.get('index')}`).val());
+        },
+
+        /**
+         * Changes flag for field inclusion.
+         */
+        changeFieldInclusion() {
+            this.set("included", Ember.$(`#field-included-${this.get('index')}`).is(':checked'));
+        }
     }
 });

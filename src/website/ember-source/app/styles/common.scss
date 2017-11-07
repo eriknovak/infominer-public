@@ -6,13 +6,16 @@ html, body {
     font-weight: 300;
     font-size: 14px;
 }
+
 body {
     padding-top:50px;
     & > div.ember-view { height:100%; }
 }
+
 h1, h2, h3, h4, h5, h6 {
     text-transform: uppercase;
 }
+
 a {
     text-decoration: none;
     cursor: pointer;
@@ -20,6 +23,7 @@ a {
         text-decoration: none;
     }
 }
+
 #header .navbar {
     margin-bottom: 0px;
     border: white solid 0px;
@@ -29,6 +33,7 @@ a {
         font-family: $main-font;
     }
 }
+
 .ember-burger-menu {
     .bm-menu {
         background-color: $tertiary-color;
@@ -76,7 +81,6 @@ a {
     }
 }
 
-// common classes
 .center {
     text-align: center;
 }

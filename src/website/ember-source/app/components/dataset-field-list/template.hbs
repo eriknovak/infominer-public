@@ -4,13 +4,13 @@
     <div class="form-inline dataset-name">
       <div class="form-group">
         <label>Dataset Name:</label>
-        <input type="text" class="form-control" value={{file.name}}>
+        <input type="text" id="dataset-name" class="form-control" oninput={{action 'changeDatasetName'}} value={{dataset.name}}>
       </div>
     </div><!-- .dataset-name -->
 
     <div class="stats">
-      {{file.numDocs}} documents, {{file.size}} bytes
-    </div><!-- .stats -->
+      {{dataset.numDocs}} documents, {{dataset.size}} bytes
+    </div>
 
   </div><!-- .col-lg-offset-2.col-lg-8 -->
 </div><!-- .row -->
@@ -27,8 +27,8 @@
         </tr>
       </thead>
       <tbody>
-        {{#each fieldValues as |fldVal|}}
-          {{dataset-field field=fldVal.field type=fldVal.type}}
+        {{#each fieldList as |field index|}}
+          {{dataset-field field=field.name type=field.type included=field.included index=index}}
         {{/each}}
       </tbody>
     </table>
@@ -38,7 +38,7 @@
 
 <div class="row">
   <div class="col-lg-offset-2 col-lg-8">
-    <button class="btn btn-primary pull-right">Save Dataset</button>
+    <button {{action submitDataset file }} class="btn btn-primary pull-right">Save Dataset</button>
     <button {{action resetList}} class="btn btn-default pull-right">Cancel</button>
   </div><!-- .col-lg-offset-2.col-lg-8 -->
 </div><!-- .row -->

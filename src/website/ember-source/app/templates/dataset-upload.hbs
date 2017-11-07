@@ -4,15 +4,26 @@
     <div class="col-lg-offset-2 col-lg-8">
       <h2>Upload Dataset</h2>
     </div>
-  </div>
-</div>
+  </div><!-- .row -->
+</div><!-- .container-fluid -->
 
-<!-- Field options selection -->
 {{#if model}}
-  {{ dataset-field-list file=model.file fieldValues=model.fieldValues resetList=(route-action "resetModel")}}
+
+  <!-- Field options selection -->
+  {{ dataset-field-list
+      file=model.file
+      dataset=model.dataset
+      fieldList=model.fieldList
+      resetList=(route-action "resetModel")
+      submitDataset=(route-action "submitDataset")
+  }}
+
 {{else}}
+
+  <!-- File Upload section -->
   <div class="container-fluid">
     <div class="row">
+
       <!-- Dropzone -->
       <div class="col-lg-offset-2 col-lg-8">
         {{#file-dropzone name="dataset" as |dropzone queue|}}
@@ -39,8 +50,10 @@
           </p>
         {{/file-dropzone}}
       </div><!-- .col-lg-offset-2.col-lg-8 -->
+
     </div><!-- .row -->
   </div><!-- .container-fluid -->
+
 {{/if}}
 
 

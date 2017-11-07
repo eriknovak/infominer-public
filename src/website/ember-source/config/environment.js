@@ -35,6 +35,7 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
+    ENV.APP.HOSTNAME = 'http://localhost:3000';
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -55,6 +56,7 @@ module.exports = function(environment) {
 
   if (environment === 'production') {
     // here you can enable a production-specific feature
+    ENV.APP.HOSTNAME = '';
   }
 
   return ENV;
