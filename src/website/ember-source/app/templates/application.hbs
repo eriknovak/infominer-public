@@ -1,5 +1,24 @@
-{{!-- The following component displays Ember's default welcome message. --}}
-{{welcome-page}}
-{{!-- Feel free to remove this! --}}
+<!-- Website header -->
+{{ website-header }}
 
-{{outlet}}
+<!-- Navigation options -->
+{{#burger-menu open=true animation='squeeze' locked=true translucentOverlay=false as |burger|}}
+
+  <!-- Navigation bar -->
+  {{#burger.menu itemTagName="li" as |menu|}}
+    <h2>Menu</h2>
+    <ul>
+      {{#menu.item}}
+        {{#link-to "datasets"}}
+          <i class="fa fa-database"></i>datasets
+        {{/link-to}}
+      {{/menu.item}}
+    </ul>
+  {{/burger.menu}}
+
+  <!-- Main content -->
+  {{#burger.outlet}}
+    {{outlet}}
+  {{/burger.outlet}}
+
+{{/burger-menu}}

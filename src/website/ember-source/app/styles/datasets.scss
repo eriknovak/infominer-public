@@ -1,0 +1,64 @@
+#database-container {
+    a {
+        &:hover {
+            background-color: $quaternary-color;
+        }
+    }
+}
+
+.dataset {
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    width: 100%;
+    font-size: 16px;
+    border: 2px solid $tertiary-color;
+    -webkit-transition: .4s;
+    transition: .4s;
+    &:hover {
+        background-color: rgba($quaternary-color,.1);
+    }
+    &.add-new {
+        border: 2px dashed $tertiary-color;
+        &:hover { border: 2px solid $tertiary-color; }
+        .fa {
+            padding: 20px;
+            font-size: 40px;
+        }
+    }
+}
+
+.dropzone {
+    @extend .dataset;
+    padding: 5% 0;
+    margin: 20px 0;
+    border: 2px dashed $tertiary-color;
+    label { margin-bottom: 0; }
+}
+
+.dataset-field-list {
+    margin-top: 30px;
+
+    .stats {
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    .dataset-name, .field {
+        label {
+            margin-bottom: 0;
+            margin-right: 10px;
+            font-weight: 300;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        input, select {
+            border-radius: 0;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+    }
+}

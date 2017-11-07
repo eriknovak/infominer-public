@@ -1,0 +1,19 @@
+<td class="field name">
+  <input type="text" id="field-name-{{index}}" class="form-control" oninput={{action 'changeFieldName'}} value={{field}}>
+</td>
+
+<td class="center field type">
+  <div class="form-inline">
+    <select id="field-type-{{index}}" class="form-control" onchange={{action 'changeFieldType'}}>
+      {{#each fieldTypes as |type|}}
+        <option>{{type}}</option>
+      {{/each}}
+    </select>
+  </div>
+</td><!-- .field.type -->
+
+<td class="center field included">
+  <input type="checkbox" id="field-included-{{index}}" onclick={{action 'changeFieldInclusion'}} checked>
+</td>
+
+{{yield}}

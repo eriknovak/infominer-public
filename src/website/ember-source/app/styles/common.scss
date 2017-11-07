@@ -1,0 +1,94 @@
+// common styles for all views
+html, body {
+    height: 100%;
+    background-color: $primary-color;
+    font-family: $main-font;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+body {
+    padding-top:50px;
+    & > div.ember-view { height:100%; }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-transform: uppercase;
+}
+
+a {
+    text-decoration: none;
+    cursor: pointer;
+    &:active, &:hover, &:focus {
+        text-decoration: none;
+    }
+}
+
+#header .navbar {
+    margin-bottom: 0px;
+    border: white solid 0px;
+    background-color: $secondary-color;
+    .navbar-brand {
+        color: $light-font-color;
+        font-family: $main-font;
+    }
+}
+
+.ember-burger-menu {
+    .bm-menu {
+        background-color: $tertiary-color;
+        color: $light-font-color;
+        h2 {
+            margin: 0;
+            padding: 1em;
+            font-size: 2em;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .bm-menu-item {
+            font-size: 16px;
+            a {
+                display: block;
+                padding: 1em 1em 1em 1.2em;
+                outline: 0;
+                border-top: 1px solid rgba(0,0,0,.2);
+                border-bottom: 1px solid rgba(0,0,0,.2);
+                color: $light-font-color;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                -webkit-transition: background .4s;
+                transition: background .4s;
+                cursor: pointer;
+                & > i {
+                    margin-right: 20px;
+                    font-size: 20px;
+                }
+            }
+            a:hover {
+                background-color: rgba($quaternary-color,.4);
+            }
+        }
+    }
+    .bm-content {
+        color: $dark-font-color;
+        padding-bottom:50px;
+    }
+}
+
+.center {
+    text-align: center;
+}
+
+.medium-size {
+    font-size: 16px;
+}
+
+.btn.pull-right {
+    margin-left: 10px;
+}

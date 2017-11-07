@@ -1,0 +1,31 @@
+<div class="container-fluid">
+
+  <!-- title -->
+  <div class="row">
+    <div class="col-sm-12">
+      <h2>Datasets</h2>
+      <p class="medium-size">Upload or select a dataset</p>
+    </div>
+  </div>
+
+  <!-- datasets list -->
+  <div id="datasets-container">
+    <div class="row">
+
+      <!-- Add new dataset -->
+      <div class="col-sm-6 col-md-3 col-lg-2">
+        <!-- Button trigger modal -->
+        {{#link-to 'dataset-upload'}}
+          <div class="dataset add-new">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            <p>add new dataset</p>
+          </div>
+        {{/link-to}}
+      </div>
+
+    </div><!-- .row -->
+  </div><!-- .datasets-container -->
+
+</div><!-- .container-fluid -->
+
+{{outlet}}
