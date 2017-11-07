@@ -28,7 +28,6 @@
     }
 }
 
-
 .dropzone {
     @extend .dataset;
     padding: 5% 0;
@@ -36,3 +35,30 @@
     border: 2px dashed $tertiary-color;
     label { margin-bottom: 0; }
 }
+
+.dataset-field-list {
+    margin-top: 30px;
+
+    .stats {
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    .dataset-name, .field {
+        label {
+            margin-bottom: 0;
+            margin-right: 10px;
+            font-weight: 300;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        input, select {
+            border-radius: 0;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+    }
+}
+

@@ -1,18 +1,21 @@
-<div class="col-sm-4">
-  field-name: <b>{{field}}</b>
-</div>
+<td class="field name">
+  <input type="text" class="form-control" value={{field}}>
+</td>
 
-<div class="col-sm-4">
-  type:
-  <div class="form-group">
-    <select class="form-control" id="sel1">
-      {{#each fieldTypes as |type|}}
-        <option>{{type}}</option>
-      {{/each}}
-    </select>
-  </div>
-</div>
+<td class="center field type">
+  <form class="form-inline">
+    <div class="form-group">
+      <select class="form-control">
+        {{#each fieldTypes as |type|}}
+          <option>{{type}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </form>
+</td>
 
-
+<td class="center field included">
+  <input type="checkbox" checked>
+</td>
 
 {{yield}}

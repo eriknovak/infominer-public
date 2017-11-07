@@ -1,7 +1,7 @@
 import Component from '@ember/component';
 
 export default Component.extend({
-    classNames: ['row'],
+    tagName: 'tr',
 
     // possible field values
     fieldTypes: ['string', 'int', 'float'],

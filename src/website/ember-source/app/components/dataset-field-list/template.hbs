@@ -1,7 +1,46 @@
-<h4>{{filename}}</h4>
+<div class="row">
+  <div class="col-lg-offset-2 col-lg-8">
 
-{{#each fieldValues as |fldVal|}}
-  {{dataset-field field=fldVal.field type=fldVal.type}}
-{{/each}}
+    <div class="form-inline dataset-name">
+      <div class="form-group">
+        <label>Dataset Name:</label>
+        <input type="text" class="form-control" value={{file.name}}>
+      </div>
+    </div><!-- .dataset-name -->
+
+    <div class="stats">
+      {{file.numDocs}} documents, {{file.size}} bytes
+    </div><!-- .stats -->
+
+  </div><!-- .col-lg-offset-2.col-lg-8 -->
+</div><!-- .row -->
+
+<div class="row">
+  <div class="col-lg-offset-2 col-lg-8">
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>field name</th>
+          <th class="center">type</th>
+          <th class="center">included</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each fieldValues as |fldVal|}}
+          {{dataset-field field=fldVal.field type=fldVal.type}}
+        {{/each}}
+      </tbody>
+    </table>
+
+  </div><!-- .col-lg-offset-2.col-lg-8 -->
+</div><!-- .row -->
+
+<div class="row">
+  <div class="col-lg-offset-2 col-lg-8">
+    <button class="btn btn-primary pull-right">Save Dataset</button>
+    <button {{action resetList}} class="btn btn-default pull-right">Cancel</button>
+  </div><!-- .col-lg-offset-2.col-lg-8 -->
+</div><!-- .row -->
 
 {{yield}}

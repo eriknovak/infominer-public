@@ -1,44 +1,48 @@
 <div class="container-fluid">
   <!-- Title -->
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-lg-offset-2 col-lg-8">
       <h2>Upload Dataset</h2>
     </div>
   </div>
-
-  <div class="row">
-    <!-- Dropzone -->
-    <div class="col-sm-12">
-      {{#file-dropzone name="dataset" as |dropzone queue|}}
-        <p class="dropzone">
-          {{#if dropzone.active}}
-            {{#if dropzone.valid}}
-              Drop to upload
-            {{else}}
-              Invalid
-            {{/if}}
-          {{else if queue.files.length}}
-            Uploading {{queue.files.length}} files. ({{queue.progress}}%)
-          {{else}}
-              {{#if dropzone.supported}}
-                Drag and drop dataset onto this area to upload them or
-              {{/if}}
-              {{#file-upload name="dataset"
-                            accept="text/plain,text/csv"
-                            multiple=false
-                            onfileadd=(route-action "readDataset")}}
-                <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
-              {{/file-upload}}
-          {{/if}}
-        </p>
-      {{/file-dropzone}}
-      {{outlet}}
-
-    </div><!-- .col-sm-12 -->
-  </div><!-- .row -->
-</div><!-- .container-fluid -->
+</div>
 
 <!-- Field options selection -->
-{{ dataset-field-list filename=model.filename fieldValues=model.fieldValues}}
+{{#if model}}
+  {{ dataset-field-list file=model.file fieldValues=model.fieldValues resetList=(route-action "resetModel")}}
+{{else}}
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Dropzone -->
+      <div class="col-lg-offset-2 col-lg-8">
+        {{#file-dropzone name="dataset" as |dropzone queue|}}
+          <p class="dropzone">
+            {{#if dropzone.active}}
+              {{#if dropzone.valid}}
+                Drop to upload
+              {{else}}
+                Invalid
+              {{/if}}
+            {{else if queue.files.length}}
+              Uploading {{queue.files.length}} files. ({{queue.progress}}%)
+            {{else}}
+                {{#if dropzone.supported}}
+                  Drag and drop dataset onto this area to upload them or
+                {{/if}}
+                {{#file-upload name="dataset"
+                              accept="text/plain,text/csv"
+                              multiple=false
+                              onfileadd=(route-action "readDataset")}}
+                  <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
+                {{/file-upload}}
+            {{/if}}
+          </p>
+        {{/file-dropzone}}
+      </div><!-- .col-lg-offset-2.col-lg-8 -->
+    </div><!-- .row -->
+  </div><!-- .container-fluid -->
+{{/if}}
+
+
 
 
