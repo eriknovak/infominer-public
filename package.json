@@ -17,5 +17,10 @@
   "bugs": {
     "url": "https://github.com/ErikNovak/InfoMiner/issues"
   },
-  "homepage": "https://github.com/ErikNovak/InfoMiner#readme"
+  "homepage": "https://github.com/ErikNovak/InfoMiner#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.2"
+  }
 }
