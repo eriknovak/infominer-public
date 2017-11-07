@@ -1,0 +1,29 @@
+[{
+    "name": "Dataset",
+    "fields": null,
+    "joins": [
+        { "name": "inSubsets", "type": "index", "store": "Subsets", "inverse": "hasElements" }
+    ]
+}, {
+    "name": "Subsets",
+    "fields": [
+        { "name": "label", "type": "string" },
+        { "name": "description", "type": "string" }
+    ],
+    "joins": [
+        { "name": "hasElements", "type": "index", "store": "Dataset", "inverse": "inSubsets" },
+        { "name": "resultedIn", "type": "field", "store": "Methods", "inverse": "produced" },
+        { "name": "usedBy", "type": "index", "store": "Methods", "inverse": "appliedOn" }
+    ]
+}, {
+    "name": "Methods",
+    "fields": [
+        { "name": "type", "type": "string" },
+        { "name": "parameters", "type": "json" },
+        { "name": "result", "type": "json" }
+    ],
+    "joins": [
+        { "name": "produced", "type": "index", "store": "Subsets", "inverse": "resultedIn" },
+        { "name": "appliedOn", "type": "index", "store": "Subsets", "inverse": "usedBy" }
+    ]
+}]
