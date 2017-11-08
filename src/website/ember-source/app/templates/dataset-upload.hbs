@@ -41,7 +41,7 @@
                   Drag and drop dataset onto this area to upload them or
                 {{/if}}
                 {{#file-upload name="dataset"
-                              accept="text/plain,text/csv"
+                              accept="[text/plain,text/csv]"
                               multiple=false
                               onfileadd=(route-action "readDataset")}}
                   <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
