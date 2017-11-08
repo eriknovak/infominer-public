@@ -28,7 +28,7 @@
       </thead>
       <tbody>
         {{#each fieldList as |field index|}}
-          {{dataset-field field=field.name type=field.type included=field.included index=index}}
+          {{dataset-field name=field.name type=field.type included=field.included index=index}}
         {{/each}}
       </tbody>
     </table>
