@@ -1,24 +1,39 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
+import EmberObject from '@ember/object';
+import { run } from '@ember/runloop';
 
 moduleForComponent('dataset-field', 'Integration | Component | dataset field', {
   integration: true
 });
 
-test('it renders', function(assert) {
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
+let field = EmberObject.create({
+  name: 'test-field',
+  type: 'string',
+  included: true,
+  index: 1
+});
 
-  this.render(hbs`{{dataset-field}}`);
+test('should display field info row', function (assert) {
+  this.set('field', field);
+  this.render(hbs`{{ dataset-field name=field.name type=field.type included=field.included index=field.index }}`);
+  assert.equal(this.$('#field-name-1').val(), 'test-field', 'Field Name: test-field');
+  assert.equal(this.$('#field-type-1').val(), 'string', 'Field Type: string');
+  assert.equal(this.$('#field-included-1').is(':checked'), true, 'Field Included: true');
+});
 
-  assert.equal(this.$().text().trim(), '');
+test('should change field name value', function (assert) {
+  this.set('field', field);
+  this.render(hbs`{{ dataset-field name=field.name type=field.type included=field.included index=field.index }}`);
+  assert.equal(this.$('#field-name-1').val(), 'test-field', 'Input value: test-field');
+  run(() => this.$('#field-name-1').val('new-field'));
+  assert.equal(this.$('#field-name-1').val(), 'new-field', 'Input value: new-field');
+});
 
-  // Template block usage:
-  this.render(hbs`
-    {{#dataset-field}}
-      template block text
-    {{/dataset-field}}
-  `);
-
-  assert.equal(this.$().text().trim(), 'template block text');
+test('should change field included value', function (assert) {
+  this.set('field', field);
+  this.render(hbs`{{ dataset-field name=field.name type=field.type included=field.included index=field.index }}`);
+  assert.equal(this.$('#field-included-1').is(':checked'), true, 'Field Name: test-field');
+  run(() => document.getElementById('field-included-1').click());
+  assert.equal(this.$('#field-included-1').is(':checked'), false, 'Field Name: new-field');
 });
