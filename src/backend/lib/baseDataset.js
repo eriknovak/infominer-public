@@ -1,6 +1,8 @@
 // external modules
 const qm = require('qminer');
-const fs = require('fs');
+
+// internal modules
+const fileManager = require('./fileManager');
 
 /**
  * The Dataset base container.
@@ -10,6 +12,7 @@ class BaseDataset {
     /**
      * Constructing the dataset base.
      * @param {Object} params - The construction parameters.
+     * @param {String} params.data_folder - Path to data folder.
      * @param {String} params.user - The user accessing the dataset.
      * @param {String} params.db - The database name.
      * @param {Object} params.init - The initialization parameters.
@@ -28,8 +31,10 @@ class BaseDataset {
         if (!self.params.init) { throw new Error('FieldError: params.init must be defined'); }
         if (!self.params.init.mode) { throw new Error('FieldError: params.init.mode must be defined'); }
 
+        if (!self.params.data_folder) { self.params.data_folder = `${__dirname}/../../../data`; }
+
         // path to database folder
-        self.dbPath = `${__dirname}/../../../data/${self.params.user}/${self.params.db}`;
+        self.dbPath = `${self.params.data_folder}/${self.params.user}/${self.params.db}`;
 
         // loads the base
         self._loadBase();
@@ -46,10 +51,12 @@ class BaseDataset {
             // check required parameters
             if (!self.params.init.fields) { throw new Error('FieldError: params.init.fields must be defined'); }
             if (!self.params.init.file) { throw new Error('FieldError: params.init.file must be defined'); }
-            // parse fields from string
-            const fields = JSON.parse(self.params.init.fields);
+
+            // create dbPath folders
+            fileManager.createDirectoryPath(self.dbPath);
+
             // get the schema for database
-            const schema = self._prepareSchema(fields);
+            const schema = self._prepareSchema(self.params.init.fields);
 
             // create new database
             self.base = new qm.Base({
@@ -59,11 +66,11 @@ class BaseDataset {
             });
 
             // fill the database with documents
-            self._pushDocsToBase(self.params.init.file, fields);
+            self._pushDocsToBase(self.params.init.file, self.params.init.fields);
 
         } else if (self.params.init.mode === 'open') {
             // open database and prepare it for analysis
-            self.base = new qm.Base({ mode: self.params.init.mode, dbPath });
+            self.base = new qm.Base({ mode: self.params.init.mode, dbPath: self.dbPath });
         } else {
             // TODO: handle non-supported mode
             throw new Error('FieldError: params.init.mode must be "createClean", "open" or "openReadOnly"');
@@ -74,7 +81,7 @@ class BaseDataset {
      * Close the database.
      */
     close() {
-        self.base.close();
+        this.base.close();
     }
 
     /**
@@ -151,11 +158,11 @@ class BaseDataset {
      */
     _parseFValue(value, type) {
         // TODO: handle NaN values
-        if (type === "string") {
+        if (type === 'string') {
             return value;
-        } else if (type === "int") {
+        } else if (type === 'int') {
             return parseInt(value);
-        } else if (type === "float") {
+        } else if (type === 'float') {
             return parseFloat(value);
         } else {
             // TODO: handle unsupported type
