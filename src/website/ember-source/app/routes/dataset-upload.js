@@ -17,6 +17,7 @@ export default Route.extend({
          */
         readDataset(file) {
             // save route object
+            // TODO: handle reading with buffers
             file.readAsText().then((data) => {
                 this.extractFields(file, data);
             });
@@ -39,15 +40,14 @@ export default Route.extend({
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
             // filter out the included fields and prepare the array as
-            let fields = fieldList.filter(field => field.included)
-                .map(field => ({ field: field.name, type: field.type }));
+            //let fields = fieldList.map(field => ({ name: field.name, type: field.type, in }));
 
             // set the options and upload
             file.upload({
                 url: `${ENV.APP.HOSTNAME}/api/dataset/new`,
                 data: {
                     dataset: JSON.stringify(dataset),
-                    fields: JSON.stringify(fields)
+                    fields: JSON.stringify(fieldList)
                 }
             });
         }
@@ -62,7 +62,7 @@ export default Route.extend({
      */
     extractFields: function (file, data) {
         // separate rows and take first row as field names
-        const tableRows = data.split(/\n/g);
+        const tableRows = data.split(/\r\n?|\n/g);
         const fields = tableRows[0].split('|');
 
         // TODO: set field type recommendation

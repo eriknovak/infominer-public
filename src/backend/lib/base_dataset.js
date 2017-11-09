@@ -1,5 +1,6 @@
 // external modules
 const qm = require('qminer');
+const fs = require('fs');
 
 /**
  * The Dataset base container.
@@ -45,19 +46,20 @@ class BaseDataset {
             // check required parameters
             if (!self.params.init.fields) { throw new Error('FieldError: params.init.fields must be defined'); }
             if (!self.params.init.file) { throw new Error('FieldError: params.init.file must be defined'); }
-
+            // parse fields from string
+            const fields = JSON.parse(self.params.init.fields);
             // get the schema for database
-            const schema = self._prepareSchema(self.params.init.fields);
+            const schema = self._prepareSchema(fields);
 
             // create new database
             self.base = new qm.Base({
                 mode: self.params.init.mode,
-                dbPath,
+                dbPath: self.dbPath,
                 schema
             });
 
             // fill the database with documents
-            self._pushDocsToBase(self.params.init.file);
+            self._pushDocsToBase(self.params.init.file, fields);
 
         } else if (self.params.init.mode === 'open') {
             // open database and prepare it for analysis
@@ -71,7 +73,7 @@ class BaseDataset {
     /**
      * Close the database.
      */
-    _closeBase() {
+    close() {
         self.base.close();
     }
 
@@ -82,10 +84,13 @@ class BaseDataset {
      */
     _prepareSchema(fields) {
         let schema = require(`${__dirname}/../config/schema.json`);
+        // filter out included fields
+        const inFields = fields.filter(field => field.included)
+            .map(field => ({ name: field.name, type: field.type }));
         // TODO: check fields schema
 
         // replace the schema fields
-        schema[0].fields = fields;
+        schema[0].fields = inFields;
         return schema;
     }
 
@@ -93,8 +98,70 @@ class BaseDataset {
      * Pushes each row of the document to database.
      * @param {Object} file - File blob.
      */
-    _pushDocsToBase(file) {
+    _pushDocsToBase(file, fields) {
+        let self = this;
+        // prepare file buffer and parameters
+        let buffer = Buffer.from(file.buffer, file.encoding);
+        let offset = 0;
 
+        // iterate until end of file
+        while (offset < buffer.length) {
+            // get index of newline
+            let newLine = buffer.indexOf('\n', offset);
+            // if there is no new lines - get length of buffer
+            if (newLine == -1) { newLine = buffer.length; }
+            // get and separate row values
+            let fValues = buffer.slice(offset, newLine).toString().trim().split('|');
+            if (offset > 0) {
+                // prepare and push record to dataset
+                let rec = self._prepareRecord(fValues, fields);
+                self.base.store('Dataset').push(rec);
+            }
+            // update offset
+            offset = newLine + 1;
+        }
     }
 
+    /**
+     * Creates an object suitable for database.
+     * @param {String[]} values - An array of field values.
+     * @param {Object[]} fields - An array of field objects.
+     * @returns {Object} A record prepared for pushing to database.
+     */
+    _prepareRecord(values, fields) {
+        let self = this;
+        // prepare record placeholder
+        let rec = { };
+        // iterate through fields
+        for (let i = 0; i < fields.length; i++) {
+            // if the field is included in the database
+            if (fields[i].included) {
+                rec[fields[i].name] = self._parseFValue(values[i], fields[i].type);
+            }
+        }
+        return rec;
+    }
+
+
+    /**
+     * Parses the value in the desired type.
+     * @param {String} value - The string in consideration.
+     * @param {String} type - The type in which we want to parse.
+     * @returns {String|Number} The value parsed in the desired type.
+     */
+    _parseFValue(value, type) {
+        // TODO: handle NaN values
+        if (type === "string") {
+            return value;
+        } else if (type === "int") {
+            return parseInt(value);
+        } else if (type === "float") {
+            return parseFloat(value);
+        } else {
+            // TODO: handle unsupported type
+            throw new Error('FieldError: type is not "string", "int" or "float"');
+        }
+    }
 }
+
+module.exports = BaseDataset;

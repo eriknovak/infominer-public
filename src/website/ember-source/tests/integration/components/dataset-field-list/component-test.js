@@ -19,7 +19,7 @@ let model = EmberObject.create({
     included: true
   }],
   file: {},
-  submitDataset: function (file) { return 1; },
+  submitDataset: function () { return 1; },
   resetList: () => { }
 });
 
@@ -39,7 +39,7 @@ test('should render the component', function (assert) {
 
 test('should delete model', function (assert) {
   let self = this;
-  model.resetList = () => { self.set('model', null); };
+  model.set('resetList', () => { self.set('model', null); });
   this.set('model', model);
   this.render(hbs`{{ dataset-field-list
     file=model.file
