@@ -27,7 +27,7 @@ export default Component.extend({
          * Changes the model field value.
          */
         changeFieldName() {
-            this.set("field", Ember.$(`#field-name-${this.get('index')}`).val());
+            this.set("name", Ember.$(`#field-name-${this.get('index')}`).val());
         },
 
         /**
