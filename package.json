@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g",
-    "ember:serve": "cd src/website/ember-source && ember serve"
+    "ember:serve": "cd src/website/ember-source && ember serve",
+    "ember:build": "cd src/website/ember-source && ember build --output-path=../public --environment=production",
+    "server:web": "cd src/website && node web-server.js",
+    "server:data": "cd src/backend && node data-server.js"
   },
   "repository": {
     "type": "git",
