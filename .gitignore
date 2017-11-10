@@ -63,6 +63,11 @@ typings/
 /data/user
 
 # ####################
+# website ignores
+
+/src/website/public
+
+# ####################
 # ember ignore files
 
 # compiled output
