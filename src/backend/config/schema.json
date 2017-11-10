@@ -7,8 +7,8 @@
 }, {
     "name": "Subsets",
     "fields": [
-        { "name": "label", "type": "string" },
-        { "name": "description", "type": "string" }
+        { "name": "label", "type": "string", "primary": true },
+        { "name": "description", "type": "string", "null": true }
     ],
     "joins": [
         { "name": "hasElements", "type": "index", "store": "Dataset", "inverse": "inSubsets" },

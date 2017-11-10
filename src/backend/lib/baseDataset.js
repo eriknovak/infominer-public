@@ -1,7 +1,9 @@
 // external modules
 const qm = require('qminer');
+const path = require('path');
 // internal modules
 const fileManager = require('./fileManager');
+
 
 /**
  * The Dataset base container.
@@ -27,10 +29,10 @@ class BaseDataset {
         if (!self.params.db) { throw new Error('FieldError: params.db must be defined'); }
         if (!self.params.mode) { throw new Error('FieldError: params.init.mode must be defined'); }
 
-        if (!self.params.data_folder) { self.params.data_folder = `${__dirname}/../../../data`; }
+        if (!self.params.data_folder) { self.params.data_folder = path.resolve(`${__dirname}/../../../data`); }
 
         // path to database folder
-        self.dbPath = `${self.params.data_folder}/${self.params.user}/${self.params.db}`;
+        self.dbPath = path.resolve(`${self.params.data_folder}/${self.params.user}/${self.params.db}`);
 
         // loads the base
         self._loadBase(fields);
@@ -98,8 +100,11 @@ class BaseDataset {
     /**
      * Pushes each row of the document to database.
      * @param {Object} file - File blob.
+     * @param {Object[]} fields - Dataset fields.
+     * @param {Object} dataset - Dataset information.
+     *
      */
-    pushDocsToBase(file, fields) {
+    pushDocsToBase(file, fields, dataset) {
         let self = this;
         // check required parameters
         if (!fields) { throw new Error('FieldError: fields must be defined'); }
@@ -119,7 +124,7 @@ class BaseDataset {
             let fValues = buffer.slice(offset, newLine).toString().trim().split('|');
             if (offset > 0) {
                 // prepare and push record to dataset
-                let rec = self._prepareRecord(fValues, fields);
+                let rec = self._prepareRecord(fValues, fields, dataset);
                 self.base.store('Dataset').push(rec);
             }
             // update offset
@@ -131,9 +136,11 @@ class BaseDataset {
      * Creates an object suitable for database.
      * @param {String[]} values - An array of field values.
      * @param {Object[]} fields - An array of field objects.
+     * @param {Object} [dataset] - Info about the dataset.
+     * @param {Object} [dataset.name] - Name of the dataset.
      * @returns {Object} A record prepared for pushing to database.
      */
-    _prepareRecord(values, fields) {
+    _prepareRecord(values, fields, dataset) {
         let self = this;
         // prepare record placeholder
         let rec = { };
@@ -142,11 +149,14 @@ class BaseDataset {
             // if the field is included in the database
             if (fields[i].included) {
                 rec[fields[i].name] = self._parseFValue(values[i], fields[i].type);
+                if (dataset) {
+                    // record is part of a subset (whole dataset)
+                    rec.inSubsets = [{ label: dataset.label }];
+                }
             }
         }
         return rec;
     }
-
 
     /**
      * Parses the value in the desired type.
