@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 // parameters used on the express app
-const PORT = process.env.PORT || 3100;
+const PORT = process.env.PORT || process.env.npm_package_config_portData || 3100;
 
 // express app creation
 let app = express();
@@ -17,6 +17,5 @@ app.use(bodyParser.urlencoded({   // to support URL-encoded bodies
 
 // upload api routes
 require('./routes/api')(app);
-
 
 app.listen(PORT, () => console.log('data-server listening on port', PORT));

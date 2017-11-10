@@ -1,8 +1,6 @@
 // external modules
 const multer = require('multer');
-// internal modules
-const BaseDataset = require('../../backend/lib/baseDataset');
-
+const request = require('request-promise-native');
 // parameter values
 let upload = multer();
 
@@ -12,21 +10,30 @@ let upload = multer();
  */
 module.exports = function (app) {
 
+    // data server domain
+    const dataDomain = `http://localhost:${process.env.npm_package_config_portData}`;
+
+    // TODO: ensure handling large datasets
     app.post('/api/dataset/new', upload.single('file'), (req, res) => {
-
-        let body = req.body;
+        // get dataset info
+        let { dataset, fields } = req.body;
         let file = req.file;
-
-        let params = {
-            user: 'user',
-            db: '01',
-            mode: 'createClean',
-            dataset: JSON.parse(body.dataset)
+        // prepare options for posting to data server
+        let options = {
+            method: 'POST',
+            uri: `${dataDomain}${req.originalUrl}`,
+            body: {
+                dataset: JSON.parse(dataset),   // dataset info
+                fields: JSON.parse(fields),     // fields for the store
+                file: file                      // file object \w content
+            },
+            json: true // Automatically stringifies the body to JSON
         };
+        // make the request
+        request(options)
+            .then(body => { console.log('Body', body); })
+            .catch(err => { console.log('Err', err); })
+            .then(() => res.end());
 
-        let dataset = new BaseDataset(params, JSON.parse(body.fields), file);
-
-        dataset.close();
-        res.end();
     });
 };

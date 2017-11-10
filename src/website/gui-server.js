@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 // parameters used on the express app
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || process.env.npm_package_config_portGui || 3000;
 
 // express app creation
 let app = express();
@@ -27,4 +27,4 @@ app.get('*', (req, res) => {
 });
 
 // run the express app
-app.listen(PORT, () => console.log('web-server listening on port', PORT));
+app.listen(PORT, () => console.log('gui-server listening on port', PORT));
