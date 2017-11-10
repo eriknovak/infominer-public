@@ -1,26 +1,30 @@
+// external modules
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
-const multer  = require('multer');
+const bodyParser = require('body-parser');
+
+// parameters used on the express app
+const PORT = process.env.PORT || 3000;
+
+// express app creation
 let app = express();
 
-app.use(cors());
+app.use(cors());                  // allow accessing from other external addresses
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({   // to support URL-encoded bodies
-  extended: true
+    extended: true
 }));
+// set where are public files
+app.use(express.static(__dirname + '/public'));
 
-let upload = multer();
+// upload api routes
+require('./routes/api')(app);
 
-
-app.post('/api/dataset/new', upload.single('file'), (req, res) => {
-
-    let body = req.body;
-    let file = req.file;
-
-    res.end();
+// handle ember web application
+// IMPORTANT: must be after all routes
+app.get('*', (req, res) => {
+    res. sendFile('./public/index.html', { root: __dirname });
 });
 
-app.listen(3000, () => {
-    console.log('Listening on port 3000');
-});
+// run the express app
+app.listen(PORT, () => console.log('web-server listening on port', PORT));
