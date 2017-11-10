@@ -1,6 +1,5 @@
 // external modules
 const qm = require('qminer');
-
 // internal modules
 const fileManager = require('./fileManager');
 
@@ -15,21 +14,18 @@ class BaseDataset {
      * @param {String} params.data_folder - Path to data folder.
      * @param {String} params.user - The user accessing the dataset.
      * @param {String} params.db - The database name.
-     * @param {Object} params.init - The initialization parameters.
-     * @param {String} params.init.mode - The mode in which the base is opened. Possible: 'open' and 'createClean'.
-     * @param {Object[]} [params.init.fields] - The fields of the dataset. Must have when `params.init.mode='createClean'`.
-     * @param {Object[]} [params.init.file] - The file blob. Must have when `params.init.mode='createClean'`.
+     * @param {String} params.mode - The mode in which the base is opened. Possible: 'open' and 'createClean'.
+     * @param {Object[]} [fields] - The fields of the dataset. Must have when `params.init.mode='createClean'`.
      *
      */
-    constructor(params) {
+    constructor(params, fields) {
         let self = this;
 
         self.params = params;
         // TODO: handle parameter values
         if (!self.params.user) { throw new Error('FieldError: params.user must be defined'); }
         if (!self.params.db) { throw new Error('FieldError: params.db must be defined'); }
-        if (!self.params.init) { throw new Error('FieldError: params.init must be defined'); }
-        if (!self.params.init.mode) { throw new Error('FieldError: params.init.mode must be defined'); }
+        if (!self.params.mode) { throw new Error('FieldError: params.init.mode must be defined'); }
 
         if (!self.params.data_folder) { self.params.data_folder = `${__dirname}/../../../data`; }
 
@@ -37,40 +33,37 @@ class BaseDataset {
         self.dbPath = `${self.params.data_folder}/${self.params.user}/${self.params.db}`;
 
         // loads the base
-        self._loadBase();
+        self._loadBase(fields);
     }
 
     /**
      * Loads the base.
+     * @param {Object[]} [fields] - The fields of the dataset. Must have when `params.init.mode='createClean'`.
      * @private
      */
-    _loadBase() {
+    _loadBase(fields) {
         let self = this;
 
-        if (self.params.init.mode === 'createClean') {
+        if (self.params.mode === 'createClean') {
             // check required parameters
-            if (!self.params.init.fields) { throw new Error('FieldError: params.init.fields must be defined'); }
-            if (!self.params.init.file) { throw new Error('FieldError: params.init.file must be defined'); }
+            if (!fields) { throw new Error('FieldError: fields must be defined'); }
 
             // create dbPath folders
             fileManager.createDirectoryPath(self.dbPath);
 
             // get the schema for database
-            const schema = self._prepareSchema(self.params.init.fields);
+            const schema = self._prepareSchema(fields);
 
             // create new database
             self.base = new qm.Base({
-                mode: self.params.init.mode,
+                mode: self.params.mode,
                 dbPath: self.dbPath,
                 schema
             });
 
-            // fill the database with documents
-            self._pushDocsToBase(self.params.init.file, self.params.init.fields);
-
-        } else if (self.params.init.mode === 'open') {
+        } else if (self.params.mode === 'open') {
             // open database and prepare it for analysis
-            self.base = new qm.Base({ mode: self.params.init.mode, dbPath: self.dbPath });
+            self.base = new qm.Base({ mode: self.params.mode, dbPath: self.dbPath });
         } else {
             // TODO: handle non-supported mode
             throw new Error('FieldError: params.init.mode must be "createClean", "open" or "openReadOnly"');
@@ -88,6 +81,7 @@ class BaseDataset {
      * Prepare database schema.
      * @param {Object[]} fields - Array of dataset fields.
      * @return {Object[]} Database schema for given dataset.
+     * @private
      */
     _prepareSchema(fields) {
         let schema = require(`${__dirname}/../config/schema.json`);
@@ -105,8 +99,12 @@ class BaseDataset {
      * Pushes each row of the document to database.
      * @param {Object} file - File blob.
      */
-    _pushDocsToBase(file, fields) {
+    pushDocsToBase(file, fields) {
         let self = this;
+        // check required parameters
+        if (!fields) { throw new Error('FieldError: fields must be defined'); }
+        if (!file) { throw new Error('FieldError: file must be defined'); }
+
         // prepare file buffer and parameters
         let buffer = Buffer.from(file.buffer, file.encoding);
         let offset = 0;

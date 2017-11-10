@@ -9,6 +9,8 @@ exports.removeFile = function(filename) {
     // check if file exists
     if (fs.existsSync(filename)) {
         fs.unlinkSync(filename);
+    } else {
+        console.warn(`File does not exist: ${filename}`);
     }
 };
 
@@ -50,7 +52,7 @@ exports.copyFolder = function(source, destination) {
     }
     // check if destination exists
     if (!fs.existsSync(destination)) {
-        fs.mkdirSync(destination);
+        exports.createDirectoryPath(destination);
     }
     // get all file names in the directory and iterate through them
     let files = fs.readdirSync(source);
