@@ -6,12 +6,13 @@ module.exports = {
   },
   extends: 'eslint:recommended',
   env: {
-    browser: true
+    browser: true,
+    embertest: true,
+    node: true
   },
   rules: {
   },
   globals: {
-    "Ember": true,
-    "require": true
+    Ember: true
   }
 };

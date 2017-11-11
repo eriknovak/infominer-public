@@ -57,6 +57,17 @@ typings/
 # dotenv environment variables file
 .env
 
+# ####################
+# backend ignores
+
+/data/user
+
+# ####################
+# website ignores
+
+/src/website/public
+
+# ####################
 # ember ignore files
 
 # compiled output

@@ -13,7 +13,9 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember test"
+    "test": "ember test",
+    "ember:serve": "ember serve",
+    "ember:build": "ember build --output-path=../public --environment=production"
   },
   "devDependencies": {
     "bootstrap-sass": "^3.3.7",
