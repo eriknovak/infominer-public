@@ -20,13 +20,13 @@
       <div class="form-group">
         <label for="dataset-description">Description</label>
         <textarea id="dataset-description" class="form-control"
-          rows="4" oninput={{action 'changeDatasetDescription'}}
+          rows="5" oninput={{action 'changeDatasetDescription'}}
           placeholder="Add dataset description (optional)"></textarea>
       </div>
     </div><!-- .dataset-description -->
 
     <div class="dataset-statistics">
-      {{dataset.numDocs}} documents, {{dataset.size}} bytes
+      <label>statistics:</label> {{dataset.numDocs}} documents, {{dataset.size}} bytes
     </div>
 
   </div><!-- .col-lg-offset-2.col-lg-8 -->

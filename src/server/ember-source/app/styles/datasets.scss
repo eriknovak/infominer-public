@@ -39,6 +39,8 @@
 
 .dataset-field-list {
 
+    table th { font-weight: 300; }
+
     .dataset-statistics {
         margin-top: 10px;
         margin-bottom: 15px;
@@ -51,7 +53,7 @@
         text-transform: uppercase;
     }
 
-    @mixin text-fields {
+    @mixin input-border {
         border-radius: 0;
         -webkit-box-shadow: none !important;
         -moz-box-shadow: none !important;
@@ -60,13 +62,15 @@
 
     .dataset-label,
     .dataset-description,
+    .dataset-statistics,
     .field {
         label {
             @include label;
         }
 
         input, select, textarea {
-           @include text-fields;
+           @include input-border;
+            resize: none;
         }
     }
 
