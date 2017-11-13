@@ -2,8 +2,8 @@
 const assert = require('assert');
 const fs = require('fs');
 // internal modules
-const BaseDataset = require('../../backend/lib/baseDataset');
-const fileManager = require('../../backend/lib/fileManager');
+const BaseDataset = require('../../lib/baseDataset');
+const fileManager = require('../../lib/fileManager');
 
 
 // TODO: write unit tests for BaseDataset
