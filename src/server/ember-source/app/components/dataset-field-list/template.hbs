@@ -1,14 +1,20 @@
 <div class="row">
   <div class="col-lg-7">
 
-    <div class="form-inline dataset-label">
+    <div class="dataset-label">
       <div class="form-group">
-        <label>Dataset Name:</label>
-        <input type="text" id="dataset-label" class="form-control"
-          oninput={{action 'changeDatasetName'}} value={{dataset.label}}
-          placeholder="Add dataset name">
+
+        <div class="row">
+          <div class="col-lg-6">
+            <label for="dataset-label">Dataset Name</label>
+            <input type="text" id="dataset-label" class="form-control"
+              oninput={{action 'changeDatasetName'}} value={{dataset.label}}
+              placeholder="Add dataset name">
+          </div>
+        </div>
+
       </div>
-    </div><!-- .dataset-name -->
+    </div><!-- .dataset-label -->
 
     <div class="dataset-description">
       <div class="form-group">
@@ -17,9 +23,9 @@
           rows="4" oninput={{action 'changeDatasetDescription'}}
           placeholder="Add dataset description (optional)"></textarea>
       </div>
-    </div><!-- .dataset-name -->
+    </div><!-- .dataset-description -->
 
-    <div class="stats">
+    <div class="dataset-statistics">
       {{dataset.numDocs}} documents, {{dataset.size}} bytes
     </div>
 
