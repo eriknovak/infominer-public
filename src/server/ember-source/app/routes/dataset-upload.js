@@ -73,7 +73,7 @@ export default Route.extend({
         let size = file.get('size');
         let numDocs = tableRows.length - 1;
         // set model of this route
-        this.set('controller.model', { file, dataset: { label, size, numDocs }, fieldList });
+        this.set('controller.model', { file, dataset: { label, size, numDocs, description: "" }, fieldList });
     },
 
     /**

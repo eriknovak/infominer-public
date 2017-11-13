@@ -45,20 +45,42 @@
         margin-bottom: 15px;
     }
 
-    .dataset-name, .field {
+    @mixin label {
+        margin-bottom: 0;
+        margin-right: 10px;
+        font-weight: 300;
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+
+    @mixin text-fields {
+        border-radius: 0;
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    .dataset-label,
+    .field {
         label {
-            margin-bottom: 0;
-            margin-right: 10px;
-            font-weight: 300;
-            font-size: 16px;
-            text-transform: uppercase;
+            @include label;
         }
 
         input, select {
-            border-radius: 0;
-            -webkit-box-shadow: none !important;
-            -moz-box-shadow: none !important;
-            box-shadow: none !important;
+           @include text-fields;
+        }
+    }
+
+    .dataset-description {
+        margin: 10px 0;
+        label {
+            @include label;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            @include text-fields;
         }
     }
 }

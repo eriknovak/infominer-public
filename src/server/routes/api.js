@@ -31,6 +31,8 @@ module.exports = function (app, pg) {
         dataset = JSON.parse(dataset);
         fields = JSON.parse(fields);
 
+        console.log(dataset);
+
         // TODO: get username of creator
         const creator = 'user'; // temporary placeholder
 

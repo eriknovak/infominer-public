@@ -1,10 +1,21 @@
 <div class="row">
-  <div class="col-lg-offset-2 col-lg-8">
+  <div class="col-lg-7">
 
-    <div class="form-inline dataset-name">
+    <div class="form-inline dataset-label">
       <div class="form-group">
         <label>Dataset Name:</label>
-        <input type="text" id="dataset-label" class="form-control" oninput={{action 'changeDatasetName'}} value={{dataset.label}}>
+        <input type="text" id="dataset-label" class="form-control"
+          oninput={{action 'changeDatasetName'}} value={{dataset.label}}
+          placeholder="Add dataset name">
+      </div>
+    </div><!-- .dataset-name -->
+
+    <div class="dataset-description">
+      <div class="form-group">
+        <label for="dataset-description">Description</label>
+        <textarea id="dataset-description" class="form-control"
+          rows="4" oninput={{action 'changeDatasetDescription'}}
+          placeholder="Add dataset description (optional)"></textarea>
       </div>
     </div><!-- .dataset-name -->
 
@@ -16,7 +27,7 @@
 </div><!-- .row -->
 
 <div class="row">
-  <div class="col-lg-offset-2 col-lg-8">
+  <div class="col-lg-7">
 
     <table class="table">
       <thead>
@@ -37,7 +48,7 @@
 </div><!-- .row -->
 
 <div class="row">
-  <div class="col-lg-offset-2 col-lg-8">
+  <div class="col-lg-7">
     <button {{action submitDataset file }} class="btn btn-primary pull-right">Save Dataset</button>
     <button {{action resetList}} class="btn btn-default pull-right">Cancel</button>
   </div><!-- .col-lg-offset-2.col-lg-8 -->
