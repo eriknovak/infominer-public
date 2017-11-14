@@ -29,7 +29,7 @@ describe('BaseDataset Tests', function () {
 
         // create file buffer object simulating dataset file upload
         let file = {
-            buffer: fs.readFileSync('../dummy-data/test-dataset.txt')
+            filePath: '../dummy-data/test-dataset.txt'
         };
 
         // fields of the dataset
@@ -44,15 +44,10 @@ describe('BaseDataset Tests', function () {
         };
 
         it('should fill the database with dataset', function(done) {
-            // loading takes more time
-            this.timeout('50000');
-
             // set test params
             let params = {
-                data_folder: './data',
-                user: 'user',
-                db: '00',
-                mode: 'createClean'
+                mode: 'createClean',
+                dbPath: './data/user/00'
             };
             // create database
             database = new BaseDataset(params, fields);
@@ -65,15 +60,10 @@ describe('BaseDataset Tests', function () {
         });
 
         it('should fill the database with dataset & add a subset', function(done) {
-            // loading takes more time
-            this.timeout('50000');
-
             // set test params
             let params = {
-                data_folder: './data',
-                user: 'user',
-                db: '00',
-                mode: 'createClean'
+                mode: 'createClean',
+                dbPath: './data/user/00'
             };
             // create database
             database = new BaseDataset(params, fields);
@@ -89,10 +79,8 @@ describe('BaseDataset Tests', function () {
         it('should load the database', function(done) {
             // set test params
             let params = {
-                data_folder: './data',
-                user: 'user',
-                db: '00',
-                mode: 'open'
+                mode: 'open',
+                dbPath: './data/user/00'
             };
             // create database
             database = new BaseDataset(params);
