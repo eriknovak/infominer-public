@@ -9,7 +9,11 @@ export default Component.extend({
          * Set the model dataset name.
          */
         changeDatasetName() {
-            this.set("dataset.name", Ember.$("#dataset-name").val());
+            this.set("dataset.label", Ember.$("#dataset-label").val());
+        },
+
+        changeDatasetDescription() {
+            this.set("dataset.description", Ember.$("#dataset-description").val());
         }
     }
 

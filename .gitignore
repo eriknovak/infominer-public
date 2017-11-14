@@ -65,29 +65,29 @@ typings/
 # ####################
 # website ignores
 
-/src/website/public
+/src/server/public
 
 # ####################
 # ember ignore files
 
 # compiled output
-/src/website/ember-source/dist
-/src/website/ember-source/tmp
+/src/server/ember-source/dist
+/src/server/ember-source/tmp
 
 # dependencies
-/src/website/ember-source/node_modules
-/src/website/ember-source/bower_components
+/src/server/ember-source/node_modules
+/src/server/ember-source/bower_components
 
 # misc
-/src/website/ember-source/sass-cache
-/src/website/ember-source/connect.lock
-/src/website/ember-source/coverage/*
-/src/website/ember-source/libpeerconnection.log
-/src/website/ember-source/npm-debug.log*
-/src/website/ember-source/yarn-error.log
-/src/website/ember-source/testem.log
+/src/server/ember-source/sass-cache
+/src/server/ember-source/connect.lock
+/src/server/ember-source/coverage/*
+/src/server/ember-source/libpeerconnection.log
+/src/server/ember-source/npm-debug.log*
+/src/server/ember-source/yarn-error.log
+/src/server/ember-source/testem.log
 
 # ember-try
-/src/website/ember-source/node_modules.ember-try/
-/src/website/ember-sourcebower.json.ember-try
-/src/website/ember-sourcepackage.json.ember-try
+/src/server/ember-source/node_modules.ember-try/
+/src/server/ember-sourcebower.json.ember-try
+/src/server/ember-sourcepackage.json.ember-try

@@ -69,11 +69,11 @@ export default Route.extend({
         let fieldList = fields.map(field => ({ name: field, type: 'string', included: true }));
 
         // get dataset name, size and number of documents
-        let name = file.get('name').split('.')[0];
+        let label = file.get('name');
         let size = file.get('size');
         let numDocs = tableRows.length - 1;
         // set model of this route
-        this.set('controller.model', { file, dataset: { name, size, numDocs }, fieldList });
+        this.set('controller.model', { file, dataset: { label, size, numDocs, description: "" }, fieldList });
     },
 
     /**

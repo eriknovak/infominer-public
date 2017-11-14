@@ -19,7 +19,7 @@ InfoMiner is an exploration service for textual data.
         # same as running
         npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g
         ```
-    - Additionally, it will automatically run `npm run postinstall` and install local ember dependencies. It is same as going to `src/website/ember-source` and running `npm install`
+    - Additionally, it will automatically run `npm run postinstall` and install local ember dependencies. It is same as navigating to `src/server/ember-source` and running `npm install`
         ```bash
         # running the command
         npm run postinstall
@@ -28,6 +28,16 @@ InfoMiner is an exploration service for textual data.
         npm install
         ```
 
+### PostgresQL configuration
+
+- Create a new PostgresQL database called `infominer` on development computer.
+- Configure `./src/config/pgconfig.js` with your own credentials.
+- Run `npm run postgres:create` to create postgres tables.
+    ```bash
+    # creates tables and indeces
+    npm run postgres:create
+    ```
+
 ## Helpful commands
 
 These commands can be used inside the project folder for quick use.
@@ -35,11 +45,8 @@ These commands can be used inside the project folder for quick use.
 | command | description |
 | ------- | ----------- |
 | `npm test` | Runs unit tests. Command must be run in `bash`. |
-| `npm run server:gui` | Runs `gui-server` located in `src/website`. The server is available on `PORT=3000`. |
-| `npm run server:data` | Runs `data-server` located in `src/backend`. The server is available on `PORT=3100`. |
+| `npm run server:gui` | Runs `gui-server` located in `src/server`. The server is available on `PORT=3000`. |
 | `npm run server:guiDebug`| Runs `gui-server` in `debug` mode. |
-| `npm run server:dataDebug`| Runs `data-server` in `debug` mode. |
-
 
 ### Ember custom commands
 
@@ -48,4 +55,5 @@ Ember commands are here for easier Ember application development and building.
 | command | description |
 | ------- | ----------- |
 | `npm run ember:serve` | Runs a development instance of `Ember` application on `http://localhost:4200`. The instance is in `development` mode and supports `live-reload`. |
-| `npm run ember:build` | Builds the `Ember` application and saves it in `src/website/public`. |
+| `npm run ember:build` | Builds the `Ember` application and saves it in `src/server/public` directory. |
+
