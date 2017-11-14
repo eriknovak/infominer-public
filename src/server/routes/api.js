@@ -2,7 +2,6 @@
 const multer = require('multer');   // accepting files from client
 const stream = require('stream');   // create stream from file buffer
 const fs = require('fs');
-
 // internal modules
 const fileManager = require('../../lib/fileManager');
 
@@ -10,14 +9,15 @@ const fileManager = require('../../lib/fileManager');
 const static = require('../../config/static');
 
 // parameter values
-let upload = multer();
+let upload = multer();   // used for uploading files
 
 /**
  * Adds api routes to express  app.
  * @param {Object} app - Express app.
  * @param {Object} pg - Postgres wrapper.
+ * @param {Object} childProcesses - Child process container.
  */
-module.exports = function (app, pg) {
+module.exports = function (app, pg, childProcesses) {
 
     // TODO: ensure handling large datasets
     app.post('/api/dataset/new', upload.single('file'), (req, res) => {
@@ -28,10 +28,9 @@ module.exports = function (app, pg) {
         let file = req.file;
 
         // parse the JSON values from the body
+        // TODO: handle exceptions
         dataset = JSON.parse(dataset);
         fields = JSON.parse(fields);
-
-        console.log(dataset);
 
         // TODO: get username of creator
         const creator = 'user'; // temporary placeholder
@@ -43,41 +42,66 @@ module.exports = function (app, pg) {
                 console.log(err); return;
             }
             // number of datasets is the name of the new dataset folder
-            const numOfDatasets = results.length;
+            const dbFolder = results.length ? results[results.length-1].id : 0;
 
             // set pg dataset values
-            const label = dataset.label || 'root';                        // the user defined dataset label
-            const dir = `${static.dataPath}/${creator}/${numOfDatasets}`; // dataset directory
-            const sourcefile = file.originalname;                         // file original name
+            const label = dataset.label || 'root';                      // the user defined dataset label
+            const dbPath = `${static.dataPath}/${creator}/${dbFolder}`; // dataset directory
+            const sourcefile = file.originalname;                       // file original name
 
             // create dataset directory
-            fileManager.createDirectoryPath(dir);
+            fileManager.createDirectoryPath(dbPath);
 
             // create write stream in dataset folder
-            let filePath = `${dir}/${file.originalname}`;
+            let filePath = `${dbPath}/${sourcefile}`;
             let writeStream = fs.createWriteStream(filePath);
 
             // save file in corresponding dataset folder
             let bufferStream = new stream.PassThrough();
             bufferStream.end(file.buffer);
+            // pipe buffer stream to write file
             bufferStream.pipe(writeStream)
                 .on('finish', () => {
                     // TODO: log completion
                     console.log('complete');
                     // save the metadata to postgres
-                    pg.insert({ creator, label, dir, sourcefile }, 'datasets', (err, results) => {
+                    pg.insert({ creator, label, dbPath }, 'datasets', (err, results) => {
                         if (err) {
                             // TODO: handle error
                             console.log(err); return;
                         }
                         // TODO: log postgres saving
 
-                        // TODO: create a new child process
+                        // ********************
+                        // Child process
+                        // ********************
 
-                        // end connection
-                        return res.end();
+                        // prepare body of the child process
+                        dataset.label = label; // set the label of the dataset
+                        // body of the message
+                        let body = {
+                            dataset,
+                            fields,
+                            file: { filePath },
+                            params: {
+                                mode: 'createClean',
+                                dbPath
+                            }
+                        };
+
+                        // create a new child process and send create process
+                        let { child } = childProcesses.fork('./child_process/dataset.js', { creator, label, dbPath });
+                        child.send({ type: 'create', body });
+
+                        // wait for the childs response
+                        child.on('message', (msg) => {
+                            // TODO: handle errors sent through msg
+                            console.log(msg);
+                            // end connection
+                            return res.end();
+                        });
+
                     });
-
                 }); // bufferStream.on('finish')
 
         }); // pg.select({ creator })
