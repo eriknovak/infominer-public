@@ -75,10 +75,7 @@ class BaseDataset {
      * Close the database.
      */
     close() {
-        console.log('Closing');
         this.base.close();
-        console.log('Closed');
-
     }
 
     /**
@@ -199,23 +196,22 @@ class BaseDataset {
     _getSubsetsInfo(datasetId) {
         let self = this;
         // gett all of the data
-        let subsets = self.base.store('Subsets').allRecords.map(rec => {
-            console.log(rec.usedBy);
-            let obj = {
-                id: rec.$id,
-                type: 'subsets',
-                label: rec.label,
-                description: rec.description,
-                resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
-                usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
-                inDataset: datasetId
-            };
-            // if (rec.resultedIn) { obj.resultedIn = rec.resultedIn.id; }
-            // if (rec.usedBy.length > 0) { obj.usedBy = rec.usedBy.map(method => method.id); }
-            return obj;
-        });
+        let subsets = self.base.store('Subsets')
+            .allRecords.map(rec => self._formatSubsetInfo(rec,datasetId));
         // return the subsets
         return subsets;
+    }
+
+    _formatSubsetInfo(rec, datasetId) {
+        return {
+            id: rec.$id,
+            type: 'subsets',
+            label: rec.label,
+            description: rec.description,
+            resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
+            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
+            inDataset: datasetId
+        };
     }
 
 }

@@ -112,10 +112,8 @@ function shutDownProcess(msg) {
     let { reqId } = msg;
     try {
         if (database) { database.close(); }
-        console.log(msg);
         process.send({ reqId, content: { status: 'done', cmd: 'shutdown' } });
     } catch(err) {
-        console.log(msg);
         process.send({ reqId, error: err });
     }
     clearInterval(interval_id);
@@ -123,19 +121,15 @@ function shutDownProcess(msg) {
 }
 
 function openDatabase(msg) {
-    console.log(msg);
 
     // TODO: validate json schema
     let { reqId, body } = msg;
 
     try {
         // get the constructor parameters
-        console.log(body);
         let { datasetId, params } = body.content;
         // create the database
         database = new BaseDataset(params);
-        console.log(database);
-
         // everything is ok
         process.send({ reqId, content: { datasetId } });
     } catch (err) {
@@ -168,9 +162,7 @@ function getDatasetInfo(msg) {
     // TODO: validate json schema
     let { reqId } = msg;
     try {
-        console.log(msg.body.content);
         let jsonResults = database.getDatasetInfo(msg.body.content);
-        console.log(jsonResults);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
         console.log('getDatasetInfo Error', err.message);
