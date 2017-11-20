@@ -20,6 +20,7 @@ async.eachSeries(
         pg.execute(
             command, [],
             (err) => {
+                if (err) { console.log('Error on execution', err.message) };
                 callback();
             }
         );

@@ -35,7 +35,6 @@ class BaseDataset {
 
         // loads the base
         self._loadBase(fields);
-        self.isOpen = true;
     }
 
     /**
@@ -76,8 +75,10 @@ class BaseDataset {
      * Close the database.
      */
     close() {
+        console.log('Closing');
         this.base.close();
-        this.isOpen = false;
+        console.log('Closed');
+
     }
 
     /**
@@ -100,19 +101,19 @@ class BaseDataset {
 
     /**
      * Pushes each row of the document to database.
-     * @param {Object} file - File blob.
+     * @param {String} filePath - File path.
      * @param {field_instance[]} fields - Dataset fields.
      * @param {Object} dataset - Dataset information.
      *
      */
-    pushDocsToBase(file, fields, dataset) {
+    pushDocsToBase(filePath, fields, dataset) {
         let self = this;
         // check required parameters
         if (!fields) { throw new Error('FieldError: fields must be defined'); }
-        if (!file) { throw new Error('FieldError: file must be defined'); }
+        if (!filePath) { throw new Error('FieldError: file must be defined'); }
 
         // read file and skip first line
-        let fileIn = qm.fs.openRead(file.filePath);
+        let fileIn = qm.fs.openRead(filePath);
         fileIn.readLine(); // skip header line
 
         // iterate until end of file
@@ -175,6 +176,48 @@ class BaseDataset {
             throw new Error('FieldError: type is not "string", "int" or "float"');
         }
     }
+
+    getDatasetInfo(dMetadata) {
+        let self = this;
+        // get all subsets
+        let subsets = self._getSubsetsInfo(dMetadata.datasetId);
+        // subset ids used in the dataset info
+        let subsetIds = subsets.map(set => set.id);
+        let jsonResults = {
+            datasets: {
+                id: dMetadata.datasetId,
+                label: dMetadata.label,
+                created: dMetadata.created,
+                hasSubsets: subsetIds
+            },
+            subsets
+        };
+        // returns
+        return jsonResults;
+    }
+
+    _getSubsetsInfo(datasetId) {
+        let self = this;
+        // gett all of the data
+        let subsets = self.base.store('Subsets').allRecords.map(rec => {
+            console.log(rec.usedBy);
+            let obj = {
+                id: rec.$id,
+                type: 'subsets',
+                label: rec.label,
+                description: rec.description,
+                resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
+                usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
+                inDataset: datasetId
+            };
+            // if (rec.resultedIn) { obj.resultedIn = rec.resultedIn.id; }
+            // if (rec.usedBy.length > 0) { obj.usedBy = rec.usedBy.map(method => method.id); }
+            return obj;
+        });
+        // return the subsets
+        return subsets;
+    }
+
 }
 
 module.exports = BaseDataset;
