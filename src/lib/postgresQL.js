@@ -116,9 +116,9 @@ class PostgreSQL {
      * Closes the connections.
      * @returns {Null}
      */
-    close() {
+    close(callback) {
         let self = this;
-        return self.pool.end();
+        self.pool.end().then(callback);
     }
 
     /**
@@ -140,6 +140,7 @@ class PostgreSQL {
                     if (err) { console.log(err); }
                     done(err);
                     let res = results ? results.rows : [];
+                    // release the client
                     if (callback) { callback(err, res); }
                 });
             } else {
@@ -147,6 +148,7 @@ class PostgreSQL {
                     if (err) { console.log(err); }
                     done(err);
                     let res = results ? results.rows : [];
+                    // release the client
                     if (callback) { callback(err, res); }
                 });
             }

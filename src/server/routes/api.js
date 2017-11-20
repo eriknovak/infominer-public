@@ -4,6 +4,7 @@ const stream = require('stream');   // create stream from file buffer
 const fs = require('fs');
 // internal modules
 const fileManager = require('../../lib/fileManager');
+const messageHandler = require('../../lib/messageHandler');
 
 // configurations
 const static = require('../../config/static');
@@ -15,14 +16,37 @@ let upload = multer();   // used for uploading files
  * Adds api routes to express  app.
  * @param {Object} app - Express app.
  * @param {Object} pg - Postgres wrapper.
- * @param {Object} childProcesses - Child process container.
+ * @param {Object} processHandler - Child process container.
  */
-module.exports = function (app, pg, childProcesses) {
+module.exports = function (app, pg, processHandler) {
+
+    // gets all user defined datasets
+    app.get('/api/datasets', (req, res) => {
+        // query parameters
+        let query = req.query;
+        // TODO: get username of creator and handle empty user
+        const creator = query.user || 'user';
+        // get user datasets
+        pg.select({ creator }, 'datasets', (err, results) => {
+            // create JSON API data
+            let datasets = results.map(rec => {
+                return {
+                    id: rec.id,
+                    type: 'dataset',
+                    label: rec.label,
+                    created: rec.created
+                };
+            });
+            // return the data
+            return res.send({ datasets });
+        });
+
+    });
 
     // TODO: ensure handling large datasets
-    app.post('/api/dataset/new', upload.single('file'), (req, res) => {
+    // posts and creates a new dataset
+    app.post('/api/datasets/new', upload.single('file'), (req, res) => {
         // TODO: log calling this route
-
         // get dataset info
         let { dataset, fields } = req.body;
         let file = req.file;
@@ -63,49 +87,114 @@ module.exports = function (app, pg, childProcesses) {
             bufferStream.pipe(writeStream)
                 .on('finish', () => {
                     // TODO: log completion
-                    console.log('complete');
                     // save the metadata to postgres
-                    pg.insert({ creator, label, dbPath }, 'datasets', (err, results) => {
-                        if (err) {
-                            // TODO: handle error
-                            console.log(err); return;
-                        }
-                        // TODO: log postgres saving
+                    pg.insert({ creator, label, dbPath }, 'datasets', (error, results) => {
+                        // if error notify user
+                        if (error) {
+                            // TODO: log error
+                            console.log(error.message);
+                            return res.send({ errors: { msg: error.message } }); }
 
-                        // ********************
-                        // Child process
-                        // ********************
+                        // initiate child process
+                        let datasetId = parseInt(results[0].id);
+                        processHandler.createChild(datasetId);
 
-                        // prepare body of the child process
+                        // prepare message body
                         dataset.label = label; // set the label of the dataset
                         // body of the message
                         let body = {
-                            dataset,
-                            fields,
-                            file: { filePath },
-                            params: {
-                                mode: 'createClean',
-                                dbPath
+                            cmd: 'create',
+                            content: {
+                                datasetId,
+                                dataset,
+                                fields,
+                                filePath,
+                                params: {
+                                    mode: 'createClean',
+                                    dbPath
+                                }
                             }
                         };
 
-                        // create a new child process and send create process
-                        let { child } = childProcesses.fork('./child_process/dataset.js', { creator, label, dbPath });
-                        child.send({ type: 'create', body });
-
-                        // wait for the childs response
-                        child.on('message', (msg) => {
-                            // TODO: handle errors sent through msg
-                            console.log(msg);
-                            // end connection
-                            return res.end();
+                        processHandler.sendAndWait(datasetId, body, function (error, results) {
+                            // if error notify user
+                            if (error) { return res.send({ errors: { msg: error.message } }); }
+                            // otherwise return results
+                            let obj = messageHandler.onCreate(results);
+                            return res.send(obj);
                         });
 
                     });
                 }); // bufferStream.on('finish')
-
         }); // pg.select({ creator })
     }); // POST /api/dataset/new
 
+    app.get('/api/datasets/:dataset_id', (req, res) => {
+        // TODO: check if dataset_id is a number
+        let datasetId = parseInt(req.params.dataset_id);
+        // get the user and set it as
+        let creator = req.user || 'user';
 
+        if (processHandler.childExist(datasetId)) {
+            // get dataset information
+            let body = { cmd: 'info', content: { datasetId } };
+            processHandler.sendAndWait(datasetId, body, (error, results) => {
+                // if error notify user
+                if (error) {
+                    // TODO: log error
+                    console.log(error.message);
+                    return res.send({ errors: { msg: error.message } });
+                }
+                let obj = messageHandler.onInfo(results);
+                return res.send(obj);
+            });
+        } else {
+            // must first run the child process
+            // get path to dataset from postgresql
+            pg.select({ id: datasetId, creator }, 'datasets', (err, results) => {
+                if (err) {
+                    // TODO: log error
+                    console.error(err);
+                    return res.send({ error: err });
+                } else if (results.length === 1) {
+                    let datasetInfo = results[0];
+
+                    // initiate child process
+                    processHandler.createChild(datasetId);
+
+                    // open dataset in child process
+                    let openParams = {
+                        cmd: 'open',
+                        content: {
+                            datasetId,
+                            params: {
+                                mode: 'open',
+                                dbPath: datasetInfo.dbpath
+                            }
+                        }
+                    };
+                    processHandler.send(datasetId, openParams);
+
+                    // get database info
+                    let infoParams = {
+                        cmd: 'info',
+                        content: {
+                            datasetId,
+                            label: datasetInfo.label,
+                            created: datasetInfo.created
+                        }
+                    };
+                    processHandler.sendAndWait(datasetId, infoParams, (error, results) => {
+                        // if error notify user
+                        if (error) { return res.send({ errors: { msg: error.message } }); }
+                        // otherwise return results
+                        let obj = messageHandler.onInfo(results);
+                        return res.send(obj);
+                    });
+                }
+
+            });
+        }
+
+    });
 };

@@ -1,6 +1,7 @@
 // external modules
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const bodyParser = require('body-parser');
 
 // internal modules
@@ -11,14 +12,29 @@ const ProcessHandler = require('../lib/processHandler');
 const PORT = process.env.PORT || process.env.npm_package_config_portGui || 3000;
 
 // child process container
-let childProcesses = new ProcessHandler();
+// let childProcesses = new ProcessHandler({
+//     processPath: path.join(__dirname, '/child_process/dataset.js')
+// });
+
+let processHandler = new ProcessHandler({
+    processPath: path.join(__dirname, '/child_process/dataset.js')
+});
 
 // on manual process exit
 process.on('SIGINT', () => {
     // disconnect each child process
-    childProcesses.close();
-    // end process with no error
-    process.exit(0);
+    processHandler.closeAllProcesses((err) => {
+        // TODO: log error
+        if (err) { console.warn('Error when closing', err); }
+        // close the postgres connection
+        console.log('Inside last callback');
+        pg.close(() => {
+            // close postgresql connection
+            console.log('Everything closed');
+            process.exit(0);
+        });
+
+    });
 });
 
 // express app creation
@@ -34,7 +50,7 @@ app.use(bodyParser.urlencoded({   // to support URL-encoded bodies
 app.use(express.static(__dirname + '/public'));
 
 // upload api routes
-require('./routes/api')(app, pg, childProcesses);
+require('./routes/api')(app, pg, processHandler);
 
 // handle ember web application
 // IMPORTANT: must be after all routes
