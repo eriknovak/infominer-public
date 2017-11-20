@@ -21,7 +21,6 @@ class ProcessHandler {
 
         child.on('message', function (msg) {
             let reqId = msg.reqId;
-            console.log('Request id', reqId);
             let callbackH = self._callbackH.get(reqId);
             if (callbackH) {
                 // callback exists
@@ -29,13 +28,13 @@ class ProcessHandler {
                 let error = msg.error ? new Error(msg.error) : undefined;
                 callback(error, msg.content);
             } else {
+                // no callback was given for this request
                 console.log(msg);
             }
         });
 
         child.on('exit', function () {
             // TODO remove from hash
-            console.log('Child deleted');
             self._childH.delete(childId);
         });
     }
@@ -68,7 +67,6 @@ class ProcessHandler {
     }
 
     sendAndWait(childId, params, callback) {
-        console.log(childId);
         let self = this;
         let childH = self._getChild(childId);
         if (!childH) { callback(new Error('Child process not existing!')); }
@@ -83,11 +81,9 @@ class ProcessHandler {
             body: params
         };
         if (childH.connected) {
-            console.log('Connected');
             // if child is connected
             childH.child.send(msg);
         } else {
-            console.log('Disconnected');
             // TODO: handle not connected childs
             callback(new Error('Child is disconnected!'));
         }
@@ -113,20 +109,17 @@ class ProcessHandler {
         let self = this;
         let tasks = [ ];
         for (let key of self._childH.keys()) {
-            console.log(key);
             tasks.push((xcallback) => {
                 console.log('Running task for child id=', key);
                 try {
                     self.sendAndWait(key, { cmd: 'shutdown' }, (error, content) => {
                         if (error) {
                             console.log('Disconnected with error');
-                            console.log(error.message);
                         }
                         xcallback();
                     });
                 } catch (err) {
                     console.log('Child already closed');
-                    console.log(err.message);
                     xcallback();
                 }
             });
