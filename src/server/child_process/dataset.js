@@ -52,8 +52,7 @@ process.on('SIGTERM', () => {
  * @property {String} dataset.dir - The dataset dir.
  * @property {String} dataset.label - The user defined dataset label.
  * @property {String} [dataset.description] - The user defined dataset description.
- * @property {Object} file - The file values.
- * @property {String} file.dir - The file directory.
+ * @property {String} filePath - The file values.
  * @property {field_instance[]} fields - An array of user defined database fields.
  */
 
@@ -105,8 +104,46 @@ function handle(msg) {
 }
 
 ///////////////////////////////////////
-// Action functions
+// Creation and shutdown functions
 ///////////////////////////////////////
+
+function openDatabase(msg) {
+
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+
+    try {
+        // get the constructor parameters
+        let { params } = body.content;
+        // create the database
+        database = new BaseDataset(params);
+        // everything is ok
+        process.send({ reqId, content: { datasetId: database.getId() } });
+    } catch (err) {
+        console.log('openDatabase Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err });
+    }
+}
+
+function createDatabase(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        // get the constructor parameters
+        let { filePath, fields, params } = body.content;
+        // create the database
+        database = new BaseDataset(params, fields);
+        // fill the database with the records
+        database.pushDocsToBase(filePath, fields);
+        // everything is ok
+        process.send({ reqId, content: { datasetId: database.getId() } });
+    } catch (err) {
+        console.log('createDatabase Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err });
+    }
+}
 
 function shutDownProcess(msg) {
     let { reqId } = msg;
@@ -120,49 +157,15 @@ function shutDownProcess(msg) {
     process.exit(0);
 }
 
-function openDatabase(msg) {
-
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-
-    try {
-        // get the constructor parameters
-        let { datasetId, params } = body.content;
-        // create the database
-        database = new BaseDataset(params);
-        // everything is ok
-        process.send({ reqId, content: { datasetId } });
-    } catch (err) {
-        console.log('openDatabase Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err });
-    }
-}
-
-function createDatabase(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        // get the constructor parameters
-        let { datasetId, dataset, filePath, fields, params } = body.content;
-        // create the database
-        database = new BaseDataset(params, fields);
-        // fill the database with the records
-        database.pushDocsToBase(filePath, fields, dataset);
-        // everything is ok
-        process.send({ reqId, content: { datasetId } });
-    } catch (err) {
-        console.log('createDatabase Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err });
-    }
-}
+///////////////////////////////////////////////
+//
+///////////////////////////////////////////////
 
 function getDatasetInfo(msg) {
     // TODO: validate json schema
-    let { reqId } = msg;
+    let { reqId, body } = msg;
     try {
-        let jsonResults = database.getDatasetInfo(msg.body.content);
+        let jsonResults = database.getDatasetInfo(body.content);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
         console.log('getDatasetInfo Error', err.message);
@@ -170,8 +173,3 @@ function getDatasetInfo(msg) {
         process.send({ reqId, error: err });
     }
 }
-
-
-///////////////////////////////////////////////
-//
-///////////////////////////////////////////////

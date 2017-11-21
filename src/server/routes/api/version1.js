@@ -3,11 +3,11 @@ const multer = require('multer');   // accepting files from client
 const stream = require('stream');   // create stream from file buffer
 const fs = require('fs');
 // internal modules
-const fileManager = require('../../lib/fileManager');
-const messageHandler = require('../../lib/messageHandler');
+const fileManager = require('../../../lib/fileManager');
+const messageHandler = require('../../../lib/messageHandler');
 
 // configurations
-const static = require('../../config/static');
+const static = require('../../../config/static');
 
 // parameter values
 let upload = multer();   // used for uploading files
@@ -22,12 +22,14 @@ module.exports = function (app, pg, processHandler) {
 
     // gets all user defined datasets
     app.get('/api/datasets', (req, res) => {
+        // TODO: log calling this route
         // query parameters
         let query = req.query;
         // TODO: get username of creator and handle empty user
-        const creator = query.user || 'user';
+        // TODO: get user from the login parameters (passport.js - future work)
+        const owner = query.user || 'user';
         // get user datasets
-        pg.select({ creator }, 'datasets', (err, results) => {
+        pg.select({ owner }, 'datasets', (err, results) => {
             // create JSON API data
             let datasets = results.map(rec => {
                 return {
@@ -40,11 +42,11 @@ module.exports = function (app, pg, processHandler) {
             // return the data
             return res.send({ datasets });
         });
-
     });
 
+
     // TODO: ensure handling large datasets
-    // posts and creates a new dataset
+    // posts file and creates a new dataset
     app.post('/api/datasets/new', upload.single('file'), (req, res) => {
         // TODO: log calling this route
         // get dataset info
@@ -57,10 +59,10 @@ module.exports = function (app, pg, processHandler) {
         fields = JSON.parse(fields);
 
         // TODO: get username of creator
-        const creator = 'user'; // temporary placeholder
+        const owner = 'user'; // temporary placeholder
 
         // get number of datasets the users already has
-        pg.select({ creator }, 'datasets', (err, results) => {
+        pg.select({ owner }, 'datasets', (err, results) => {
             if (err) {
                 // TODO: handle error
                 console.log(err); return;
@@ -69,15 +71,17 @@ module.exports = function (app, pg, processHandler) {
             const dbFolder = results.length ? results[results.length-1].id : 0;
 
             // set pg dataset values
-            const label = dataset.label || 'root';                      // the user defined dataset label
-            const dbPath = `${static.dataPath}/${creator}/${dbFolder}`; // dataset directory
-            const sourcefile = file.originalname;                       // file original name
+            const label = dataset.label;                              // the user defined dataset label
+            const description = dataset.description;                  // the description of the dataset
+            const dbPath = `${static.dataPath}/${owner}/${dbFolder}`; // dataset directory
+
+            console.log(description);
 
             // create dataset directory
             fileManager.createDirectoryPath(dbPath);
 
             // create write stream in dataset folder
-            let filePath = `${dbPath}/${sourcefile}`;
+            let filePath = `${dbPath}/originalSource.txt`;
             let writeStream = fs.createWriteStream(filePath);
 
             // save file in corresponding dataset folder
@@ -88,7 +92,7 @@ module.exports = function (app, pg, processHandler) {
                 .on('finish', () => {
                     // TODO: log completion
                     // save the metadata to postgres
-                    pg.insert({ creator, label, dbPath }, 'datasets', (error, results) => {
+                    pg.insert({ owner, label, description, dbPath }, 'datasets', (error, results) => {
                         // if error notify user
                         if (error) {
                             // TODO: log error
@@ -96,7 +100,8 @@ module.exports = function (app, pg, processHandler) {
                             return res.send({ errors: { msg: error.message } }); }
 
                         // initiate child process
-                        let datasetId = parseInt(results[0].id);
+                        let datasetInfo = results[0];
+                        let datasetId = parseInt(datasetInfo.id);
                         processHandler.createChild(datasetId);
 
                         // prepare message body
@@ -105,11 +110,13 @@ module.exports = function (app, pg, processHandler) {
                         let body = {
                             cmd: 'create',
                             content: {
-                                datasetId,
-                                dataset,
                                 fields,
                                 filePath,
                                 params: {
+                                    datasetId,
+                                    label,
+                                    description,
+                                    created: datasetInfo.created,
                                     mode: 'createClean',
                                     dbPath
                                 }
@@ -129,72 +136,72 @@ module.exports = function (app, pg, processHandler) {
         }); // pg.select({ creator })
     }); // POST /api/dataset/new
 
+
+    function sendToProcess(childId, owner, msg, callback) {
+        let sendMessage = function (err) {
+            if (err) { return callback(err); }
+            processHandler.sendAndWait(childId, msg, callback);
+        };
+
+        if (processHandler.childExist(childId)) {
+            // send the request to the process
+            sendMessage();
+        } else {
+            // opens
+            openProcess(childId, owner, sendMessage);
+        }
+    }
+
+    function openProcess(childId, owner, callback) {
+        // get the
+        pg.select({ id: childId, owner }, 'datasets', (err, results) => {
+            if (err) {
+                // TODO: log error
+                console.error(err);
+                return callback(err);
+            } else if (results.length === 1) {
+                let datasetInfo = results[0];
+                // initiate child process
+                processHandler.createChild(childId);
+                // open dataset in child process
+                let openParams = {
+                    cmd: 'open',
+                    content: {
+                        params: {
+                            datasetId: childId,
+                            label: datasetInfo.label,
+                            description: datasetInfo.description,
+                            created: datasetInfo.created,
+                            mode: 'open',
+                            dbPath: datasetInfo.dbpath
+                        }
+                    }
+                };
+                processHandler.sendAndWait(childId, openParams, function (err) {
+                    if (err) { return callback(err); }
+                    callback();
+                });
+
+            }
+        });
+    }
+
     app.get('/api/datasets/:dataset_id', (req, res) => {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user and set it as
-        let creator = req.user || 'user';
+        let owner = req.user || 'user';
 
-        if (processHandler.childExist(datasetId)) {
-            // get dataset information
-            let body = { cmd: 'info', content: { datasetId } };
-            processHandler.sendAndWait(datasetId, body, (error, results) => {
-                // if error notify user
-                if (error) {
-                    // TODO: log error
-                    console.log(error.message);
-                    return res.send({ errors: { msg: error.message } });
-                }
-                let obj = messageHandler.onInfo(results);
-                return res.send(obj);
-            });
-        } else {
-            // must first run the child process
-            // get path to dataset from postgresql
-            pg.select({ id: datasetId, creator }, 'datasets', (err, results) => {
-                if (err) {
-                    // TODO: log error
-                    console.error(err);
-                    return res.send({ error: err });
-                } else if (results.length === 1) {
-                    let datasetInfo = results[0];
-
-                    // initiate child process
-                    processHandler.createChild(datasetId);
-
-                    // open dataset in child process
-                    let openParams = {
-                        cmd: 'open',
-                        content: {
-                            datasetId,
-                            params: {
-                                mode: 'open',
-                                dbPath: datasetInfo.dbpath
-                            }
-                        }
-                    };
-                    processHandler.send(datasetId, openParams);
-
-                    // get database info
-                    let infoParams = {
-                        cmd: 'info',
-                        content: {
-                            datasetId,
-                            label: datasetInfo.label,
-                            created: datasetInfo.created
-                        }
-                    };
-                    processHandler.sendAndWait(datasetId, infoParams, (error, results) => {
-                        // if error notify user
-                        if (error) { return res.send({ errors: { msg: error.message } }); }
-                        // otherwise return results
-                        let obj = messageHandler.onInfo(results);
-                        return res.send(obj);
-                    });
-                }
-
-            });
-        }
-
+        let body = { cmd: 'info', content: { datasetId } };
+        sendToProcess(datasetId, owner, body, function (error, results) {
+            // if error notify user
+            if (error) {
+                // TODO: log error
+                console.log(error.message);
+                return res.send({ errors: { msg: error.message } });
+            }
+            let obj = messageHandler.onInfo(results);
+            return res.send(obj);
+        });
     });
 };

@@ -7,7 +7,7 @@
 }, {
     "name": "Subsets",
     "fields": [
-        { "name": "label", "type": "string", "primary": true },
+        { "name": "label", "type": "string" },
         { "name": "description", "type": "string", "null": true }
     ],
     "joins": [

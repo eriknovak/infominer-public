@@ -48,10 +48,8 @@ class BaseDataset {
         if (self.params.mode === 'createClean') {
             // check required parameters
             if (!fields) { throw new Error('FieldError: fields must be defined'); }
-
             // create dbPath folders
             fileManager.createDirectoryPath(self.params.dbPath);
-
             // get the schema for database
             const schema = self._prepareSchema(fields);
 
@@ -79,6 +77,14 @@ class BaseDataset {
     }
 
     /**
+     * Gets the dataset id.
+     * @returns {Number} The dataset id.
+     */
+    getId() {
+        return this.params.datasetId;
+    }
+
+    /**
      * Prepare database schema.
      * @param {field_instance[]} fields - Array of dataset fields.
      * @return {Object[]} Database schema for given dataset.
@@ -103,11 +109,11 @@ class BaseDataset {
      * @param {Object} dataset - Dataset information.
      *
      */
-    pushDocsToBase(filePath, fields, dataset) {
+    pushDocsToBase(filePath, fields) {
         let self = this;
         // check required parameters
+        if (!filePath) { throw new Error('FieldError: filePath must be defined'); }
         if (!fields) { throw new Error('FieldError: fields must be defined'); }
-        if (!filePath) { throw new Error('FieldError: file must be defined'); }
 
         // read file and skip first line
         let fileIn = qm.fs.openRead(filePath);
@@ -119,8 +125,12 @@ class BaseDataset {
             let newLine = fileIn.readLine();
             let fValues = newLine.trim().split('|');
             // prepare and push record to dataset
-            let rec = self._prepareRecord(fValues, fields, dataset);
-            self.base.store('Dataset').push(rec);
+            let rec = self._prepareRecord(fValues, fields);
+            let recId = self.base.store('Dataset').push(rec);
+            // get record and check for join with root subset
+            if (self.base.store('Dataset')[recId].inSubsets.empty) {
+                self.base.store('Dataset')[recId].$addJoin('inSubsets', self.base.store('Subsets')[0]);
+            }
         }
     }
 
@@ -128,11 +138,9 @@ class BaseDataset {
      * Creates an object suitable for database.
      * @param {String[]} values - An array of field values.
      * @param {field_instance[]} fields - An array of field objects.
-     * @param {Object} [dataset] - Info about the dataset.
-     * @param {Object} [dataset.name] - Name of the dataset.
      * @returns {Object} A record prepared for pushing to database.
      */
-    _prepareRecord(values, fields, dataset) {
+    _prepareRecord(values, fields) {
         let self = this;
         // prepare record placeholder
         let rec = { };
@@ -141,11 +149,12 @@ class BaseDataset {
             // if the field is included in the database
             if (fields[i].included) {
                 rec[fields[i].name] = self._parseFValue(values[i], fields[i].type);
-                if (dataset) {
-                    // record is part of a subset (whole dataset)
-                    let data = { };
-                    if (dataset.label) { data.label = dataset.label; }
-                    if (dataset.description) { data.description = dataset.description; }
+                // record is part of a subset (whole dataset)
+                if (self.base.store('Subsets').empty) {
+                    let data = {
+                        label: 'root',
+                        description: 'The root subset. Contains all records of dataset.'
+                    };
                     // if data contains any fields
                     if (Object.keys(data).length > 0) { rec.inSubsets = [data]; }
                 }
@@ -174,17 +183,18 @@ class BaseDataset {
         }
     }
 
-    getDatasetInfo(dMetadata) {
+    getDatasetInfo() {
         let self = this;
         // get all subsets
-        let subsets = self._getSubsetsInfo(dMetadata.datasetId);
+        let subsets = self._getSubsetsInfo(self.params.datasetId);
         // subset ids used in the dataset info
         let subsetIds = subsets.map(set => set.id);
         let jsonResults = {
             datasets: {
-                id: dMetadata.datasetId,
-                label: dMetadata.label,
-                created: dMetadata.created,
+                id: self.params.datasetId,
+                label: self.params.label,
+                description: self.params.description,
+                created: self.params.created,
                 hasSubsets: subsetIds
             },
             subsets
@@ -193,24 +203,23 @@ class BaseDataset {
         return jsonResults;
     }
 
-    _getSubsetsInfo(datasetId) {
+    _getSubsetsInfo() {
         let self = this;
         // gett all of the data
         let subsets = self.base.store('Subsets')
-            .allRecords.map(rec => self._formatSubsetInfo(rec,datasetId));
+            .allRecords.map(rec => self._formatSubsetInfo(rec));
         // return the subsets
         return subsets;
     }
 
-    _formatSubsetInfo(rec, datasetId) {
+    _formatSubsetInfo(rec) {
         return {
             id: rec.$id,
             type: 'subsets',
             label: rec.label,
             description: rec.description,
             resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
-            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
-            inDataset: datasetId
+            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null
         };
     }
 

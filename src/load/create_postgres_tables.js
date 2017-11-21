@@ -6,10 +6,8 @@ const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
 
 // prepare commands we want to execute
 let commands = [
-    'CREATE TABLE IF NOT EXISTS datasets (id serial PRIMARY KEY, creator varchar NOT NULL, label varchar NOT NULL, dbPath varchar NOT NULL, created timestamp with time zone DEFAULT NOW());',
-    'CREATE INDEX IF NOT EXISTS datasets_creator_idx ON datasets(creator);',
-    'CREATE INDEX IF NOT EXISTS datasets_setname_idx ON datasets(label);',
-    'CREATE INDEX IF NOT EXISTS datasets_timezone_idx ON datasets(created);'
+    'CREATE TABLE IF NOT EXISTS datasets (id serial PRIMARY KEY, owner varchar NOT NULL, dbPath varchar NOT NULL, label varchar NOT NULL, description varchar, created timestamp with time zone DEFAULT NOW());',
+    'CREATE INDEX IF NOT EXISTS datasets_creator_idx ON datasets(owner);'
 ];
 
 // execute them one by one
@@ -20,7 +18,7 @@ async.eachSeries(
         pg.execute(
             command, [],
             (err) => {
-                if (err) { console.log('Error on execution', err.message) };
+                if (err) { console.log('Error on execution', err.message); }
                 callback();
             }
         );
