@@ -1,0 +1,18 @@
+<div class="container-fluid">
+  <!-- Title -->
+  <div class="row dataset-header">
+    <div class="col-sm-6 col-md-5 col-lg-4">
+      <h1 class="dataset-label">{{dataset.label}}</h1>
+      <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
+      <span class="dataset-created">Created: {{dataset.date}}</span>
+    </div>
+    <div class="col-sm-6 col-md-7 col-lg-8">
+      {{#if dataset.description}}
+        <h4 class="dataset-description-header">Description</h4>
+        <p class="dataset-description">{{dataset.description}}</p>
+      {{/if}}
+    </div>
+  </div><!-- .row -->
+</div><!-- .container-fluid -->
+
+{{yield}}

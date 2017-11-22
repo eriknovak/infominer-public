@@ -183,6 +183,10 @@ class BaseDataset {
         }
     }
 
+    /**
+     * Gets the dataset info with the subsets.
+     * @returns {Object} The object containing the dataset and subset info.
+     */
     getDatasetInfo() {
         let self = this;
         // get all subsets
@@ -195,6 +199,7 @@ class BaseDataset {
                 label: self.params.label,
                 description: self.params.description,
                 created: self.params.created,
+                numberOfDocuments: self.base.store('Dataset').length,
                 hasSubsets: subsetIds
             },
             subsets
@@ -203,6 +208,10 @@ class BaseDataset {
         return jsonResults;
     }
 
+    /**
+     * Gets information about the subsets in the database.
+     * @returns {Object[]} An array of subset representation objects.
+     */
     _getSubsetsInfo() {
         let self = this;
         // gett all of the data
@@ -212,6 +221,11 @@ class BaseDataset {
         return subsets;
     }
 
+    /**
+     * Formats the subset record.
+     * @param {Object} rec - The subset record.
+     * @returns {Object} The subset json representation.
+     */
     _formatSubsetInfo(rec) {
         return {
             id: rec.$id,

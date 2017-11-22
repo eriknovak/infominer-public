@@ -1,0 +1,31 @@
+.dataset-header {
+    border-bottom: 1px solid #cccccc;
+    padding-bottom: 20px;
+    .dataset-description-header {
+        margin-top: 20px;
+    }
+    .dataset-description {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+}
+
+.dataset-content{
+    .container-fluid {
+        display:table;
+        width: 100%;
+        margin-top: -50px;
+        padding: 50px 0 0 0; /*set left/right padding according to needs*/
+        box-sizing: border-box;
+    }
+
+    .row {
+        height: 100%;
+        display: table-row;
+    }
+
+    .row .no-float {
+    display: table-cell;
+    float: none;
+    }
+}

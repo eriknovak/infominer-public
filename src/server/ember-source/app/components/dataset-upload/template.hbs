@@ -1,11 +1,11 @@
 <div class="row">
-  <div class="col-lg-7">
+  <div class="col-lg-12">
 
     <div class="dataset-label">
       <div class="form-group">
 
         <div class="row">
-          <div class="col-lg-6">
+          <div class="col-md-6">
             <label for="dataset-label">Dataset Name</label>
             <input type="text" id="dataset-label" class="form-control"
               oninput={{action 'changeDatasetName'}} value={{dataset.label}}
@@ -26,14 +26,14 @@
     </div><!-- .dataset-description -->
 
     <div class="dataset-statistics">
-      <label>statistics:</label> {{dataset.numDocs}} documents, {{dataset.size}} bytes
+      {{dataset.numDocs}} documents, {{dataset.size}} bytes
     </div>
 
   </div><!-- .col-lg-offset-2.col-lg-8 -->
 </div><!-- .row -->
 
 <div class="row">
-  <div class="col-lg-7">
+  <div class="col-lg-12">
 
     <table class="table">
       <thead>
@@ -45,7 +45,7 @@
       </thead>
       <tbody>
         {{#each fieldList as |field index|}}
-          {{dataset-field name=field.name type=field.type included=field.included index=index}}
+          {{dataset-upload-field name=field.name type=field.type included=field.included index=index}}
         {{/each}}
       </tbody>
     </table>
@@ -54,7 +54,7 @@
 </div><!-- .row -->
 
 <div class="row">
-  <div class="col-lg-7">
+  <div class="col-lg-12">
     <button {{action submitDataset file }} class="btn btn-primary pull-right">Save Dataset</button>
     <button {{action resetList}} class="btn btn-default pull-right">Cancel</button>
   </div><!-- .col-lg-offset-2.col-lg-8 -->

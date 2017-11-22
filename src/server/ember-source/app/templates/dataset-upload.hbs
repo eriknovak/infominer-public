@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <!-- Title -->
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
       <h2>Upload Dataset</h2>
     </div>
   </div><!-- .row -->
@@ -10,7 +10,7 @@
 {{#if model}}
 
   <!-- Field options selection -->
-  {{ dataset-field-list
+  {{ dataset-upload
       file=model.file
       dataset=model.dataset
       fieldList=model.fieldList
@@ -25,7 +25,7 @@
     <div class="row">
 
       <!-- Dropzone -->
-      <div class="col-lg-8">
+      <div class="col-lg-12">
         {{#file-dropzone name="dataset" as |dropzone queue|}}
           <p class="dropzone">
             {{#if dropzone.active}}

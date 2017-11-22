@@ -1,24 +1,13 @@
 <!-- Website header -->
 {{ website-header }}
 
-<!-- Navigation options -->
-{{#burger-menu open=true animation='squeeze' locked=true translucentOverlay=false as |burger|}}
+<div class="container-fluid wrapper">
 
-  <!-- Navigation bar -->
-  {{#burger.menu itemTagName="li" as |menu|}}
-    <h2>Menu</h2>
-    <ul>
-      {{#menu.item}}
-        {{#link-to "datasets"}}
-          <i class="fa fa-database"></i>datasets
-        {{/link-to}}
-      {{/menu.item}}
-    </ul>
-  {{/burger.menu}}
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+      <!-- The content of the website -->
+      {{outlet}}
+    </div>
+  </div>
 
-  <!-- Main content -->
-  {{#burger.outlet}}
-    {{outlet}}
-  {{/burger.outlet}}
-
-{{/burger-menu}}
+</div><!-- .container-fluid -->

@@ -44,11 +44,13 @@ export default Route.extend({
 
             // set the options and upload
             file.upload({
-                url: `${ENV.APP.HOSTNAME}/api/dataset/new`,
+                url: `${ENV.APP.HOSTNAME}/api/datasets/new`,
                 data: {
                     dataset: JSON.stringify(dataset),
                     fields: JSON.stringify(fieldList)
                 }
+            }).then(data => {
+                this.transitionTo('dataset', data.body.id);
             });
         }
     },
