@@ -7,7 +7,7 @@ export default Route.extend({
         let { dataset_id } = this.paramsFor('dataset');
         this.store.adapterFor('subset').set('namespace', `api/datasets/${dataset_id}`);
         // get the subset info
-        return this.get('store').findRecord('subset', params.subset_id);
+        return this.get('store').findRecord('subset', params.subset_id, { reload: true });
     }
 
 });
