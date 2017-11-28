@@ -1,0 +1,8 @@
+{{ dataset-header dataset=model deleteDataset=(route-action "deleteDataset") }}
+
+{{#dataset-structure subsets=model.hasSubsets }}
+  {{outlet}}
+{{/dataset-structure}}
+
+
+

@@ -2,9 +2,27 @@ const async = require('async');
 // creating child processes
 const { fork } = require('child_process');
 
+// TODO: logging process activity
 
+/**
+ * The child process container and handler.
+ */
 class ProcessHandler {
 
+    /**
+     * Child process instance.
+     * @typedef child_object
+     * @type {Object}
+     * @property {Number} id - Postgresql dataset id.
+     * @property {Object} child - The forked child process.
+     * @property {Boolean} connected - If the child is connected with the parent process.
+     */
+
+    /**
+     * Initializes the process handler.
+     * @param {Object} params - The process handler parameters.
+     * @param {String} processPath - The path to the child process.
+     */
     constructor(params) {
         let self = this;
 
@@ -14,6 +32,11 @@ class ProcessHandler {
         self._processPath = params.processPath;
     }
 
+    /**
+     * Initializes the child process.
+     * TODO: log activity
+     * @param {Number} childId - The id of the child process. Used for further reference to the child process.
+     */
     createChild(childId) {
         let self = this;
         let child = fork(self._processPath, [], { silent: false });
@@ -34,21 +57,36 @@ class ProcessHandler {
         });
 
         child.on('exit', function () {
-            // TODO remove from hash
             self._childH.delete(childId);
         });
     }
 
+    /**
+     * Checks if the child process exists.
+     * @param {Number} childId - Id reference to the child process.
+     * @returns {Boolean} True if process exists. Otherwise, false.
+     */
     childExist(childId) {
         let self = this;
         return self._getChild(childId) ? true : false;
     }
 
+    /**
+     * Get the child process if exists.
+     * @param {Number} childId - The process reference id.
+     * @param {}
+     */
     _getChild(childId) {
         let self = this;
         return self._childH.get(childId);
     }
 
+    /**
+     * Sends the message to the child process. No response is requested.
+     * TODO: log activity
+     * @param {Number} childId - The reference process id.
+     * @param {Object} params - Message body.
+     */
     send(childId, params) {
         let self = this;
         let childH = self._getChild(childId);
@@ -65,7 +103,13 @@ class ProcessHandler {
             // TODO: handle not connected childs
         }
     }
-
+    /**
+     * Sends the message to the child process. Response is requested.
+     * TODO: log activity
+     * @param {Number} childId - The reference process id.
+     * @param {Object} params - Message body.
+     * @param {Function} callback - The callback funtion. What to do with the response.
+     */
     sendAndWait(childId, params, callback) {
         let self = this;
         let childH = self._getChild(childId);
@@ -93,6 +137,10 @@ class ProcessHandler {
         }
     }
 
+    /**
+     * Cleans the request mapping.
+     * TODO: log activity
+     */
     _cleanReqMap() {
         let self = this;
         for (let key in self._callbackH.keys()) {
@@ -105,6 +153,11 @@ class ProcessHandler {
         }
     }
 
+    /**
+     * Closes all processes.
+     * TODO: log activity
+     * @param {Function} callback - The function called at the end of the process.
+     */
     closeAllProcesses(callback) {
         let self = this;
         let tasks = [ ];
@@ -129,13 +182,5 @@ class ProcessHandler {
     }
 }
 
+// exports the process handler
 module.exports = ProcessHandler;
-
-
-/**
- * Child process instance.
- * @typedef child_object
- * @type {Object}
- * @property {Number} id - Postgresql dataset id.
- * @property {Object} child - The forked child process.
- */

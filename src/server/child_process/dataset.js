@@ -52,8 +52,7 @@ process.on('SIGTERM', () => {
  * @property {String} dataset.dir - The dataset dir.
  * @property {String} dataset.label - The user defined dataset label.
  * @property {String} [dataset.description] - The user defined dataset description.
- * @property {Object} file - The file values.
- * @property {String} file.dir - The file directory.
+ * @property {String} filePath - The file values.
  * @property {field_instance[]} fields - An array of user defined database fields.
  */
 
@@ -79,6 +78,11 @@ function handle(msg) {
         return;
     }
     switch (msg.body.cmd) {
+
+    /////////////////////////////////////////////////////////////////
+    // database handling cases
+    /////////////////////////////////////////////////////////////////
+
     case 'init':
         console.log('Initialize child process id=', process.pid);
         break;
@@ -90,14 +94,24 @@ function handle(msg) {
         console.log('Opening database in child process id=', process.pid);
         openDatabase(msg);
         break;
-    case 'info':
-        console.log('Get database info in child process id=', process.pid);
-        getDatasetInfo(msg);
-        break;
     case 'shutdown':
         console.log('Received shutdown command');
         shutDownProcess(msg);
         break;
+
+    /////////////////////////////////////////////////////////////////
+    // database info retrieving
+    /////////////////////////////////////////////////////////////////
+
+    case 'dataset_info':
+        console.log('Get database info in child process id=', process.pid);
+        getDatasetInfo(msg);
+        break;
+    case 'subset_info':
+        console.log('Get database info in child process id=', process.pid);
+        getSubsetInfo(msg);
+        break;
+
     default:
         console.log('Unknown cmd in child process, cmd=' + msg.body.cmd);
         break;
@@ -105,37 +119,24 @@ function handle(msg) {
 }
 
 ///////////////////////////////////////
-// Action functions
+// database handling cases
 ///////////////////////////////////////
 
-function shutDownProcess(msg) {
-    let { reqId } = msg;
-    try {
-        if (database) { database.close(); }
-        process.send({ reqId, content: { status: 'done', cmd: 'shutdown' } });
-    } catch(err) {
-        process.send({ reqId, error: err });
-    }
-    clearInterval(interval_id);
-    process.exit(0);
-}
-
 function openDatabase(msg) {
-
     // TODO: validate json schema
     let { reqId, body } = msg;
 
     try {
         // get the constructor parameters
-        let { datasetId, params } = body.content;
+        let { params } = body.content;
         // create the database
         database = new BaseDataset(params);
         // everything is ok
-        process.send({ reqId, content: { datasetId } });
+        process.send({ reqId, content: { datasetId: database.getId() } });
     } catch (err) {
         console.log('openDatabase Error', err.message);
         // notify parent process about the error
-        process.send({ reqId, error: err });
+        process.send({ reqId, error: err.message });
     }
 }
 
@@ -144,34 +145,64 @@ function createDatabase(msg) {
     let { reqId, body } = msg;
     try {
         // get the constructor parameters
-        let { datasetId, dataset, filePath, fields, params } = body.content;
+        let { filePath, fields, params } = body.content;
         // create the database
         database = new BaseDataset(params, fields);
         // fill the database with the records
-        database.pushDocsToBase(filePath, fields, dataset);
+        database.pushDocsToBase(filePath, fields);
         // everything is ok
-        process.send({ reqId, content: { datasetId } });
+        process.send({ reqId, content: { datasetId: database.getId() } });
     } catch (err) {
         console.log('createDatabase Error', err.message);
         // notify parent process about the error
-        process.send({ reqId, error: err });
+        process.send({ reqId, error: err.message });
     }
 }
+
+function shutDownProcess(msg) {
+    let { reqId } = msg;
+    try {
+        let dbPath = null;
+        if (database) {
+            dbPath = database.getDbPath();
+            database.close();
+        }
+        process.send({ reqId, content: { dbPath } });
+    } catch(err) {
+        process.send({ reqId, error: err.message });
+    }
+    clearInterval(interval_id);
+    process.exit(0);
+}
+
+///////////////////////////////////////////////
+// database info retrieving
+///////////////////////////////////////////////
 
 function getDatasetInfo(msg) {
     // TODO: validate json schema
     let { reqId } = msg;
     try {
-        let jsonResults = database.getDatasetInfo(msg.body.content);
+        let jsonResults = database.getDatasetInfo();
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
         console.log('getDatasetInfo Error', err.message);
         // notify parent process about the error
-        process.send({ reqId, error: err });
+        process.send({ reqId, error: err.message });
     }
 }
 
-
-///////////////////////////////////////////////
-//
-///////////////////////////////////////////////
+function getSubsetInfo(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let subsetId = body.content ? body.content.subsetId : null;
+        console.log(subsetId);
+        let jsonResults = database.getSubsetInfo(subsetId);
+        process.send({ reqId, content: { jsonResults } });
+    } catch (err) {
+        console.log('getSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
