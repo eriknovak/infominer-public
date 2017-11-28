@@ -54,6 +54,18 @@ a {
     }
 }
 
+.modal-content {
+    border-radius: 0px;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.warning {
+    color: red;
+}
+
 .center {
     text-align: center;
 }
@@ -62,6 +74,15 @@ a {
     font-size: 16px;
 }
 
-.btn.pull-right {
-    margin-left: 10px;
+.btn {
+    border-radius: 0px;
+    border: 0px solid;
+
+    &.btn-primary {
+        background-color: $secondary-color;
+    }
+
+    &.pull-right {
+        margin-left: 10px;
+    }
 }

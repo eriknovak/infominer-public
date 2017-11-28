@@ -1,61 +1,71 @@
 <div class="container-fluid">
-  <!-- Title -->
   <div class="row">
-    <div class="col-lg-12">
-      <h2>Upload Dataset</h2>
-    </div>
+    <div class="col-sm-12 col-lg-offset-1 col-lg-10">
+
+      <div class="container-fluid">
+        <!-- Title -->
+        <div class="row">
+          <div class="col-lg-12">
+            <h2>Upload Dataset</h2>
+          </div>
+        </div><!-- .col-lg-12 -->
+      </div><!-- .row -->
+
+      {{#if model}}
+        <!-- Title -->
+        <div class="row">
+          <div class="col-lg-10">
+            <!-- Field options selection -->
+            {{ dataset-upload
+                file=model.file
+                dataset=model.dataset
+                fieldList=model.fieldList
+                resetList=(route-action "resetModel")
+                submitDataset=(route-action "submitDataset")
+            }}
+          </div><!-- .col-lg-8 -->
+        </div><!-- .row -->
+      {{else}}
+
+        <!-- File Upload section -->
+        <div class="container-fluid">
+          <div class="row">
+
+            <!-- Dropzone -->
+            <div class="col-lg-12">
+              {{#file-dropzone name="dataset" as |dropzone queue|}}
+                <p class="dropzone">
+                  {{#if dropzone.active}}
+                    {{#if dropzone.valid}}
+                      Drop to upload
+                    {{else}}
+                      Invalid
+                    {{/if}}
+                  {{else if queue.files.length}}
+                    Uploading {{queue.files.length}} files. ({{queue.progress}}%)
+                  {{else}}
+                      {{#if dropzone.supported}}
+                        Drag and drop dataset onto this area to upload them or
+                      {{/if}}
+                      {{#file-upload name="dataset"
+                                    accept=["text/plain", "text/csv"]
+                                    multiple=false
+                                    onfileadd=(route-action "readDataset")}}
+                        <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
+                      {{/file-upload}}
+                  {{/if}}
+                </p>
+              {{/file-dropzone}}
+            </div><!-- .col-lg-offset-2.col-lg-8 -->
+
+          </div><!-- .row -->
+        </div><!-- .container-fluid -->
+
+      {{/if}}
+
+    </div><!-- .col-sm-12.col-lg-offset-1.col-lg-10 -->
   </div><!-- .row -->
 </div><!-- .container-fluid -->
-
-{{#if model}}
-
-  <!-- Field options selection -->
-  {{ dataset-upload
-      file=model.file
-      dataset=model.dataset
-      fieldList=model.fieldList
-      resetList=(route-action "resetModel")
-      submitDataset=(route-action "submitDataset")
-  }}
-
-{{else}}
-
-  <!-- File Upload section -->
-  <div class="container-fluid">
-    <div class="row">
-
-      <!-- Dropzone -->
-      <div class="col-lg-12">
-        {{#file-dropzone name="dataset" as |dropzone queue|}}
-          <p class="dropzone">
-            {{#if dropzone.active}}
-              {{#if dropzone.valid}}
-                Drop to upload
-              {{else}}
-                Invalid
-              {{/if}}
-            {{else if queue.files.length}}
-              Uploading {{queue.files.length}} files. ({{queue.progress}}%)
-            {{else}}
-                {{#if dropzone.supported}}
-                  Drag and drop dataset onto this area to upload them or
-                {{/if}}
-                {{#file-upload name="dataset"
-                              accept=["text/plain", "text/csv"]
-                              multiple=false
-                              onfileadd=(route-action "readDataset")}}
-                  <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
-                {{/file-upload}}
-            {{/if}}
-          </p>
-        {{/file-dropzone}}
-      </div><!-- .col-lg-offset-2.col-lg-8 -->
-
-    </div><!-- .row -->
-  </div><!-- .container-fluid -->
-
-{{/if}}
-
 
 
 

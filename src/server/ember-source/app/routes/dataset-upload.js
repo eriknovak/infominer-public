@@ -50,7 +50,7 @@ export default Route.extend({
                     fields: JSON.stringify(fieldList)
                 }
             }).then(data => {
-                this.transitionTo('dataset', data.body.id);
+                this.transitionTo('dataset.subset', data.body.id, 0);
             });
         }
     },

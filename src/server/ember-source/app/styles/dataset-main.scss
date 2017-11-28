@@ -1,13 +1,15 @@
 .dataset-header {
     border-bottom: 1px solid #cccccc;
-    padding-bottom: 20px;
-    .dataset-description-header {
-        margin-top: 20px;
+    .dataset-header-information{
+        padding-bottom: 20px;
+        .dataset-description {
+            max-height: 150px;
+            overflow-y: auto;
+        }
     }
-    .dataset-description {
-        max-height: 150px;
-        overflow-y: auto;
-    }
+}
+.description-header {
+    margin-top: 20px;
 }
 
 .dataset-content{
@@ -23,9 +25,35 @@
         height: 100%;
         display: table-row;
     }
+}
 
-    .row .no-float {
-    display: table-cell;
-    float: none;
+.subset-information{
+    border-bottom: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+
+    .subset-basic-information {
+        margin-top: 10px;
+        .subset-creation-method {
+            font-weight: 700;
+            color: green;
+        }
+        .subset-parent {
+            font-weight: 700;
+            color: $tertiary-color;
+        }
+    }
+
+    .subset-navigation {
+        margin-top: 20px;
+        .btn {
+            background-color: $primary-color;
+            color: $dark-font-color;
+            margin-bottom: -2px;
+            margin-right: 5px;
+            &.active {
+                background-color: $tertiary-color;
+                color: white;
+            }
+        }
     }
 }

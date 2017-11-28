@@ -5,5 +5,6 @@ export default DS.Model.extend({
     description: DS.attr('string'),
     inDataset: DS.belongsTo('dataset'),
     usedBy: DS.hasMany('method', { inverse: 'appliedOn' }),
-    resultedIn: DS.belongsTo('method', { inverse: 'produced' })
+    resultedIn: DS.belongsTo('method', { inverse: 'produced' }),
+    numberOfElements: DS.attr('number')
 });

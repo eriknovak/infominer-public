@@ -85,6 +85,14 @@ class BaseDataset {
     }
 
     /**
+     * Gets the dataset data location.
+     * @returns {String} The dataset location.
+     */
+    getDbPath() {
+        return this.params.dbPath;
+    }
+
+    /**
      * Prepare database schema.
      * @param {field_instance[]} fields - Array of dataset fields.
      * @return {Object[]} Database schema for given dataset.
@@ -190,7 +198,7 @@ class BaseDataset {
     getDatasetInfo() {
         let self = this;
         // get all subsets
-        let subsets = self._getSubsetsInfo(self.params.datasetId);
+        let { subsets } = self.getSubsetInfo();
         // subset ids used in the dataset info
         let subsetIds = subsets.map(set => set.id);
         let jsonResults = {
@@ -212,13 +220,27 @@ class BaseDataset {
      * Gets information about the subsets in the database.
      * @returns {Object[]} An array of subset representation objects.
      */
-    _getSubsetsInfo() {
+    getSubsetInfo(id) {
         let self = this;
-        // gett all of the data
-        let subsets = self.base.store('Subsets')
-            .allRecords.map(rec => self._formatSubsetInfo(rec));
+        // get database subsets
+        let subsets = self.base.store('Subsets');
+        let setObj = { subsets: null };
+        // if id is a number
+        if (!isNaN(parseFloat(id))) {
+            // validate id
+            if (id < 0 || subsets.length <= id) {
+                // TODO: handle this error
+                return null;
+            }
+            // get one subset and format it
+            let set = subsets[id];
+            setObj.subsets = self._formatSubsetInfo(set);
+        } else {
+            setObj.subsets = subsets.allRecords
+                .map(rec => self._formatSubsetInfo(rec));
+        }
         // return the subsets
-        return subsets;
+        return setObj;
     }
 
     /**
@@ -233,7 +255,8 @@ class BaseDataset {
             label: rec.label,
             description: rec.description,
             resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
-            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null
+            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
+            numberOfElements: rec.hasElements.length
         };
     }
 

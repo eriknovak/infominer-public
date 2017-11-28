@@ -1,18 +1,57 @@
-<div class="container-fluid">
-  <!-- Title -->
-  <div class="row dataset-header">
-    <div class="col-sm-6 col-md-5 col-lg-4">
-      <h1 class="dataset-label">{{dataset.label}}</h1>
-      <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
-      <span class="dataset-created">Created: {{dataset.date}}</span>
-    </div>
-    <div class="col-sm-6 col-md-7 col-lg-8">
-      {{#if dataset.description}}
-        <h4 class="dataset-description-header">Description</h4>
-        <p class="dataset-description">{{dataset.description}}</p>
-      {{/if}}
+<div class="container-fluid dataset-header">
+  <div class="row dataset-header-information">
+    <div class="col-sm-12 col-lg-offset-1 col-lg-11">
+      <div class="row">
+        <div class="col-sm-6 col-md-5 col-lg-4">
+          <!-- Dataset title and information -->
+          <h1 class="dataset-label">{{dataset.label}}</h1>
+
+          <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#delete-dataset-modal">Delete</button>
+          <button class="btn btn-primary pull-right">Edit</button>
+
+          <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
+          <span class="dataset-created">Created: {{dataset.date}}</span>
+
+        </div>
+        <div class="col-sm-6 col-md-7 col-lg-8">
+          {{#if dataset.description}}
+            <!-- Dataset description -->
+            <div class="row">
+              <div class="col-lg-10">
+                <h4 class="description-header">Description</h4>
+                <p class="dataset-description">{{dataset.description}}</p>
+              </div>
+            </div>
+          {{/if}}
+        </div>
+      </div>
     </div>
   </div><!-- .row -->
 </div><!-- .container-fluid -->
+
+<!-- Delete dataset warning -->
+<div class="modal fade" id="delete-dataset-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- modal header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <!-- modal title -->
+        <h4 class="modal-title warning">Deleting dataset</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete dataset: <b class="uppercase">{{dataset.label}}</b>? You will not be able to revert this action.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Go back</button>
+        <button type="button" class="btn btn-danger" onclick={{action deleteDataset}}>Yes, delete dataset</button>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 {{yield}}

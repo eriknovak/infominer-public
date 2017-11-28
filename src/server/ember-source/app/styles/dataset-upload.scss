@@ -11,10 +11,8 @@
     margin-bottom: 10px;
     padding: 10px;
     text-align: center;
-    border-radius: 10px;
     width: 100%;
     font-size: 16px;
-    border: 2px solid $tertiary-color;
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -34,6 +32,7 @@
 
     &.add-new {
         border: 2px dashed $tertiary-color;
+        padding: 8px;
         background-color: white;
         color: $tertiary-color;
         &:hover {

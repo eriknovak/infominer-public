@@ -1,12 +1,21 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-sm-3">
-        {{#each subsets as |subset|}}
-          {{subset.label}}
-        {{/each}}
-    </div>
-    <div class="col-sm-9">
-      {{yield}}
-    </div>
-  </div>
-</div>
+    <div class="col-sm-12 col-lg-offset-1 col-lg-11">
+
+      <div class="row">
+        <div class="col-sm-6 col-md-5 col-lg-4">
+          <!-- dataset navigation -->
+          <h4 class="description-header">Structure</h4>
+          {{#each subsets as |subset|}}
+            {{subset.label}}
+          {{/each}}
+        </div>
+        <div class="col-sm-6 col-md-7 col-lg-8 subset-information">
+          <!-- Subset content -->
+          {{yield}}
+        </div>
+      </div>
+
+    </div><!-- .col-sm-12.col-lg-offset-1.col-lg-10 -->
+  </div><!-- .row -->
+</div><!-- .container-fluid -->
