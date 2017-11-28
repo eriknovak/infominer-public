@@ -217,7 +217,6 @@ module.exports = function (app, pg, processHandler) {
      * get dataset info of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id', (req, res) => {
-        console.log('Dataset id');
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
@@ -294,7 +293,6 @@ module.exports = function (app, pg, processHandler) {
      * get subset info of dataset with id=dataset_id and subset_id=subset_id
      */
     app.get('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
-        console.log('Subset id');
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
@@ -315,6 +313,38 @@ module.exports = function (app, pg, processHandler) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
+    });
+
+
+    /**
+     * Gets the subset documents
+     */
+    app.get('/api/datasets/:dataset_id/subsets/:subset_id/documents', (req, res) => {
+
+        // TODO: check if dataset_id is a number
+        let datasetId = parseInt(req.params.dataset_id);
+        let subsetId = parseInt(req.params.subset_id);
+
+        // query values
+        // TODO: check if query contains offset, limit or page
+        let query = req.query;
+
+        // get the user
+        let owner = req.user || 'user';
+
+        // set the body info
+        let body = { cmd: 'subset_documents_info', content: { subsetId, query } };
+        sendToProcess(datasetId, owner, body, function (error, results) {
+            // if error notify user
+            if (error) {
+                // TODO: log error
+                console.log(error.message);
+                return res.send({ errors: { msg: error.message } });
+            }
+            let obj = messageHandler.onInfo(results);
+            return res.send(obj);
+        });
+
     });
 
 };

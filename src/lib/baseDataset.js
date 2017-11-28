@@ -243,6 +243,36 @@ class BaseDataset {
         return setObj;
     }
 
+    getSubsetDocuments(id, query) {
+        let self = this;
+        // get database subsets
+        let subsets = self.base.store('Subsets');
+        let setObj = { documents: null };
+        if (id < 0 || subsets.length <= id) {
+            // TODO: handle this error
+            return null;
+        }
+        // prepare the query parameters
+        let offset = query.offset ? query.offset : 0;
+        let limit = query.limit ? query.limit : 10;
+
+        // if page exists, modify offset
+        if (query.page) {
+            offset = (query.page-1)*limit;
+        }
+
+        // get the subset documents limited by
+        let subsetDocuments = subsets[id].hasElements;
+        // TODO: allow filtering documents
+
+        // truncate the documents using the query
+        subsetDocuments.trunc(limit, offset);
+
+        // get the documents
+        setObj.documents = subsetDocuments.map(rec => self._formatDocumentInfo(rec));
+        return setObj;
+    }
+
     /**
      * Formats the subset record.
      * @param {Object} rec - The subset record.
@@ -257,6 +287,22 @@ class BaseDataset {
             resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
             usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
             numberOfElements: rec.hasElements.length
+        };
+    }
+
+    /**
+     * Formats the document record.
+     * @param {Object} rec - The document record.
+     * @returns {Object} The document json representation.
+     */
+    _formatDocumentInfo(rec) {
+        let self = this;
+        return {
+            id: rec.$id,
+            type: 'documents',
+            fields: self.base.store('Dataset').fields
+                .map(field => ({ name: field.name, type: field.type })),
+            values: rec.toJSON(false, false, false)
         };
     }
 

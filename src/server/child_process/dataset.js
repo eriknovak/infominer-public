@@ -108,8 +108,12 @@ function handle(msg) {
         getDatasetInfo(msg);
         break;
     case 'subset_info':
-        console.log('Get database info in child process id=', process.pid);
+        console.log('Get subset info in child process id=', process.pid);
         getSubsetInfo(msg);
+        break;
+    case 'subset_documents_info':
+        console.log('Get subset info in child process id=', process.pid);
+        getSubsetDocuments(msg);
         break;
 
     default:
@@ -204,4 +208,21 @@ function getSubsetInfo(msg) {
         // notify parent process about the error
         process.send({ reqId, error: err.message });
     }
+}
+
+function getSubsetDocuments(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let subsetId = body.content.subsetId;
+        let query = body.content.query;
+        let jsonResults = database.getSubsetDocuments(subsetId, query);
+        process.send({ reqId, content: { jsonResults } });
+    } catch (err) {
+        console.log('getSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+
+
 }

@@ -1,32 +1,39 @@
-<div class="row">
-  <div class="col-lg-10">
-    <h1>{{ model.label }}</h1>
+<div class="row subset-information">
+  <div class="col-lg-12">
 
     <div class="row">
-      <div class="col-lg-4">
-        <p class="subset-basic-information">
-          <span class="dataset-documents-number">{{ model.numberOfElements }} documents</span><br/>
-          Created using: <span class="subset-creation-method">{{if model.resultedIn model.resultedIn.type 'none'}}</span><br/>
-          Derived from: <span class="subset-parent">{{if model.resultedIn model.resultedIn.appliedOn 'none' }}</span><br/>
-        </p>
-      </div>
-      <div class="col-lg-6">
-        <h4>Description</h4>
-        <p class="dataset-description">{{ model.description }}</p>
+      <div class="col-lg-10">
+        <h1>{{ model.label }}</h1>
+
+        <div class="row">
+          <div class="col-lg-4">
+            <p class="subset-basic-information">
+              <span class="dataset-documents-number">{{ model.numberOfElements }} documents</span><br/>
+              Created using: <span class="subset-creation-method">{{if model.resultedIn model.resultedIn.type 'none'}}</span><br/>
+              Derived from: <span class="subset-parent">{{if model.resultedIn model.resultedIn.appliedOn 'none' }}</span><br/>
+            </p>
+          </div>
+          <div class="col-lg-6">
+            <h4>Description</h4>
+            <p class="dataset-description">{{ model.description }}</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
+    <div class="row subset-navigation">
+      <div class="col-lg-12">
+
+      {{#link-to "dataset.subset.statistics" model.id class="btn btn-primary"}}Statistics{{/link-to}}
+      {{#link-to "dataset.subset.documents" model.id class="btn btn-primary"}}Documents{{/link-to}}
+
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="row subset-navigation">
-  <div class="col-lg-12">
 
-    {{#link-to "dataset.subset" model class="btn btn-primary"}}Statistics{{/link-to}}
-    {{#link-to "datasets" class="btn btn-primary"}}Documents{{/link-to}}
-
-  </div>
-</div>
 
 <!-- subset statistics and documents -->
 <div class="row">
