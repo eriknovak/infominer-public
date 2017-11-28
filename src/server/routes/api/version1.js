@@ -105,7 +105,7 @@ module.exports = function (app, pg, processHandler) {
         pg.select({ owner }, 'datasets', (err, results) => {
             if (err) {
                 return res.send({ errors: { msg: err.message } });
-             }
+            }
             // create JSON API data
             let datasets = results.map(rec => {
                 return {
@@ -149,9 +149,9 @@ module.exports = function (app, pg, processHandler) {
             const dbFolder = results.length ? results[results.length-1].id : 0;
 
             // set pg dataset values
-            const label = dataset.label;                              // the user defined dataset label
-            const description = dataset.description;                  // the description of the dataset
-            const dbPath = `${static.dataPath}/${owner}/${dbFolder}`; // dataset directory
+            const label = dataset.label;                                // the user defined dataset label
+            const description = dataset.description;                    // the description of the dataset
+            const dbPath = `${static.dataPath}\\${owner}\\${dbFolder}`; // dataset directory
 
             // create dataset directory
             fileManager.createDirectoryPath(dbPath);
@@ -217,6 +217,7 @@ module.exports = function (app, pg, processHandler) {
      * get dataset info of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id', (req, res) => {
+        console.log('Dataset id');
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
@@ -293,6 +294,8 @@ module.exports = function (app, pg, processHandler) {
      * get subset info of dataset with id=dataset_id and subset_id=subset_id
      */
     app.get('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
+        console.log('Subset id');
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         let subsetId = parseInt(req.params.subset_id);

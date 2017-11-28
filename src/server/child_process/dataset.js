@@ -197,7 +197,6 @@ function getSubsetInfo(msg) {
     let { reqId, body } = msg;
     try {
         let subsetId = body.content ? body.content.subsetId : null;
-        console.log(subsetId);
         let jsonResults = database.getSubsetInfo(subsetId);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
