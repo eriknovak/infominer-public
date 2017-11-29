@@ -31,7 +31,8 @@ export default Component.extend({
         for (let pageN = page - 2; pageN < page + 3; pageN++) {
             if (pageN < 1) { continue; }     // go to next page
             if (pageN > lastPage) { break; } // other pages are larger
-            quickSelect.push(pageN);
+
+            quickSelect.push({ pageN, active: pageN === page });
         }
         this.set('quickSelect', quickSelect);
 

@@ -30,6 +30,7 @@ export default Route.extend({
         changeLimit(limit) {
             // update the limit and transition to route
             this.set('limit', limit);
+            this.set('page', 1);
             this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
                 .then(model => this.set('controller.model', model));
 

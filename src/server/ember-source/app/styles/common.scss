@@ -86,6 +86,7 @@ a {
         background-color: $secondary-color;
         -webkit-transition: background .4s;
         transition: background .4s;
+        &.disabled:hover { background-color: $secondary-color; }
         &:hover {
             background-color: darken($secondary-color, 10%);
         }
@@ -96,6 +97,7 @@ a {
         background-color: $quaternary-color;
         -webkit-transition: background .4s;
         transition: background .4s;
+        &.disabled:hover { background-color: $quaternary-color; }
         &:hover {
             background-color: darken($quaternary-color, 10%);
         }
@@ -106,6 +108,13 @@ a {
         background-color: $primary-color;
         -webkit-transition: background .4s;
         transition: background .4s;
+        &.disabled:hover { background-color: $primary-color; }
+
+        &.active {
+            background-color: darken($primary-color, 20%);
+            &:hover { background-color: darken($primary-color, 20%); }
+         }
+
         &:hover {
             background-color: darken($primary-color, 10%);
         }
