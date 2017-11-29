@@ -7,6 +7,14 @@
     }
 
     .table {
+        tbody > tr {
+            &.selected {
+                background-color: $primary-color;
+            }
+
+            & > td { vertical-align: middle; }
+        }
+
         thead > tr > th {
             border-top: 1px solid $quaternary-color !important;
             border-bottom: 2px solid $quaternary-color;

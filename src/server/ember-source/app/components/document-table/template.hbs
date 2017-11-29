@@ -20,8 +20,8 @@
       </thead>
       <!-- Body -->
       <tbody>
-        {{#each documents as |document| }}
-          {{ document-table-row valueObject=document.values fields=fields }}
+        {{#each documents as |document index| }}
+          {{ document-table-row valueObject=document.values fields=fields index=index }}
         {{/each}}
       </tbody>
     </table>

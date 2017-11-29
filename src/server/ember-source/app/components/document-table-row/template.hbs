@@ -1,6 +1,11 @@
-<td><input type="checkbox"></td>
-{{#each values as |value|}}
-  <td>{{ value }}</td>
+<td>
+  <div class="checkbox">
+    <input type="checkbox" id="checkbox-{{index}}" />
+    <label for="checkbox-{{index}}" onclick={{action 'selectDocument' index}}></label>
+  </div>
+</td>
+{{#each docValues as |value|}}
+  <td class="{{ value.field }}">{{ value.value }}</td>
 {{/each}}
 
 {{yield}}
