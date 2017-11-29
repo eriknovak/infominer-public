@@ -327,7 +327,11 @@ module.exports = function (app, pg, processHandler) {
 
         // query values
         // TODO: check if query contains offset, limit or page
-        let query = req.query;
+        let query = {
+            offset: parseInt(req.query.offset),
+            limit: parseInt(req.query.limit),
+            page: parseInt(req.query.page)
+        };
 
         // get the user
         let owner = req.user || 'user';

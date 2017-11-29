@@ -2,17 +2,46 @@ import Route from '@ember/routing/route';
 
 export default Route.extend({
 
-    model(params) {
+    queryParams: {
+        page: {
+            replace: true,
+            refreshModel: true
+        },
+        limit: {
+            replace: true,
+            refreshModel: true
+        }
+    },
+
+    page: 1,
+    limit: 10,
+
+    model(params, transition) {
         // modify namespace for subset model
-        console.log(this.paramsFor('dataset'));
-        console.log(this.modelFor('subset'));
-        let { dataset_id } = this.paramsFor('dataset');
-        // console.log(this.modelFor(this.routeName));
-        // let { subset_id } = this.paramsFor('subset');
-        // console.log(dataset_id, subset_id);
-        // this.store.adapterFor('document').set('namespace', `api/datasets/${dataset_id}/subsets/${subset_id}`);
-        // // get the subset info
-        // return this.get('store').query('document', { page: 1 });
+        let { dataset_id } = transition.params.dataset;
+        let { subset_id } = transition.params['dataset.subset'];
+        // set adapter for documents
+        this.store.adapterFor('document').set('namespace', `api/datasets/${dataset_id}/subsets/${subset_id}`);
+        // get initial documents
+        return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') });
+    },
+
+    actions: {
+        changeLimit(limit) {
+            // update the limit and transition to route
+            this.set('limit', limit);
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
+                .then(model => this.set('controller.model', model));
+
+        },
+        changePage(page) {
+            // update the limit and transition to route
+            this.set('page', page);
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
+                .then(model => this.set('controller.model', model));
+        }
+
+
     }
 
 });

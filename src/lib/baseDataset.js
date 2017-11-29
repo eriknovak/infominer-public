@@ -247,7 +247,6 @@ class BaseDataset {
         let self = this;
         // get database subsets
         let subsets = self.base.store('Subsets');
-        let setObj = { documents: null };
         if (id < 0 || subsets.length <= id) {
             // TODO: handle this error
             return null;
@@ -255,16 +254,29 @@ class BaseDataset {
         // prepare the query parameters
         let offset = query.offset ? query.offset : 0;
         let limit = query.limit ? query.limit : 10;
-
         // if page exists, modify offset
         if (query.page) {
             offset = (query.page-1)*limit;
         }
+        // get page
+        let page = Math.floor(offset/limit) + 1;
 
         // get the subset documents limited by
         let subsetDocuments = subsets[id].hasElements;
         // TODO: allow filtering documents
 
+        let setObj = {
+            documents: null,
+            meta: {
+                fields: self.base.store('Dataset').fields
+                    .map(field => ({ name: field.name, type: field.type })),
+                pagination: {
+                    page,
+                    limit,
+                    documentCount: subsetDocuments.length
+                }
+            }
+        };
         // truncate the documents using the query
         subsetDocuments.trunc(limit, offset);
 
@@ -296,12 +308,9 @@ class BaseDataset {
      * @returns {Object} The document json representation.
      */
     _formatDocumentInfo(rec) {
-        let self = this;
         return {
             id: rec.$id,
             type: 'documents',
-            fields: self.base.store('Dataset').fields
-                .map(field => ({ name: field.name, type: field.type })),
             values: rec.toJSON(false, false, false)
         };
     }

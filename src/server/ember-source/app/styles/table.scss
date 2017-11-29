@@ -1,0 +1,26 @@
+.document-table {
+    .table-options {
+        padding-top: 40px;
+        padding-bottom: 10px;
+
+        select { width: 50px; }
+
+    }
+
+    .table {
+        thead > tr > th {
+            border-top: 1px solid $quaternary-color !important;
+            border-bottom: 2px solid $quaternary-color;
+            color: $quaternary-color;
+        }
+    }
+
+    .table-pagination {
+        width: 100%;
+        margin-bottom: 50px;
+        .pull-center {
+            text-align: center;
+        }
+    }
+}
+
