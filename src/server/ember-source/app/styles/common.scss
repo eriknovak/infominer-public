@@ -130,6 +130,11 @@ a {
     border-radius: 0px;
     border: 0px solid;
 
+    &:focus, &:active {
+        outline: none !important;
+        box-shadow: none;
+     }
+
     &.btn-primary {
         background-color: $secondary-color;
         -webkit-transition: background .4s;

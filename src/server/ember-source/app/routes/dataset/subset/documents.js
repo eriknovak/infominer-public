@@ -2,17 +2,6 @@ import Route from '@ember/routing/route';
 
 export default Route.extend({
 
-    queryParams: {
-        page: {
-            replace: true,
-            refreshModel: true
-        },
-        limit: {
-            replace: true,
-            refreshModel: true
-        }
-    },
-
     page: 1,
     limit: 10,
 
@@ -30,7 +19,14 @@ export default Route.extend({
         changeLimit(limit) {
             // update the limit and transition to route
             this.set('limit', limit);
-            this.set('page', 1);
+            // check if the pagination changes
+            const pagination = this.get('controller.model.meta.pagination');
+            // calculage the new maxpage value
+            let maxPage = pagination.documentCount / limit;
+            if (maxPage % 1 !== 0) { maxPage = Math.floor(maxPage) + 1; }
+            // change page value if not in bound
+            if (pagination.page > maxPage) { this.set('page', maxPage); }
+
             this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
                 .then(model => this.set('controller.model', model));
 

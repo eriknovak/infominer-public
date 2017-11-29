@@ -1,11 +1,11 @@
 <div class="pull-center">
   <!-- Go to first page -->
-  <button id="go-to-first" class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+  <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
     onclick={{if onFirstPage null (action 'getDocuments' firstPage)}}>
     <i class="fa fa-angle-double-left" aria-hidden="true"></i>
   </button>
   <!-- Go to previous page -->
-  <button id="go-to-previous" class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+  <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
     onclick={{if onFirstPage null (action 'getDocuments' prevPage)}}>
     <i class="fa fa-angle-left" aria-hidden="true"></i>
   </button>
@@ -19,12 +19,12 @@
   {{/each}}
 
   <!-- Go to next page -->
-  <button id="go-to-next" class="btn btn-secondary {{if onLastPage 'disabled'}}"
+  <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
     onclick={{if onLastPage null (action 'getDocuments' nextPage)}}>
     <i class="fa fa-angle-right" aria-hidden="true"></i>
   </button>
   <!-- Go to last page -->
-  <button id="go-to-last" class="btn btn-secondary {{if onLastPage 'disabled'}}"
+  <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
     onclick={{if onLastPage null (action 'getDocuments' lastPage)}}>
     <i class="fa fa-angle-double-right" aria-hidden="true"></i>
   </button>

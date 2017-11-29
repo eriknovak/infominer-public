@@ -13,8 +13,6 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        // set component id
-        this.set("elementId", `document-${this.get('index')}`);
 
         // get document valueObject and fields
         const valueObject = this.get('valueObject');
