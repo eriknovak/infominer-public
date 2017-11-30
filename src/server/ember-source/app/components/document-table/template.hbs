@@ -13,6 +13,7 @@
       <thead>
         <tr>
           <th></th>
+          <th>id</th>
           {{#each fields as |field|}}
             <th>{{field.name}}</th>
           {{/each}}
@@ -20,8 +21,8 @@
       </thead>
       <!-- Body -->
       <tbody>
-        {{#each documents as |document index| }}
-          {{ document-table-row valueObject=document.values fields=fields index=index }}
+        {{#each documents as |document| }}
+          {{ document-table-row document=document fields=fields }}
         {{/each}}
       </tbody>
     </table>

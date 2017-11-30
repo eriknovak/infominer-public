@@ -30,9 +30,11 @@ a {
     .navbar-brand {
         color: $light-font-color;
         font-family: $main-font;
+        font-weight: 400;
     }
     .navbar-nav {
         font-size: 16px;
+        font-weight: 400;
         a {
             display: block;
             padding: 1em 1em 1em 1em;

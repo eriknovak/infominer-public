@@ -1,9 +1,14 @@
+<!-- document selection checkbox -->
 <td>
-  <div class="checkbox">
-    <input type="checkbox" id="checkbox-{{index}}" />
-    <label for="checkbox-{{index}}" onclick={{action 'selectDocument' index}}></label>
-  </div>
+  {{ checkbox-select
+    checkboxId=(concat "checkbox-" index)
+    checked=selected
+    checkboxAction=(action 'selectDocument')
+  }}
 </td>
+<!-- document id -->
+<td class="index">{{ index }}</td>
+<!-- document values -->
 {{#each docValues as |value|}}
   <td class="{{ value.field }}">{{ value.value }}</td>
 {{/each}}

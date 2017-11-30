@@ -2,6 +2,11 @@ import Route from '@ember/routing/route';
 
 export default Route.extend({
 
+    // default parameters
+    defaultPage: 1,
+    defaultLimit: 10,
+
+    // current parameters
     page: 1,
     limit: 10,
 
@@ -9,9 +14,18 @@ export default Route.extend({
         // modify namespace for subset model
         let { dataset_id } = transition.params.dataset;
         let { subset_id } = transition.params['dataset.subset'];
+        // construct namespace
+        const namespace = `api/datasets/${dataset_id}/subsets/${subset_id}`;
+        // check if in same namespace - accordingly change page and limit
+        if (this.store.adapterFor('document').get('namespace') !== namespace) {
+            this.set('page', this.defaultPage);
+            this.set('limit', this.defaultlimit);
+            // unload document store - create clean slate for new request
+            this.store.unloadAll('document');
+        }
         // set adapter for documents
-        this.store.adapterFor('document').set('namespace', `api/datasets/${dataset_id}/subsets/${subset_id}`);
-        // get initial documents
+        this.store.adapterFor('document').set('namespace', namespace);
+        // get documents
         return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') });
     },
 
@@ -37,8 +51,6 @@ export default Route.extend({
             this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
                 .then(model => this.set('controller.model', model));
         }
-
-
     }
 
 });

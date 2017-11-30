@@ -4,6 +4,7 @@ export default Component.extend({
     // component class
     classNameBindings: ['selected'],
     selected: false,
+    checked: false,
     // component tag
     tagName: 'tr',
 
@@ -11,11 +12,16 @@ export default Component.extend({
     // Component Life Cycle
     ///////////////////////////////////////////////////////
 
+    init() {
+        this._super(...arguments);
+        this.set('selected', false);
+    },
+
     didReceiveAttrs() {
         this._super(...arguments);
 
         // get document valueObject and fields
-        const valueObject = this.get('valueObject');
+        const document = this.get('document');
         const fields = this.get('fields');
 
         // save document values
@@ -23,9 +29,11 @@ export default Component.extend({
         // get values in the fields order
         for (let field of fields) {
             // console.log(field);
-            docValues.push({ value: valueObject[field.name], field: field.name });
+            docValues.push({ value: document.get(`values.${field.name}`), field: field.name });
         }
         // save values
+        this.set('index', document.get('id'));
+        this.set('selected', document.get('selected'));
         this.set('docValues', docValues);
     },
 
@@ -34,10 +42,11 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
-        selectDocument(id) {
+        selectDocument() {
             // get checkbox status
-            const checked = !this.$(`#checkbox-${id}`).prop('checked');
-            this.set('selected', checked);
+            this.toggleProperty('selected');
+            this.set('document.selected', this.get('selected'));
+
         }
     }
 
