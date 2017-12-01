@@ -50,7 +50,7 @@ require('./routes/api/version1')(app, pg, processHandler);
 // handle ember web application
 // IMPORTANT: must be after all routes
 app.get('*', (req, res) => {
-    res. sendFile('./public/index.html', { root: __dirname });
+    res.sendFile('./public/index.html', { root: __dirname });
 });
 
 // run the express app

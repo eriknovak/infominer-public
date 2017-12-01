@@ -13,16 +13,19 @@ export default Component.extend({
 
         // set page, limit and count
         const page = pagination.page;
+        const limit = pagination.limit;
+        const count = pagination.documentCount;
+
         this.set('page', page);
-        this.set('limit', pagination.limit);
-        this.set('count', pagination.documentCount);
+        this.set('limit', limit);
+        this.set('count', count);
 
         // page navigation
         this.set('firstPage', 1);
         this.set('prevPage', page-1);
         this.set('nextPage', page+1);
         // set last page
-        let lastPage = this.count/this.limit;
+        let lastPage = count/limit;
         if (lastPage % 1 !== 0) { lastPage = Math.floor(lastPage) + 1; }
         this.set('lastPage', lastPage);
 
@@ -39,6 +42,14 @@ export default Component.extend({
         // set condition values
         this.set('onFirstPage', page === 1);
         this.set('onLastPage', page === lastPage);
+
+        // how many documents are shown
+        const startDisplay = 1 + (page-1)*limit;
+        const endDisplay = page*limit > count ? count : page*limit;
+
+        // set display information
+        this.set('startDisplay', startDisplay);
+        this.set('endDisplay', endDisplay);
 
     },
 

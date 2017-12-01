@@ -1,9 +1,6 @@
-<span>
-  Show:
-  <select id="table-show-limit" onchange={{action 'changeLimit'}}>
-    {{#each possibleLimits as |limit|}}
-      <option selected={{if limit.selected "selected"}}>{{ limit.value }}</option>
-    {{/each}}
-  </select>
-
-</span>
+Show:
+<select id="table-show-limit" onchange={{action 'changeLimit'}}>
+  {{#each possibleLimits as |limit|}}
+    <option selected={{if limit.selected "selected"}}>{{ limit.value }}</option>
+  {{/each}}
+</select>

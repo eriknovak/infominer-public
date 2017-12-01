@@ -1,0 +1,16 @@
+<!-- Header -->
+<thead>
+  <tr>
+    <th>
+    </th>
+    {{#each fields as |field|}}
+      <th>{{field.name}}</th>
+    {{/each}}
+  </tr>
+</thead>
+<!-- Body -->
+<tbody>
+  {{#each documents as |document| }}
+    {{ document-table-row document=document fields=fields }}
+  {{/each}}
+</tbody>

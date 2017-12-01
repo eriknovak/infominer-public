@@ -45,12 +45,30 @@ export default Route.extend({
                 .then(model => this.set('controller.model', model));
 
         },
+
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
             this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
                 .then(model => this.set('controller.model', model));
+        },
+
+        createSubset(params) {
+            // get subset label
+            const subsetLabel = params.label;
+            const subsetDescription = params.description;
+            console.log(subsetLabel);
+            console.log(subsetDescription);
+            // get local documents
+            const documents = this.get('store').peekAll('document');
+            // documents.forEach((item, index) => {
+            //     console.log(item.get('selected'), index);
+            // });
+            let documentIds = documents.filterBy('selected', true).map(doc => parseInt(doc.get('id')));
+            console.log(documentIds);
+
         }
+
     }
 
 });

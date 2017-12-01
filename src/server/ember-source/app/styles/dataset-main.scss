@@ -29,7 +29,6 @@
 
 .subset-information{
     border-bottom: 1px solid #cccccc;
-    border-left: 1px solid #cccccc;
 
     .subset-basic-information {
         margin-top: 10px;
@@ -65,4 +64,8 @@
     .subset-information{
         border-left: 0px solid;
     }
+}
+
+.new-subset {
+    label { @include label; }
 }

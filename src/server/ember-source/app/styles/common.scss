@@ -80,13 +80,15 @@ a {
     font-size: 16px;
 }
 
+/**
+ * Custom checkbox style - component 'checkbox-select'
+ */
+
 .checkbox {
     width: 20px;
     position: relative;
-    margin: 0 5px;
-    margin-top: -8px;
-    margin-right: -5px;
-
+    margin: auto;
+    margin-top: -9px !important;
 
     input[type=checkbox] {
         display: none;
@@ -128,6 +130,10 @@ a {
     }
 }
 
+/**
+ * Global button styles
+ */
+
 .btn {
     border-radius: 0px;
     border: 0px solid;
@@ -135,47 +141,47 @@ a {
     &:focus, &:active {
         outline: none !important;
         box-shadow: none;
-     }
+    }
 
-    &.btn-primary {
-        background-color: $secondary-color;
+    @mixin button-type($color) {
+        background-color: $color;
         -webkit-transition: background .4s;
         transition: background .4s;
-        &.disabled:hover { background-color: $secondary-color; }
-        &:hover {
-            background-color: darken($secondary-color, 10%);
+        &.disabled:hover { background-color: $color; }
+        &.active {
+            background-color: darken($color, 20%);
+            &:hover { background-color: darken($color, 20%); }
         }
+        &:hover { background-color: darken($color, 10%); }
+    }
+
+    &.btn-primary {
+        @include button-type($secondary-color);
     }
 
     &.btn-secondary {
         color: white;
-        background-color: $quaternary-color;
-        -webkit-transition: background .4s;
-        transition: background .4s;
-        &.disabled:hover { background-color: $quaternary-color; }
-        &:hover {
-            background-color: darken($quaternary-color, 10%);
-        }
+        @include button-type($quaternary-color);
     }
 
     &.btn-tertiary {
         color: $dark-font-color;
-        background-color: $primary-color;
-        -webkit-transition: background .4s;
-        transition: background .4s;
-        &.disabled:hover { background-color: $primary-color; }
-
-        &.active {
-            background-color: darken($primary-color, 20%);
-            &:hover { background-color: darken($primary-color, 20%); }
-         }
-
-        &:hover {
-            background-color: darken($primary-color, 10%);
-        }
+        @include button-type($primary-color);
     }
 
     &.pull-right {
         margin-left: 10px;
     }
+}
+
+/**
+ * Input and label style
+ */
+
+input, select, textarea {
+    border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+    resize: none;
 }

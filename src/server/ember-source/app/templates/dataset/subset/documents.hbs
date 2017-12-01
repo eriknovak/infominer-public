@@ -1,3 +1,8 @@
-{{ document-table model=model changeLimit=(route-action 'changeLimit') changePage=(route-action 'changePage') }}
+{{ document-table
+  model=model
+  changeLimit=(route-action 'changeLimit')
+  changePage=(route-action 'changePage')
+  createSubset=(route-action 'createSubset')
+}}
 
 {{outlet}}
