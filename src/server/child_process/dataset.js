@@ -86,11 +86,11 @@ function handle(msg) {
     case 'init':
         console.log('Initialize child process id=', process.pid);
         break;
-    case 'create':
+    case 'create_dataset':
         console.log('Creating database in child process id=', process.pid);
         createDatabase(msg);
         break;
-    case 'open':
+    case 'open_dataset':
         console.log('Opening database in child process id=', process.pid);
         openDatabase(msg);
         break;
@@ -103,11 +103,11 @@ function handle(msg) {
     // database info retrieving
     /////////////////////////////////////////////////////////////////
 
-    case 'dataset_info':
+    case 'get_dataset_info':
         console.log('Get database info in child process id=', process.pid);
         getDatasetInfo(msg);
         break;
-    case 'subset_info':
+    case 'get_subset_info':
         console.log('Get subset info in child process id=', process.pid);
         getSubsetInfo(msg);
         break;
@@ -115,7 +115,18 @@ function handle(msg) {
         console.log('Get subset info in child process id=', process.pid);
         getSubsetDocuments(msg);
         break;
-
+    case 'create_subset':
+        console.log('Get subset info in child process id=', process.pid);
+        createSubset(msg);
+        break;
+    case 'get_method_info':
+        console.log('Get method info in child process id=', process.pid);
+        getMethodInfo(msg);
+        break;
+    case 'create_method':
+        console.log('Get method info in child process id=', process.pid);
+        createMethod(msg);
+        break;
     default:
         console.log('Unknown cmd in child process, cmd=' + msg.body.cmd);
         break;
@@ -196,12 +207,29 @@ function getDatasetInfo(msg) {
     }
 }
 
+/////////////////////////////
+// subset functions
+
 function getSubsetInfo(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
     try {
         let subsetId = body.content ? body.content.subsetId : null;
         let jsonResults = database.getSubsetInfo(subsetId);
+        process.send({ reqId, content: { jsonResults } });
+    } catch (err) {
+        console.log('getSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+function createSubset(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let { subset } = body.content;
+        let jsonResults = database.createSubset(subset);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
         console.log('getSubsetInfo Error', err.message);
@@ -223,6 +251,36 @@ function getSubsetDocuments(msg) {
         // notify parent process about the error
         process.send({ reqId, error: err.message });
     }
+}
 
+/////////////////////////////
+// method functions
 
+function getMethodInfo(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let methodId = body.content ? body.content.methodId : null;
+        let jsonResults = database.getMethodInfo(methodId);
+        process.send({ reqId, content: { jsonResults } });
+    } catch (err) {
+        console.log('getSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+function createMethod(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let { method } = body.content;
+        let jsonResults = database.createMethod(method);
+        console.log(jsonResults);
+        process.send({ reqId, content: { jsonResults } });
+    } catch (err) {
+        console.log('getSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
 }

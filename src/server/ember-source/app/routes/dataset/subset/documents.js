@@ -10,21 +10,25 @@ export default Route.extend({
     page: 1,
     limit: 10,
 
-    model(params, transition) {
+    beforeModel(transition) {
         // modify namespace for subset model
         let { dataset_id } = transition.params.dataset;
         let { subset_id } = transition.params['dataset.subset'];
         // construct namespace
         const namespace = `api/datasets/${dataset_id}/subsets/${subset_id}`;
+        let documentAdapter = this.get('store').adapterFor('document');
         // check if in same namespace - accordingly change page and limit
-        if (this.store.adapterFor('document').get('namespace') !== namespace) {
+        if (documentAdapter.get('namespace') !== namespace) {
             this.set('page', this.defaultPage);
             this.set('limit', this.defaultlimit);
             // unload document store - create clean slate for new request
             this.store.unloadAll('document');
         }
         // set adapter for documents
-        this.store.adapterFor('document').set('namespace', namespace);
+        documentAdapter.set('namespace', namespace);
+    },
+
+    model() {
         // get documents
         return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') });
     },
@@ -54,18 +58,62 @@ export default Route.extend({
         },
 
         createSubset(params) {
+            let self = this;
             // get subset label
             const subsetLabel = params.label;
             const subsetDescription = params.description;
-            console.log(subsetLabel);
-            console.log(subsetDescription);
+
             // get local documents
-            const documents = this.get('store').peekAll('document');
-            // documents.forEach((item, index) => {
-            //     console.log(item.get('selected'), index);
-            // });
-            let documentIds = documents.filterBy('selected', true).map(doc => parseInt(doc.get('id')));
-            console.log(documentIds);
+            const selectedDocs = self.get('store').peekAll('document').filterBy('selected', true);
+
+            // if there are selected
+            if (selectedDocs.get('length') > 0) {
+
+                // get subset ids and methods
+                Ember.RSVP.hash({
+                    subsets: self.get('store').findAll('subset'),
+                    methods: self.get('store').findAll('method')
+                }).then(datasets => ({
+                    subsetId: datasets.subsets.get('length') ? datasets.subsets.get('length') : 0,
+                    methodId: datasets.methods.get('length') ? datasets.methods.get('length') : 0
+                })).then(ids => {
+                    // create a new method
+                    const newMethod = self.get('store').createRecord('method', {
+                        id: ids.methodId,
+                        methodType: 'filter.manual',
+                        parameters: { documentIds: selectedDocs.map(doc => parseInt(doc.id)) },
+                        result: { documentIds: selectedDocs.map(doc => parseInt(doc.id)) },
+                        appliedOn: self.modelFor('dataset.subset')
+                    });
+                    // save method
+                    newMethod.save().then(function () {
+                        // create new subset
+                        const newSubset = self.get('store').createRecord('subset', {
+                            id: ids.subsetId,
+                            label: subsetLabel,
+                            description: subsetDescription,
+                            documents: selectedDocs,
+                            resultedIn: newMethod
+                        });
+                        // save subset
+                        newSubset.save()
+                            .then(() => {
+                                Ember.$('.modal-backdrop').remove();
+                                self.transitionTo('dataset.subset.statistics', self.modelFor('dataset'), newSubset);
+                            }).catch(error => {
+                                console.log(error.message);
+                            });
+                        });
+
+
+
+                });
+
+            } else {
+                // TODO: send a message to the user - no documents selected
+                console.log('No documents selected');
+            }
+
 
         }
 

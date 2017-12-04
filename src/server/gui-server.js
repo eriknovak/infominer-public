@@ -45,12 +45,17 @@ app.use(bodyParser.urlencoded({   // to support URL-encoded bodies
 app.use(express.static(__dirname + '/public'));
 
 // upload api routes
-require('./routes/api/version1')(app, pg, processHandler);
+require('./routes/api/v1')(app, pg, processHandler);
 
 // handle ember web application
 // IMPORTANT: must be after all routes
 app.get('*', (req, res) => {
-    res.sendFile('./public/index.html', { root: __dirname });
+    console.log(req.query);
+    console.log(req.params);
+    console.log(req.body);
+
+    return res.end();
+    // res.sendFile('./public/index.html', { root: __dirname });
 });
 
 // run the express app

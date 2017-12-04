@@ -218,7 +218,7 @@ class BaseDataset {
 
     /**
      * Gets information about the subsets in the database.
-     * @returns {Object[]} An array of subset representation objects.
+     * @returns {Object} An array of subset representation objects.
      */
     getSubsetInfo(id) {
         let self = this;
@@ -243,7 +243,51 @@ class BaseDataset {
         return setObj;
     }
 
+    /**
+     * Creates a subset record in the database.
+     * @param {Object} subset - The subset to store.
+     * @param {String} subset.label - The label of the subset.
+     * @param {String} [subset.description] - The subset description.
+     * @param {Number} subset.resultedIn - The id of the method that created the subset.
+     * @param {Number[]} subset.documents - Array of documents the subset contains.
+     */
+    createSubset(subset) {
+        // TODO: log activity
+        let self = this;
+        // create subset record
+        let qSubset = {
+            label: subset.label,
+            description: subset.description
+        };
+        // get method that created the subset
+        let method = self.base.store('Methods')[subset.resultedIn];
+        if (method) {
+            // add join to method
+            let subsetId = self.base.store('Subsets').push(qSubset);
+            self.base.store('Subsets')[subsetId].$addJoin('resultedIn', method);
+
+            // add joins to documents/elements
+            for (let documentId of subset.documents) {
+                let document = self.base.store('Dataset')[documentId];
+                if (document) { self.base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
+            }
+            return { subsets: { id: subsetId } };
+        } else {
+            throw new Error(`No subset with id=${method.appliedOn}`);
+        }
+    }
+
+    /**
+     * Gets documents that are part of the subset.
+     * @param {Number} id - Subset id.
+     * @param {Object} [query] - Query for retrieving documents.
+     * @param {Number} [query.limit=10] - The number of documents it retrieves.
+     * @param {Number} [query.offset=0] - The retrieval starting point.
+     * @param {Number} [query.page] - The page number based on the limit.
+     * @returns {Object} The object containing the documents and it's metadata.
+     */
     getSubsetDocuments(id, query) {
+        // TODO: log activity
         let self = this;
         // get database subsets
         let subsets = self.base.store('Subsets');
@@ -286,6 +330,64 @@ class BaseDataset {
     }
 
     /**
+     * Gets information about the methods in the database.
+     * @returns {Object} An array of methods representation objects.
+     */
+    getMethodInfo(id) {
+        // TODO: log activity
+        let self = this;
+        // get database methods
+        let methods = self.base.store('Methods');
+        let methodObj = { methods: null };
+        // if id is a number
+        if (!isNaN(parseFloat(id))) {
+            // validate id
+            if (id < 0 || methods.length <= id) {
+                // TODO: handle this error
+                return null;
+            }
+            // get one method and format it
+            let set = methods[id];
+            methodObj.methods = self._formatMethodInfo(set);
+        } else {
+            methodObj.methods = methods.allRecords
+                .map(rec => self._formatMethodInfo(rec));
+        }
+        // return the methods
+        return methodObj;
+    }
+
+    /**
+     * Creates a method record in the database.
+     * @param {Object} method - The method to store.
+     * @param {String} method.methodType - The type of the method.
+     * @param {Object} method.parameters - The parameters of the method.
+     * @param {Object} method.result - The result of the method.
+     * @param {Number} method.appliedOn - The id of the subset the method was applied on.
+     */
+    createMethod(method) {
+        // TODO: log activity
+
+        let self = this;
+        // prepare method object
+        let qMethod = {
+            type: method.methodType,
+            parameters: method.parameters,
+            result: method.result
+        };
+        // get subset on which the method was used
+        let subset = self.base.store('Subsets')[method.appliedOn];
+        if (subset) {
+            let methodId = self.base.store('Methods').push(qMethod);
+            self.base.store('Methods')[methodId].$addJoin('appliedOn', subset);
+            return { methods: { id: methodId } };
+        } else {
+            throw new Error(`No subset with id=${method.appliedOn}`);
+        }
+
+    }
+
+    /**
      * Formats the subset record.
      * @param {Object} rec - The subset record.
      * @returns {Object} The subset json representation.
@@ -296,9 +398,9 @@ class BaseDataset {
             type: 'subsets',
             label: rec.label,
             description: rec.description,
-            resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
-            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
-            numberOfElements: rec.hasElements.length
+            resultedIn: rec.resultedIn ? rec.resultedIn.$id : null,
+            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.$id) : null,
+            documents: !rec.hasElements.empty ? rec.hasElements.map(doc => doc.$id) : null
         };
     }
 
@@ -311,7 +413,25 @@ class BaseDataset {
         return {
             id: rec.$id,
             type: 'documents',
+            subsets: !rec.inSubsets.empty ? rec.inSubsets.map(subset => subset.$id) : null,
             values: rec.toJSON(false, false, false)
+        };
+    }
+
+    /**
+     * Formats the method record.
+     * @param {Object} rec - The method record.
+     * @returns {Object} The method json representation.
+     */
+    _formatMethodInfo(rec) {
+        return {
+            id: rec.$id,
+            type: 'methods',
+            methodType: rec.type,
+            parameters: rec.parameters,
+            result: rec.result,
+            produced: !rec.produced.empty ? rec.produced.map(subset => subset.$id) : null,
+            appliedOn: !rec.appliedOn.empty ? rec.appliedOn.map(subset => subset.$id) : null
         };
     }
 

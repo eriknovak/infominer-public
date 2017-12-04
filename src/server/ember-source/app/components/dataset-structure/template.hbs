@@ -6,8 +6,10 @@
         <div class="col-sm-5 col-md-4">
           <!-- dataset navigation -->
           <h4 class="description-header">Structure</h4>
-          {{#each subsets as |subset|}}
-            {{subset.label}}
+          {{#each dataset.hasSubsets as |subset|}}
+            {{#link-to 'dataset.subset.statistics' dataset subset }}
+              {{subset.label}}
+            {{/link-to}}
           {{/each}}
         </div>
         <div class="col-sm-7 col-md-8">

@@ -3,7 +3,15 @@ import Route from '@ember/routing/route';
 export default Route.extend({
 
     model(params) {
-        return this.get('store').findRecord('dataset', params.dataset_id, { reload: true });
+        return this.get('store').findRecord('dataset', params.dataset_id);
+    },
+
+    afterModel(model, transition) {
+        let { dataset_id } = transition.params.dataset;
+        const namespace = `api/datasets/${dataset_id}`;
+        // modify namespace for subset and method model
+        this.store.adapterFor('subset').set('namespace', namespace);
+        this.store.adapterFor('method').set('namespace', namespace);
     },
 
     actions: {
