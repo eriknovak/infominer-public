@@ -232,6 +232,7 @@ class BaseDataset {
                 // TODO: handle this error
                 return null;
             }
+            console.log('GetSubsetInfo', id);
             // get one subset and format it
             let set = subsets[id];
             setObj.subsets = self._formatSubsetInfo(set);

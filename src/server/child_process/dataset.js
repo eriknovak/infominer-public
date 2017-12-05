@@ -214,7 +214,9 @@ function getSubsetInfo(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
     try {
+        console.log(body);
         let subsetId = body.content ? body.content.subsetId : null;
+        console.log('subsetid inside', subsetId);
         let jsonResults = database.getSubsetInfo(subsetId);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
@@ -259,12 +261,13 @@ function getSubsetDocuments(msg) {
 function getMethodInfo(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
+    console.log(msg);
     try {
         let methodId = body.content ? body.content.methodId : null;
         let jsonResults = database.getMethodInfo(methodId);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
-        console.log('getSubsetInfo Error', err.message);
+        console.log('getMethodInfo Error', err.message);
         // notify parent process about the error
         process.send({ reqId, error: err.message });
     }
@@ -276,10 +279,9 @@ function createMethod(msg) {
     try {
         let { method } = body.content;
         let jsonResults = database.createMethod(method);
-        console.log(jsonResults);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
-        console.log('getSubsetInfo Error', err.message);
+        console.log('getMethodInfo Error', err.message);
         // notify parent process about the error
         process.send({ reqId, error: err.message });
     }

@@ -9,12 +9,15 @@ export default Route.extend({
 
     model(params) {
         // get the subset info
-        return this.get('store').findRecord('subset', params.subset_id, { reload: true });
+        return this.get('store').findRecord('subset', params.subset_id);
     },
 
     afterModel(model) {
         let methodId = model.belongsTo('resultedIn').id();
-        if (!isNaN(parseFloat(methodId))) { this.get('store').findRecord('method', methodId); }
+        // find the method
+        if (!isNaN(parseFloat(methodId))) {
+            this.get('store').findRecord('method', methodId);
+        }
     }
 
 });

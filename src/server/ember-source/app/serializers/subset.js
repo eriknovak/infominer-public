@@ -2,7 +2,7 @@ import DS from 'ember-data';
 
 export default DS.RESTSerializer.extend({
 
-    serialize(snapshot, options) {
+    serialize() {
         let json = this._super(...arguments);
 
         // id and appliedOn should be integers
