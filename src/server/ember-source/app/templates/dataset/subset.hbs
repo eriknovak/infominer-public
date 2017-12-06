@@ -6,7 +6,7 @@
         <h1>{{ model.label }}</h1>
 
         <div class="row">
-          <div class="col-lg-4">
+          <div class="col-lg-3">
             <p class="subset-basic-information">
               <span class="dataset-documents-number">{{ model.documentCount }} documents</span><br/>
               Created using: <span class="method">{{if model.resultedIn model.resultedIn.methodType 'none' }}</span><br/>
@@ -14,7 +14,7 @@
             </p>
           </div>
           {{#if model.description }}
-            <div class="col-lg-6">
+            <div class="col-lg-9">
               <h4>Description</h4>
               <p class="dataset-description">{{ model.description }}</p>
             </div>
@@ -25,7 +25,7 @@
     </div>
 
     <div class="row subset-navigation">
-      <div class="col-lg-11">
+      <div class="col-lg-10">
 
       {{#link-to "dataset.subset.statistics" model class="btn btn-primary"}}Statistics{{/link-to}}
       {{#link-to "dataset.subset.documents" model class="btn btn-primary"}}Documents{{/link-to}}
@@ -34,8 +34,6 @@
     </div>
   </div>
 </div>
-
-
 
 <!-- subset statistics and documents -->
 <div class="row">
