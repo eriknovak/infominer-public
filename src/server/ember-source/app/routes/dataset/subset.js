@@ -18,6 +18,7 @@ export default Route.extend({
         if (!isNaN(parseFloat(methodId))) {
             this.get('store').findRecord('method', methodId);
         }
+        this.transitionTo('dataset.subset.statistics', model);
     }
 
 });

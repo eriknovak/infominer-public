@@ -1,0 +1,18 @@
+{{#if method.produced }}
+  <!-- button for toggling collapse -->
+  <button class="btn btn-xs rotate {{unless collapsed 'down'}}" data-toggle="collapse"
+    aria-expanded="false" onclick={{action 'toggleBranch'}}>
+    <i class="fa fa-chevron-right"></i>
+  </button>
+{{else}}
+  <!-- placeholder for the toggle -->
+  <span class="navigation-button-placeholder"></span>
+{{/if}}
+<!-- method type/label -->
+{{ method.methodType }}
+
+{{#bs-collapse collapsed=collapsed class="tree-branch"}}
+  {{#each method.produced as |subset| }}
+    {{ structure-subset subset=subset dataset=dataset }}
+  {{/each}}
+{{/bs-collapse}}

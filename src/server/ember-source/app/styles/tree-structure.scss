@@ -1,0 +1,35 @@
+@mixin tree-structure {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.rotate {
+    -moz-transition: all .2s linear;
+    -webkit-transition: all .2s linear;
+    transition: all .2s linear;
+    &.down{
+        -ms-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+}
+
+.tree-structure {
+
+    @include tree-structure;
+
+    .btn {
+        background-color: transparent;
+    }
+
+    .tree-branch {
+        padding-left: 20px;
+    }
+
+    .navigation-button-placeholder {
+        display: inline-block;
+        width: 20px;
+    }
+}

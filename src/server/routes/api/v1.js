@@ -324,7 +324,6 @@ module.exports = function (app, pg, processHandler) {
 
         // get the user
         let owner = req.user || 'user';
-        console.log('subsetid', subsetId);
         // set the body info
         let body = { cmd: 'get_subset_info', content: { subsetId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -405,8 +404,6 @@ module.exports = function (app, pg, processHandler) {
 
         // get the user
         let owner = req.user || 'user';
-
-        console.log('methodid', methodId);
 
         // set the body info
         let body = { cmd: 'get_method_info', content: { methodId } };

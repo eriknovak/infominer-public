@@ -33,7 +33,7 @@ export default Route.extend({
             model.destroyRecord()
                 .then(() => {
                     // remove modal backdrop and redirect to dataset library
-                    Ember.$('.modal-backdrop').remove();
+                    Ember.$('#delete-dataset-modal').modal('toggle');
                     this.transitionTo('datasets');
                 });
         }

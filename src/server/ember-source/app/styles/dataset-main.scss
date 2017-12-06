@@ -27,19 +27,37 @@
     }
 }
 
+@mixin link-style ($color) {
+    font-weight: 600;
+    color: $color;
+    a {
+        padding: 0 5px;
+        background-color: white;
+        -webkit-transition: background .4s;
+        transition: background .4s;
+        &:hover {
+            background-color: $primary-color;
+        }
+
+        &.active {
+            background-color: $color;
+            color: white;
+        }
+    }
+}
+
+.method {
+    @include link-style(green);
+}
+.subset {
+    @include link-style($tertiary-color);
+}
+
 .subset-information{
     border-bottom: 1px solid #cccccc;
 
     .subset-basic-information {
         margin-top: 10px;
-        .subset-creation-method {
-            font-weight: 700;
-            color: green;
-        }
-        .subset-parent {
-            font-weight: 700;
-            color: $tertiary-color;
-        }
     }
 
     .subset-navigation {

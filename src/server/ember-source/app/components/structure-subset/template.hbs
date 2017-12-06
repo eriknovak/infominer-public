@@ -1,0 +1,20 @@
+{{#if subset.usedBy }}
+  <!-- button for toggling collapse -->
+  <button class="btn btn-xs rotate {{unless collapsed 'down'}}" data-toggle="collapse"
+    aria-expanded="false" onclick={{action 'toggleBranch'}}>
+    <i class="fa fa-chevron-right"></i>
+  </button>
+{{else}}
+  <!-- placeholder for the toggle -->
+  <span class="navigation-button-placeholder"></span>
+{{/if}}
+
+{{#link-to 'dataset.subset' dataset subset }}
+  {{ subset.label }}
+{{/link-to}}
+
+{{#bs-collapse collapsed=collapsed class="tree-branch"}}
+  {{#each subset.usedBy as |method| }}
+    {{ structure-method method=method dataset=dataset }}
+  {{/each}}
+{{/bs-collapse}}

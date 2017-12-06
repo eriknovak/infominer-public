@@ -88,7 +88,7 @@ export default Route.extend({
                     });
                     // save subset
                     subset.save().then(() => {
-                            Ember.$('.modal-backdrop').remove();
+                            Ember.$('#create-subset-documents-modal').modal('toggle');
                             self.transitionTo('dataset.subset.statistics', self.modelFor('dataset'), subset);
                         }).catch(error => {
                             console.log(error.message);

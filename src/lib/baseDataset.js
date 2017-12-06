@@ -199,8 +199,11 @@ class BaseDataset {
         let self = this;
         // get all subsets
         let { subsets } = self.getSubsetInfo();
+        let { methods } = self.getMethodInfo();
+
         // subset ids used in the dataset info
         let subsetIds = subsets.map(set => set.id);
+
         let jsonResults = {
             datasets: {
                 id: self.params.datasetId,
@@ -210,7 +213,8 @@ class BaseDataset {
                 numberOfDocuments: self.base.store('Dataset').length,
                 hasSubsets: subsetIds
             },
-            subsets
+            subsets,
+            methods
         };
         // returns
         return jsonResults;

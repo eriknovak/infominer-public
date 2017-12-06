@@ -9,8 +9,8 @@
           <div class="col-lg-4">
             <p class="subset-basic-information">
               <span class="dataset-documents-number">{{ model.documentCount }} documents</span><br/>
-              Created using: <span class="subset-creation-method">{{if model.resultedIn model.resultedIn.methodType 'none' }}</span><br/>
-              Derived from: <span class="subset-parent">{{if model.resultedIn model.resultedIn.appliedOn.label 'none' }}</span><br/>
+              Created using: <span class="method">{{if model.resultedIn model.resultedIn.methodType 'none' }}</span><br/>
+              Derived from: <span class="subset">{{if model.resultedIn model.resultedIn.appliedOn.label 'none' }}</span><br/>
             </p>
           </div>
           {{#if model.description }}
@@ -25,7 +25,7 @@
     </div>
 
     <div class="row subset-navigation">
-      <div class="col-lg-12">
+      <div class="col-lg-11">
 
       {{#link-to "dataset.subset.statistics" model class="btn btn-primary"}}Statistics{{/link-to}}
       {{#link-to "dataset.subset.documents" model class="btn btn-primary"}}Documents{{/link-to}}
