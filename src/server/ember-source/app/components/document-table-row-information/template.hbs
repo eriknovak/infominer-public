@@ -1,0 +1,21 @@
+<td colspan="{{rowWidth}}">
+  <div class="collapse" id="{{collapseId}}">
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <!-- Fill the container with documents -->
+          {{#each docValues as |value|}}
+            <label class="subset">{{value.field}}</label>
+            <p>{{value.value}}</p>
+          {{/each}}
+
+        </div><!-- -->
+      </div><!-- .row -->
+    </div><!-- .container-fluid -->
+
+  </div>
+</td>
+
+{{yield}}

@@ -1,15 +1,7 @@
 import Component from '@ember/component';
 
 export default Component.extend({
-    classNames: ['document'],
-    // component class
-    classNameBindings: ['selected'],
-    selected: false,
-
-    // component attributes
-    dataToggle: 'collapse',
-    dataTarget: '',
-
+    classNames: ['document-information-row'],
     // component tag
     tagName: 'tr',
 
@@ -26,35 +18,24 @@ export default Component.extend({
         this._super(...arguments);
 
         // get document valueObject and fields
-        const document = this.get('document');
         const fields = this.get('fields');
+        let rowWidth = 1 + fields.length;
+        this.set('rowWidth', rowWidth);
 
         // save document values
+        const document = this.get('document');
         let docValues = [ ];
         // get values in the fields order
         for (let field of fields) {
             docValues.push({ value: document.get(`values.${field.name}`), field: field.name });
         }
         // save values
-        this.set('index', document.get('id'));
-        this.set('selected', document.get('selected'));
         this.set('docValues', docValues);
-
-        // set link with expanded info
-        this.set('dataTarget', `#document-${document.id}`);
+        this.set('collapseId', `document-${document.id}`);
     },
 
     ///////////////////////////////////////////////////////
     // Actions
     ///////////////////////////////////////////////////////
-
-    actions: {
-        selectDocument() {
-            // get checkbox status
-            this.toggleProperty('selected');
-            this.set('document.selected', this.get('selected'));
-
-        }
-    }
 
 });

@@ -4,7 +4,7 @@
     <th>
     </th>
     {{#each fields as |field|}}
-      <th>{{field.name}}</th>
+      <th class="{{field.name}}">{{field.name}}</th>
     {{/each}}
   </tr>
 </thead>
@@ -12,5 +12,6 @@
 <tbody>
   {{#each documents as |document| }}
     {{ document-table-row document=document fields=fields }}
+    {{ document-table-row-information document=document fields=fields }}
   {{/each}}
 </tbody>

@@ -13,10 +13,40 @@
         tbody > tr {
             &.selected {
                 background-color: $primary-color;
+                & + .document-information-row td {
+                    background-color: $primary-color !important;
+                }
+                &:hover + .document-information-row td {
+                    background-color: $primary-color !important;
+                }
             }
 
-            & > td { vertical-align: middle; }
+            &:hover + .document-information-row td {
+                background-color: #f5f5f5 !important;
+            }
+
+            & > td {
+                vertical-align: middle;
+                border-top: 0px !important;
+            }
+
+            .clickable {
+                cursor: pointer;
+            }
         }
+
+        .document-information-row {
+            &:hover td { background-color: white; }
+
+            td {
+                padding: 0px !important;
+                border-bottom: 1px solid #dddddd;
+                .document-information {
+                    margin: 5px;
+                }
+            }
+        }
+
 
         thead > tr > th {
             border-top: 1px solid $quaternary-color !important;
@@ -25,6 +55,8 @@
             color: $quaternary-color;
         }
     }
+
+
 
     .table-pagination {
         width: 100%;
