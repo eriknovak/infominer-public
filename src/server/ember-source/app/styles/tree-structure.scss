@@ -45,12 +45,12 @@
         &:after {
             content: '';
             position: absolute;
-            left: -12px;
+            left: -11px;
         }
 
         &:before {
             border-top: 1px solid;
-            top: 9px;
+            top: 10px;
             width: 8px;
             height: 0;
         }
@@ -67,7 +67,7 @@
     .child {
         position: relative;
         & .tree-branch > .child:last-child:after {
-            height: 8px !important;
+            height: 8px;
         }
     }
 }
