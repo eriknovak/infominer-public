@@ -6,6 +6,8 @@ export default Route.extend({
     defaultPage: 1,
     defaultLimit: 10,
 
+    sortOption: null,
+
     // current parameters
     page: 1,
     limit: 10,
@@ -23,7 +25,7 @@ export default Route.extend({
             // set default parameters
             this.set('page', this.defaultPage);
             this.set('limit', this.defaultlimit);
-
+            this.set('sortOption', null);
             // set all documents as un-selected
             this.get('store').peekAll('document')
                 .forEach(doc => doc.set('selected', false));
@@ -35,7 +37,11 @@ export default Route.extend({
 
     model() {
         // get documents
-        return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') });
+        return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') });
+    },
+
+    afterModel(model) {
+        // TODO: save field names for table sorting
     },
 
     actions: {
@@ -50,7 +56,7 @@ export default Route.extend({
             // change page value if not in bound
             if (pagination.page > maxPage) { this.set('page', maxPage); }
 
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') })
                 .then(model => this.set('controller.model', model));
 
         },
@@ -58,7 +64,14 @@ export default Route.extend({
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit') })
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') })
+                .then(model => this.set('controller.model', model));
+        },
+
+        sortByField(field) {
+            this.set('sortOption', { field: field });
+            // TODO: manipulate sorting by field name
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') })
                 .then(model => this.set('controller.model', model));
         },
 

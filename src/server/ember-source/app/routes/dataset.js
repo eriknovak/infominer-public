@@ -19,7 +19,7 @@ export default Route.extend({
             methodAdapter.set('namespace', namespace);
         }
         // get data
-        return this.get('store').findRecord('dataset', params.dataset_id, { reload: true });
+        return this.get('store').findRecord('dataset', params.dataset_id);
     },
 
     actions: {

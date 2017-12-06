@@ -352,7 +352,8 @@ module.exports = function (app, pg, processHandler) {
         let query = {
             offset: parseInt(req.query.offset),
             limit: parseInt(req.query.limit),
-            page: parseInt(req.query.page)
+            page: parseInt(req.query.page),
+            sort: req.query.sort
         };
 
         // get the user

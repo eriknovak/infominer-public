@@ -1,13 +1,12 @@
 import Component from '@ember/component';
 
 export default Component.extend({
-    classNames: ['document'],
     // component class
+    classNames: ['document'],
     classNameBindings: ['selected'],
     selected: false,
 
     // component attributes
-    dataToggle: 'collapse',
     dataTarget: '',
 
     // component tag

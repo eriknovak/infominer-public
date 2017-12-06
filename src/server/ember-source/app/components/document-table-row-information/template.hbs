@@ -1,4 +1,10 @@
-<td colspan="{{rowWidth}}">
+<!-- empty data table -->
+<td class="clickable" data-toggle="collapse" data-target="#{{collapseId}}"></td>
+
+<!-- document values content -->
+<td colspan="{{rowWidth}}" class="clickable" data-toggle="collapse"
+    data-target="#{{collapseId}}">
+
   <div class="collapse" id="{{collapseId}}">
 
     <div class="container-fluid">
@@ -11,11 +17,9 @@
             <p>{{value.value}}</p>
           {{/each}}
 
-        </div><!-- -->
+        </div><!-- .col-lg-12 -->
       </div><!-- .row -->
     </div><!-- .container-fluid -->
 
-  </div>
+  </div><!-- .collapse -->
 </td>
-
-{{yield}}

@@ -13,12 +13,12 @@
         tbody > tr {
             &.selected {
                 background-color: $primary-color;
-                & + .document-information-row td {
-                    background-color: $primary-color !important;
-                }
+
+                & + .document-information-row td,
                 &:hover + .document-information-row td {
                     background-color: $primary-color !important;
                 }
+
             }
 
             &:hover + .document-information-row td {
@@ -47,7 +47,6 @@
             }
         }
 
-
         thead > tr > th {
             border-top: 1px solid $quaternary-color !important;
             border-bottom: 2px solid $quaternary-color;
@@ -55,8 +54,6 @@
             color: $quaternary-color;
         }
     }
-
-
 
     .table-pagination {
         width: 100%;

@@ -4,7 +4,7 @@ export default Route.extend({
 
     beforeModel() {
         // reload model for parent route
-        this.modelFor('dataset').reload();
+        // this.modelFor('dataset').reload();
     },
 
     model(params) {

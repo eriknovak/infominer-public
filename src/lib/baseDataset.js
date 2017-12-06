@@ -289,11 +289,16 @@ class BaseDataset {
      * @param {Number} [query.limit=10] - The number of documents it retrieves.
      * @param {Number} [query.offset=0] - The retrieval starting point.
      * @param {Number} [query.page] - The page number based on the limit.
+     * @param {Object} [query.sort] - The sort parameters.
+     * @param {String} query.sort.fieldName - The field by which the sorting is done.
+     * @param {Boolean} [query.sort.isAscending] - The flag specifiying is sort is done
+     * in ascending or descending order.
      * @returns {Object} The object containing the documents and it's metadata.
      */
     getSubsetDocuments(id, query) {
         // TODO: log activity
         let self = this;
+        console.log(query);
         // get database subsets
         let subsets = self.base.store('Subsets');
         if (id < 0 || subsets.length <= id) {
@@ -314,6 +319,15 @@ class BaseDataset {
         let subsetDocuments = subsets[id].hasElements;
         // TODO: allow filtering documents
 
+        // TODO: sort subsetDocuments by field
+        if (query.sort) {
+            // TODO: check if sort object has expected schema
+            const ascFlag = query.sort.isAscending ? 1 : -1;
+            const field = query.sort.field;
+            subsetDocuments.sortByField(field, ascFlag);
+        }
+
+        // prepare objects
         let setObj = {
             documents: null,
             meta: {
@@ -329,8 +343,10 @@ class BaseDataset {
         // truncate the documents using the query
         subsetDocuments.trunc(limit, offset);
 
-        // get the documents
+        // format the documents
         setObj.documents = subsetDocuments.map(rec => self._formatDocumentInfo(rec));
+
+        // return documents and metadata
         return setObj;
     }
 

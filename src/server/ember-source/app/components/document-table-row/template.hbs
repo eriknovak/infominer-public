@@ -6,10 +6,9 @@
     checkboxAction=(action 'selectDocument')
   }}
 </td>
+
 <!-- document values -->
 {{#each docValues as |value|}}
-  <td class="{{ value.field }} clickable" data-toggle="{{dataToggle}}"
-    data-target="{{dataTarget}}">{{ value.value }}</td>
+  <td class="{{value.field}} clickable" data-toggle="collapse"
+    data-target="{{dataTarget}}">{{value.value}}</td>
 {{/each}}
-
-{{yield}}

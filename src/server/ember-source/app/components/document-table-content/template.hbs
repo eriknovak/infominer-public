@@ -4,7 +4,7 @@
     <th>
     </th>
     {{#each fields as |field|}}
-      <th class="{{field.name}}">{{field.name}}</th>
+      <th class="{{field.name}}" {{action sortByField field.name}}>{{field.name}}</th>
     {{/each}}
   </tr>
 </thead>
