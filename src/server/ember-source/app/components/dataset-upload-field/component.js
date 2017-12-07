@@ -1,12 +1,16 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+    // component attributes
     tagName: 'tr',
 
     // possible field values
     fieldTypes: ['string', 'int', 'float'],
-
     included: true,
+
+    ///////////////////////////////////////////////////////
+    // Component Life Cycle
+    ///////////////////////////////////////////////////////
 
     didReceiveAttrs() {
         this._super(...arguments);
@@ -29,6 +33,9 @@ export default Component.extend({
 
     },
 
+    ///////////////////////////////////////////////////////
+    // Actions
+    ///////////////////////////////////////////////////////
 
     actions: {
         /**

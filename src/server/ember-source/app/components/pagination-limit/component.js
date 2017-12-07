@@ -1,7 +1,7 @@
 import Component from '@ember/component';
 
 export default Component.extend({
-
+    // component attributes
     tagName: 'span',
 
     ///////////////////////////////////////////////////////
@@ -40,6 +40,9 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
+        /**
+         * Changes the number of documents shown in the table.
+         */
         changeLimit() {
             // get new limit and use it
             let newLimit = parseInt(this.$('#table-show-limit').find(':selected').val());

@@ -1,7 +1,7 @@
 import Component from '@ember/component';
 
 export default Component.extend({
-    // component class
+    // component attributes
     classNames: ['document'],
     classNameBindings: ['selected'],
     selected: false,
@@ -48,6 +48,9 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
+        /**
+         * Toggles if the document is selected or not.
+         */
         selectDocument() {
             // get checkbox status
             this.toggleProperty('selected');

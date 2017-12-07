@@ -52,7 +52,19 @@
             border-bottom: 2px solid $quaternary-color;
             vertical-align: middle;
             color: $quaternary-color;
+            cursor: pointer;
+
+            &.checkbox-header {
+                white-space: nowrap;
+                width: 1%;
+            }
+            // the sorting
+            .fa {
+                padding: 3px 0;
+                font-size: 12px;
+            }
         }
+
     }
 
     .table-pagination {

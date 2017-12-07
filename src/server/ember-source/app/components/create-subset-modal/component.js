@@ -1,15 +1,12 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+    // component attributes
     classNames: ['modal', 'fade'],
     attributeBindings: ['tabindex', 'role'],
     tagName: 'div',
     tabindex: -1,
     role: 'dialog',
-
-    ///////////////////////////////////////////////////////
-    // Default values
-    ///////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -26,14 +23,23 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
+        /**
+         * Change subset name.
+         */
         changeSubsetName() {
             this.set("subsetName", Ember.$(`#${this.get('id')} input`).val());
         },
 
+        /**
+         * Change subset description.
+         */
         changeSubsetDescription() {
             this.set("subsetDescription", Ember.$(`#${this.get('id')} textarea`).val());
         },
 
+        /**
+         * Save the subset.
+         */
         saveSubset() {
             // prepare subset info object
             const subsetInfo = {

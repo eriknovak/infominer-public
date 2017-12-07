@@ -1,18 +1,13 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+    // component attributes
     classNames: ['document-information-row'],
-    // component tag
     tagName: 'tr',
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
-
-    init() {
-        this._super(...arguments);
-        this.set('selected', false);
-    },
 
     didReceiveAttrs() {
         this._super(...arguments);

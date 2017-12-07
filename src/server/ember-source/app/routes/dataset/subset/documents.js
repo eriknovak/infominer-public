@@ -6,7 +6,7 @@ export default Route.extend({
     defaultPage: 1,
     defaultLimit: 10,
 
-    sortOption: null,
+    sortTarget: null,
 
     // current parameters
     page: 1,
@@ -25,7 +25,7 @@ export default Route.extend({
             // set default parameters
             this.set('page', this.defaultPage);
             this.set('limit', this.defaultlimit);
-            this.set('sortOption', null);
+            this.set('sortTarget', null);
             // set all documents as un-selected
             this.get('store').peekAll('document')
                 .forEach(doc => doc.set('selected', false));
@@ -37,14 +37,20 @@ export default Route.extend({
 
     model() {
         // get documents
-        return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') });
+        return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') });
     },
 
     afterModel(model) {
         // TODO: save field names for table sorting
+        let fields = model.get('meta.fields');
     },
 
     actions: {
+        /**
+         * Change the number of documents to be displayed in the table and
+         * make a new request.
+         * @param {Number} limit - The number of documents to be displayed.
+         */
         changeLimit(limit) {
             // update the limit and transition to route
             this.set('limit', limit);
@@ -56,25 +62,41 @@ export default Route.extend({
             // change page value if not in bound
             if (pagination.page > maxPage) { this.set('page', maxPage); }
 
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') })
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
                 .then(model => this.set('controller.model', model));
 
         },
 
+        /**
+         * Change the document page in the table and make a new request.
+         * @param {Number} page - The page number of documents.
+         */
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') })
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
                 .then(model => this.set('controller.model', model));
         },
 
-        sortByField(field) {
-            this.set('sortOption', { field: field });
+        /**
+         * Sort the documents by the field.
+         * @param {Object} params - The sort parameters.
+         * @param {String} param.field - The field name.
+         * @param {String} param.sortType - The sort type.
+         */
+        sortByField(params) {
+            this.set('sortTarget', params);
             // TODO: manipulate sorting by field name
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortOption') })
+            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
                 .then(model => this.set('controller.model', model));
         },
 
+        /**
+         * Creates the subset out of the selected documents.
+         * @param {Object} params - The subset information.
+         * @param {String} param.label - The subset label.
+         * @param {String} param.description - The subset description.
+         */
         createSubset(params) {
             let self = this;
             // get local documents

@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+    // component attributes
     classNames: ["table-pagination"],
 
     ///////////////////////////////////////////////////////
@@ -50,7 +51,6 @@ export default Component.extend({
         // set display information
         this.set('startDisplay', startDisplay);
         this.set('endDisplay', endDisplay);
-
     },
 
     ///////////////////////////////////////////////////////
@@ -58,6 +58,10 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
+        /**
+         * Gets the documents on the requested page.
+         * @param {Number} pageNumber - The requested page.
+         */
         getDocuments(pageNumber) {
             // get new limit and use it
             let changePage = this.get('changePage');

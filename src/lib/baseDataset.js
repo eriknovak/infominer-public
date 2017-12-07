@@ -203,7 +203,7 @@ class BaseDataset {
 
         // subset ids used in the dataset info
         let subsetIds = subsets.map(set => set.id);
-
+        // prepare response object
         let jsonResults = {
             datasets: {
                 id: self.params.datasetId,
@@ -236,7 +236,6 @@ class BaseDataset {
                 // TODO: handle this error
                 return null;
             }
-            console.log('GetSubsetInfo', id);
             // get one subset and format it
             let set = subsets[id];
             setObj.subsets = self._formatSubsetInfo(set);
@@ -254,7 +253,7 @@ class BaseDataset {
      * @param {String} subset.label - The label of the subset.
      * @param {String} [subset.description] - The subset description.
      * @param {Number} subset.resultedIn - The id of the method that created the subset.
-     * @param {Number[]} subset.documents - Array of documents the subset contains.
+     * @param {Number[]} subset.documents - Array of document ids the subset contains.
      */
     createSubset(subset) {
         // TODO: log activity
@@ -276,6 +275,7 @@ class BaseDataset {
                 let document = self.base.store('Dataset')[documentId];
                 if (document) { self.base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
             }
+            // return id of created subset
             return { subsets: { id: subsetId } };
         } else {
             throw new Error(`No subset with id=${method.appliedOn}`);
@@ -291,14 +291,12 @@ class BaseDataset {
      * @param {Number} [query.page] - The page number based on the limit.
      * @param {Object} [query.sort] - The sort parameters.
      * @param {String} query.sort.fieldName - The field by which the sorting is done.
-     * @param {Boolean} [query.sort.isAscending] - The flag specifiying is sort is done
-     * in ascending or descending order.
+     * @param {String} [query.sort.sortType] - The flag specifiying is sort is done. Possible: `asc` or `desc`.
      * @returns {Object} The object containing the documents and it's metadata.
      */
     getSubsetDocuments(id, query) {
         // TODO: log activity
         let self = this;
-        console.log(query);
         // get database subsets
         let subsets = self.base.store('Subsets');
         if (id < 0 || subsets.length <= id) {
@@ -312,27 +310,41 @@ class BaseDataset {
         if (query.page) {
             offset = (query.page-1)*limit;
         }
-        // get page
+        // get page number
         let page = Math.floor(offset/limit) + 1;
+
+        // TODO: get documents using the query function
+        // this will wrap sorting and filtering in one function
 
         // get the subset documents limited by
         let subsetDocuments = subsets[id].hasElements;
+
         // TODO: allow filtering documents
 
-        // TODO: sort subsetDocuments by field
+        // sort the result by specified field
         if (query.sort) {
             // TODO: check if sort object has expected schema
-            const ascFlag = query.sort.isAscending ? 1 : -1;
+            const ascFlag = query.sort.sortType === 'desc' ? -1 : 1;
             const field = query.sort.field;
             subsetDocuments.sortByField(field, ascFlag);
         }
+
+        // prepare field metadata
+        let fields = self.base.store('Dataset').fields
+            .map(field => {
+                let sortType = null;
+                // if the documents were sorted by the field
+                if (query.sort && query.sort.field === field.name) {
+                    sortType = query.sort.sortType;
+                }
+                return { name: field.name, type: field.type, sortType };
+            });
 
         // prepare objects
         let setObj = {
             documents: null,
             meta: {
-                fields: self.base.store('Dataset').fields
-                    .map(field => ({ name: field.name, type: field.type })),
+                fields,
                 pagination: {
                     page,
                     limit,
@@ -352,7 +364,7 @@ class BaseDataset {
 
     /**
      * Gets information about the methods in the database.
-     * @returns {Object} An array of methods representation objects.
+     * @returns {Object} An object containing the array of method representation objects.
      */
     getMethodInfo(id) {
         // TODO: log activity

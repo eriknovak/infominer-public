@@ -31,45 +31,12 @@ process.on('SIGTERM', () => {
 
 //////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////
-// Documentation objects
-///////////////////////////////////////////////
-
-/**
- * The dataset field used in QMiner database.
- * @typedef field_instance
- * @type {Object}
- * @property {String} name - The name of the field.
- * @property {String} type - The type of the field.
- * @property {Boolean} included - If the field is included in the database.
- */
-
-/**
- * The object containing dataset creation parameters.
- * @typedef creation_parameters
- * @type {Object}
- * @property {Object} dataset - The dataset values.
- * @property {String} dataset.dir - The dataset dir.
- * @property {String} dataset.label - The user defined dataset label.
- * @property {String} [dataset.description] - The user defined dataset description.
- * @property {String} filePath - The file values.
- * @property {field_instance[]} fields - An array of user defined database fields.
- */
-
-/**
- * The message send to the child process.
- * @typedef process_message
- * @type {!Object}
- * @property {String} type - The type corresponding to the process action
- * @property {Object | creation_parameters} body - The body parameters used in the process.
- */
-
 ///////////////////////////////////////
 // Message Handler
 ///////////////////////////////////////
 
 /**
- *
+ * How to handle the process message.
  * @param {process_message} msg - The message to the child process.
  */
 function handle(msg) {
@@ -137,10 +104,30 @@ function handle(msg) {
 // database handling cases
 ///////////////////////////////////////
 
+/**
+ * The dataset field used in QMiner database.
+ * @typedef field_instance
+ * @type {Object}
+ * @property {String} name - The name of the field.
+ * @property {String} type - The type of the field.
+ * @property {Boolean} included - If the field is included in the database.
+ */
+
+/**
+ * Opens the database.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {String} msg.body.cmd - What command needs to be executed.
+ * @param {Object} msg.body.content - The content for the body.
+ * @param {Object} msg.body.content.params - The initialization parameters.
+ * @param {String} msg.body.content.params.dbPath - Where the database is stored.
+ * @param {String} msg.body.content.params.mode - In what mode the database should be opened.
+ */
 function openDatabase(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
-
     try {
         // get the constructor parameters
         let { params } = body.content;
@@ -155,6 +142,20 @@ function openDatabase(msg) {
     }
 }
 
+/**
+ * Creates the database.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {String} msg.body.cmd - What command needs to be executed.
+ * @param {Object} msg.body.content - The content for the body.
+ * @param {Object} msg.body.content.params - The initialization parameters.
+ * @param {String} msg.body.content.params.dbPath - Where the database is stored.
+ * @param {String} msg.body.content.params.mode - In what mode the database should be opened.
+ * @param {Object} msg.body.content.filePath - Where is file for filling the database.
+ * @param {field_instance[]} msg.body.content.fields -  where file for filling the database is.
+ */
 function createDatabase(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
@@ -174,6 +175,14 @@ function createDatabase(msg) {
     }
 }
 
+/**
+ * Shutdown the child process.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {String} msg.body.cmd - What command needs to be executed.
+ */
 function shutDownProcess(msg) {
     let { reqId } = msg;
     try {
@@ -194,6 +203,12 @@ function shutDownProcess(msg) {
 // database info retrieving
 ///////////////////////////////////////////////
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ */
 function getDatasetInfo(msg) {
     // TODO: validate json schema
     let { reqId } = msg;
@@ -210,13 +225,20 @@ function getDatasetInfo(msg) {
 /////////////////////////////
 // subset functions
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.subsetId] - The id of the subset.
+ */
 function getSubsetInfo(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
     try {
-        console.log(body);
         let subsetId = body.content ? body.content.subsetId : null;
-        console.log('subsetid inside', subsetId);
         let jsonResults = database.getSubsetInfo(subsetId);
         process.send({ reqId, content: { jsonResults } });
     } catch (err) {
@@ -226,6 +248,19 @@ function getSubsetInfo(msg) {
     }
 }
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.subset - The subset object.
+ * @param {Object} msg.body.content.subset.label - The subset label.
+ * @param {Object} [msg.body.content.subset.description] - The subset description.
+ * @param {Object} msg.body.content.subset.resultedIn - Which method created the subset.
+ * @param {Number[]} msg.body.content.subset.documents - Array of document ids the subset contains.
+ */
 function createSubset(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
@@ -240,6 +275,22 @@ function createSubset(msg) {
     }
 }
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Number} msg.body.content.subsetId - The subset object.
+ * @param {Object} [msg.body.content.query] - The query/filter parameters.
+ * @param {Number} [msg.body.content.query.limit] - The number of documents it retrieves.
+ * @param {Number} [msg.body.content.query.offset] - The retrieval starting point.
+ * @param {Number} [msg.body.content.query.page] - The page number based on the limit.
+ * @param {Object} [msg.body.content.query.sort] - The sort parameters.
+ * @param {String} msg.body.content.query.sort.fieldName - The field by which the sorting is done.
+ * @param {String} [msg.body.content.query.sort.sortType] - The flag specifiying is sort is done. Possible: `asc` or `desc`.
+ */
 function getSubsetDocuments(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
@@ -258,10 +309,18 @@ function getSubsetDocuments(msg) {
 /////////////////////////////
 // method functions
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.methodId] - The id of the subset.
+ */
 function getMethodInfo(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
-    console.log(msg);
     try {
         let methodId = body.content ? body.content.methodId : null;
         let jsonResults = database.getMethodInfo(methodId);
@@ -273,6 +332,19 @@ function getMethodInfo(msg) {
     }
 }
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.method - The subset object.
+ * @param {String} msg.body.content.method.methodType - The type of the method.
+ * @param {Object} msg.body.content.method.parameters - The parameters of the method.
+ * @param {Object} msg.body.content.method.result - The result of the method.
+ * @param {Number} msg.body.content.method.appliedOn - The id of the subset the method was applied on.
+ */
 function createMethod(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
