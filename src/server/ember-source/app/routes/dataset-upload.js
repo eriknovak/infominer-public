@@ -10,6 +10,10 @@ export default Route.extend({
         return null;
     },
 
+    ///////////////////////////////////////////////////////
+    // Actions
+    ///////////////////////////////////////////////////////
+
     actions: {
         /**
          * Reads dataset and extracts the fields.
@@ -40,7 +44,6 @@ export default Route.extend({
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
             // filter out the included fields and prepare the array as
-            //let fields = fieldList.map(field => ({ name: field.name, type: field.type, in }));
 
             // set the options and upload
             file.upload({
@@ -50,7 +53,7 @@ export default Route.extend({
                     fields: JSON.stringify(fieldList)
                 }
             }).then(data => {
-                this.transitionTo('dataset.subset.statistics', data.body.id, 0);
+                this.transitionTo('dataset.subset.statistics', data.body.datasetId, 0);
             });
         }
     },

@@ -101,12 +101,28 @@ class BaseDataset {
     _prepareSchema(fields) {
         let schema = require(`${__dirname}/../config/schema.json`);
         // filter out included fields
-        const inFields = fields.filter(field => field.included)
-            .map(field => ({ name: field.name, type: field.type }));
+        const inFields = fields.filter(field => field.included);
+
+        // prepare the dataset fields
+        const datasetFields = inFields.map(field => ({ name: field.name, type: field.type, null: true }));
         // TODO: check fields schema
 
         // replace the schema fields
-        schema[0].fields = inFields;
+        schema[0].fields = datasetFields;
+
+        // add dataset schema keys
+        let datasetKeys = [ ];
+        for (let field of inFields) {
+            // string fields are used for keys
+            if (field.type === 'string') {
+                datasetKeys.push({ field: field.name, type: 'text' });
+            }
+        }
+        // TODO: check keys schema
+
+        // add keys to the schema
+        if (datasetKeys.length) { schema[0].keys = datasetKeys; }
+
         return schema;
     }
 
@@ -131,15 +147,21 @@ class BaseDataset {
         while (!fileIn.eof) {
             // get new row and its values
             let newLine = fileIn.readLine();
+            // skip empty lines
+            if (newLine.trim() === '') { continue; }
+
             let fValues = newLine.trim().split('|');
             // prepare and push record to dataset
             let rec = self._prepareRecord(fValues, fields);
-            let recId = self.base.store('Dataset').push(rec);
-            // get record and check for join with root subset
-            if (self.base.store('Dataset')[recId].inSubsets.empty) {
-                self.base.store('Dataset')[recId].$addJoin('inSubsets', self.base.store('Subsets')[0]);
-            }
+            self.base.store('Dataset').push(rec);
         }
+        // create the root subset
+        let subset = {
+            label: 'root',
+            description: 'The root subset. Contains all records of dataset.',
+            documents: self.base.store('Dataset').allRecords.map(rec => rec.$id)
+        };
+        self.createSubset(subset);
     }
 
     /**
@@ -157,15 +179,6 @@ class BaseDataset {
             // if the field is included in the database
             if (fields[i].included) {
                 rec[fields[i].name] = self._parseFValue(values[i], fields[i].type);
-                // record is part of a subset (whole dataset)
-                if (self.base.store('Subsets').empty) {
-                    let data = {
-                        label: 'root',
-                        description: 'The root subset. Contains all records of dataset.'
-                    };
-                    // if data contains any fields
-                    if (Object.keys(data).length > 0) { rec.inSubsets = [data]; }
-                }
             }
         }
         return rec;
@@ -264,22 +277,21 @@ class BaseDataset {
             description: subset.description
         };
         // get method that created the subset
+        let subsetId = self.base.store('Subsets').push(qSubset);
         let method = self.base.store('Methods')[subset.resultedIn];
+
         if (method) {
             // add join to method
-            let subsetId = self.base.store('Subsets').push(qSubset);
             self.base.store('Subsets')[subsetId].$addJoin('resultedIn', method);
-
-            // add joins to documents/elements
-            for (let documentId of subset.documents) {
-                let document = self.base.store('Dataset')[documentId];
-                if (document) { self.base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
-            }
-            // return id of created subset
-            return { subsets: { id: subsetId } };
-        } else {
-            throw new Error(`No subset with id=${method.appliedOn}`);
         }
+
+        // add joins to documents/elements
+        for (let documentId of subset.documents) {
+            let document = self.base.store('Dataset')[documentId];
+            if (document) { self.base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
+        }
+        // return id of created subset
+        return { subsets: { id: subsetId } };
     }
 
     /**
@@ -313,21 +325,31 @@ class BaseDataset {
         // get page number
         let page = Math.floor(offset/limit) + 1;
 
-        // TODO: get documents using the query function
-        // this will wrap sorting and filtering in one function
+        // prepare qminer query
+        let qmQuery = {
+            $join: {
+                $name: 'hasElements',
+                $query: {
+                    $from: 'Subsets',
+                    $id: id
+                }
+            }
+        };
 
-        // get the subset documents limited by
-        let subsetDocuments = subsets[id].hasElements;
-
-        // TODO: allow filtering documents
-
-        // sort the result by specified field
+        // add sorting to the query
         if (query.sort) {
             // TODO: check if sort object has expected schema
             const ascFlag = query.sort.sortType === 'desc' ? -1 : 1;
             const field = query.sort.field;
-            subsetDocuments.sortByField(field, ascFlag);
+            // set sort to the query
+            qmQuery.$sort = { };
+            qmQuery.$sort[field] = ascFlag;
         }
+
+        // TODO: allow filtering documents
+
+        // get the subset documents
+        let subsetDocuments = self.base.search(qmQuery);
 
         // prepare field metadata
         let fields = self.base.store('Dataset').fields
@@ -337,6 +359,7 @@ class BaseDataset {
                 if (query.sort && query.sort.field === field.name) {
                     sortType = query.sort.sortType;
                 }
+                // return field metadata
                 return { name: field.name, type: field.type, sortType };
             });
 
@@ -433,7 +456,7 @@ class BaseDataset {
             description: rec.description,
             resultedIn: rec.resultedIn ? rec.resultedIn.$id : null,
             usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.$id) : null,
-            documents: !rec.hasElements.empty ? rec.hasElements.map(doc => doc.$id) : null
+            documentCount: !rec.hasElements.empty ? rec.hasElements.length : null
         };
     }
 

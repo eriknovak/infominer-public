@@ -12,6 +12,8 @@ export default Component.extend({
     // component tag
     tagName: 'tr',
 
+    nWords: 10,
+
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
@@ -32,7 +34,9 @@ export default Component.extend({
         let docValues = [ ];
         // get values in the fields order
         for (let field of fields) {
-            docValues.push({ value: document.get(`values.${field.name}`), field: field.name });
+            let value = document.get(`values.${field.name}`);
+            if (field.type == 'string') { value = this._trimContent(value, this.get('nWords')); }
+            docValues.push({ value: value, field: field.name });
         }
         // save values
         this.set('index', document.get('id'));
@@ -57,6 +61,20 @@ export default Component.extend({
             this.set('document.selected', this.get('selected'));
 
         }
+    },
+
+    /**
+     *
+     * @param {String} content - Content to be trimmed.
+     * @param {Number} nWords - How many words the content can contain.
+     * @returns {String} Trimmed content.
+     */
+
+    _trimContent(string, nWords) {
+        const stringWords = string.split(' ');
+        if (stringWords.length < nWords) { return string; }
+        let newWords = stringWords.slice(0, nWords);
+        return newWords.join(' ') + ' ...';
     }
 
 });

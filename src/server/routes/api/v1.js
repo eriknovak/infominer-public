@@ -144,7 +144,7 @@ module.exports = function (app, pg, processHandler) {
         pg.select({ owner }, 'datasets', (err, results) => {
             if (err) {
                 // TODO: handle error
-                console.log(err); return;
+                console.log(err); return res.end();
             }
             // number of datasets is the name of the new dataset folder
             const dbFolder = results.length ? results[results.length-1].id : 0;
@@ -174,15 +174,17 @@ module.exports = function (app, pg, processHandler) {
                         if (xerr) {
                             // TODO: log error
                             console.log(xerr.message);
-                            return res.send({ errors: { msg: xerr.message } }); }
+                            return res.send({ errors: { msg: xerr.message } });
+                        }
 
                         // initiate child process
                         let datasetInfo = results[0];
                         let datasetId = parseInt(datasetInfo.id);
                         processHandler.createChild(datasetId);
 
-                        // prepare message body
-                        dataset.label = label; // set the label of the dataset
+                        // redirect the user to dataset
+                        res.send({ datasetId });
+
                         // body of the message
                         let body = {
                             cmd: 'create_dataset',
@@ -199,14 +201,8 @@ module.exports = function (app, pg, processHandler) {
                                 }
                             }
                         };
-
-                        processHandler.sendAndWait(datasetId, body, function (error, results) {
-                            // if error notify user
-                            if (error) { return res.send({ errors: { msg: error.message } }); }
-                            // otherwise return results
-                            let obj = messageHandler.onCreate(results);
-                            return res.send(obj);
-                        });
+                        // create dataset
+                        processHandler.send(datasetId, body);
 
                     });
                 }); // bufferStream.on('finish')
@@ -245,23 +241,28 @@ module.exports = function (app, pg, processHandler) {
         // get the user
         let owner = req.user || 'user';
 
-        let body = { cmd: 'shutdown' };
-        sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
-            if (error) {
-                // TODO: log error
-                console.log('DELETE datasets/:datasets_id', error.message);
-                return res.send({ errors: { msg: error.message } });
+        pg.delete({ id: datasetId, owner }, 'datasets', (err) => {
+            if (err) {
+                // TODO: handle error
+                console.log('DELETE datasets/:datasets_id', err.message);
             }
+            // respond to request
+            res.send({});
 
-            pg.delete({ id: datasetId, owner }, 'datasets', (err, xresults) => {
-                // TODO: delete dataset
+            let body = { cmd: 'shutdown' };
+            sendToProcess(datasetId, owner, body, function (error, results) {
+                // if error notify user
+                if (error) {
+                    // TODO: log error
+                    console.log('DELETE datasets/:datasets_id', error.message);
+                    return res.send({ errors: { msg: error.message } });
+                }
+                // delete dataset
                 let datasetDbPath = results.dbPath;
                 if (datasetDbPath) { fileManager.removeFolder(datasetDbPath); }
-                return res.send({});
-            });
+            }); // sendToProcess
+        });
 
-        }); // sendToProcess
     }); // GET /api/datasets/:dataset_id
 
 

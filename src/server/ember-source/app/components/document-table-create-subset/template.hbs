@@ -1,5 +1,6 @@
 <button class="btn btn-primary pull-right" data-toggle="modal"
-  data-target="#create-subset-documents-modal">Create Subset</button>
+  data-target="#create-subset-documents-modal"
+  {{action 'emptyWarningContainer'}}>Create Subset</button>
 
 {{ create-subset-modal id='create-subset-documents-modal'
   createSubset=createSubset type='Document Selection'}}

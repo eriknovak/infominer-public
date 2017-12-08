@@ -5,12 +5,12 @@ export default Route.extend({
     // default parameters
     defaultPage: 1,
     defaultLimit: 10,
-
-    sortTarget: null,
+    defaultSortTarget: null,
 
     // current parameters
     page: 1,
     limit: 10,
+    sortTarget: null,
 
     beforeModel(transition) {
         // modify namespace for subset model
@@ -25,7 +25,7 @@ export default Route.extend({
             // set default parameters
             this.set('page', this.defaultPage);
             this.set('limit', this.defaultlimit);
-            this.set('sortTarget', null);
+            this.set('sortTarget', this.defaultSortTarget);
             // set all documents as un-selected
             this.get('store').peekAll('document')
                 .forEach(doc => doc.set('selected', false));
@@ -38,11 +38,6 @@ export default Route.extend({
     model() {
         // get documents
         return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') });
-    },
-
-    afterModel(model) {
-        // TODO: save field names for table sorting
-        let fields = model.get('meta.fields');
     },
 
     actions: {
@@ -61,9 +56,8 @@ export default Route.extend({
             if (maxPage % 1 !== 0) { maxPage = Math.floor(maxPage) + 1; }
             // change page value if not in bound
             if (pagination.page > maxPage) { this.set('page', maxPage); }
-
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
-                .then(model => this.set('controller.model', model));
+            // update model
+            this._updateModel();
 
         },
 
@@ -74,8 +68,8 @@ export default Route.extend({
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
-                .then(model => this.set('controller.model', model));
+            // update model
+            this._updateModel();
         },
 
         /**
@@ -86,9 +80,8 @@ export default Route.extend({
          */
         sortByField(params) {
             this.set('sortTarget', params);
-            // TODO: manipulate sorting by field name
-            this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
-                .then(model => this.set('controller.model', model));
+            // update model
+            this._updateModel();
         },
 
         /**
@@ -102,9 +95,23 @@ export default Route.extend({
             // get local documents
             const selectedDocs = self.get('store').peekAll('document').filterBy('selected', true);
 
-            // if there are selected
-            if (selectedDocs.get('length') > 0) {
+            // get warning container
+            let warningContent = Ember.$('#create-subset-documents-modal div.warning');
+            // empty warning container
+            warningContent.empty();
 
+            if (params.label.length === 0) {
+                // TODO: notify the user the subset label is missing
+                warningContent.append('<p class="warning-content">No subset name found</p>');
+            }
+
+            if (selectedDocs.get('length') === 0) {
+                // TODO: notify user there were no documents selected
+                warningContent.append('<p class="warning-content">No documents were selected</p>');
+            }
+
+            // if there are selected
+            if (params.label.length > 0 && selectedDocs.get('length') > 0) {
                 // create a new method
                 const method = self.get('store').createRecord('method', {
                     methodType: 'filter.manual',
@@ -119,6 +126,7 @@ export default Route.extend({
                         label: params.label,
                         description: params.description,
                         documents: selectedDocs,
+                        documentCount: selectedDocs.get('length'),
                         resultedIn: method
                     });
                     // save subset
@@ -130,14 +138,19 @@ export default Route.extend({
                         });
                     });
 
-            } else {
-                // TODO: send a message to the user - no documents selected
-                console.log('No documents selected');
             }
-
-
         }
+    },
 
+    // helper functions
+    _updateModel() {
+        // empty table and add a loading row
+        this.set('controller.model.loading', true);
+
+        // request for data and update the model
+        this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
+            .then(model => this.set('controller.model', model));
     }
+
 
 });
