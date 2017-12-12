@@ -20,7 +20,7 @@ export default Component.extend({
 
         // set column width for medium and large view size
         this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
-        this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'md');
+        this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'md');
 
         // set aggregates with classes
         this.set('aggregates', aggregates);
