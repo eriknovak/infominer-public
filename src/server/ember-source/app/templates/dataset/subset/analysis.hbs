@@ -1,6 +1,6 @@
 {{#each model.usedBy as |method|}}
   {{#if method.result}}
-    {{method.methodType}}<br/>
+    {{ analysis-method type=method.methodType result=method.result }}
   {{/if}}
 {{/each}}
 

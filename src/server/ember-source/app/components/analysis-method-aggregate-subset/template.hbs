@@ -1,0 +1,16 @@
+<h4>Aggregates</h4>
+
+<div class="row">
+
+  {{#each aggregates as |aggregate|}}
+    <div class="{{ aggregate.class }}">
+      {{ component (concat "aggregate-" aggregate.type)
+          field=aggregate.field
+          distribution=aggregate.distribution
+      }}
+    </div>
+  {{/each}}
+
+</div>
+
+{{yield}}
