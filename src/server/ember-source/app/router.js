@@ -12,8 +12,8 @@ Router.map(function() {
   this.route('dataset', { path: '/datasets/:dataset_id' }, function() {
     this.route('subsets');
     this.route('subset', { path: '/subsets/:subset_id' }, function() {
-      this.route('documents', { path: '/docs' });
-      this.route('statistics', { path: '/stats' });
+      this.route('documents', { path: '/documents' });
+      this.route('analysis');
     });
   });
 });

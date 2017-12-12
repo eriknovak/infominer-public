@@ -430,7 +430,13 @@ module.exports = function (app, pg, processHandler) {
         // get the user
         let owner = req.user || 'user';
 
-        const { method } = req.body;
+        let { method } = req.body;
+
+        console.log(method);
+        // change the method type
+        method.type = method.methodType;
+        delete method.methodType;
+        console.log(method);
 
         // set the body info
         let body = { cmd: 'create_method', content: { method } };

@@ -1,6 +1,6 @@
 import { moduleFor, test } from 'ember-qunit';
 
-moduleFor('route:dataset/subset/statistics', 'Unit | Route | dataset/subset/statistics', {
+moduleFor('route:dataset/subset/analysis', 'Unit | Route | dataset/subset/analysis', {
   // Specify the other units that are required for this test.
   // needs: ['controller:foo']
 });

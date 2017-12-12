@@ -110,29 +110,38 @@ export default Route.extend({
                 warningContent.append('<p class="warning-content">No documents were selected</p>');
             }
 
-            // if there are selected
+            // if there are selected documents and label given
             if (params.label.length > 0 && selectedDocs.get('length') > 0) {
+                // get parent subset - to save method
+                let parentSubset = self.modelFor('dataset.subset');
+
                 // create a new method
                 const method = self.get('store').createRecord('method', {
+                    id: self.get('store').peekAll('method').get('length'),
                     methodType: 'filter.manual',
-                    parameters: { documentIds: selectedDocs.map(doc => parseInt(doc.id)) },
-                    result: { documentIds: selectedDocs.map(doc => parseInt(doc.id)) },
-                    appliedOn: self.modelFor('dataset.subset')
+                    parameters: { docIds: selectedDocs.map(doc => parseInt(doc.id)) },
+                    appliedOn: parentSubset
                 });
+
+                // create new subset
+                const subset = self.get('store').createRecord('subset', {
+                    id: self.get('store').peekAll('subset').get('length'),
+                    label: params.label,
+                    description: params.description,
+                    documents: selectedDocs,
+                    documentCount: selectedDocs.get('length'),
+                    resultedIn: method
+                });
+
+                method.get('produced').pushObject(subset);
+
                 // save method
                 method.save().then(function () {
-                    // create new subset
-                    const subset = self.get('store').createRecord('subset', {
-                        label: params.label,
-                        description: params.description,
-                        documents: selectedDocs,
-                        documentCount: selectedDocs.get('length'),
-                        resultedIn: method
-                    });
                     // save subset
-                    subset.save().then(() => {
+                    subset.save().then(function () {
+                            // hide modal and transition to new route
                             Ember.$('#create-subset-documents-modal').modal('toggle');
-                            self.transitionTo('dataset.subset.statistics', self.modelFor('dataset'), subset);
+                            self.transitionTo('dataset.subset.analysis', self.modelFor('dataset'), subset);
                         }).catch(error => {
                             console.log(error.message);
                         });

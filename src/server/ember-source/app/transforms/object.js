@@ -2,7 +2,7 @@ import DS from 'ember-data';
 
 export default DS.Transform.extend({
   deserialize(serialized) {
-    return Object.keys(serialized).length == 0 ? null : serialized;
+      return (serialized && Object.keys(serialized).length > 0) ? serialized : null;
   },
 
   serialize(deserialized) {

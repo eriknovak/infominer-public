@@ -22,7 +22,7 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     /**
-     * Change date to dd/mm/YYYY format.
+     * Change date to dd/mm/YYYY format
      */
     _prepareDate() {
         const c = this.get('dataset.created');

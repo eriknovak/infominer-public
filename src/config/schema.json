@@ -20,7 +20,7 @@
     "fields": [
         { "name": "type", "type": "string" },
         { "name": "parameters", "type": "json" },
-        { "name": "result", "type": "json" }
+        { "name": "result", "type": "json", "null": true }
     ],
     "joins": [
         { "name": "produced", "type": "index", "store": "Subsets", "inverse": "resultedIn" },

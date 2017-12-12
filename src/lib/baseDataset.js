@@ -131,7 +131,7 @@ class BaseDataset {
      * @param {String} filePath - File path.
      * @param {field_instance[]} fields - Dataset fields.
      * @param {Object} dataset - Dataset information.
-     *
+     * @returns {Object} Object containing the subset id.
      */
     pushDocsToBase(filePath, fields) {
         let self = this;
@@ -161,7 +161,7 @@ class BaseDataset {
             description: 'The root subset. Contains all records of dataset.',
             documents: self.base.store('Dataset').allRecords.map(rec => rec.$id)
         };
-        self.createSubset(subset);
+        return self.createSubset(subset);
     }
 
     /**
@@ -244,13 +244,9 @@ class BaseDataset {
         let setObj = { subsets: null };
         // if id is a number
         if (!isNaN(parseFloat(id))) {
-            // validate id
-            if (id < 0 || subsets.length <= id) {
-                // TODO: handle this error
-                return null;
-            }
             // get one subset and format it
             let set = subsets[id];
+            if (!set) { return null; }
             setObj.subsets = self._formatSubsetInfo(set);
         } else {
             setObj.subsets = subsets.allRecords
@@ -394,7 +390,7 @@ class BaseDataset {
         let self = this;
         // get database methods
         let methods = self.base.store('Methods');
-        let methodObj = { methods: null };
+        let methodObj = { methods: null, meta: null };
         // if id is a number
         if (!isNaN(parseFloat(id))) {
             // validate id
@@ -423,14 +419,14 @@ class BaseDataset {
      */
     createMethod(method) {
         // TODO: log activity
-
         let self = this;
         // prepare method object
         let qMethod = {
-            type: method.methodType,
+            type: method.type,
             parameters: method.parameters,
             result: method.result
         };
+
         // get subset on which the method was used
         let subset = self.base.store('Subsets')[method.appliedOn];
         if (subset) {
@@ -440,7 +436,60 @@ class BaseDataset {
         } else {
             throw new Error(`No subset with id=${method.appliedOn}`);
         }
+    }
 
+    /**
+     * Calculates the aggregates on the subset.
+     * @param {Number} subsetId - The subset id.
+     * @returns {Object} Object containing the method id.
+     */
+    aggregateSubset(subsetId) {
+        // TODO: log activity
+
+        let self = this;
+
+        const subset = self.base.store('Subsets')[subsetId];
+        if (subset) {
+            // get dataset fields and subset elements
+            const fields = self.base.store('Dataset').fields;
+            const elements = subset.hasElements;
+
+            // store the method
+            let qMethod = {
+                type: 'aggregate.subset',
+                parameters: { subsetId },
+                result: { aggregates: [ ] },
+                appliedOn: subsetId
+            };
+
+            // iterate through the fields
+            for (let field of fields) {
+                // TODO: intelligent way to select aggregation type
+                let type = field.type === 'string' ? 'keywords' : 'histogram';
+                // get aggregate distribution
+                let distribution = self._aggregateByField(elements, field.name, type);
+                qMethod.result.aggregates.push({ field: field.name, type, distribution });
+            }
+
+            // save the method
+            return self.createMethod(qMethod);
+
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Aggregates elements by field and type.
+     * @param {RecordSet} elements - A record set of elements.
+     * @param {Object} field - Object containing field name and type.
+     * @param {String} type - The aggregate type.
+     * @returns The results of the aggregation.
+     */
+    _aggregateByField(elements, field, type) {
+        // TODO: check if field exists
+        let distribution = elements.aggr({ name: `${field}_${type}`, field, type });
+        return distribution;
     }
 
     /**

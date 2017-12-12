@@ -26,9 +26,9 @@ module.exports = {
 
     onInfo: function (results) {
         // todo: check json schema
-        let { jsonResults } = results;
-        console.log(jsonResults);
-        return jsonResults;
+        let { result } = results;
+        console.log(result);
+        return result;
     },
 
     /**

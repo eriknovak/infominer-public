@@ -1,4 +1,4 @@
-{{#if subset.usedBy }}
+{{#if parent }}
   <!-- button for toggling collapse -->
   <button class="btn btn-xs rotate {{unless collapsed 'down'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleBranch'}}>
@@ -15,6 +15,11 @@
 
 {{#bs-collapse collapsed=collapsed class="tree-branch"}}
   {{#each subset.usedBy as |method| }}
-    {{ structure-method method=method dataset=dataset }}
+
+    {{#if method.produced}}
+      <!-- subsets are joined to this method -->
+      {{ structure-method method=method dataset=dataset }}
+    {{/if}}
+
   {{/each}}
 {{/bs-collapse}}

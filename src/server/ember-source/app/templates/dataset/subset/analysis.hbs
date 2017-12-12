@@ -1,0 +1,7 @@
+{{#each model.usedBy as |method|}}
+  {{#if method.result}}
+    {{method.methodType}}<br/>
+  {{/if}}
+{{/each}}
+
+{{outlet}}

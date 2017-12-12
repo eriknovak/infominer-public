@@ -165,7 +165,8 @@ function createDatabase(msg) {
         // create the database
         database = new BaseDataset(params, fields);
         // fill the database with the records
-        database.pushDocsToBase(filePath, fields);
+        let result = database.pushDocsToBase(filePath, fields);
+        database.aggregateSubset(result.subsets.id);
         // everything is ok
         process.send({ reqId, content: { datasetId: database.getId() } });
     } catch (err) {
@@ -213,8 +214,8 @@ function getDatasetInfo(msg) {
     // TODO: validate json schema
     let { reqId } = msg;
     try {
-        let jsonResults = database.getDatasetInfo();
-        process.send({ reqId, content: { jsonResults } });
+        let result = database.getDatasetInfo();
+        process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getDatasetInfo Error', err.message);
         // notify parent process about the error
@@ -239,8 +240,8 @@ function getSubsetInfo(msg) {
     let { reqId, body } = msg;
     try {
         let subsetId = body.content ? body.content.subsetId : null;
-        let jsonResults = database.getSubsetInfo(subsetId);
-        process.send({ reqId, content: { jsonResults } });
+        let result = database.getSubsetInfo(subsetId);
+        process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getSubsetInfo Error', err.message);
         // notify parent process about the error
@@ -266,8 +267,10 @@ function createSubset(msg) {
     let { reqId, body } = msg;
     try {
         let { subset } = body.content;
-        let jsonResults = database.createSubset(subset);
-        process.send({ reqId, content: { jsonResults } });
+        let result = database.createSubset(subset);
+        database.aggregateSubset(result.subsets.id);
+        result = database.getSubsetInfo(result.subsets.id);
+        process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getSubsetInfo Error', err.message);
         // notify parent process about the error
@@ -297,8 +300,8 @@ function getSubsetDocuments(msg) {
     try {
         let subsetId = body.content.subsetId;
         let query = body.content.query;
-        let jsonResults = database.getSubsetDocuments(subsetId, query);
-        process.send({ reqId, content: { jsonResults } });
+        let result = database.getSubsetDocuments(subsetId, query);
+        process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getSubsetInfo Error', err.message);
         // notify parent process about the error
@@ -323,8 +326,8 @@ function getMethodInfo(msg) {
     let { reqId, body } = msg;
     try {
         let methodId = body.content ? body.content.methodId : null;
-        let jsonResults = database.getMethodInfo(methodId);
-        process.send({ reqId, content: { jsonResults } });
+        let result = database.getMethodInfo(methodId);
+        process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getMethodInfo Error', err.message);
         // notify parent process about the error
@@ -350,8 +353,8 @@ function createMethod(msg) {
     let { reqId, body } = msg;
     try {
         let { method } = body.content;
-        let jsonResults = database.createMethod(method);
-        process.send({ reqId, content: { jsonResults } });
+        let result = database.createMethod(method);
+        process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getMethodInfo Error', err.message);
         // notify parent process about the error

@@ -3,8 +3,7 @@ import Route from '@ember/routing/route';
 export default Route.extend({
 
     beforeModel() {
-        // reload model for parent route
-        // this.modelFor('dataset').reload();
+        this.modelFor('dataset').reload();
     },
 
     model(params) {
@@ -13,12 +12,12 @@ export default Route.extend({
     },
 
     afterModel(model) {
+        // get method that created the subset
         let methodId = model.belongsTo('resultedIn').id();
-        // find the method
-        if (!isNaN(parseFloat(methodId))) {
-            this.get('store').findRecord('method', methodId);
-        }
-        this.transitionTo('dataset.subset.statistics', model);
+        if (methodId) { this.get('store').findRecord('method', methodId); }
+
+        // transition to the subset
+        this.transitionTo('dataset.subset.analysis', model);
     }
 
 });

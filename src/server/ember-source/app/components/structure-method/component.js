@@ -14,7 +14,7 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         const method = this.get('method');
-        if (method.hasMany('produced').ids() > 0) { this.set('parent', true); }
+        if (method.hasMany('produced').ids().length > 0) { this.set('parent', true); }
     },
 
     ///////////////////////////////////////////////////////
