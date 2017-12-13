@@ -1,4 +1,2 @@
-<h6>{{ field }}</h6>
-<textarea rows="7" readonly>{{keywords}}</textarea>
-
-{{yield}}
+<h6>{{ field }} keywords</h6>
+{{ graph-wordcloud keywords=distribution.keywords }}

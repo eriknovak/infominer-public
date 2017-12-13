@@ -12,7 +12,6 @@ $main-font: 'Open Sans';
 @import "ember-bootstrap/bootstrap";
 
 // mixins
-
 @mixin label {
     margin: 0;
     font-size: 14px;
@@ -28,6 +27,6 @@ $main-font: 'Open Sans';
 @import 'dataset-main.scss';
 @import 'table.scss';
 @import 'analysis.scss';
-
+@import 'graph.scss';
 
 

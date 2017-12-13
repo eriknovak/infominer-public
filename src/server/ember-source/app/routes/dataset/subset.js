@@ -2,10 +2,6 @@ import Route from '@ember/routing/route';
 
 export default Route.extend({
 
-    beforeModel() {
-        this.modelFor('dataset').reload();
-    },
-
     model(params) {
         // get the subset info
         return this.get('store').findRecord('subset', params.subset_id);

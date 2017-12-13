@@ -1,10 +1,9 @@
-<h4>Aggregates</h4>
-
 <div class="row">
 
   {{#each aggregates as |aggregate|}}
     <div class="{{ aggregate.columnSize }}">
-      {{ component (concat "aggregate-" aggregate.type)
+      {{ component
+          (concat "aggregate-" aggregate.type)
           field=aggregate.field
           distribution=aggregate.distribution
       }}
@@ -12,5 +11,3 @@
   {{/each}}
 
 </div>
-
-{{yield}}

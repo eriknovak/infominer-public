@@ -9,15 +9,11 @@ export default Component.extend({
     parent: false,
 
     parentState: observer('subset.usedBy.@each.[]', function () {
-        // console.log('parentState', this.get('subset.id'));
-
         this.get('subset.usedBy').then(methods => {
             let producedSubsets = methods.filter((item, index, self) => {
                 return item.hasMany('produced').ids().length > 0;
             });
-            // console.log(producedSubsets);
             let isParent = producedSubsets.get('length') > 0;
-            // console.log(isParent);
             this.set('parent', isParent);
         });
     }),
@@ -35,9 +31,8 @@ export default Component.extend({
     didReceiveAttrs() {
         let self = this;
         self._super(...arguments);
-        const subset = self.get('subset');
+        const methods = self.get('subset.usedBy');
         // subset contains methods that produced new subset
-        let methods = subset.get('usedBy');
         for (let i = 0; i < methods.get('length'); i++) {
             let method = methods.objectAt(i);
             if (method.hasMany('produced').ids().length > 0) { self.set('parent', true); break; }
