@@ -12,7 +12,7 @@ export default Component.extend({
         this._super(...arguments);
         let distribution = this.get('distribution');
         // get keywords and their tf-idf values
-        let keywords = distribution.keywords.map(keyword => `${keyword.keyword} (${Math.round(keyword.weight * 100)/100})`).join(', ');
+        let keywords = distribution.keywords;
         // sets the values
         this.set('keywords', keywords);
     }

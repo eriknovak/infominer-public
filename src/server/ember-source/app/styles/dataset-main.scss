@@ -86,4 +86,8 @@
 
 .new-subset {
     label { @include label; }
+    .new-subset-information { margin-bottom: 10px; }
+    .warning-content {
+        margin-bottom: 5px;
+    }
 }

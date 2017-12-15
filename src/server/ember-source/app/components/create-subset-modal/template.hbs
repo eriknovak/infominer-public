@@ -13,16 +13,8 @@
       <div class="modal-body new-subset">
         <div class="container-fluid">
 
-          <!-- warning placeholder -->
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="warning">
-              </div>
-            </div>
-          </div>
-
           <!-- subset label -->
-          <div class="row">
+          <div class="row new-subset-information">
             <div class="col-lg-6">
               <label>Subset Name</label>
               <input type="text" class="form-control"
@@ -32,7 +24,7 @@
           </div>
 
           <!-- subset description -->
-          <div class="row">
+          <div class="row new-subset-information">
             <div class="col-lg-12">
               <div class="form-group">
                 <label>Description</label>
@@ -47,6 +39,14 @@
           <div class="row">
             <div class="col-lg-12">
               {{yield}}
+            </div>
+          </div>
+
+          <!-- warning placeholder -->
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="warning">
+              </div>
             </div>
           </div>
 

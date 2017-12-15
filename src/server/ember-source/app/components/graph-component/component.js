@@ -22,12 +22,12 @@ export default Component.extend({
         let self = this;
         this._super(...arguments);
         // set element width
-        self.handleResize();
+        self._handleResize();
         // set window resize listener
         Ember.$(window).on('resize', function () {
             clearTimeout(self.get('resizeTimer'));
             self.set('resizeTimer', setTimeout(function () {
-                self.handleResize();
+                self._handleResize();
             }, 100));
         });
     },
@@ -42,14 +42,14 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     // listener to changes of `width`, `height` and `data`
-    containerSizeChange: observer('width', 'height', 'data', function () {
+    _containerSizeChange: observer('width', 'height', function () {
         Ember.run.once(this, 'drawGraph');
     }),
 
     /**
      * Resizes the width and height.
      */
-    handleResize() {
+    _handleResize() {
         this.set('width', Ember.$(this.element).width());
         this.set('height', Ember.$(this.element).height());
     },

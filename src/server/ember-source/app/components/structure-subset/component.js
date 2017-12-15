@@ -10,7 +10,7 @@ export default Component.extend({
 
     parentState: observer('subset.usedBy.@each.[]', function () {
         this.get('subset.usedBy').then(methods => {
-            let producedSubsets = methods.filter((item, index, self) => {
+            let producedSubsets = methods.filter((item) => {
                 return item.hasMany('produced').ids().length > 0;
             });
             let isParent = producedSubsets.get('length') > 0;
