@@ -1,9 +1,9 @@
-{{#each model.usedBy as |method|}}
-  {{#if method.result}}
+{{#each model.subset.usedBy as |method|}}
+  {{#if method.analysisAppropriate}}
     {{ analysis-method type=method.methodType result=method.result }}
   {{/if}}
 {{/each}}
 
-{{ method-selection }}
+{{ method-selection action=(route-action 'startAnalysis') dataset=model.dataset }}
 
 {{outlet}}

@@ -8,10 +8,41 @@
         </button>
         <!-- modal title -->
         <h4 class="modal-title">Analysis selection</h4>
-        {{type}}
       </div>
       <div class="modal-body">
         <div class="container-fluid">
+          <div class="row method-selection-container">
+            <div class="col-lg-12">
+
+              <div class="form-inline">
+                <label class="method-selection-label">Method</label>
+                <select id="{{methodSelectionId}}" class="form-control" onchange={{action "changeMethodSelection"}}>
+                  {{#each availableMethods as |method|}}
+                    <option>{{method}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+            </div><!-- .col-lg-12 -->
+          </div><!-- .row -->
+
+          <div class="row">
+            <div class="col-lg-12">
+              {{ component (concat "method-selection-modal-" renderComponentName)
+                methodParameters=methodParameters
+                dataset=dataset
+              }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-12">
+              {{ method-selection-modal-feature-selection
+                parameters=methodParameters.parameters
+                dataset=dataset
+              }}
+            </div><!-- .col-lg-12 -->
+          </div><!-- .row -->
 
           <!-- additional content -->
           <div class="row">
@@ -25,7 +56,7 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary">Start Analysis</button>
+        <button type="button" class="btn btn-primary" {{action 'startAnalysis'}}>Start Analysis</button>
       </div>
 
     </div><!-- /.modal-content -->

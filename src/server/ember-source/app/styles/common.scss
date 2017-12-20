@@ -23,6 +23,10 @@ a {
     }
 }
 
+/**************************************
+ * Navigation bar
+ *************************************/
+
 #header .navbar {
     margin-bottom: 0px;
     border: white solid 0px;
@@ -64,37 +68,15 @@ a {
     border-radius: 0px;
 }
 
-.uppercase {
-    text-transform: uppercase;
-}
-
-.warning {
-    color: red;
-}
-
-.center {
-    text-align: center;
-}
-
-.medium-size {
-    font-size: 16px;
-}
-
-.loading {
-    padding-top: 18%;
-    color: $secondary-color;
-    text-align: center;
-}
-
-/**
+/**************************************
  * Custom checkbox style - component 'checkbox-select'
- */
+ *************************************/
 
 .checkbox {
     width: 20px;
+    height: 20px;
     position: relative;
     margin: auto;
-    margin-top: -9px !important;
 
     input[type=checkbox] {
         display: none;
@@ -136,9 +118,9 @@ a {
     }
 }
 
-/**
+/**************************************
  * Global button styles
- */
+ *************************************/
 
 .btn {
     border-radius: 0px;
@@ -180,9 +162,9 @@ a {
     }
 }
 
-/**
+/**************************************
  * Input and label style
- */
+ *************************************/
 
 input, select, textarea {
     border-radius: 0 !important;
@@ -190,4 +172,49 @@ input, select, textarea {
     -moz-box-shadow: none !important;
     box-shadow: none !important;
     resize: none;
+}
+
+/**************************************
+ * Loading
+ *************************************/
+
+.loading {
+    padding-top: 18%;
+    color: $secondary-color;
+    text-align: center;
+}
+
+/**************************************
+ * Helper classes
+ *************************************/
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.warning {
+    color: red;
+}
+
+.center {
+    text-align: center;
+}
+
+.medium-size {
+    font-size: 16px;
+}
+
+.highlight-text-only {
+    font-weight: 600;
+}
+
+.bottom-space {
+    margin-bottom: 10px;
+}
+
+// highlights part of the text
+.highlight {
+    background-color: $primary-color;
+    font-weight: 500;
+    padding: 0px 2px;
 }

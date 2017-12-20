@@ -8,6 +8,8 @@ export default Component.extend({
     collapsed: false,
     parent: false,
 
+    featureOptions: { },
+
     parentState: observer('subset.usedBy.@each.[]', function () {
         this.get('subset.usedBy').then(methods => {
             let producedSubsets = methods.filter((item) => {

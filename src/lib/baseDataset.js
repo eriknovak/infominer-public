@@ -224,7 +224,8 @@ class BaseDataset {
                 description: self.params.description,
                 created: self.params.created,
                 numberOfDocuments: self.base.store('Dataset').length,
-                hasSubsets: subsetIds
+                hasSubsets: subsetIds,
+                fields: self.base.store('Dataset').fields
             },
             subsets,
             methods
