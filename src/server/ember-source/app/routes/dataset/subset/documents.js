@@ -134,14 +134,13 @@ export default Route.extend({
                 });
 
                 method.get('produced').pushObject(subset);
-
                 // save method
                 method.save().then(function () {
                     // save subset
                     subset.save().then(function () {
                             // hide modal and transition to new route
                             Ember.$('#create-subset-documents-modal').modal('toggle');
-                            self.transitionTo('dataset.subset.analysis', self.modelFor('dataset'), subset);
+                            self.transitionTo('dataset.subset', self.modelFor('dataset'), subset.id);
                         }).catch(error => {
                             console.log(error.message);
                         });

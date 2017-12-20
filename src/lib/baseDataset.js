@@ -249,6 +249,13 @@ class BaseDataset {
             let set = subsets[id];
             if (!set) { return null; }
             setObj.subsets = self._formatSubsetInfo(set);
+            // get method that created the subset
+            setObj.methods = [self._formatMethodInfo(set.resultedIn)];
+            if (set.usedBy.length) {
+                // get methods that used the subset
+                let usedByMethods = set.usedBy.map(method => self._formatMethodInfo(method));
+                setObj.methods = setObj.methods.concat(usedByMethods);
+            }
         } else {
             setObj.subsets = subsets.allRecords
                 .map(rec => self._formatSubsetInfo(rec));
