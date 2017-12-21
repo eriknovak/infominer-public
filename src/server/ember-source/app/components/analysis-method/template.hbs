@@ -1,6 +1,6 @@
 <!-- render component based on method type -->
-{{#if result}}
-  {{ component methodComponent result=result }}
+{{#if method.result}}
+  {{ component methodComponent method=method }}
 {{else}}
   <div class="col-lg-10">
     <div class="loading">

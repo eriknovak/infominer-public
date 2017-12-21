@@ -432,11 +432,9 @@ module.exports = function (app, pg, processHandler) {
 
         let { method } = req.body;
 
-        console.log(method);
         // change the method type
         method.type = method.methodType;
         delete method.methodType;
-        console.log(method);
 
         // set the body info
         let body = { cmd: 'create_method', content: { method } };

@@ -11,11 +11,10 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         // get type of the method
-        let type = this.get('type');
-
+        let type = this.get('method.methodType');
         // prepare component name based on the type
         let methodComponent = `analysis-method-${type.replace(/\./g, '-')}`;
         this.set('methodComponent', methodComponent);
-    }
+    },
 
 });

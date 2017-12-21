@@ -5,8 +5,7 @@ export default Route.extend({
     beforeModel() {
         // redirect to '/datasets'
         this._super(...arguments);
-        console.log('subsets');
-        this.transitionTo('dataset.subset.analysis', 0);
+        this.transitionTo('dataset.subset.analysis', this.modelFor('dataset'), 0);
     }
 
 });

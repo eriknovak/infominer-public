@@ -5,21 +5,35 @@ export default Component.extend({
     // component attributes
     classNames: ['field-features'],
 
-    // parameter options
-    featureOptions: ['text', 'numeric'],
-
     // selected parameters
-    selectedFeatureOption: 'text',
     included: true,
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
 
+    init() {
+        this._super(...arguments);
+        // set the feature options
+        this.set('featureOptions', [
+            { type: 'text', selected: false },
+            { type: 'numeric', selected: false }
+        ]);
+    },
+
     didReceiveAttrs() {
         this._super(...arguments);
         // TODO: field type determines what is the default feature option
-
+        let fieldType = this.get('features.fieldType');
+        // get the feature option depending on the field type
+        let option = fieldType === 'string' ?
+            this.get('featureOptions').objectAt(0):
+            this.get('featureOptions').objectAt(1);
+        // set the option default value
+        Ember.set(option, 'selected', true);
+        // set the selected feature parameter
+        this.set('selectedFeatureOption', Ember.get(option, 'type'));
+        // save the feature options
         this._saveFeatureOptions();
     },
 

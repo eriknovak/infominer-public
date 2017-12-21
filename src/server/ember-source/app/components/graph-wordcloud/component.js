@@ -1,8 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
 
-const { computed } = Ember;
-
 // d3 visualizations
 import { min, max } from 'd3-array';
 import { select } from 'd3-selection';
@@ -32,7 +30,6 @@ const WordCloudComponent = GraphComponent.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        // prepare data
         this.prepareText(this.get('keywords'));
     },
 

@@ -14,7 +14,7 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        let result = this.get('result');
+        let result = this.get('method.result');
 
         // prepare the layout of the components
         let aggregates = result.aggregates;

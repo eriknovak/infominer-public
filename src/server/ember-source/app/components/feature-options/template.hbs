@@ -2,7 +2,10 @@
   onchange={{action "changeFeaturesType" value="target.value"}}
   disabled={{if included '' 'disabled'}}>
   {{#each featureOptions as |featureOption| }}
-    <option value='{{featureOption}}'>{{featureOption}}</option>
+    <option value='{{featureOption.type}}'
+      selected={{if featureOption.selected 'selected'}}>
+      {{featureOption.type}}
+    </option>
   {{/each}}
 </select>
 <span class="include-field pull-right">

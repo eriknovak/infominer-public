@@ -249,13 +249,21 @@ class BaseDataset {
             let set = subsets[id];
             if (!set) { return null; }
             setObj.subsets = self._formatSubsetInfo(set);
-            // get method that created the subset
-            setObj.methods = [self._formatMethodInfo(set.resultedIn)];
+            // prepare methods handler
+            setObj.methods = [ ];
+            if (set.resultedIn) {
+                // set the resulted in method
+                let resultedInMethod = [self._formatMethodInfo(set.resultedIn)];
+                setObj.methods = setObj.methods.concat(resultedInMethod);
+            }
             if (set.usedBy.length) {
                 // get methods that used the subset
                 let usedByMethods = set.usedBy.map(method => self._formatMethodInfo(method));
                 setObj.methods = setObj.methods.concat(usedByMethods);
             }
+            // remove the 'methods' property if none were given
+            if (!setObj.methods.length) { delete setObj.methods; }
+
         } else {
             setObj.subsets = subsets.allRecords
                 .map(rec => self._formatSubsetInfo(rec));
@@ -438,9 +446,13 @@ class BaseDataset {
         // get subset on which the method was used
         let subset = self.base.store('Subsets')[method.appliedOn];
         if (subset) {
-            let methodId = self.base.store('Methods').push(qMethod);
-            self.base.store('Methods')[methodId].$addJoin('appliedOn', subset);
-            return { methods: { id: methodId } };
+            // TODO: run method analysis based on it's type
+            switch(qMethod.type) {
+            case 'clustering.kmeans':
+                self._clusterKMeans(qMethod, subset);
+                break;
+            }
+            return self._saveMethod(qMethod, subset);
         } else {
             throw new Error(`No subset with id=${method.appliedOn}`);
         }
@@ -493,6 +505,7 @@ class BaseDataset {
      * @param {Object} field - Object containing field name and type.
      * @param {String} type - The aggregate type.
      * @returns The results of the aggregation.
+     * @private
      */
     _aggregateByField(elements, field, type) {
         // TODO: check if field exists
@@ -504,6 +517,7 @@ class BaseDataset {
      * Formats the subset record.
      * @param {Object} rec - The subset record.
      * @returns {Object} The subset json representation.
+     * @private
      */
     _formatSubsetInfo(rec) {
         return {
@@ -521,6 +535,7 @@ class BaseDataset {
      * Formats the document record.
      * @param {Object} rec - The document record.
      * @returns {Object} The document json representation.
+     * @private
      */
     _formatDocumentInfo(rec) {
         return {
@@ -535,6 +550,7 @@ class BaseDataset {
      * Formats the method record.
      * @param {Object} rec - The method record.
      * @returns {Object} The method json representation.
+     * @private
      */
     _formatMethodInfo(rec) {
         return {
@@ -542,10 +558,122 @@ class BaseDataset {
             type: 'methods',
             methodType: rec.type,
             parameters: rec.parameters,
-            result: rec.result,
+            result: this._formatMethodResults(rec.type, rec.result),
             produced: !rec.produced.empty ? rec.produced.map(subset => subset.$id) : null,
             appliedOn: !rec.appliedOn.empty ? rec.appliedOn.map(subset => subset.$id) : null
         };
+    }
+
+    /**
+     * Formats the method results.
+     * @param {String} type - The method type.
+     * @param {Object} result - The results saved in the method.
+     * @returns {Object} The formated method results.
+     * @private
+     */
+    _formatMethodResults(type, result) {
+        switch(type) {
+        case 'clustering.kmeans':
+            return this._formatKMeansResult(result);
+        default:
+            return result;
+        }
+    }
+
+    /**
+     * Formats the KMeans results.
+     * @param {Object} result - The KMeans results.
+     * @returns {Object} The formated results.
+     * @private
+     */
+    _formatKMeansResult(result) {
+        return { clusters: result.clusters.map(cluster => ({
+            documentCount: cluster.docIds.length,
+            aggregates: cluster.aggregates
+        }))};
+    }
+
+    /**
+     * Handles filter method.
+     * @param {Object} qMethod - Method parameters.
+     * @param {Object} subset - The subset object.
+     * @returns {Object} The stored method object.
+     * @private
+     */
+    _saveMethod(qMethod, subset) {
+        let self = this;
+        let methodId = self.base.store('Methods').push(qMethod);
+        self.base.store('Methods')[methodId].$addJoin('appliedOn', subset);
+        // returns
+        return { methods: self._formatMethodInfo(self.base.store('Methods')[methodId]) };
+    }
+
+    /**
+     * Creates a feature space out of the features.
+     * @param {Object[]} features - Object of feature elements.
+     * @returns {Object} The feature space.
+     * @private
+     */
+    _createFeatureSpace(features) {
+        return new qm.FeatureSpace(this.base, features);
+    }
+
+    /**
+     * Cluster the subset using KMeans and save results in qMethod.
+     * @param {Object} qMethod - Method parameters.
+     * @param {Object} subset - The subset object.
+     * @private
+     */
+    _clusterKMeans(qMethod, subset) {
+        let self = this;
+        // create a feature space
+        let features = qMethod.parameters.features;
+        features.forEach(feature => { feature.source='Dataset'; });
+        let featureSpace = self._createFeatureSpace(features);
+
+        // get subset elements and update the feature space
+        let documents = subset.hasElements;
+        featureSpace.updateRecords(documents);
+
+        // get matrix representation of the documents
+        let spMatrix = featureSpace.extractSparseMatrix(documents);
+
+        // prepare the KMeans method and run the clustering
+        let methodParams = qMethod.parameters.method;
+        // don't allow empty clusters
+        methodParams.allowEmpty = false;
+        let kMeans = new qm.analytics.KMeans(methodParams);
+        kMeans.fit(spMatrix);
+        // get the document-cluster affiliation
+        const idxv = kMeans.getModel().idxv;
+        // prepare clusters array in the results
+        qMethod.result = { clusters: Array.apply(null, Array(methodParams.k)).map(() => ({ docIds: [], aggregates: [ ] })) };
+
+        // populate the result clusters
+        for (let id = 0; id < idxv.length; id++) {
+            let docId = documents[id].$id;
+            let clusterId = idxv[id];
+            // store the document id in the correct cluster
+            qMethod.result.clusters[clusterId].docIds.push(docId);
+        }
+
+        // for each cluster calculate the aggregates
+        const fields = self.base.store('Dataset').fields;
+        for (let i = 0; i < qMethod.result.clusters.length; i++) {
+            // get elements in the cluster
+            let docIds = new qm.la.IntVector(qMethod.result.clusters[i].docIds);
+            let clusterElements = self.base.store('Dataset').newRecordSet(docIds);
+
+            // iterate through the fields
+            for (let field of fields) {
+                // TODO: intelligent way to select aggregation type
+                let type = field.type === 'string' ? 'keywords' : 'histogram';
+                // get aggregate distribution
+                let distribution = self._aggregateByField(clusterElements, field.name, type);
+                qMethod.result.clusters[i].aggregates.push({ field: field.name, type, distribution });
+            }
+        }
+
     }
 
 }

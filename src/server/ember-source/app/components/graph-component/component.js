@@ -1,5 +1,4 @@
 import Component from '@ember/component';
-import { observer } from '@ember/object';
 
 export default Component.extend({
     // component attributes
@@ -41,17 +40,13 @@ export default Component.extend({
     // Helper functions
     ///////////////////////////////////////////////////////
 
-    // listener to changes of `width`, `height` and `data`
-    _containerSizeChange: observer('width', 'height', function () {
-        Ember.run.once(this, 'drawGraph');
-    }),
-
     /**
      * Resizes the width and height.
      */
     _handleResize() {
         this.set('width', Ember.$(this.element).width());
         this.set('height', Ember.$(this.element).height());
+        this.drawGraph();
     },
 
     /**

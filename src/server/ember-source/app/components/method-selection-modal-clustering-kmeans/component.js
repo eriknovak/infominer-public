@@ -52,8 +52,7 @@ export default Component.extend({
 
     _setParameters() {
         // set parameter values
-        this.set('methodParameters.type', 'clustering.kmeans');
-        this.set('methodParameters.parameters.method', { distanceType: this.get('chosenMetrics'),  k: this.get('k') });
+        this.set('parameters.method', { distanceType: this.get('chosenMetrics'),  k: this.get('k') });
 
     }
 });
