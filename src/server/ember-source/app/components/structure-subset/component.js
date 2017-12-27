@@ -10,8 +10,8 @@ export default Component.extend({
 
     featureOptions: { },
 
-    parentState: observer('subset.usedBy.@each.[]', function () {
-        this.get('subset.usedBy').then(methods => {
+    _parentState: observer('subset.usedBy.@each.produced.[]', function () {
+        this.get('usedBy').then(methods => {
             let producedSubsets = methods.filter((item) => {
                 return item.hasMany('produced').ids().length > 0;
             });
@@ -33,7 +33,7 @@ export default Component.extend({
     didReceiveAttrs() {
         let self = this;
         self._super(...arguments);
-        const methods = self.get('subset.usedBy');
+        const methods = self.get('usedBy');
         // subset contains methods that produced new subset
         for (let i = 0; i < methods.get('length'); i++) {
             let method = methods.objectAt(i);

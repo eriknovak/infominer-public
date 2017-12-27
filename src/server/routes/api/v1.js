@@ -300,6 +300,8 @@ module.exports = function (app, pg, processHandler) {
 
         const { subset } = req.body;
 
+        console.log(subset);
+
         // set the body info
         let body = { cmd: 'create_subset', content: { subset } };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -450,4 +452,14 @@ module.exports = function (app, pg, processHandler) {
         });
     });
 
+    app.put('/api/datasets/:dataset_id/methods/:method_id', (req, res) => {
+        // TODO: check if dataset_id is a number
+        let datasetId = parseInt(req.params.dataset_id);
+        let methodId = parseInt(req.params.method_id);
+
+        let { method } = req.body;
+        console.log(method);
+
+        res.send({ methods: { id: method.id } });
+    });
 };

@@ -109,3 +109,16 @@
         }
     }
 }
+
+// analysis results
+.analysis {
+
+    .clustering {
+        h3 { border-bottom: 1px solid #cccccc; }
+        .clusters {
+            .cluster-header {
+                color: $secondary-color;
+            }
+        }
+    }
+}

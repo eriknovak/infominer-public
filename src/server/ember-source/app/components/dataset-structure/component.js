@@ -8,8 +8,8 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        const dataset = this.get('dataset');
-        this.set('root', dataset.get('hasSubsets').get('firstObject'));
+        let root = this.get('dataset.hasSubsets').get('firstObject');
+        this.set('root', root);
     }
 
     ///////////////////////////////////////////////////////

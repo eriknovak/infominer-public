@@ -55,7 +55,6 @@ const HistogramComponent = GraphComponent.extend({
         let min = histogram.min;
         let max = histogram.max;
         let hValues = histogram.values;
-
         // caluculate the step function
         let step = (max - min)/hValues.length;
         // calculate histogram values

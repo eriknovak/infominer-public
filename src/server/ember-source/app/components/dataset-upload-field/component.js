@@ -5,7 +5,7 @@ export default Component.extend({
     tagName: 'tr',
 
     // possible field values
-    fieldTypes: ['string', 'int', 'float'],
+    fieldTypes: ['string', 'float'],
     included: true,
 
     ///////////////////////////////////////////////////////

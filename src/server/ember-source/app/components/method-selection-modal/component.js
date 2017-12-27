@@ -12,7 +12,7 @@ export default Component.extend({
     methodSelectionId: 'method-selection',
 
     // method options
-    availableMethods: ['clustering.kmeans', 'clustering.lda'],
+    availableMethods: ['clustering.kmeans'],
     selectedMethod: 'clustering.kmeans',
 
     renderComponentName: computed('selectedMethod', function () {

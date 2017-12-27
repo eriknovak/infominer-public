@@ -64,3 +64,9 @@ $height: 250px;
 
     }
 }
+
+// analysis results
+
+.clustering {
+    .graph { height: calc(#{$height} - 100px); }
+}

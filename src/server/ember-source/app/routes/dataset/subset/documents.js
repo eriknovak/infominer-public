@@ -133,7 +133,6 @@ export default Route.extend({
                     resultedIn: method
                 });
 
-                method.get('produced').pushObject(subset);
                 // save method
                 method.save().then(function () {
                     // save subset

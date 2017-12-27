@@ -291,10 +291,20 @@ class BaseDataset {
         // get method that created the subset
         let subsetId = self.base.store('Subsets').push(qSubset);
         let method = self.base.store('Methods')[subset.resultedIn];
-
         if (method) {
             // add join to method
             self.base.store('Subsets')[subsetId].$addJoin('resultedIn', method);
+        }
+
+        if(subset.meta) {
+            // use metadata to determine the documents in the subset
+            if (!isNaN(parseFloat(subset.meta.clusterId))) {
+                // subset contains documents that were in the cluster
+                let clusterId = subset.meta.clusterId;
+                subset.documents = method.result.clusters[clusterId].docIds;
+                method.result.clusters[clusterId].subsetCreated = true;
+
+            }
         }
 
         // add joins to documents/elements
@@ -417,6 +427,22 @@ class BaseDataset {
             // get one method and format it
             let set = methods[id];
             methodObj.methods = self._formatMethodInfo(set);
+            // subset information
+            methodObj.subsets = [ ];
+
+            if (!set.appliedOn.empty) {
+                // set the resulted in method
+                let appliedOnSubsets = set.appliedOn.map(subset => self._formatSubsetInfo(subset));
+                methodObj.subsets = methodObj.subsets.concat(appliedOnSubsets);
+            }
+            if (!set.produced.empty) {
+                // get methods that used the subset
+                let producedSubsets = set.produced.map(subset => self._formatSubsetInfo(subset));
+                methodObj.subsets = methodObj.subsets.concat(producedSubsets);
+            }
+            // remove the 'methods' property if none were given
+            if (!methodObj.subsets.length) { delete methodObj.subsets; }
+
         } else {
             methodObj.methods = methods.allRecords
                 .map(rec => self._formatMethodInfo(rec));
@@ -589,7 +615,8 @@ class BaseDataset {
     _formatKMeansResult(result) {
         return { clusters: result.clusters.map(cluster => ({
             documentCount: cluster.docIds.length,
-            aggregates: cluster.aggregates
+            aggregates: cluster.aggregates,
+            subsetCreated: cluster.subsetCreated
         }))};
     }
 
@@ -625,8 +652,10 @@ class BaseDataset {
      * @private
      */
     _clusterKMeans(qMethod, subset) {
+        console.time('clusterKMeans');
         let self = this;
         // create a feature space
+        console.time('featureSpace');
         let features = qMethod.parameters.features;
         features.forEach(feature => { feature.source='Dataset'; });
         let featureSpace = self._createFeatureSpace(features);
@@ -634,20 +663,28 @@ class BaseDataset {
         // get subset elements and update the feature space
         let documents = subset.hasElements;
         featureSpace.updateRecords(documents);
+        console.timeEnd('featureSpace');
 
+        console.time('extractSparseMatrix');
         // get matrix representation of the documents
         let spMatrix = featureSpace.extractSparseMatrix(documents);
+        console.timeEnd('extractSparseMatrix');
 
         // prepare the KMeans method and run the clustering
+        console.time('Kmeans fitting');
         let methodParams = qMethod.parameters.method;
         // don't allow empty clusters
         methodParams.allowEmpty = false;
         let kMeans = new qm.analytics.KMeans(methodParams);
         kMeans.fit(spMatrix);
+        console.timeEnd('Kmeans fitting');
+
+        console.time('clusters');
+
         // get the document-cluster affiliation
         const idxv = kMeans.getModel().idxv;
         // prepare clusters array in the results
-        qMethod.result = { clusters: Array.apply(null, Array(methodParams.k)).map(() => ({ docIds: [], aggregates: [ ] })) };
+        qMethod.result = { clusters: Array.apply(null, Array(methodParams.k)).map(() => ({ docIds: [ ], aggregates: [ ], subsetCreated: false })) };
 
         // populate the result clusters
         for (let id = 0; id < idxv.length; id++) {
@@ -656,6 +693,7 @@ class BaseDataset {
             // store the document id in the correct cluster
             qMethod.result.clusters[clusterId].docIds.push(docId);
         }
+        console.timeEnd('clusters');
 
         // for each cluster calculate the aggregates
         const fields = self.base.store('Dataset').fields;
@@ -673,7 +711,7 @@ class BaseDataset {
                 qMethod.result.clusters[i].aggregates.push({ field: field.name, type, distribution });
             }
         }
-
+        console.timeEnd('clusterKMeans');
     }
 
 }

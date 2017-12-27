@@ -8,11 +8,11 @@ export default Component.extend({
     // services
     columnWidth: service('column-size'),
 
-
     didReceiveAttrs() {
         this._super(...arguments);
-        let clusters = this.get('method.result.clusters');
+        let method = this.get('method');
 
+        let clusters = method.get('result.clusters');
         // prepare the layout of the components
         for (let i = 0; i < clusters.length; i++) {
             let aggregates = clusters.objectAt(i).aggregates;
@@ -23,4 +23,5 @@ export default Component.extend({
         // set aggregates with classes
         this.set('clusters', clusters);
     }
+
 });
