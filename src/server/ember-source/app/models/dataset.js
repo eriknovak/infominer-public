@@ -5,5 +5,6 @@ export default DS.Model.extend({
     description: DS.attr('string'),
     created: DS.attr('date'),
     numberOfDocuments: DS.attr('number'),
-    hasSubsets: DS.hasMany('subset', { inverse: null })
+    hasSubsets: DS.hasMany('subset', { inverse: null }),
+    fields: DS.attr()
 });

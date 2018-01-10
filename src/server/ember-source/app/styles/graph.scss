@@ -1,0 +1,72 @@
+$wordcloud-font: 'Passion One';
+
+$height: 250px;
+
+.method-selection {
+    display: block;
+    height: $height;
+    margin: -1px;
+    margin-top: 30px;
+    border: 1px dashed $primary-color;
+    text-align: center;
+    -webkit-transition: background .4s;
+    transition: background .4s;
+
+    &:hover {
+        background-color: $primary-color;
+        color: $secondary-color;
+    }
+
+    .content {
+        display: inline-block;
+        margin: 89px 0;
+    }
+}
+
+.graph {
+    width: 100%;
+    height: $height;
+
+    &.wordcloud {
+        margin: -1px; // for border space
+        border: 1px solid $primary-color;
+        font-weight: 500;
+        text.small { fill: darken($primary-color, 35%); }
+        text.medium { fill: $tertiary-color; }
+        text.large { fill: $dark-font-color; }
+    }
+
+    &.histogram {
+        .percent {
+            rect {
+                fill: $tertiary-color;
+            }
+            .frequency {
+                font: 10px $main-font;
+                fill: white;
+                cursor: default;
+            }
+        }
+
+        .percentSumOutline,
+        .percentSum rect {
+            fill: darken($primary-color, 2%);
+        }
+
+        .domain {
+            stroke: $dark-font-color;
+
+        }
+        .tick {
+            line { stroke: $dark-font-color; }
+            text { font-family: $main-font; }
+        }
+
+    }
+}
+
+// analysis results
+
+.clustering {
+    .graph { height: calc(#{$height} - 100px); }
+}

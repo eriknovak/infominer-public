@@ -10,8 +10,11 @@ Router.map(function() {
   this.route('datasets');
   this.route('dataset-upload');
   this.route('dataset', { path: '/datasets/:dataset_id' }, function() {
-    this.route('subsets', { path: '/subsets' });
-    this.route('subset', { path: '/subsets/:subset_id' });
+    this.route('subsets');
+    this.route('subset', { path: '/subsets/:subset_id' }, function() {
+      this.route('documents', { path: '/documents' });
+      this.route('analysis');
+    });
   });
 });
 

@@ -1,4 +1,19 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+
+    ///////////////////////////////////////////////////////
+    // Component Life Cycle
+    ///////////////////////////////////////////////////////
+
+    didReceiveAttrs() {
+        this._super(...arguments);
+        let root = this.get('dataset.hasSubsets').get('firstObject');
+        this.set('root', root);
+    }
+
+    ///////////////////////////////////////////////////////
+    // Actions
+    ///////////////////////////////////////////////////////
+
 });

@@ -1,10 +1,16 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+    // component attributes
     tagName: 'tr',
 
     // possible field values
-    fieldTypes: ['string', 'int', 'float'],
+    fieldTypes: ['string', 'float'],
+    included: true,
+
+    ///////////////////////////////////////////////////////
+    // Component Life Cycle
+    ///////////////////////////////////////////////////////
 
     didReceiveAttrs() {
         this._super(...arguments);
@@ -19,29 +25,38 @@ export default Component.extend({
         }
         // set field types
         this.set('fieldTypes', fieldTypes);
+
+        // set element ids
+        this.set('nameId', `field-name-${this.get('index')}`);
+        this.set('typeId', `field-type-${this.get('index')}`);
+        this.set('checkboxId', `field-included-${this.get('index')}`);
+
     },
 
+    ///////////////////////////////////////////////////////
+    // Actions
+    ///////////////////////////////////////////////////////
 
     actions: {
         /**
          * Changes the model field value.
          */
         changeFieldName() {
-            this.set("name", Ember.$(`#field-name-${this.get('index')}`).val());
+            this.set('name', Ember.$(`#${this.get('nameId')}`).val());
         },
 
         /**
          * Changes the field type value.
          */
         changeFieldType() {
-            this.set("type", Ember.$(`#field-type-${this.get('index')}`).val());
+            this.set('type', Ember.$(`#${this.get('typeId')}`).val());
         },
 
         /**
          * Changes flag for field inclusion.
          */
         changeFieldInclusion() {
-            this.set("included", Ember.$(`#field-included-${this.get('index')}`).is(':checked'));
+            this.set('included', Ember.$(`#${this.get('checkboxId')}`).is(':checked'));
         }
     }
 });

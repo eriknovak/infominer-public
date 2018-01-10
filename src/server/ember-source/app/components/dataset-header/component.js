@@ -2,18 +2,27 @@ import Component from '@ember/component';
 
 export default Component.extend({
 
+    ///////////////////////////////////////////////////////
+    // Component Life Cycle
+    ///////////////////////////////////////////////////////
+
     didReceiveAttrs() {
         this._super(...arguments);
         // modify date to appropriate format
         this._prepareDate();
     },
 
+    ///////////////////////////////////////////////////////
+    // Actions
+    ///////////////////////////////////////////////////////
 
-    ///////////////////////////////////
-    // helper functions
+
+    ///////////////////////////////////////////////////////
+    // Helper functions
+    ///////////////////////////////////////////////////////
 
     /**
-     * Change date to dd/mm/YYYY format.
+     * Change date to dd/mm/YYYY format
      */
     _prepareDate() {
         const c = this.get('dataset.created');

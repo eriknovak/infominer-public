@@ -1,0 +1,47 @@
+<div class="row">
+
+  <div class="col-xs-12 col-sm-12 col-md-3">
+    <!-- which documents are shown -->
+    <div class="document-display-info">
+      <p>Displaying {{startDisplay}}-{{endDisplay}} of {{count}}</p>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-6">
+    <!-- navigation -->
+    <div class="navigation-buttons pull-center">
+      <!-- Go to first page -->
+      <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+        onclick={{if onFirstPage null (action 'getDocuments' firstPage)}}>
+        <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+      </button>
+      <!-- Go to previous page -->
+      <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+        onclick={{if onFirstPage null (action 'getDocuments' prevPage)}}>
+        <i class="fa fa-angle-left" aria-hidden="true"></i>
+      </button>
+
+      <!-- Set buttons to navigate through pages -->
+      {{#each quickSelect as |quickPage|}}
+        <button class="btn btn-tertiary {{if quickPage.active 'active'}}"
+          onclick={{action 'getDocuments' quickPage.pageN}}>
+          {{quickPage.pageN}}
+        </button>
+      {{/each}}
+
+      <!-- Go to next page -->
+      <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
+        onclick={{if onLastPage null (action 'getDocuments' nextPage)}}>
+        <i class="fa fa-angle-right" aria-hidden="true"></i>
+      </button>
+      <!-- Go to last page -->
+      <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
+        onclick={{if onLastPage null (action 'getDocuments' lastPage)}}>
+        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+{{yield}}

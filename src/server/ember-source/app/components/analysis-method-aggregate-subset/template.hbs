@@ -1,0 +1,13 @@
+<div class="row">
+
+  {{#each aggregates as |aggregate|}}
+    <div class="{{ aggregate.columnSize }}">
+      {{ component
+          (concat "aggregate-" aggregate.type)
+          field=aggregate.field
+          distribution=aggregate.distribution
+      }}
+    </div>
+  {{/each}}
+
+</div>

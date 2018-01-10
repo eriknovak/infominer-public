@@ -2,18 +2,17 @@
   <div class="row dataset-header-information">
     <div class="col-sm-12 col-lg-offset-1 col-lg-11">
       <div class="row">
-        <div class="col-sm-6 col-md-5 col-lg-4">
+        <div class="col-sm-5 col-md-4 col-lg-3">
           <!-- Dataset title and information -->
           <h1 class="dataset-label">{{dataset.label}}</h1>
 
           <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#delete-dataset-modal">Delete</button>
-          <button class="btn btn-primary pull-right">Edit</button>
 
           <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
           <span class="dataset-created">Created: {{dataset.date}}</span>
 
         </div>
-        <div class="col-sm-6 col-md-7 col-lg-8">
+        <div class="col-sm-7 col-md-8 col-lg-9">
           {{#if dataset.description}}
             <!-- Dataset description -->
             <div class="row">

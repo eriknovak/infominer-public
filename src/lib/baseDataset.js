@@ -101,12 +101,28 @@ class BaseDataset {
     _prepareSchema(fields) {
         let schema = require(`${__dirname}/../config/schema.json`);
         // filter out included fields
-        const inFields = fields.filter(field => field.included)
-            .map(field => ({ name: field.name, type: field.type }));
+        const inFields = fields.filter(field => field.included);
+
+        // prepare the dataset fields
+        const datasetFields = inFields.map(field => ({ name: field.name, type: field.type, null: true }));
         // TODO: check fields schema
 
         // replace the schema fields
-        schema[0].fields = inFields;
+        schema[0].fields = datasetFields;
+
+        // add dataset schema keys
+        let datasetKeys = [ ];
+        for (let field of inFields) {
+            // string fields are used for keys
+            if (field.type === 'string') {
+                datasetKeys.push({ field: field.name, type: 'text' });
+            }
+        }
+        // TODO: check keys schema
+
+        // add keys to the schema
+        if (datasetKeys.length) { schema[0].keys = datasetKeys; }
+
         return schema;
     }
 
@@ -115,7 +131,7 @@ class BaseDataset {
      * @param {String} filePath - File path.
      * @param {field_instance[]} fields - Dataset fields.
      * @param {Object} dataset - Dataset information.
-     *
+     * @returns {Object} Object containing the subset id.
      */
     pushDocsToBase(filePath, fields) {
         let self = this;
@@ -131,15 +147,21 @@ class BaseDataset {
         while (!fileIn.eof) {
             // get new row and its values
             let newLine = fileIn.readLine();
+            // skip empty lines
+            if (newLine.trim() === '') { continue; }
+
             let fValues = newLine.trim().split('|');
             // prepare and push record to dataset
             let rec = self._prepareRecord(fValues, fields);
-            let recId = self.base.store('Dataset').push(rec);
-            // get record and check for join with root subset
-            if (self.base.store('Dataset')[recId].inSubsets.empty) {
-                self.base.store('Dataset')[recId].$addJoin('inSubsets', self.base.store('Subsets')[0]);
-            }
+            self.base.store('Dataset').push(rec);
         }
+        // create the root subset
+        let subset = {
+            label: 'root',
+            description: 'The root subset. Contains all records of dataset.',
+            documents: self.base.store('Dataset').allRecords.map(rec => rec.$id)
+        };
+        return self.createSubset(subset);
     }
 
     /**
@@ -157,15 +179,6 @@ class BaseDataset {
             // if the field is included in the database
             if (fields[i].included) {
                 rec[fields[i].name] = self._parseFValue(values[i], fields[i].type);
-                // record is part of a subset (whole dataset)
-                if (self.base.store('Subsets').empty) {
-                    let data = {
-                        label: 'root',
-                        description: 'The root subset. Contains all records of dataset.'
-                    };
-                    // if data contains any fields
-                    if (Object.keys(data).length > 0) { rec.inSubsets = [data]; }
-                }
             }
         }
         return rec;
@@ -199,8 +212,11 @@ class BaseDataset {
         let self = this;
         // get all subsets
         let { subsets } = self.getSubsetInfo();
+        let { methods } = self.getMethodInfo();
+
         // subset ids used in the dataset info
         let subsetIds = subsets.map(set => set.id);
+        // prepare response object
         let jsonResults = {
             datasets: {
                 id: self.params.datasetId,
@@ -208,9 +224,11 @@ class BaseDataset {
                 description: self.params.description,
                 created: self.params.created,
                 numberOfDocuments: self.base.store('Dataset').length,
-                hasSubsets: subsetIds
+                hasSubsets: subsetIds,
+                fields: self.base.store('Dataset').fields
             },
-            subsets
+            subsets,
+            methods
         };
         // returns
         return jsonResults;
@@ -218,7 +236,7 @@ class BaseDataset {
 
     /**
      * Gets information about the subsets in the database.
-     * @returns {Object[]} An array of subset representation objects.
+     * @returns {Object} An array of subset representation objects.
      */
     getSubsetInfo(id) {
         let self = this;
@@ -227,14 +245,25 @@ class BaseDataset {
         let setObj = { subsets: null };
         // if id is a number
         if (!isNaN(parseFloat(id))) {
-            // validate id
-            if (id < 0 || subsets.length <= id) {
-                // TODO: handle this error
-                return null;
-            }
             // get one subset and format it
             let set = subsets[id];
+            if (!set) { return null; }
             setObj.subsets = self._formatSubsetInfo(set);
+            // prepare methods handler
+            setObj.methods = [ ];
+            if (set.resultedIn) {
+                // set the resulted in method
+                let resultedInMethod = [self._formatMethodInfo(set.resultedIn)];
+                setObj.methods = setObj.methods.concat(resultedInMethod);
+            }
+            if (set.usedBy.length) {
+                // get methods that used the subset
+                let usedByMethods = set.usedBy.map(method => self._formatMethodInfo(method));
+                setObj.methods = setObj.methods.concat(usedByMethods);
+            }
+            // remove the 'methods' property if none were given
+            if (!setObj.methods.length) { delete setObj.methods; }
+
         } else {
             setObj.subsets = subsets.allRecords
                 .map(rec => self._formatSubsetInfo(rec));
@@ -244,9 +273,277 @@ class BaseDataset {
     }
 
     /**
+     * Creates a subset record in the database.
+     * @param {Object} subset - The subset to store.
+     * @param {String} subset.label - The label of the subset.
+     * @param {String} [subset.description] - The subset description.
+     * @param {Number} subset.resultedIn - The id of the method that created the subset.
+     * @param {Number[]} subset.documents - Array of document ids the subset contains.
+     */
+    createSubset(subset) {
+        // TODO: log activity
+        let self = this;
+        // create subset record
+        let qSubset = {
+            label: subset.label,
+            description: subset.description
+        };
+        // get method that created the subset
+        let subsetId = self.base.store('Subsets').push(qSubset);
+        let method = self.base.store('Methods')[subset.resultedIn];
+        if (method) {
+            // add join to method
+            self.base.store('Subsets')[subsetId].$addJoin('resultedIn', method);
+        }
+
+        if(subset.meta) {
+            // use metadata to determine the documents in the subset
+            if (!isNaN(parseFloat(subset.meta.clusterId))) {
+                // subset contains documents that were in the cluster
+                let clusterId = subset.meta.clusterId;
+                subset.documents = method.result.clusters[clusterId].docIds;
+                method.result.clusters[clusterId].subsetCreated = true;
+
+            }
+        }
+
+        // add joins to documents/elements
+        for (let documentId of subset.documents) {
+            let document = self.base.store('Dataset')[documentId];
+            if (document) { self.base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
+        }
+        // return id of created subset
+        return { subsets: { id: subsetId } };
+    }
+
+    /**
+     * Gets documents that are part of the subset.
+     * @param {Number} id - Subset id.
+     * @param {Object} [query] - Query for retrieving documents.
+     * @param {Number} [query.limit=10] - The number of documents it retrieves.
+     * @param {Number} [query.offset=0] - The retrieval starting point.
+     * @param {Number} [query.page] - The page number based on the limit.
+     * @param {Object} [query.sort] - The sort parameters.
+     * @param {String} query.sort.fieldName - The field by which the sorting is done.
+     * @param {String} [query.sort.sortType] - The flag specifiying is sort is done. Possible: `asc` or `desc`.
+     * @returns {Object} The object containing the documents and it's metadata.
+     */
+    getSubsetDocuments(id, query) {
+        // TODO: log activity
+        let self = this;
+        // get database subsets
+        let subsets = self.base.store('Subsets');
+        if (id < 0 || subsets.length <= id) {
+            // TODO: handle this error
+            return null;
+        }
+        // prepare the query parameters
+        let offset = query.offset ? query.offset : 0;
+        let limit = query.limit ? query.limit : 10;
+        // if page exists, modify offset
+        if (query.page) {
+            offset = (query.page-1)*limit;
+        }
+        // get page number
+        let page = Math.floor(offset/limit) + 1;
+
+        // prepare qminer query
+        let qmQuery = {
+            $join: {
+                $name: 'hasElements',
+                $query: {
+                    $from: 'Subsets',
+                    $id: id
+                }
+            }
+        };
+
+        // add sorting to the query
+        if (query.sort) {
+            // TODO: check if sort object has expected schema
+            const ascFlag = query.sort.sortType === 'desc' ? -1 : 1;
+            const field = query.sort.field;
+            // set sort to the query
+            qmQuery.$sort = { };
+            qmQuery.$sort[field] = ascFlag;
+        }
+
+        // TODO: allow filtering documents
+
+        // get the subset documents
+        let subsetDocuments = self.base.search(qmQuery);
+
+        // prepare field metadata
+        let fields = self.base.store('Dataset').fields
+            .map(field => {
+                let sortType = null;
+                // if the documents were sorted by the field
+                if (query.sort && query.sort.field === field.name) {
+                    sortType = query.sort.sortType;
+                }
+                // return field metadata
+                return { name: field.name, type: field.type, sortType };
+            });
+
+        // prepare objects
+        let setObj = {
+            documents: null,
+            meta: {
+                fields,
+                pagination: {
+                    page,
+                    limit,
+                    documentCount: subsetDocuments.length
+                }
+            }
+        };
+        // truncate the documents using the query
+        subsetDocuments.trunc(limit, offset);
+
+        // format the documents
+        setObj.documents = subsetDocuments.map(rec => self._formatDocumentInfo(rec));
+
+        // return documents and metadata
+        return setObj;
+    }
+
+    /**
+     * Gets information about the methods in the database.
+     * @returns {Object} An object containing the array of method representation objects.
+     */
+    getMethodInfo(id) {
+        // TODO: log activity
+        let self = this;
+        // get database methods
+        let methods = self.base.store('Methods');
+        let methodObj = { methods: null, meta: null };
+        // if id is a number
+        if (!isNaN(parseFloat(id))) {
+            // validate id
+            if (id < 0 || methods.length <= id) {
+                // TODO: handle this error
+                return null;
+            }
+            // get one method and format it
+            let set = methods[id];
+            methodObj.methods = self._formatMethodInfo(set);
+            // subset information
+            methodObj.subsets = [ ];
+
+            if (!set.appliedOn.empty) {
+                // set the resulted in method
+                let appliedOnSubsets = set.appliedOn.map(subset => self._formatSubsetInfo(subset));
+                methodObj.subsets = methodObj.subsets.concat(appliedOnSubsets);
+            }
+            if (!set.produced.empty) {
+                // get methods that used the subset
+                let producedSubsets = set.produced.map(subset => self._formatSubsetInfo(subset));
+                methodObj.subsets = methodObj.subsets.concat(producedSubsets);
+            }
+            // remove the 'methods' property if none were given
+            if (!methodObj.subsets.length) { delete methodObj.subsets; }
+
+        } else {
+            methodObj.methods = methods.allRecords
+                .map(rec => self._formatMethodInfo(rec));
+        }
+        // return the methods
+        return methodObj;
+    }
+
+    /**
+     * Creates a method record in the database.
+     * @param {Object} method - The method to store.
+     * @param {String} method.methodType - The type of the method.
+     * @param {Object} method.parameters - The parameters of the method.
+     * @param {Object} method.result - The result of the method.
+     * @param {Number} method.appliedOn - The id of the subset the method was applied on.
+     */
+    createMethod(method) {
+        // TODO: log activity
+        let self = this;
+        // prepare method object
+        let qMethod = {
+            type: method.type,
+            parameters: method.parameters,
+            result: method.result
+        };
+
+        // get subset on which the method was used
+        let subset = self.base.store('Subsets')[method.appliedOn];
+        if (subset) {
+            // TODO: run method analysis based on it's type
+            switch(qMethod.type) {
+            case 'clustering.kmeans':
+                self._clusterKMeans(qMethod, subset);
+                break;
+            }
+            return self._saveMethod(qMethod, subset);
+        } else {
+            throw new Error(`No subset with id=${method.appliedOn}`);
+        }
+    }
+
+    /**
+     * Calculates the aggregates on the subset.
+     * @param {Number} subsetId - The subset id.
+     * @returns {Object} Object containing the method id.
+     */
+    aggregateSubset(subsetId) {
+        // TODO: log activity
+
+        let self = this;
+
+        const subset = self.base.store('Subsets')[subsetId];
+        if (subset) {
+            // get dataset fields and subset elements
+            const fields = self.base.store('Dataset').fields;
+            const elements = subset.hasElements;
+
+            // store the method
+            let qMethod = {
+                type: 'aggregate.subset',
+                parameters: { subsetId },
+                result: { aggregates: [ ] },
+                appliedOn: subsetId
+            };
+
+            // iterate through the fields
+            for (let field of fields) {
+                // TODO: intelligent way to select aggregation type
+                let type = field.type === 'string' ? 'keywords' : 'histogram';
+                // get aggregate distribution
+                let distribution = self._aggregateByField(elements, field.name, type);
+                qMethod.result.aggregates.push({ field: field.name, type, distribution });
+            }
+
+            // save the method
+            return self.createMethod(qMethod);
+
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Aggregates elements by field and type.
+     * @param {RecordSet} elements - A record set of elements.
+     * @param {Object} field - Object containing field name and type.
+     * @param {String} type - The aggregate type.
+     * @returns The results of the aggregation.
+     * @private
+     */
+    _aggregateByField(elements, field, type) {
+        // TODO: check if field exists
+        let distribution = elements.aggr({ name: `${field}_${type}`, field, type });
+        return distribution;
+    }
+
+    /**
      * Formats the subset record.
      * @param {Object} rec - The subset record.
      * @returns {Object} The subset json representation.
+     * @private
      */
     _formatSubsetInfo(rec) {
         return {
@@ -254,10 +551,167 @@ class BaseDataset {
             type: 'subsets',
             label: rec.label,
             description: rec.description,
-            resultedIn: rec.resultedIn ? rec.resultedIn.id : null,
-            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.id) : null,
-            numberOfElements: rec.hasElements.length
+            resultedIn: rec.resultedIn ? rec.resultedIn.$id : null,
+            usedBy: !rec.usedBy.empty ? rec.usedBy.map(method => method.$id) : null,
+            documentCount: !rec.hasElements.empty ? rec.hasElements.length : null
         };
+    }
+
+    /**
+     * Formats the document record.
+     * @param {Object} rec - The document record.
+     * @returns {Object} The document json representation.
+     * @private
+     */
+    _formatDocumentInfo(rec) {
+        return {
+            id: rec.$id,
+            type: 'documents',
+            subsets: !rec.inSubsets.empty ? rec.inSubsets.map(subset => subset.$id) : null,
+            values: rec.toJSON(false, false, false)
+        };
+    }
+
+    /**
+     * Formats the method record.
+     * @param {Object} rec - The method record.
+     * @returns {Object} The method json representation.
+     * @private
+     */
+    _formatMethodInfo(rec) {
+        return {
+            id: rec.$id,
+            type: 'methods',
+            methodType: rec.type,
+            parameters: rec.parameters,
+            result: this._formatMethodResults(rec.type, rec.result),
+            produced: !rec.produced.empty ? rec.produced.map(subset => subset.$id) : null,
+            appliedOn: !rec.appliedOn.empty ? rec.appliedOn.map(subset => subset.$id) : null
+        };
+    }
+
+    /**
+     * Formats the method results.
+     * @param {String} type - The method type.
+     * @param {Object} result - The results saved in the method.
+     * @returns {Object} The formated method results.
+     * @private
+     */
+    _formatMethodResults(type, result) {
+        switch(type) {
+        case 'clustering.kmeans':
+            return this._formatKMeansResult(result);
+        default:
+            return result;
+        }
+    }
+
+    /**
+     * Formats the KMeans results.
+     * @param {Object} result - The KMeans results.
+     * @returns {Object} The formated results.
+     * @private
+     */
+    _formatKMeansResult(result) {
+        return { clusters: result.clusters.map(cluster => ({
+            documentCount: cluster.docIds.length,
+            aggregates: cluster.aggregates,
+            subsetCreated: cluster.subsetCreated
+        }))};
+    }
+
+    /**
+     * Handles filter method.
+     * @param {Object} qMethod - Method parameters.
+     * @param {Object} subset - The subset object.
+     * @returns {Object} The stored method object.
+     * @private
+     */
+    _saveMethod(qMethod, subset) {
+        let self = this;
+        let methodId = self.base.store('Methods').push(qMethod);
+        self.base.store('Methods')[methodId].$addJoin('appliedOn', subset);
+        // returns
+        return { methods: self._formatMethodInfo(self.base.store('Methods')[methodId]) };
+    }
+
+    /**
+     * Creates a feature space out of the features.
+     * @param {Object[]} features - Object of feature elements.
+     * @returns {Object} The feature space.
+     * @private
+     */
+    _createFeatureSpace(features) {
+        return new qm.FeatureSpace(this.base, features);
+    }
+
+    /**
+     * Cluster the subset using KMeans and save results in qMethod.
+     * @param {Object} qMethod - Method parameters.
+     * @param {Object} subset - The subset object.
+     * @private
+     */
+    _clusterKMeans(qMethod, subset) {
+        console.time('clusterKMeans');
+        let self = this;
+        // create a feature space
+        console.time('featureSpace');
+        let features = qMethod.parameters.features;
+        features.forEach(feature => { feature.source='Dataset'; });
+        let featureSpace = self._createFeatureSpace(features);
+
+        // get subset elements and update the feature space
+        let documents = subset.hasElements;
+        featureSpace.updateRecords(documents);
+        console.timeEnd('featureSpace');
+
+        console.time('extractSparseMatrix');
+        // get matrix representation of the documents
+        let spMatrix = featureSpace.extractSparseMatrix(documents);
+        console.timeEnd('extractSparseMatrix');
+
+        // prepare the KMeans method and run the clustering
+        console.time('Kmeans fitting');
+        let methodParams = qMethod.parameters.method;
+        // don't allow empty clusters
+        methodParams.allowEmpty = false;
+        let kMeans = new qm.analytics.KMeans(methodParams);
+        kMeans.fit(spMatrix);
+        console.timeEnd('Kmeans fitting');
+
+        console.time('clusters');
+
+        // get the document-cluster affiliation
+        const idxv = kMeans.getModel().idxv;
+        // prepare clusters array in the results
+        qMethod.result = { clusters: Array.apply(null, Array(methodParams.k)).map(() => ({ docIds: [ ], aggregates: [ ], subsetCreated: false })) };
+
+        // populate the result clusters
+        for (let id = 0; id < idxv.length; id++) {
+            let docId = documents[id].$id;
+            let clusterId = idxv[id];
+            // store the document id in the correct cluster
+            qMethod.result.clusters[clusterId].docIds.push(docId);
+        }
+        console.timeEnd('clusters');
+
+        // for each cluster calculate the aggregates
+        const fields = self.base.store('Dataset').fields;
+        for (let i = 0; i < qMethod.result.clusters.length; i++) {
+            // get elements in the cluster
+            let docIds = new qm.la.IntVector(qMethod.result.clusters[i].docIds);
+            let clusterElements = self.base.store('Dataset').newRecordSet(docIds);
+
+            // iterate through the fields
+            for (let field of fields) {
+                // TODO: intelligent way to select aggregation type
+                let type = field.type === 'string' ? 'keywords' : 'histogram';
+                // get aggregate distribution
+                let distribution = self._aggregateByField(clusterElements, field.name, type);
+                qMethod.result.clusters[i].aggregates.push({ field: field.name, type, distribution });
+            }
+        }
+        console.timeEnd('clusterKMeans');
     }
 
 }

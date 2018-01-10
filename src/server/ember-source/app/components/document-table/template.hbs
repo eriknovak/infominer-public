@@ -1,0 +1,15 @@
+<div class="row document-table">
+  <div class="col-lg-12">
+
+    <div class="row">
+      <div class="col-lg-12 table-options">
+        {{ pagination-limit limit=pagination.limit changeLimit=changeLimit }}
+        {{ document-table-create-subset createSubset=createSubset }}
+      </div>
+    </div>
+    {{ document-table-content documents=documents fields=fields sortByField=sortByField }}
+    {{ pagination-navigation pagination=pagination documents=documents changePage=changePage }}
+  </div>
+</div>
+
+{{yield}}

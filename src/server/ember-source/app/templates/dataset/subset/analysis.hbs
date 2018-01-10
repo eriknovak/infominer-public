@@ -1,0 +1,9 @@
+{{#each model.subset.usedBy as |method|}}
+  {{#if method.analysisAppropriate}}
+    {{ analysis-method method=method createSubset=(route-action "createSubset") }}
+  {{/if}}
+{{/each}}
+
+{{ method-selection action=(route-action 'startAnalysis') dataset=model.dataset }}
+
+{{outlet}}

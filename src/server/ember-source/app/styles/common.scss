@@ -23,6 +23,10 @@ a {
     }
 }
 
+/**************************************
+ * Navigation bar
+ *************************************/
+
 #header .navbar {
     margin-bottom: 0px;
     border: white solid 0px;
@@ -30,9 +34,11 @@ a {
     .navbar-brand {
         color: $light-font-color;
         font-family: $main-font;
+        font-weight: 400;
     }
     .navbar-nav {
         font-size: 16px;
+        font-weight: 400;
         a {
             display: block;
             padding: 1em 1em 1em 1em;
@@ -49,7 +55,7 @@ a {
             }
         }
         a:hover {
-            background-color: rgba($quaternary-color,.4);
+            background-color: lighten($secondary-color, 10%);
         }
     }
 
@@ -61,6 +67,126 @@ a {
 .modal-content {
     border-radius: 0px;
 }
+
+/**************************************
+ * Custom checkbox style - component 'checkbox-select'
+ *************************************/
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    margin: auto;
+
+    input[type=checkbox] {
+        display: none;
+    }
+
+    input[type=checkbox]:checked + label:after {
+        opacity: 1;
+    }
+
+    label {
+        cursor: pointer;
+        position: absolute;
+        padding: 0px;
+        width: 20px;
+        height: 20px;
+        top: 0;
+        left: 0;
+        border: 1px solid darken($primary-color, 20%);
+        border-radius: 3px;
+
+        &:hover::after {
+            opacity: 0.5;
+        }
+
+        &:after {
+            opacity: 0;
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 6px;
+            background: transparent;
+            top: 4px;
+            left: 5px;
+            border: 3px solid #333;
+            border-top: none;
+            border-right: none;
+            transform: rotate(-50deg);
+        }
+    }
+}
+
+/**************************************
+ * Global button styles
+ *************************************/
+
+.btn {
+    border-radius: 0px;
+    border: 0px solid;
+
+    &:focus, &:active {
+        outline: none !important;
+        box-shadow: none;
+    }
+
+    @mixin button-type($color) {
+        background-color: $color;
+        -webkit-transition: background .4s;
+        transition: background .4s;
+        &.disabled:hover { background-color: $color; }
+        &.active {
+            background-color: darken($color, 20%);
+            &:hover { background-color: darken($color, 20%); }
+        }
+        &:hover { background-color: darken($color, 10%); }
+    }
+
+    &.btn-primary {
+        @include button-type($secondary-color);
+    }
+
+    &.btn-secondary {
+        color: white;
+        @include button-type($quaternary-color);
+    }
+
+    &.btn-tertiary {
+        color: $dark-font-color;
+        @include button-type($primary-color);
+    }
+
+    &.pull-right {
+        margin-left: 10px;
+    }
+}
+
+/**************************************
+ * Input and label style
+ *************************************/
+
+input, select, textarea {
+    border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+    resize: none;
+}
+
+/**************************************
+ * Loading
+ *************************************/
+
+.loading {
+    padding-top: 18%;
+    color: $secondary-color;
+    text-align: center;
+}
+
+/**************************************
+ * Helper classes
+ *************************************/
 
 .uppercase {
     text-transform: uppercase;
@@ -78,15 +204,17 @@ a {
     font-size: 16px;
 }
 
-.btn {
-    border-radius: 0px;
-    border: 0px solid;
+.highlight-text-only {
+    font-weight: 600;
+}
 
-    &.btn-primary {
-        background-color: $secondary-color;
-    }
+.bottom-space {
+    margin-bottom: 10px;
+}
 
-    &.pull-right {
-        margin-left: 10px;
-    }
+// highlights part of the text
+.highlight {
+    background-color: $primary-color;
+    font-weight: 500;
+    padding: 0px 2px;
 }

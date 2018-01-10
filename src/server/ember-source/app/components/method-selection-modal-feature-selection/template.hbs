@@ -1,0 +1,17 @@
+<div class="feature-selection">
+  <span>
+    feature selection
+    <i class="fa fa-chevron-down rotate {{if collapsed 'left'}}"
+      aria-hidden="true" onclick={{action 'toggleFeatureOptions'}}></i>
+  </span>
+</div>
+
+{{#bs-collapse collapsed=collapsed class="feature-options"}}
+  <p class="description">
+    TODO: description for the feature selection panel - this influences the analysis results.
+  </p>
+
+  {{#each parameters.features as |features index| }}
+    {{ feature-options features=features index=index }}
+  {{/each}}
+{{/bs-collapse}}

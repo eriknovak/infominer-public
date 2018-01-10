@@ -1,0 +1,62 @@
+<!-- Create document subset -->
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- modal header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <!-- modal title -->
+        <h4 class="modal-title">Create Subset</h4>
+        {{type}}
+      </div>
+      <div class="modal-body new-subset">
+        <div class="container-fluid">
+
+          <!-- subset label -->
+          <div class="row new-subset-information">
+            <div class="col-lg-6">
+              <label>Subset Name</label>
+              <input type="text" class="form-control"
+                oninput={{action 'changeSubsetName'}} value={{subsetName}}
+                placeholder="Add subset name">
+            </div>
+          </div>
+
+          <!-- subset description -->
+          <div class="row new-subset-information">
+            <div class="col-lg-12">
+              <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" rows="5"
+                   oninput={{action 'changeSubsetDescription'}}
+                  placeholder="Add subset description (optional)"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- additional content -->
+          <div class="row">
+            <div class="col-lg-12">
+              {{yield}}
+            </div>
+          </div>
+
+          <!-- warning placeholder -->
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="warning">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button {{action 'saveSubset'}} type="button" class="btn btn-primary">Save Subset</button>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->

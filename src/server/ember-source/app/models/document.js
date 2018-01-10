@@ -1,7 +1,7 @@
 import DS from 'ember-data';
 
 export default DS.Model.extend({
-    fields: DS.attr(),
-    values: DS.attr('parameters'),
-    inSubsets: DS.hasMany('subset')
+    values: DS.attr('object'),
+    subsets: DS.hasMany('subset'),
+    selected: DS.attr('boolean', { defaultValue: false })
 });
