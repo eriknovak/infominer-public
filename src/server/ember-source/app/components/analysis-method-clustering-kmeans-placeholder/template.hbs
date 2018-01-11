@@ -1,0 +1,29 @@
+<h3>Clustering KMeans</h3>
+<div class="clusters">
+  {{#each clusters as |cluster index|}}
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="cluster-content">
+          <div class="subset-button pull-right placeholder"></div>
+
+          <h4 class="cluster-header">
+            <p class="placeholder"></p>
+          </h4>
+
+          <p class="document-number placeholder"></p>
+
+          <div class="row">
+            {{#each cluster as |placeholder index|}}
+              <div class="{{concat placeholder.columnlg ' ' placeholder.columnsm}}">
+                <h6 class="field-title placeholder"></h6>
+                <div class="graph placeholder"></div>
+              </div>
+            {{/each}}
+          </div>
+        </div><!-- .cluster-content -->
+      </div><!-- .col-lg-12 -->
+    </div><!-- .row -->
+
+  {{/each}}
+</div>
+{{yield}}

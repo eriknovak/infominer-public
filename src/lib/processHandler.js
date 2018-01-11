@@ -40,7 +40,7 @@ class ProcessHandler {
     createChild(childId) {
         let self = this;
         let child = fork(self._processPath, [], { silent: false });
-        self._childH.set(childId, { child, connected: true });
+        self._childH.set(childId, { child, connected: true, lastCall: null });
 
         child.on('message', function (msg) {
             let reqId = msg.reqId;

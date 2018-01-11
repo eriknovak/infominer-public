@@ -214,24 +214,30 @@ class BaseDataset {
         let { subsets } = self.getSubsetInfo();
         let { methods } = self.getMethodInfo();
 
-        // subset ids used in the dataset info
-        let subsetIds = subsets.map(set => set.id);
         // prepare response object
         let jsonResults = {
-            datasets: {
-                id: self.params.datasetId,
-                label: self.params.label,
-                description: self.params.description,
-                created: self.params.created,
-                numberOfDocuments: self.base.store('Dataset').length,
-                hasSubsets: subsetIds,
-                fields: self.base.store('Dataset').fields
-            },
+            datasets: self._formatDatasetInfo(),
             subsets,
             methods
         };
         // returns
         return jsonResults;
+    }
+
+    /**
+     * Set the dataset info.
+     * @returns {Object} The dataset data info.
+     */
+    editDatasetInfo(datasetInfo) {
+        let self = this;
+        // TODO: check datasetInfo schema
+        console.log(datasetInfo);
+        // update database parameter values
+        if (typeof datasetInfo.label === 'string') { self.params.label = datasetInfo.label; }
+        if (typeof datasetInfo.description === 'string') { self.params.description = datasetInfo.description; }
+
+        // return the new dataset info
+        return { datasets: self._formatDatasetInfo() };
     }
 
     /**
@@ -302,8 +308,11 @@ class BaseDataset {
                 // subset contains documents that were in the cluster
                 let clusterId = subset.meta.clusterId;
                 subset.documents = method.result.clusters[clusterId].docIds;
-                method.result.clusters[clusterId].subsetCreated = true;
-
+                // update cluster information
+                let clusters = method.result.clusters;
+                clusters[clusterId].subsetCreated = true;
+                clusters[clusterId].subsetId = subsetId;
+                method.result = { clusters };
             }
         }
 
@@ -314,6 +323,30 @@ class BaseDataset {
         }
         // return id of created subset
         return { subsets: { id: subsetId } };
+    }
+
+    /**
+     * Creates a subset record in the database.
+     * @param {Object} subsetInfo - The subset information.
+     * @param {String} subsetInfo.label - The new subset label.
+     * @param {String} [subsetInfo.description] - The new subset description.
+     */
+    editSubsetInfo(sInfo) {
+        let self = this;
+        // TODO: check subsetInfo schema
+
+        // get subset info and update state
+        let subset = self.base.store('Subsets')[sInfo.subsetId];
+
+        // update the subset label and description
+        if (typeof sInfo.label === 'string') { subset.label = sInfo.label; }
+        if (typeof sInfo.description === 'string' || sInfo.description === null) {
+            subset.description = sInfo.description;
+        }
+
+        // return the subset information
+        return { subsets: self._formatSubsetInfo(subset) };
+
     }
 
     /**
@@ -540,6 +573,29 @@ class BaseDataset {
     }
 
     /**
+     * Format the dataset info.
+     * @returns {Object} The dataset json representation.
+     * @private
+     */
+    _formatDatasetInfo() {
+        let self = this;
+        //  get subset info
+        let { subsets } = self.getSubsetInfo();
+        // subset ids used in the dataset info
+        let subsetIds = subsets.map(set => set.id);
+
+        return {
+            id: self.params.datasetId,
+            label: self.params.label,
+            description: self.params.description,
+            created: self.params.created,
+            numberOfDocuments: self.base.store('Dataset').length,
+            hasSubsets: subsetIds,
+            fields: self.base.store('Dataset').fields
+        };
+    }
+
+    /**
      * Formats the subset record.
      * @param {Object} rec - The subset record.
      * @returns {Object} The subset json representation.
@@ -616,7 +672,8 @@ class BaseDataset {
         return { clusters: result.clusters.map(cluster => ({
             documentCount: cluster.docIds.length,
             aggregates: cluster.aggregates,
-            subsetCreated: cluster.subsetCreated
+            subsetCreated: cluster.subsetCreated,
+            subsetId: cluster.subsetId
         }))};
     }
 
@@ -675,16 +732,20 @@ class BaseDataset {
         let methodParams = qMethod.parameters.method;
         // don't allow empty clusters
         methodParams.allowEmpty = false;
-        let kMeans = new qm.analytics.KMeans(methodParams);
-        kMeans.fit(spMatrix);
+        console.log(methodParams);
+        let KMeans = new qm.analytics.KMeans(methodParams);
+        KMeans.fit(spMatrix);
         console.timeEnd('Kmeans fitting');
 
         console.time('clusters');
 
         // get the document-cluster affiliation
-        const idxv = kMeans.getModel().idxv;
+        const idxv = KMeans.getModel().idxv;
         // prepare clusters array in the results
-        qMethod.result = { clusters: Array.apply(null, Array(methodParams.k)).map(() => ({ docIds: [ ], aggregates: [ ], subsetCreated: false })) };
+        qMethod.result = {
+            clusters: Array.apply(null, Array(methodParams.k))
+                .map(() => ({ docIds: [ ], aggregates: [ ], subsetCreated: false }))
+        };
 
         // populate the result clusters
         for (let id = 0; id < idxv.length; id++) {

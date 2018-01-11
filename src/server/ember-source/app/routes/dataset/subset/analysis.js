@@ -10,7 +10,7 @@ export default Route.extend({
 
     actions: {
         /**
-         *
+         * Starts the analysis.
          * @param {Object} analysisParams - Parameters for the analysis.
          */
         startAnalysis(analysisParams) {
@@ -25,21 +25,20 @@ export default Route.extend({
                 appliedOn: parentSubset
             });
 
+            Ember.$('.modal.analysis-modal').modal('toggle');
             method.save().then(function () {
-                // transition to subset analysis
-                Ember.$('.modal.analysis-modal').modal('toggle');
-                self.transitionTo('dataset.subset.analysis', self.modelFor('dataset'), parentSubset);
+                // // transition to subset analysis
+                // self.transitionTo('dataset.subset.analysis', self.modelFor('dataset'), parentSubset);
             });
         },
 
         /**
-         *
+         * Creates a subset and stores it on the backend.
          * @param {Object} subsetInfo - The subset information parameters.
          */
         createSubset(subsetInfo) {
             let self = this;
             // update method internal state
-            let parentSubset = self.modelFor('dataset.subset');
             this.get('store').findRecord('method', subsetInfo.methodId).then(method => {
                 // create new subset
                 const subset = self.get('store').createRecord('subset', {
@@ -51,13 +50,10 @@ export default Route.extend({
                 });
                 // set cluster id to send as metadata
                 subset.set('clusterId', subsetInfo.clusterId);
+                Ember.$(`#${subsetInfo.modalId}`).modal('toggle');
 
                 // save the cluster
-                subset.save().then(function () {
-                    method.save();
-                    Ember.$(`#${subsetInfo.modalId}`).modal('toggle');
-                    self.transitionTo('dataset.subset', self.modelFor('dataset'), subset.id);
-                });
+                subset.save();
             });
         }
     }

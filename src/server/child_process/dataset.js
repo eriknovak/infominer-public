@@ -74,17 +74,25 @@ function handle(msg) {
         console.log('Get database info in child process id=', process.pid);
         getDatasetInfo(msg);
         break;
+    case 'edit_dataset_info':
+        console.log('Get database info in child process id=', process.pid);
+        editDatasetInfo(msg);
+        break;
     case 'get_subset_info':
         console.log('Get subset info in child process id=', process.pid);
         getSubsetInfo(msg);
         break;
-    case 'subset_documents_info':
-        console.log('Get subset info in child process id=', process.pid);
-        getSubsetDocuments(msg);
-        break;
     case 'create_subset':
         console.log('Get subset info in child process id=', process.pid);
         createSubset(msg);
+        break;
+    case 'edit_subset_info':
+        console.log('Get subset info in child process id=', process.pid);
+        editSubsetInfo(msg);
+        break;
+    case 'subset_documents_info':
+        console.log('Get subset info in child process id=', process.pid);
+        getSubsetDocuments(msg);
         break;
     case 'get_method_info':
         console.log('Get method info in child process id=', process.pid);
@@ -223,6 +231,29 @@ function getDatasetInfo(msg) {
     }
 }
 
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.label] - The new dataset label.
+ * @param {Object} [msg.body.content.description] - The new dataset description.
+ */
+function editDatasetInfo(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let datasetInfo = body.content;
+        let result = database.editDatasetInfo(datasetInfo);
+        process.send({ reqId, content: { result } });
+    } catch (err) {
+        console.log('updateDatasetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
 /////////////////////////////
 // subset functions
 
@@ -244,6 +275,32 @@ function getSubsetInfo(msg) {
         process.send({ reqId, content: { result } });
     } catch (err) {
         console.log('getSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.subsetId] - The id of the subset.
+ * @param {Object} [msg.body.content.label] - The new subset label.
+ * @param {Object} [msg.body.content.description] - The new subset description.
+ */
+function editSubsetInfo(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let subsetInfo = body.content;
+        console.log(subsetInfo);
+        let result = database.editSubsetInfo(subsetInfo);
+        process.send({ reqId, content: { result } });
+    } catch (err) {
+        console.log('editSubsetInfo Error', err.message);
         // notify parent process about the error
         process.send({ reqId, error: err.message });
     }

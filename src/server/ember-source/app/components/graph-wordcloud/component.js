@@ -92,6 +92,7 @@ const WordCloudComponent = GraphComponent.extend({
         cloud().size([width, height])
             .words(data)
             .rotate(0)
+            .random(() => 0.5)
             .font('Open Sans')
             .fontWeight(500)
             .fontSize(function(d) { return d.size; })

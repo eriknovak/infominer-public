@@ -1,4 +1,6 @@
-{{ dataset-header dataset=model deleteDataset=(route-action "deleteDataset") }}
+{{ dataset-header dataset=model
+  deleteDataset=(route-action "deleteDataset")
+}}
 
 {{#dataset-structure dataset=model}}
   {{outlet}}

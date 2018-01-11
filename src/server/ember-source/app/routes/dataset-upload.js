@@ -1,8 +1,21 @@
 import Route from '@ember/routing/route';
-import ENV from 'ember-source/config/environment';
+import ENV from '../config/environment';
+import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
-export default Route.extend({
+import { inject as service } from '@ember/service';
+
+/**
+ * For development do not use authentication.
+ * for other environments (production) user authentication.
+ */
+const DatasetUploadRoute = ENV.environment === 'development' ?
+    Route.extend({ }) :
+    Route.extend(AuthenticatedRouteMixin);
+
+
+export default DatasetUploadRoute.extend({
     uploader: Ember.inject.service('file-queue'),
+    notify: service('notify'),
 
     model() {
         this.resetQueue();
@@ -53,7 +66,29 @@ export default Route.extend({
                     fields: JSON.stringify(fieldList)
                 }
             }).then(data => {
-                this.transitionTo('dataset.subset.analysis', data.body.datasetId, 0);
+                // continuously check if dataset is loaded
+                let interval = setInterval(() => {
+                    Ember.$.get(`${ENV.APP.HOSTNAME}/api/datasets/${data.body.datasetId}/check`)
+                        .then(response => {
+                            // if data loaded change state
+                            if (response.loaded) {
+                                // clear the interval
+                                clearInterval(interval);
+                                this.get('notify').info({
+                                    html: `<div class="notification">
+                                            Dataset <span class="database-label">
+                                                '${response.label}'
+                                            </span> successfully loaded!
+                                        </div>`
+                                });
+
+                                // set dataset loaded property
+                                let dataset = this.get('store').peekRecord('dataset', response.id);
+                                dataset.set('loaded', response.loaded);
+                            }
+                        });
+                }, 3000);
+                this.transitionTo('datasets');
             });
         }
     },
@@ -70,8 +105,27 @@ export default Route.extend({
         const tableRows = data.split(/\r\n?|\n/g);
         const fields = tableRows[0].split('|');
 
+        let limit = fields.length > 100 ? 100 : fields.length;
+        let fieldTypes = fields.map(() => 'float');
+
+        for (let i = 1; i < limit; i++) {
+            // if all fields are strings - end array
+            if (fieldTypes.every(type => type === 'string')) { break; }
+            // document row values
+            let values = tableRows[1].split('|');
+            for (let j = 0; j < values.length; j++) {
+                let value = values[j];
+                // check if value is a float
+                // TODO: handle examples like '1aa212'
+                if (isNaN(parseFloat(value))) { fieldTypes[j] = 'string'; }
+            }
+        }
+
         // TODO: set field type recommendation
-        let fieldList = fields.map(field => ({ name: field, type: 'string', included: true }));
+        let fieldList = [];
+        for (let i = 0; i < fields.length; i++) {
+            fieldList.push({ name: fields[i], type: fieldTypes[i], included: true });
+        }
 
         // get dataset name, size and number of documents
         let label = file.get('name');

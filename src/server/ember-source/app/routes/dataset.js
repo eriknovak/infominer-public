@@ -1,6 +1,16 @@
 import Route from '@ember/routing/route';
+import ENV from '../config/environment';
+import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
-export default Route.extend({
+/**
+ * For development do not use authentication.
+ * for other environments (production) user authentication.
+ */
+const DatasetRoute = ENV.environment === 'development' ?
+    Route.extend({ }) :
+    Route.extend(AuthenticatedRouteMixin);
+
+export default DatasetRoute.extend({
 
     model(params) {
         // unload subsets and methods
@@ -27,15 +37,13 @@ export default Route.extend({
          * Deletes the dataset from the user library.
          */
         deleteDataset() {
-            let model = this.modelFor(this.routeName);
             // delete dataset and send to backend
             // calls DELETE /api/datasets/:dataset_id
-            model.destroyRecord()
-                .then(() => {
-                    // remove modal backdrop and redirect to dataset library
-                    Ember.$('#delete-dataset-modal').modal('toggle');
-                    this.transitionTo('datasets');
-                });
+            this.modelFor(this.routeName).destroyRecord().then(() => {
+                // remove modal backdrop and redirect to dataset library
+                Ember.$('#delete-dataset-modal').modal('toggle');
+                this.transitionTo('datasets');
+            });
         }
 
     }

@@ -65,8 +65,29 @@ $height: 250px;
     }
 }
 
-// analysis results
-
+/**************************************
+ * analysis results
+ *************************************/
 .clustering {
     .graph { height: calc(#{$height} - 100px); }
+}
+
+/**************************************
+ * placeholder style
+ *************************************/
+
+ @keyframes pulse {
+    0% { background-color: lighten($primary-color, 5%); }
+    50% { background-color: $primary-color; }
+    100% { background-color: lighten($primary-color, 5%); }
+}
+
+.placeholder {
+    animation: pulse 2s infinite ease-in-out;
+    &.field-title     { width: 144px; height: 13px; }
+    &.document-number { width: 120px; height: 13px; }
+    .cluster-header & { width: 104px; height: 19px; }
+    &.subset-button   { width: 114px; height: 31px; }
+
+
 }

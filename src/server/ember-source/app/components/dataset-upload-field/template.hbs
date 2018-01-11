@@ -5,8 +5,11 @@
 <td class="center field type">
   <div class="form-inline">
     <select id="{{typeId}}" class="form-control" onchange={{action "changeFieldType"}}>
-      {{#each fieldTypes as |type|}}
-        <option>{{type}}</option>
+      {{#each fieldTypes as |typeOption|}}
+        <option value='{{typeOption.type}}'
+          selected={{if typeOption.selected 'selected'}}>
+          {{typeOption.type}}
+        </option>
       {{/each}}
     </select>
   </div>

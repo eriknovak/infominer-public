@@ -6,7 +6,10 @@
           <!-- Dataset title and information -->
           <h1 class="dataset-label">{{dataset.label}}</h1>
 
-          <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#delete-dataset-modal">Delete</button>
+          <button class="btn btn-primary pull-right" data-toggle="modal"
+            data-target="#delete-dataset-modal">Delete</button>
+          <button class="btn btn-primary pull-right" data-toggle="modal"
+            data-target="#edit-dataset-modal" {{action 'removeModalWarnings'}}>Edit</button>
 
           <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
           <span class="dataset-created">Created: {{dataset.date}}</span>
@@ -47,6 +50,68 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Go back</button>
         <button type="button" class="btn btn-danger" onclick={{action deleteDataset}}>Yes, delete dataset</button>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<!-- Edit dataset -->
+<div class="modal fade" id="edit-dataset-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- modal header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <!-- modal title -->
+        <h4 class="modal-title">Edit dataset</h4>
+      </div>
+      <div class="modal-body new-subset">
+        <div class="container-fluid">
+
+          <!-- dataset label -->
+          <div class="row new-subset-information">
+            <div class="col-lg-6">
+              <label>Dataset Label</label>
+              <input type="text" class="form-control"
+                oninput={{action 'changeDatasetLabel'}}
+                value={{datasetLabel}}
+                placeholder="Add dataset label">
+            </div>
+          </div>
+
+          <!-- dataset description -->
+          <div class="row new-subset-information">
+            <div class="col-lg-12">
+              <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" rows="5"
+                  oninput={{action 'changeDatasetDescription'}}
+                  value={{datasetDescription}}
+                  placeholder="Add dataset description (optional)">
+                </textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- warning placeholder -->
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="warning">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div><!-- .modal-body -->
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" {{action 'submitDatasetChanges'}}>Edit dataset</button>
       </div>
 
     </div><!-- /.modal-content -->

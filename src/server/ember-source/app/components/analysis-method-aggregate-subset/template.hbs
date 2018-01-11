@@ -1,7 +1,7 @@
 <div class="row">
 
   {{#each aggregates as |aggregate|}}
-    <div class="{{ aggregate.columnSize }}">
+    <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
       {{ component
           (concat "aggregate-" aggregate.type)
           field=aggregate.field

@@ -6,7 +6,7 @@ const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
 
 // prepare commands we want to execute
 let commands = [
-    'CREATE TABLE IF NOT EXISTS datasets (id serial PRIMARY KEY, owner varchar NOT NULL, dbPath varchar NOT NULL, label varchar NOT NULL, description varchar, created timestamp with time zone DEFAULT NOW());',
+    'CREATE TABLE IF NOT EXISTS datasets (id serial PRIMARY KEY, owner varchar NOT NULL, dbPath varchar NOT NULL, label varchar NOT NULL, description varchar, created timestamp with time zone DEFAULT NOW(), loaded boolean DEFAULT FALSE);',
     'CREATE INDEX IF NOT EXISTS datasets_creator_idx ON datasets(owner);'
 ];
 

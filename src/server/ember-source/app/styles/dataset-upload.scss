@@ -21,29 +21,35 @@
     @include dataset-square;
 
     color: white;
-    background-color: rgba($quaternary-color,.8);
+    background-color: $quaternary-color;
     &:hover {
-        background-color: rgba($quaternary-color,1);
+        background-color: darken($quaternary-color, 10%);
     }
     .fa {
-        padding: 20px;
+        margin: 20px;
         font-size: 40px;
     }
+    &.loading {
+        background-color: lighten($quaternary-color, 10%);
+        &:hover { background-color: lighten($quaternary-color, 10%); }
 
+    }
     &.add-new {
         border: 2px dashed $tertiary-color;
         padding: 8px;
+        height: 158px;
         background-color: white;
         color: $tertiary-color;
         &:hover {
             border: 2px solid $tertiary-color;
-            background-color: rgba($quaternary-color,.1);
+            background-color: lighten($quaternary-color, 20%);
         }
     }
 
     .dataset-label {
-        text-transform: uppercase;
         font-weight: 400;
+        text-transform: uppercase;
+        margin-bottom: 4px;
     }
 }
 
