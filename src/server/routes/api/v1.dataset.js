@@ -136,8 +136,10 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                             if (error) {
                                 // TODO: handle error
                                 console.log('Error', error.message);
+                                pg.delete({ id: datasetId, owner }, 'datasets');
+                            } else {
+                                pg.update({ loaded: true }, { id: datasetId }, 'datasets');
                             }
-                            pg.update({ loaded: true }, { id: datasetId }, 'datasets');
                         });
                     });
                 }); // bufferStream.on('finish')
@@ -152,7 +154,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        const owner = req.user ? req.user.id : 'user';;
+        const owner = req.user ? req.user.id : 'user';
 
         let body = { cmd: 'get_dataset_info' };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -174,7 +176,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        const owner = req.user ? req.user.id : 'user';;
+        const owner = req.user ? req.user.id : 'user';
 
         // get dataset information
         // TODO: check schema structure
@@ -213,7 +215,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        const owner = req.user ? req.user.id : 'user';;
+        const owner = req.user ? req.user.id : 'user';
         // respond to request
 
         if (processHandler.childExist(datasetId)) {
@@ -295,5 +297,4 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             }
         }); // pg.select({ owner })
     });
-
-}
+};

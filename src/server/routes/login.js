@@ -22,7 +22,6 @@ module.exports = function (app, passport) {
             failureRedirect: '/login'
         }),
         function (req, res) {
-            console.log('login successful');
             res.redirect('/');
         }
     );
@@ -41,7 +40,6 @@ module.exports = function (app, passport) {
             failureRedirect: '/login'
         }),
         function (req, res) {
-            console.log('login successful');
             res.redirect('/');
         }
     );
@@ -51,7 +49,6 @@ module.exports = function (app, passport) {
      *
      */
     app.get('/auth/account', function (req, res) {
-        console.log('checking');
         // prepare authentication object
         let authentication = req.isAuthenticated() ?
             { authenticated: true, user: req.user } :
@@ -64,7 +61,6 @@ module.exports = function (app, passport) {
      * Set logout
      */
     app.get('/auth/logout', function (req, res) {
-        console.log('logout');
         req.logout();
         res.end();
     });
