@@ -217,7 +217,7 @@ describe('BaseDataset Tests', function () {
         describe('createMethod', function () {
             // method values
             let qMethod = {
-                methodType: 'filter.manual',
+                type: 'filter.manual',
                 parameters: { docId: [0, 1] },
                 result: { docId: [0, 1] },
                 appliedOn: 0
@@ -232,7 +232,7 @@ describe('BaseDataset Tests', function () {
             it('should have the method in the database', function (done) {
                 let method = database.base.store('Methods')[0];
                 // TODO: schema check
-                assert.equal(method.type, qMethod.methodType, 'Method type is not same');
+                assert.equal(method.type, qMethod.type, 'Method type is not same');
                 assert.equal(method.parameters.docId.length, qMethod.parameters.docId.length, 'Parameters should contain docId with 2 elements');
                 assert.equal(method.result.docId.length, qMethod.result.docId.length, 'Result should contain docId with 2 elements');
                 // end test
