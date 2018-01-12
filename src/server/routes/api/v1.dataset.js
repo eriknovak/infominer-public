@@ -156,7 +156,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // get the user
         const owner = req.user ? req.user.id : 'user';
 
-        let body = { cmd: 'get_dataset_info' };
+        let body = { cmd: 'get_dataset' };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
@@ -194,7 +194,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             }
 
             // make update on the process
-            let body = { cmd: 'edit_dataset_info', content: { label, description } };
+            let body = { cmd: 'edit_dataset', content: { label, description } };
             sendToProcess(datasetId, owner, body, function (error, results) {
                 // if error notify user
                 if (error) {

@@ -1,0 +1,23 @@
+{
+    "description": "The input to get dataset information",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": ["integer"],
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "get_dataset"
+                }
+            },
+            "required": ["cmd"]
+        }
+    },
+    "required": ["reqId"]
+}

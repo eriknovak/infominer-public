@@ -1,0 +1,38 @@
+{
+    "description": "The input to edit a dataset",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": "integer",
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "edit_dataset"
+                },
+                "content": {
+                    "description": "The content used with the specified 'cmd' command",
+                    "type": "object",
+                    "properties": {
+                        "label": {
+                            "description": "The label of the dataset",
+                            "type": "string"
+                        },
+                        "description": {
+                            "description": "The description of the dataset",
+                            "type": "string"
+                        }
+                    },
+                    "required": ["label"]
+                }
+            },
+            "required": ["cmd", "content"]
+        }
+    },
+    "required": ["reqId", "body"]
+}

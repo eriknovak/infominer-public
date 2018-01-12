@@ -11,8 +11,11 @@ const BaseDataset = require('../../lib/baseDataset');
 
 // json schema validator
 const validator = require('../../lib/jsonValidator')({
+    // the schemas used to validate the input
     createDataset: require('../../schemas/child_messages/createDataset'),
     openDataset:   require('../../schemas/child_messages/openDataset'),
+    editDataset:   require('../../schemas/child_messages/editDataset'),
+    getDataset:    require('../../schemas/child_messages/getDataset'),
     shutdown:      require('../../schemas/child_messages/shutdown')
 });
 
@@ -29,11 +32,11 @@ process.on('message', (msg) => {
 });
 process.on('SIGINT', () => {
     console.log('Received SIGINT, this process id = ' + process.pid);
-    shutDownProcess({ reqId: 'SIGINT' });
+    shutdownProcess({ reqId: 'SIGINT' });
 });
 process.on('SIGTERM', () => {
     console.log('Received SIGTERM, this process id = ' + process.pid);
-    shutDownProcess({ reqId: 'SIGTERM' });
+    shutdownProcess({ reqId: 'SIGTERM' });
 });
 
 //////////////////////////////////////////////////////////////////////////
@@ -70,20 +73,20 @@ function handle(msg) {
         break;
     case 'shutdown':
         console.log('Received shutdown command');
-        shutDownProcess(msg);
+        shutdownProcess(msg);
         break;
 
     /////////////////////////////////////////////////////////////////
     // database info retrieving
     /////////////////////////////////////////////////////////////////
 
-    case 'get_dataset_info':
+    case 'get_dataset':
         console.log('Get database info in child process id=', process.pid);
-        getDatasetInfo(msg);
+        getDataset(msg);
         break;
-    case 'edit_dataset_info':
+    case 'edit_dataset':
         console.log('Get database info in child process id=', process.pid);
-        editDatasetInfo(msg);
+        editDataset(msg);
         break;
     case 'get_subset_info':
         console.log('Get subset info in child process id=', process.pid);
@@ -214,7 +217,7 @@ function createDatabase(msg) {
  * @param {Object} msg.body - The body of the message.
  * @param {String} msg.body.cmd - What command needs to be executed.
  */
-function shutDownProcess(msg) {
+function shutdownProcess(msg) {
     // validate message information
     handleMessageValidation(msg, validator.schemas.shutdown, function (msg) {
         // message is in correct format
@@ -244,17 +247,19 @@ function shutDownProcess(msg) {
  * @param {Number} msg.reqId - The request id - used for for getting the callback
  * what to do with the results.
  */
-function getDatasetInfo(msg) {
-    // TODO: validate json schema
-    let { reqId } = msg;
-    try {
-        let result = database.getDatasetInfo();
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getDatasetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+function getDataset(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.getDataset, function (msg) {
+        let { reqId } = msg;
+        try {
+            let result = database.getDatasetInfo();
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getDatasetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -266,18 +271,20 @@ function getDatasetInfo(msg) {
  * @param {Object} [msg.body.content.label] - The new dataset label.
  * @param {Object} [msg.body.content.description] - The new dataset description.
  */
-function editDatasetInfo(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let datasetInfo = body.content;
-        let result = database.editDatasetInfo(datasetInfo);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('updateDatasetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+function editDataset(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.editDataset, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let datasetInfo = body.content;
+            let result = database.editDatasetInfo(datasetInfo);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('updateDatasetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /////////////////////////////
