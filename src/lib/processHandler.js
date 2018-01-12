@@ -30,17 +30,31 @@ class ProcessHandler {
         self._childH = new Map();
         self._callbackH = new Map();
         self._processPath = params.processPath;
+
+        // child monitoring parameters
+        self._processMaxAge = params.processMaxAge;
+
+        /**
+         * set the cleanup interval
+         * default: 1 hours
+         */
+        let cleanupInterval = params.cleanupMilliseconds || 60*60*1000;
+
+        self._cleanupInterval = setInterval(function () {
+            self._cleanupProcess();
+        }, cleanupInterval);
     }
 
     /**
      * Initializes the child process.
      * TODO: log activity
-     * @param {Number} childId - The id of the child process. Used for further reference to the child process.
+     * @param {Number} childId - The id of the child process. Used for
+     * further reference to the child process.
      */
     createChild(childId) {
         let self = this;
         let child = fork(self._processPath, [], { silent: false });
-        self._childH.set(childId, { child, connected: true, lastCall: null });
+        self._childH.set(childId, { child, connected: true, lastCall: 0 });
 
         child.on('message', function (msg) {
             let reqId = msg.reqId;
@@ -49,7 +63,10 @@ class ProcessHandler {
                 // callback exists
                 let callback = callbackH.callback;
                 let error = msg.error ? new Error(msg.error) : undefined;
+                // envoke the callback
                 callback(error, msg.content);
+                // delete the callback hash
+                self._callbackH.delete(reqId);
             } else {
                 // no callback was given for this request
                 console.log(msg);
@@ -81,6 +98,13 @@ class ProcessHandler {
         return self._childH.get(childId);
     }
 
+    _updateProcessLastCall(childId, childProcess) {
+        let self = this;
+        // get process timestamp info
+        childProcess.lastCall = Date.now();
+        self._childH.set(childId, childProcess);
+    }
+
     /**
      * Sends the message to the child process. No response is requested.
      * TODO: log activity
@@ -91,6 +115,8 @@ class ProcessHandler {
         let self = this;
         let childH = self._getChild(childId);
         if (!childH) { return new Error('Child process not running!'); }
+        // update child process
+        self._updateProcessLastCall(childId, childH);
         // prepare message
         let msg = {
             reqId: -1,
@@ -114,6 +140,8 @@ class ProcessHandler {
         let self = this;
         let childH = self._getChild(childId);
         if (!childH) { callback(new Error('Child process not existing!')); }
+        // update child process
+        self._updateProcessLastCall(childId, childH);
         // store callback
         self._callbackH.set(self._currReqId, {
             timestamp: Date.now(),
@@ -131,7 +159,7 @@ class ProcessHandler {
             // TODO: handle not connected childs
             callback(new Error('Child is disconnected!'));
         }
-        // TODO bolj pametno
+        // TODO: handle request cleanup
         if (self._currReqId % 100) {
             self._cleanReqMap();
         }
@@ -139,16 +167,48 @@ class ProcessHandler {
 
     /**
      * Cleans the request mapping.
+     * @private
      * TODO: log activity
      */
     _cleanReqMap() {
         let self = this;
-        for (let key in self._callbackH.keys()) {
+
+        // the maximum duration of the callback
+        let maxDuration = 2*60*1000;
+
+        for (let key of self._callbackH.keys()) {
             let now = Date.now();
-            if (now - self._callbackH.get(key).timestamp > 1000*30) {
-                let callback = self._callbackH[key].callback;
+            // check if callback is `maxDuration` old
+            if (now - self._callbackH.get(key).timestamp > maxDuration) {
+                let callback = self._callbackH.get(key).callback;
                 self._callbackH.delete(key);
                 callback(new Error('Request timed out!'));
+            }
+        }
+    }
+
+    _cleanupProcess() {
+        let self = this;
+
+        /**
+         * Creates the callback function for cleanup.
+         * @param {Object} error - The error object.
+         * @returns {Function} The callback functions.
+         */
+        function _setCallback(key) {
+            return function (error) {
+                if (error) { console.log('Disconnected with error'); }
+                console.log('process shutdown', key);
+            };
+        }
+
+        // iterate through processes and close old processes
+        for (let key of self._childH.keys()) {
+            let now = Date.now();
+            if (now - self._childH.get(key).lastCall > self._processMaxAge) {
+                // send to process to shutdown
+                // this will also remove the child from the hash
+                self.sendAndWait(key, { cmd: 'shutdown' }, _setCallback(key));
             }
         }
     }
@@ -162,23 +222,32 @@ class ProcessHandler {
         let self = this;
         let tasks = [ ];
         for (let key of self._childH.keys()) {
-            tasks.push((xcallback) => {
-                console.log('Running task for child id=', key);
-                try {
-                    self.sendAndWait(key, { cmd: 'shutdown' }, (error, content) => {
-                        if (error) {
-                            console.log('Disconnected with error');
-                        }
-                        xcallback();
-                    });
-                } catch (err) {
-                    console.log('Child already closed');
-                    xcallback();
-                }
-            });
+            tasks.push(self._stopProcessCallback(key));
         }
         // run the closing tasks
         async.series(tasks, callback);
+    }
+
+    /**
+     * Creates a callback function to close the process.
+     * @param {String} childId - The id of the child process.
+     * @returns {Function} The callback function.
+     * @private
+     */
+    _stopProcessCallback(childId) {
+        let self = this;
+        return function (xcallback) {
+            console.log('Running task for child id=', childId);
+            try {
+                self.sendAndWait(childId, { cmd: 'shutdown' }, (error) => {
+                    if (error) { console.log('Disconnected with error'); }
+                    xcallback();
+                });
+            } catch (err) {
+                console.log('Child already closed');
+                xcallback();
+            }
+        };
     }
 }
 

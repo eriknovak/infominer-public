@@ -15,7 +15,9 @@ const ProcessHandler = require('../lib/processHandler');
 const PORT = process.env.PORT || process.env.npm_package_config_portGui || 3000;
 
 let processHandler = new ProcessHandler({
-    processPath: path.join(__dirname, '/child_process/dataset.js')
+    processPath: path.join(__dirname, '/child_process/dataset.js'),
+    cleanupMilliseconds: 30*60*1000, // 30 minutes
+    processMaxAge: 2*60*60*1000 // 2 hours
 });
 
 // on manual process exit
