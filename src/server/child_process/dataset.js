@@ -9,6 +9,13 @@ let interval_id = setInterval(() => { }, 10 * 1000);
 // internal modules
 const BaseDataset = require('../../lib/baseDataset');
 
+// json schema validator
+const validator = require('../../lib/jsonValidator')({
+    createDataset: require('../../schemas/child_messages/createDataset'),
+    openDataset:   require('../../schemas/child_messages/openDataset'),
+    shutdown:      require('../../schemas/child_messages/shutdown')
+});
+
 // database placeholder
 let database = null;
 
@@ -112,6 +119,17 @@ function handle(msg) {
 // database handling cases
 ///////////////////////////////////////
 
+function handleMessageValidation(msg, schema, callback) {
+    // validate message information
+    if (validator.validate(msg, schema)) {
+        callback(msg);
+    } else {
+        // the validation found an inconsistences in the object
+        process.send({ reqId: msg.reqId, error: 'Message is not in the correct schema' });
+    }
+}
+
+
 /**
  * The dataset field used in QMiner database.
  * @typedef field_instance
@@ -134,20 +152,21 @@ function handle(msg) {
  * @param {String} msg.body.content.params.mode - In what mode the database should be opened.
  */
 function openDatabase(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        // get the constructor parameters
-        let { params } = body.content;
-        // create the database
-        database = new BaseDataset(params);
-        // everything is ok
-        process.send({ reqId, content: { datasetId: database.getId() } });
-    } catch (err) {
-        console.log('openDatabase Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.openDataset, function (msg) {
+        // message is in correct format
+        let { reqId, body } = msg;
+        try {
+            // get the constructor parameters
+            let { params } = body.content;
+            database = new BaseDataset(params); // create the database
+            process.send({ reqId, content: { datasetId: database.getId() } });
+        } catch (err) {
+            console.log('openDatabase Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -165,23 +184,26 @@ function openDatabase(msg) {
  * @param {field_instance[]} msg.body.content.fields -  where file for filling the database is.
  */
 function createDatabase(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        // get the constructor parameters
-        let { filePath, fields, params } = body.content;
-        // create the database
-        database = new BaseDataset(params, fields);
-        // fill the database with the records
-        let result = database.pushDocsToBase(filePath, fields);
-        database.aggregateSubset(result.subsets.id);
-        // everything is ok
-        process.send({ reqId, content: { datasetId: database.getId() } });
-    } catch (err) {
-        console.log('createDatabase Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.createDataset, function (msg) {
+        // message is in correct format
+        let { reqId, body } = msg;
+        try {
+            // get the constructor parameters
+            let { filePath, fields, params } = body.content;
+            // create the database
+            database = new BaseDataset(params, fields);
+            // fill the database with the records
+            let result = database.pushDocsToBase(filePath, fields);
+            database.aggregateSubset(result.subsets.id);
+            // everything is ok
+            process.send({ reqId, content: { datasetId: database.getId() } });
+        } catch (err) {
+            console.log('createDatabase Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -193,19 +215,23 @@ function createDatabase(msg) {
  * @param {String} msg.body.cmd - What command needs to be executed.
  */
 function shutDownProcess(msg) {
-    let { reqId } = msg;
-    try {
-        let dbPath = null;
-        if (database) {
-            dbPath = database.getDbPath();
-            database.close();
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.shutdown, function (msg) {
+        // message is in correct format
+        let { reqId } = msg;
+        try {
+            let dbPath = null;
+            if (database) {
+                dbPath = database.getDbPath();
+                database.close();
+            }
+            process.send({ reqId, content: { dbPath } });
+        } catch(err) {
+            process.send({ reqId, error: err.message });
         }
-        process.send({ reqId, content: { dbPath } });
-    } catch(err) {
-        process.send({ reqId, error: err.message });
-    }
-    clearInterval(interval_id);
-    process.exit(0);
+        clearInterval(interval_id);
+        process.exit(0);
+    });
 }
 
 ///////////////////////////////////////////////
