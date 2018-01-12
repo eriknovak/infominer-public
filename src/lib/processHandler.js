@@ -34,10 +34,7 @@ class ProcessHandler {
         // child monitoring parameters
         self._processMaxAge = params.processMaxAge;
 
-        /**
-         * set the cleanup interval
-         * default: 1 hours
-         */
+        // Set the cleanup interval. Default: 1 hours
         let cleanupInterval = params.cleanupMilliseconds || 60*60*1000;
 
         self._cleanupInterval = setInterval(function () {
@@ -47,9 +44,9 @@ class ProcessHandler {
 
     /**
      * Initializes the child process.
-     * TODO: log activity
      * @param {Number} childId - The id of the child process. Used for
      * further reference to the child process.
+     * TODO: log activity
      */
     createChild(childId) {
         let self = this;
