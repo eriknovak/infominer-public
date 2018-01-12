@@ -4,6 +4,7 @@ import { inject as service } from '@ember/service';
 export default Base.extend({
     session: service('session'),
 
+    // TODO: fix data authorization
     authorize(sessionData, block) {
         const accessToken = sessionData.id;
         if (this.get('session.isAuthenticated') && !Ember.isEmpty(accessToken)) {
