@@ -4,6 +4,6 @@
   {{/if}}
 {{/each}}
 
-{{ method-selection action=(route-action 'startAnalysis') dataset=model.dataset }}
+{{ method-selection dataset=model.dataset action=(route-action 'startAnalysis') }}
 
 {{outlet}}

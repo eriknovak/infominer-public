@@ -6,16 +6,16 @@ export default Component.extend({
     classNames: ['col-lg-12 clustering'],
 
     // services
+    router: service('-routing'),
     columnWidth: service('column-size'),
 
     didReceiveAttrs() {
         this._super(...arguments);
         let method = this.get('method');
-
         // get number of clusters
         let clusterNumber = method.get('parameters.method.k');
-        let fieldInfo = method.get('parameters.features')
-            .map(feature => ({ field: feature.field, type: feature.type }));
+        let fieldInfo = this.get('dataset.fields')
+            .map(field => ({ field: field.field, type: field.type }));
 
         // prepare placeholders
         let placeholders = [];
