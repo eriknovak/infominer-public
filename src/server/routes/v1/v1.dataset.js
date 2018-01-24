@@ -6,7 +6,6 @@ const qm = require('qminer');
 
 // internal modules
 const fileManager = require('../../../lib/fileManager');
-const messageHandler = require('../../../lib/messageHandler');
 
 // configurations
 const static = require('../../../config/static');

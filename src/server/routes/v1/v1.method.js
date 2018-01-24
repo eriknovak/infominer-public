@@ -1,6 +1,3 @@
-// internal modules
-const messageHandler = require('../../../lib/messageHandler');
-
 /**
  * Adds api routes to .
  * @param {Object} app - Express app.
