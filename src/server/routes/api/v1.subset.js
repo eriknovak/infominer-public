@@ -102,7 +102,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let description = subset.description;
 
         // set the body info
-        let body = { cmd: 'edit_subset_info', content: { subsetId, label, description } };
+        let body = { cmd: 'edit_subset', content: { subsetId, label, description } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {

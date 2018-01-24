@@ -1,5 +1,5 @@
 {
-    "description": "The input to open a dataset",
+    "description": "The input to create a method",
     "type": "object",
     "properties": {
         "reqId": {
@@ -13,27 +13,25 @@
             "properties": {
                 "cmd": {
                     "description": "The command used to identify the value",
-                    "constant": "open_dataset"
+                    "constant": "create_method"
                 },
                 "content": {
                     "description": "The content used with the specified 'cmd' command",
                     "type": "object",
                     "properties": {
-                        "params": {
-                            "description": "The parameters specifically used to create the qminer database",
+                        "method": {
+                            "description": "The method creation parameters",
                             "type": "object",
                             "properties": {
-                                "datasetId":   { "type": "number" },
-                                "label":       { "type": "string" },
-                                "description": { "type": ["string", "null"] },
-                                "created":     { "type": "string" },
-                                "mode":        { "type": "string" },
-                                "dbPath":      { "type": "string" }
+                                "type":       { "type": "string" },
+                                "parameters": { "type": "object" },
+                                "result":     { "type": ["object", "null"] },
+                                "appliedOn":  { "type": "integer" }
                             },
-                            "required": ["datasetId", "label", "created", "mode", "dbPath"]
+                            "required": ["type", "parameters", "appliedOn"]
                         }
                     },
-                    "required": ["params"]
+                    "required": ["method"]
                 }
             },
             "required": ["cmd", "content"]

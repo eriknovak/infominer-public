@@ -231,7 +231,7 @@ class BaseDataset {
     editDatasetInfo(datasetInfo) {
         let self = this;
         // TODO: check datasetInfo schema
-        console.log(datasetInfo);
+
         // update database parameter values
         if (typeof datasetInfo.label === 'string') { self.params.label = datasetInfo.label; }
         if (typeof datasetInfo.description === 'string') { self.params.description = datasetInfo.description; }

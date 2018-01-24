@@ -20,7 +20,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let owner = req.user || 'user';
 
         // set the body info
-        let body = { cmd: 'get_method_info' };
+        let body = { cmd: 'get_method' };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
@@ -46,7 +46,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let owner = req.user || 'user';
 
         // set the body info
-        let body = { cmd: 'get_method_info', content: { methodId } };
+        let body = { cmd: 'get_method', content: { methodId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {

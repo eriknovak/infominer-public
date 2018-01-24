@@ -60,6 +60,13 @@
     border: 2px dashed $tertiary-color;
     label { margin-bottom: 0; }
     #upload-dataset { font-weight: 600; }
+
+    .progress {
+        width: 70%;
+        border-radius: 0px;
+        margin: auto;
+        .progress-bar { border-radius: 0px; }
+    }
 }
 
 .dataset-field-list {

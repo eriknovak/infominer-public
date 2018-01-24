@@ -16,7 +16,13 @@ const validator = require('../../lib/jsonValidator')({
     openDataset:   require('../../schemas/child_messages/openDataset'),
     editDataset:   require('../../schemas/child_messages/editDataset'),
     getDataset:    require('../../schemas/child_messages/getDataset'),
-    shutdown:      require('../../schemas/child_messages/shutdown')
+    shutdown:      require('../../schemas/child_messages/shutdown'),
+    // subset message schemas
+    createSubset:  require('../../schemas/child_messages/createSubset'),
+
+    // method message schemas
+    getMethod:     require('../../schemas/child_messages/getMethod'),
+    createMethod:  require('../../schemas/child_messages/createMethod')
 });
 
 // database placeholder
@@ -96,17 +102,17 @@ function handle(msg) {
         console.log('Get subset info in child process id=', process.pid);
         createSubset(msg);
         break;
-    case 'edit_subset_info':
+    case 'edit_subset':
         console.log('Get subset info in child process id=', process.pid);
-        editSubsetInfo(msg);
+        editSubset(msg);
         break;
     case 'subset_documents_info':
         console.log('Get subset info in child process id=', process.pid);
         getSubsetDocuments(msg);
         break;
-    case 'get_method_info':
+    case 'get_method':
         console.log('Get method info in child process id=', process.pid);
-        getMethodInfo(msg);
+        getMethod(msg);
         break;
     case 'create_method':
         console.log('Get method info in child process id=', process.pid);
@@ -128,7 +134,7 @@ function handleMessageValidation(msg, schema, callback) {
         callback(msg);
     } else {
         // the validation found an inconsistences in the object
-        process.send({ reqId: msg.reqId, error: 'Message is not in the correct schema' });
+        process.send({ reqId: msg.reqId, error: 'Sent message is not in a correct schema' });
     }
 }
 
@@ -324,12 +330,11 @@ function getSubsetInfo(msg) {
  * @param {Object} [msg.body.content.label] - The new subset label.
  * @param {Object} [msg.body.content.description] - The new subset description.
  */
-function editSubsetInfo(msg) {
+function editSubset(msg) {
     // TODO: validate json schema
     let { reqId, body } = msg;
     try {
         let subsetInfo = body.content;
-        console.log(subsetInfo);
         let result = database.editSubsetInfo(subsetInfo);
         process.send({ reqId, content: { result } });
     } catch (err) {
@@ -353,19 +358,21 @@ function editSubsetInfo(msg) {
  * @param {Number[]} msg.body.content.subset.documents - Array of document ids the subset contains.
  */
 function createSubset(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let { subset } = body.content;
-        let result = database.createSubset(subset);
-        database.aggregateSubset(result.subsets.id);
-        result = database.getSubsetInfo(result.subsets.id);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getSubsetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.createSubset, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let { subset } = body.content;
+            let result = database.createSubset(subset);
+            database.aggregateSubset(result.subsets.id);
+            result = database.getSubsetInfo(result.subsets.id);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getSubsetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -411,18 +418,20 @@ function getSubsetDocuments(msg) {
  * @param {Object} [msg.body.content] - The content of the message.
  * @param {Object} [msg.body.content.methodId] - The id of the subset.
  */
-function getMethodInfo(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let methodId = body.content ? body.content.methodId : null;
-        let result = database.getMethodInfo(methodId);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getMethodInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+function getMethod(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.getMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let methodId = body.content ? body.content.methodId : null;
+            let result = database.getMethodInfo(methodId);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getMethod Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -439,15 +448,17 @@ function getMethodInfo(msg) {
  * @param {Number} msg.body.content.method.appliedOn - The id of the subset the method was applied on.
  */
 function createMethod(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let { method } = body.content;
-        let result = database.createMethod(method);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getMethodInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.createMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let { method } = body.content;
+            let result = database.createMethod(method);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getMethodInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }

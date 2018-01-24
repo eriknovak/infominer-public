@@ -18,14 +18,14 @@ export default Component.extend({
          * Set the model dataset name.
          */
         changeDatasetName() {
-            this.set("dataset.label", Ember.$("#dataset-label").val());
+            this.set("dataset.label", Ember.$("#dataset-label").val().trim());
         },
 
         /**
          * Set the model dataset description.
          */
         changeDatasetDescription() {
-            this.set("dataset.description", Ember.$("#dataset-description").val());
+            this.set("dataset.description", Ember.$("#dataset-description").val().trim());
         }
     }
 

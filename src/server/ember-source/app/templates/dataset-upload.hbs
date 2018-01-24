@@ -42,7 +42,10 @@
                       Invalid
                     {{/if}}
                   {{else if queue.files.length}}
-                    Uploading file...
+                    Uploading File...
+                    {{#bs-progress as |p|}}
+                      {{p.bar value=queue.progress minValue=0 maxValue=100 showLabel=true}}
+                    {{/bs-progress}}
                   {{else}}
                       {{#if dropzone.supported}}
                         Drag and drop dataset onto this area to upload them or
@@ -50,7 +53,7 @@
                       {{#file-upload name="dataset"
                                     accept=["text/plain", "text/csv"]
                                     multiple=false
-                                    onfileadd=(route-action "readDataset")}}
+                                    onfileadd=(route-action "uploadDataset")}}
                         <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
                       {{/file-upload}}
                   {{/if}}

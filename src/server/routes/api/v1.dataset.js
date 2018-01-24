@@ -1,7 +1,10 @@
 // external modules
 const multer = require('multer');   // accepting files from client
 const stream = require('stream');   // create stream from file buffer
+const path = require('path');
 const fs = require('fs');
+
+const qm = require('qminer');
 
 // internal modules
 const fileManager = require('../../../lib/fileManager');
@@ -10,8 +13,22 @@ const messageHandler = require('../../../lib/messageHandler');
 // configurations
 const static = require('../../../config/static');
 
-// parameter values
-let upload = multer();   // used for uploading files
+/**
+ * Temporary files folder. It stores all of the files that
+ * are found there.
+ */
+
+// set destination path
+const destinationPath = path.join(__dirname, '../../../../data/temp');
+// create desctination path if not existing
+fileManager.createDirectoryPath(destinationPath);
+
+// implement disk storage using Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, destinationPath);
+    }
+});
 
 /**
  * Adds api routes to .
@@ -56,14 +73,87 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
      * posts file and creates a new dataset
      * TODO: ensure handling large datasets
      */
-    app.post('/api/datasets/new', upload.single('file'), (req, res) => {
+    const upload =  multer({ storage }).single('file');
+    app.post('/api/datasets/uploadTemp', (req, res) => {
+        upload(req, res, function (error) {
+            if (error) {
+                // TODO: handle error
+                console.log(error);
+                return res.send({ errors: { msg: error.message } });
+            }
+            // the file was successfully uploaded
+            let file = req.file;
+            // TODO: get username of creator
+            const owner = req.user ? req.user.id : 'user'; // temporary placeholder
+
+            // insert temporary file
+            pg.insert({ owner, filepath: file.path, filename: file.filename }, 'tempDatasets', (err) => {
+                if (err) {
+                    // TODO: log error
+                    console.log(err.message);
+                    return res.send({ errors: { msg: err.message } });
+                }
+
+                // get dataset information
+                let label = file.originalname;
+                let filename = file.filename; // used only to access from postgres
+                let size = file.size;
+
+                /////////////////////////////////////////////
+                // get fields from uploaded dataset
+
+                // read the file
+                let datasetFIn = qm.fs.openRead(file.path);
+                // get first row in the document - the fields
+                const fields = datasetFIn.readLine().split('|');
+                // set field types container
+                let fieldTypes = fields.map(() => 'float');
+                // set limit - read first limit rows to determine field types
+                let limit = 100, count = 1;
+
+                // set field types based on initial rows
+                while(!datasetFIn.eof || count < limit) {
+                    // escape loop if all fields are strings
+                    if (fieldTypes.every(type => type === 'string')) { break; }
+                    // document values to determine type of field
+                    let document = datasetFIn.readLine().trim();
+                    if (document.length === 0) { count++; continue; }
+                    let docValues = document.split('|');
+                    for (let j = 0; j < docValues.length; j++) {
+                        let value = docValues[j];
+                        // check if value is a float
+                        // TODO: handle examples like '1aa212'
+                        if (isNaN(parseFloat(value))) { fieldTypes[j] = 'string'; }
+                    }
+                    // we read a document - increment the count
+                    count++;
+                }
+
+                // set field list containing field name and type
+                let fieldList = [];
+                for (let i = 0; i < fields.length; i++) {
+                    fieldList.push({ name: fields[i].trim(), type: fieldTypes[i], included: true });
+                }
+
+                // return values to the user - for dataset creation
+                return res.send({
+                    dataset: {
+                        label,
+                        filename,
+                        size
+                    },
+                    fieldList
+                });
+
+            });
+        });
+    });
+
+    app.post('/api/datasets', (req, res) => {
         // TODO: log calling this route
         // get dataset info
         let { dataset, fields } = req.body;
-        let file = req.file;
 
-        // parse the JSON values from the body
-        // TODO: handle exceptions
         dataset = JSON.parse(dataset);
         fields = JSON.parse(fields);
 
@@ -87,62 +177,69 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             // create dataset directory
             fileManager.createDirectoryPath(dbPath);
 
-            // create write stream in dataset folder
-            let filePath = `${dbPath}/originalSource.txt`;
-            let writeStream = fs.createWriteStream(filePath);
+            // get temporary file
+            pg.select({ owner, filename: dataset.filename }, 'tempDatasets', (xerr, results) => {
+                // if error notify user
+                if (xerr) {
+                    // TODO: log error
+                    console.log(xerr.message);
+                    return res.send({ errors: { msg: xerr.message } });
+                }
+                if (results.length !== 1) {
+                    // TODO: log error
+                    console.log('found multiple temporary datasets with', dataset.filename);
+                    return res.send({ errors: { msg: 'found multiple temporary datasets with ' + dataset.filename } });
+                }
+                // save temporary dataset file information
+                let tempDataset = results[0];
 
-            // save file in corresponding dataset folder
-            let bufferStream = new stream.PassThrough();
-            bufferStream.end(file.buffer);
-            // pipe buffer stream to write file
-            bufferStream.pipe(writeStream)
-                .on('finish', () => {
-                    // TODO: log completion
-                    // save the metadata to postgres
-                    pg.insert({ owner, label, description, dbPath }, 'datasets', (xerr, results) => {
-                        // if error notify user
-                        if (xerr) {
-                            // TODO: log error
-                            console.log(xerr.message);
-                            return res.send({ errors: { msg: xerr.message } });
+                // insert dataset value
+                pg.insert({ owner, label, description, dbPath }, 'datasets', (xerr, results) => {
+                    // if error notify user
+                    if (xerr) {
+                        // TODO: log error
+                        console.log(xerr.message);
+                        return res.send({ errors: { msg: xerr.message } });
+                    }
+
+                    // initiate child process
+                    let datasetInfo = results[0];
+                    let datasetId = parseInt(datasetInfo.id);
+                    processHandler.createChild(datasetId);
+
+                    // redirect the user to dataset
+                    res.send({ datasetId });
+
+                    // body of the message
+                    let body = {
+                        cmd: 'create_dataset',
+                        content: {
+                            fields,
+                            filePath: tempDataset.filepath,
+                            params: {
+                                datasetId,
+                                label,
+                                description,
+                                created: datasetInfo.created,
+                                mode: 'createClean',
+                                dbPath
+                            }
                         }
+                    };
+                    // create dataset
+                    processHandler.sendAndWait(datasetId, body, function (error) {
+                        if (error) {
+                            // TODO: handle error
+                            console.log('Error', error.message);
+                            pg.delete({ id: datasetId, owner }, 'datasets');
+                        } else {
+                            pg.update({ loaded: true }, { id: datasetId }, 'datasets');
+                        }
+                        pg.delete({ id: tempDataset.id, owner }, 'tempDatasets');
 
-                        // initiate child process
-                        let datasetInfo = results[0];
-                        let datasetId = parseInt(datasetInfo.id);
-                        processHandler.createChild(datasetId);
-
-                        // redirect the user to dataset
-                        res.send({ datasetId });
-
-                        // body of the message
-                        let body = {
-                            cmd: 'create_dataset',
-                            content: {
-                                fields,
-                                filePath,
-                                params: {
-                                    datasetId,
-                                    label,
-                                    description,
-                                    created: datasetInfo.created,
-                                    mode: 'createClean',
-                                    dbPath
-                                }
-                            }
-                        };
-                        // create dataset
-                        processHandler.sendAndWait(datasetId, body, function (error) {
-                            if (error) {
-                                // TODO: handle error
-                                console.log('Error', error.message);
-                                pg.delete({ id: datasetId, owner }, 'datasets');
-                            } else {
-                                pg.update({ loaded: true }, { id: datasetId }, 'datasets');
-                            }
-                        });
                     });
-                }); // bufferStream.on('finish')
+                });
+            });
         }); // pg.select({ owner })
     }); // POST /api/dataset/new
 
@@ -243,19 +340,16 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         } else {
             // get the dataset information
             pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
-                if (error) {
-                    // TODO: handle error
-                    console.log('DELETE datasets/:datasets_id', error.message);
-                }
+                // TODO: handle error
+                if (error) { console.log('DELETE datasets/:datasets_id', error.message); }
+
                 if (results.length === 1) {
                     let dataset = results[0];
 
                     // process is already stopped - just delete from table and remove folder
                     pg.delete({ id: datasetId, owner }, 'datasets', function (xerror) {
-                        if (xerror) {
-                            // TODO: handle error
-                            console.log('DELETE datasets/:datasets_id', xerror.message);
-                        }
+                        // TODO: handle error
+                        if (xerror) { console.log('DELETE datasets/:datasets_id', xerror.message); }
                         // return the process
                         res.send({});
 
@@ -263,6 +357,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                         let datasetDbPath = dataset.dbPath;
                         if (datasetDbPath) { fileManager.removeFolder(datasetDbPath); }
                     });
+                } else {
+                    // TODO: handle unexisting or multiple datasets
                 }
             });
         }
@@ -278,9 +374,9 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         const owner = req.user ? req.user.id : 'user';
         // get user datasets
         pg.select({ id: datasetId, owner }, 'datasets', (err, results) => {
-            if (err) {
-                return res.send({ errors: { msg: err.message } });
-            }
+            // TODO: log error
+            if (err) { return res.send({ errors: { msg: err.message } }); }
+
             if (results.length === 1) {
                 // there are only one record with that id
                 let rec = results[0];

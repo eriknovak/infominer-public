@@ -46,7 +46,7 @@ export default Component.extend({
          * Changes the model field value.
          */
         changeFieldName() {
-            this.set('name', Ember.$(`#${this.get('nameId')}`).val());
+            this.set('name', Ember.$(`#${this.get('nameId')}`).val().trim());
         },
 
         /**
