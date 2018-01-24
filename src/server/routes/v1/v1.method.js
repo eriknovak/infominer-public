@@ -31,7 +31,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+
+    }); // GET /api/datasets/:dataset_id/methods
 
     /**
      * get subset info of dataset with id=dataset_id and subset_id=subset_id
@@ -57,7 +58,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+
+    }); // GET /api/datasets/:dataset_id/methods/:method_id
 
     /**
      * POST a new method to the database
@@ -86,5 +88,6 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+
+    }); // POST /api/datasets/:dataset_id/methods
 };

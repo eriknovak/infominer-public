@@ -31,7 +31,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+    }); // GET /api/datasets/:dataset_id/subsets
 
     /**
      * POST a new subset to the databse
@@ -56,7 +56,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+    }); // POST /api/datasets/:dataset_id/subsets
 
     /**
      * get subset info of dataset with id=dataset_id and subset_id=subset_id
@@ -81,7 +81,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+    }); // GET /api/datasets/:dataset_id/subsets/:subset_id
 
     /**
      * get subset info of dataset with id=dataset_id and subset_id=subset_id
@@ -113,7 +113,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+    }); // PUT /api/datasets/:dataset_id/subsets/:subset_id
 
     /**
      * Gets the subset documents
@@ -148,5 +148,5 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
         });
-    });
+    }); // GET /api/datasets/:dataset_id/subsets/:subset_id/documents
 };

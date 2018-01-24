@@ -63,7 +63,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             });
             // return the data
             return res.send({ datasets });
-        }); // pg.select({ owner })
+        }); // pg.select({ owner }, 'datasets')
+
     }); // GET /api/datasets
 
 
@@ -145,7 +146,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
 
             }); // pg.insert()
         }); // upload()
-    }); // POST '/api/datasets/uploadTemp'
+
+    }); // POST /api/datasets/uploadTemp
 
     app.post('/api/datasets', (req, res) => {
         // TODO: log calling this route
@@ -234,12 +236,13 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                             pg.update({ loaded: true }, { id: datasetId }, 'datasets');
                         }
                         pg.delete({ id: tempDataset.id, owner }, 'tempDatasets');
+                    }); // processHandler.sendAndWait()
 
-                    });
-                });
-            });
-        }); // pg.select({ owner })
-    }); // POST /api/dataset/new
+                }); // pg.insert({ owner, label, description, dbPath }, 'datasets')
+            }); // pg.select({ owner, filename }, 'tempDatasets')
+        }); // pg.select({ owner }, 'datasets')
+
+    }); // POST /api/datasets
 
 
     /**
@@ -261,7 +264,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             }
             let obj = messageHandler.onInfo(results);
             return res.send(obj);
-        });
+        }); // sendToProcess
+
     }); // GET /api/datasets/:dataset_id
 
     /**
@@ -300,7 +304,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 let obj = messageHandler.onInfo(results);
                 return res.send(obj);
             }); // sendToProcess
-        }); // pg.update
+        }); // pg.update({ label, description }, 'datasets')
+
     }); // PUT /api/datasets/:dataset_id
 
     /**
@@ -334,7 +339,8 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                     let datasetDbPath = processResults.dbPath;
                     if (datasetDbPath) { fileManager.removeFolder(datasetDbPath); }
                 });
-            });
+            }); // pg.delete({ id, owner }, 'datasets')
+
         } else {
             // get the dataset information
             pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
@@ -354,11 +360,11 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                         // delete dataset folder
                         let datasetDbPath = dataset.dbPath;
                         if (datasetDbPath) { fileManager.removeFolder(datasetDbPath); }
-                    });
+                    }); // pg.delete({ id, owner }, 'datasets')
                 } else {
                     // TODO: handle unexisting or multiple datasets
                 }
-            });
+            }); // pg.select({ id, owner }, 'datasets')
         }
     }); // GET /api/datasets/:dataset_id
 
@@ -389,6 +395,6 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
             } else {
                 return res.send({});
             }
-        }); // pg.select({ owner })
-    });
+        }); // pg.select({ owner }, 'datasets')
+    }); // GET /api/datasets/:dataset_id/check
 };

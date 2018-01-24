@@ -9,15 +9,17 @@ const session = require('express-session'); // maintaining sessions
 
 // internal modules
 const pg = require('../lib/postgresQL')(require('../config/pgconfig')); // postgres connection
-// contains the process handler class
-const ProcessHandler = require('../lib/processHandler');
+
 // parameters used on the express app
 const PORT = process.env.PORT || process.env.npm_package_config_portGui || 3000;
 
+// contains the process handler class
+const ProcessHandler = require('../lib/processHandler');
+// create an instance of the process handler
 let processHandler = new ProcessHandler({
     processPath: path.join(__dirname, '/child_process/dataset.js'),
     cleanupMilliseconds: 30*60*1000, // 30 minutes
-    processMaxAge: 2*60*60*1000 // 2 hours
+    processMaxAge:     2*60*60*1000  // 2 hours
 });
 
 // on manual process exit
@@ -52,7 +54,7 @@ app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // if secure: `true` will make req.user = undefined if not in https protocol
+    cookie: { secure: false } // if secure: `true` will make req.user = undefined if not in 'https' protocol
 }));
 
 // passport configuration
