@@ -20,7 +20,8 @@ const validator = require('../../lib/jsonValidator')({
     // subset message schemas
     createSubset:  require('../../schemas/child_messages/createSubset'),
     getSubset:     require('../../schemas/child_messages/getSubset'),
-    editSubset:     require('../../schemas/child_messages/editSubset'),
+    editSubset:    require('../../schemas/child_messages/editSubset'),
+    getSubsetDocuments: require('../../schemas/child_messages/getSubsetDocuments'),
     // method message schemas
     getMethod:     require('../../schemas/child_messages/getMethod'),
     createMethod:  require('../../schemas/child_messages/createMethod')
@@ -107,7 +108,7 @@ function handle(msg) {
         console.log('Get subset info in child process id=', process.pid);
         editSubset(msg);
         break;
-    case 'subset_documents_info':
+    case 'get_subset_documents':
         console.log('Get subset info in child process id=', process.pid);
         getSubsetDocuments(msg);
         break;
@@ -129,7 +130,13 @@ function handle(msg) {
 // database handling cases
 ///////////////////////////////////////
 
-function handleMessageValidation(msg, schema, callback) {
+/**
+ * message validation function.
+ * @param {Object} msg - The message object sent to the child process.
+ * @param {Object} schema - The schema the message object must follow.
+ * @param {Function} callback - The function called if the message matches the schema.
+ */
+function messageValidation(msg, schema, callback) {
     // validate message information
     if (validator.validate(msg, schema)) {
         callback(msg);
@@ -163,7 +170,7 @@ function handleMessageValidation(msg, schema, callback) {
  */
 function openDatabase(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.openDataset, function (msg) {
+    messageValidation(msg, validator.schemas.openDataset, function (msg) {
         // message is in correct format
         let { reqId, body } = msg;
         try {
@@ -195,7 +202,7 @@ function openDatabase(msg) {
  */
 function createDatabase(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.createDataset, function (msg) {
+    messageValidation(msg, validator.schemas.createDataset, function (msg) {
         // message is in correct format
         let { reqId, body } = msg;
         try {
@@ -226,7 +233,7 @@ function createDatabase(msg) {
  */
 function shutdownProcess(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.shutdown, function (msg) {
+    messageValidation(msg, validator.schemas.shutdown, function (msg) {
         // message is in correct format
         let { reqId } = msg;
         try {
@@ -256,7 +263,7 @@ function shutdownProcess(msg) {
  */
 function getDataset(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.getDataset, function (msg) {
+    messageValidation(msg, validator.schemas.getDataset, function (msg) {
         let { reqId } = msg;
         try {
             let results = database.getDatasetInfo();
@@ -280,7 +287,7 @@ function getDataset(msg) {
  */
 function editDataset(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.editDataset, function (msg) {
+    messageValidation(msg, validator.schemas.editDataset, function (msg) {
         let { reqId, body } = msg;
         try {
             let datasetInfo = body.content;
@@ -308,7 +315,7 @@ function editDataset(msg) {
  */
 function getSubset(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.getSubset, function (msg) {
+    messageValidation(msg, validator.schemas.getSubset, function (msg) {
         let { reqId, body } = msg;
         try {
             let subsetId = body.content ? body.content.subsetId : null;
@@ -335,7 +342,7 @@ function getSubset(msg) {
  */
 function editSubset(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.editSubset, function (msg) {
+    messageValidation(msg, validator.schemas.editSubset, function (msg) {
         let { reqId, body } = msg;
         try {
             let subsetInfo = body.content;
@@ -364,7 +371,7 @@ function editSubset(msg) {
  */
 function createSubset(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.createSubset, function (msg) {
+    messageValidation(msg, validator.schemas.createSubset, function (msg) {
         let { reqId, body } = msg;
         try {
             let { subset } = body.content;
@@ -397,18 +404,20 @@ function createSubset(msg) {
  * @param {String} [msg.body.content.query.sort.sortType] - The flag specifiying is sort is done. Possible: `asc` or `desc`.
  */
 function getSubsetDocuments(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let subsetId = body.content.subsetId;
-        let query = body.content.query;
-        let results = database.getSubsetDocuments(subsetId, query);
-        process.send({ reqId, results });
-    } catch (err) {
-        console.log('getSubsetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    messageValidation(msg, validator.schemas.getSubsetDocuments, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let subsetId = body.content.subsetId;
+            let query = body.content.query;
+            let results = database.getSubsetDocuments(subsetId, query);
+            process.send({ reqId, results });
+        } catch (err) {
+            console.log('getSubsetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /////////////////////////////
@@ -425,7 +434,7 @@ function getSubsetDocuments(msg) {
  */
 function getMethod(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.getMethod, function (msg) {
+    messageValidation(msg, validator.schemas.getMethod, function (msg) {
         let { reqId, body } = msg;
         try {
             let methodId = body.content ? body.content.methodId : null;
@@ -454,7 +463,7 @@ function getMethod(msg) {
  */
 function createMethod(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.createMethod, function (msg) {
+    messageValidation(msg, validator.schemas.createMethod, function (msg) {
         let { reqId, body } = msg;
         try {
             let { method } = body.content;

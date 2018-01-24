@@ -1,0 +1,51 @@
+{
+    "description": "The input to get subset documents information",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": ["integer"],
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "get_subset_documents"
+                },
+                "content": {
+                    "description": "The content used with the specified 'cmd' command",
+                    "type": "object",
+                    "properties": {
+                        "subsetId": { "type": "integer" },
+                        "query": {
+                            "description": "The query parameters used to filter the subset documents",
+                            "type": "object",
+                            "properties": {
+                                "offset": { "type": ["integer", "null"] },
+                                "limit":  { "type": ["integer", "null"] },
+                                "page":   { "type": ["integer", "null"] },
+                                "sort": {
+                                    "oneOf": [{
+                                        "type": "object",
+                                        "properties": {
+                                            "field":    { "type": "string" },
+                                            "sortType": { "type": "string" }
+                                        },
+                                        "required": ["field"]
+                                    }, {
+                                        "type": ["string", "null"]
+                                    }]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "required": ["cmd"]
+        }
+    },
+    "required": ["reqId", "body"]
+}

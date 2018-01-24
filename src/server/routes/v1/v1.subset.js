@@ -130,7 +130,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let owner = req.user ? req.user.id : 'user';
 
         // set the body info
-        let body = { cmd: 'subset_documents_info', content: { subsetId, query } };
+        let body = { cmd: 'get_subset_documents', content: { subsetId, query } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
