@@ -709,10 +709,8 @@ class BaseDataset {
      * @private
      */
     _clusterKMeans(qMethod, subset) {
-        console.time('clusterKMeans');
         let self = this;
         // create a feature space
-        console.time('featureSpace');
         let features = qMethod.parameters.features;
         features.forEach(feature => { feature.source='Dataset'; });
         let featureSpace = self._createFeatureSpace(features);
@@ -720,24 +718,16 @@ class BaseDataset {
         // get subset elements and update the feature space
         let documents = subset.hasElements;
         featureSpace.updateRecords(documents);
-        console.timeEnd('featureSpace');
 
-        console.time('extractSparseMatrix');
         // get matrix representation of the documents
         let spMatrix = featureSpace.extractSparseMatrix(documents);
-        console.timeEnd('extractSparseMatrix');
 
         // prepare the KMeans method and run the clustering
-        console.time('Kmeans fitting');
         let methodParams = qMethod.parameters.method;
         // don't allow empty clusters
         methodParams.allowEmpty = false;
-        console.log(methodParams);
         let KMeans = new qm.analytics.KMeans(methodParams);
         KMeans.fit(spMatrix);
-        console.timeEnd('Kmeans fitting');
-
-        console.time('clusters');
 
         // get the document-cluster affiliation
         const idxv = KMeans.getModel().idxv;
@@ -754,7 +744,6 @@ class BaseDataset {
             // store the document id in the correct cluster
             qMethod.result.clusters[clusterId].docIds.push(docId);
         }
-        console.timeEnd('clusters');
 
         // for each cluster calculate the aggregates
         const fields = self.base.store('Dataset').fields;
@@ -772,7 +761,6 @@ class BaseDataset {
                 qMethod.result.clusters[i].aggregates.push({ field: field.name, type, distribution });
             }
         }
-        console.timeEnd('clusterKMeans');
     }
 
 }
