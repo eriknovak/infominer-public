@@ -5,9 +5,10 @@
  */
 module.exports = function (app, passport) {
 
-    /**
-     * GOOGLE authentication
-     */
+    /////////////////////////////////////////////
+    // GOOGLE authentication
+    /////////////////////////////////////////////
+
     app.get('/auth/google',
         passport.authenticate('google', {
             failureRedirect: '/login',
@@ -26,9 +27,11 @@ module.exports = function (app, passport) {
         }
     );
 
-    /**
-     * TWITTER authentication
-     */
+
+    /////////////////////////////////////////////
+    // TWITTER authentication
+    /////////////////////////////////////////////
+
     app.get('/auth/twitter',
         passport.authenticate('twitter', {
             failureRedirect: '/login'
@@ -44,12 +47,14 @@ module.exports = function (app, passport) {
         }
     );
 
-    /**
-     * Checks if the client has a session connection -
-     *
-     */
+
+    /////////////////////////////////////////////
+    // Check client session connection
+    /////////////////////////////////////////////
+
     app.get('/auth/account', function (req, res) {
         // prepare authentication object
+        // TODO: return only user information, NOT whole object
         let authentication = req.isAuthenticated() ?
             { authenticated: true, user: req.user } :
             { authenticated: false, user: null };
@@ -57,9 +62,10 @@ module.exports = function (app, passport) {
         res.json(authentication);
     });
 
-    /**
-     * Set logout
-     */
+
+    /////////////////////////////////////////////
+    // Logout
+    /////////////////////////////////////////////
     app.get('/auth/logout', function (req, res) {
         req.logout();
         res.end();

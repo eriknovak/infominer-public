@@ -67,9 +67,8 @@ app.use(passport.session());
 // set where are public files
 app.use(express.static(__dirname + '/public/'));
 
-// handle login routes
+// set login & API routes
 require('./routes/login')(app, passport);
-// handle api routes
 require('./routes/route.handler')(app, pg, processHandler);
 
 // handle ember web application
