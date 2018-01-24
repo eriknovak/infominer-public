@@ -20,7 +20,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let owner = req.user ? req.user.id : 'user';
 
         // set the body info
-        let body = { cmd: 'get_subset_info' };
+        let body = { cmd: 'get_subset' };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
@@ -28,8 +28,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('GET datasets/:datasets_id/subsets', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets
 
@@ -53,8 +52,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('POST datasets/:datasets_id/subsets', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
     }); // POST /api/datasets/:dataset_id/subsets
 
@@ -70,7 +68,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // get the user
         let owner = req.user ? req.user.id : 'user';
         // set the body info
-        let body = { cmd: 'get_subset_info', content: { subsetId } };
+        let body = { cmd: 'get_subset', content: { subsetId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
@@ -78,8 +76,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('GET datasets/:datasets_id/subsets/:subset_id', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id
 
@@ -110,8 +107,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('PUT datasets/:datasets_id/subsets/:subset_id', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
     }); // PUT /api/datasets/:dataset_id/subsets/:subset_id
 
@@ -145,8 +141,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('GET datasets/:datasets_id/subsets/:subset_id/documents', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id/documents
 };

@@ -61,7 +61,7 @@ class ProcessHandler {
                 let callback = callbackH.callback;
                 let error = msg.error ? new Error(msg.error) : undefined;
                 // envoke the callback
-                callback(error, msg.content);
+                callback(error, msg.results);
                 // delete the callback hash
                 self._callbackH.delete(reqId);
             } else {

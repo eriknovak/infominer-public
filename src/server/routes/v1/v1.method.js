@@ -28,8 +28,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('GET datasets/:datasets_id/methods', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
 
     }); // GET /api/datasets/:dataset_id/methods
@@ -55,8 +54,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('GET datasets/:datasets_id/methods/:method_id', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
 
     }); // GET /api/datasets/:dataset_id/methods/:method_id
@@ -85,8 +83,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('POST datasets/:datasets_id/methods', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         });
 
     }); // POST /api/datasets/:dataset_id/methods

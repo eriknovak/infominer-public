@@ -262,8 +262,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 console.log('GET datasets/:datasets_id', error.message);
                 return res.send({ errors: { msg: error.message } });
             }
-            let obj = messageHandler.onInfo(results);
-            return res.send(obj);
+            return res.send(results);
         }); // sendToProcess
 
     }); // GET /api/datasets/:dataset_id
@@ -301,8 +300,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                     console.log('PUT datasets/:datasets_id', error.message);
                     return res.send({ errors: { msg: error.message } });
                 }
-                let obj = messageHandler.onInfo(results);
-                return res.send(obj);
+                return res.send(results);
             }); // sendToProcess
         }); // pg.update({ label, description }, 'datasets')
 
@@ -334,10 +332,9 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                 // shutdown process
                 let body = { cmd: 'shutdown' };
                 // send the request to the process
-                processHandler.sendAndWait(datasetId, body, function (error, processResults) {
+                processHandler.sendAndWait(datasetId, body, function (error, dbPath) {
                     // delete dataset folder
-                    let datasetDbPath = processResults.dbPath;
-                    if (datasetDbPath) { fileManager.removeFolder(datasetDbPath); }
+                    if (dbPath) { fileManager.removeFolder(dbPath); }
                 });
             }); // pg.delete({ id, owner }, 'datasets')
 
@@ -358,8 +355,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                         res.send({});
 
                         // delete dataset folder
-                        let datasetDbPath = dataset.dbPath;
-                        if (datasetDbPath) { fileManager.removeFolder(datasetDbPath); }
+                        if (dataset.dbPath) { fileManager.removeFolder(dataset.dbPath); }
                     }); // pg.delete({ id, owner }, 'datasets')
                 } else {
                     // TODO: handle unexisting or multiple datasets
