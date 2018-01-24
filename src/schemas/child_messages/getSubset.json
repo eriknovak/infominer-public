@@ -1,5 +1,5 @@
 {
-    "description": "The input to get method information",
+    "description": "The input to get subset information",
     "type": "object",
     "properties": {
         "reqId": {

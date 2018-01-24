@@ -19,7 +19,8 @@ const validator = require('../../lib/jsonValidator')({
     shutdown:      require('../../schemas/child_messages/shutdown'),
     // subset message schemas
     createSubset:  require('../../schemas/child_messages/createSubset'),
-
+    getSubset:     require('../../schemas/child_messages/getSubset'),
+    editSubset:     require('../../schemas/child_messages/editSubset'),
     // method message schemas
     getMethod:     require('../../schemas/child_messages/getMethod'),
     createMethod:  require('../../schemas/child_messages/createMethod')
@@ -307,7 +308,7 @@ function editDataset(msg) {
  */
 function getSubset(msg) {
     // validate message information
-    handleMessageValidation(msg, validator.schemas.getDataset, function (msg) {
+    handleMessageValidation(msg, validator.schemas.getSubset, function (msg) {
         let { reqId, body } = msg;
         try {
             let subsetId = body.content ? body.content.subsetId : null;
@@ -333,17 +334,19 @@ function getSubset(msg) {
  * @param {Object} [msg.body.content.description] - The new subset description.
  */
 function editSubset(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let subsetInfo = body.content;
-        let results = database.editSubsetInfo(subsetInfo);
-        process.send({ reqId, results });
-    } catch (err) {
-        console.log('editSubsetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.editSubset, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let subsetInfo = body.content;
+            let results = database.editSubsetInfo(subsetInfo);
+            process.send({ reqId, results });
+        } catch (err) {
+            console.log('editSubsetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
