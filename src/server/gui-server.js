@@ -68,7 +68,7 @@ app.use(express.static(__dirname + '/public/'));
 // handle login routes
 require('./routes/login')(app, passport);
 // handle api routes
-require('./routes/api/v1')(app, pg, processHandler);
+require('./routes/route.handler')(app, pg, processHandler);
 
 // handle ember web application
 // IMPORTANT: must be after all routes

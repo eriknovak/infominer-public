@@ -77,8 +77,8 @@ module.exports = function (app, pg, processHandler) {
     // Routes of the api
     /////////////////////////////////////////////////////////////////////
 
-    require('./v1.dataset.js')(app, pg, processHandler, sendToProcess, _openProcess);
-    require('./v1.subset.js')(app, pg, processHandler, sendToProcess);
-    require('./v1.method.js')(app, pg, processHandler, sendToProcess);
+    require('./v1/v1.dataset.js')(app, pg, processHandler, sendToProcess, _openProcess);
+    require('./v1/v1.subset.js') (app, pg, processHandler, sendToProcess);
+    require('./v1/v1.method.js') (app, pg, processHandler, sendToProcess);
 
 };

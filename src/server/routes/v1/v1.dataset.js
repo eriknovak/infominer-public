@@ -1,8 +1,6 @@
 // external modules
-const multer = require('multer');   // accepting files from client
-const stream = require('stream');   // create stream from file buffer
+const multer = require('multer'); // accepting files from client
 const path = require('path');
-const fs = require('fs');
 
 const qm = require('qminer');
 
@@ -73,7 +71,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
      * posts file and creates a new dataset
      * TODO: ensure handling large datasets
      */
-    const upload =  multer({ storage }).single('file');
+    const upload = multer({ storage }).single('file');
     app.post('/api/datasets/uploadTemp', (req, res) => {
         upload(req, res, function (error) {
             if (error) {
@@ -145,9 +143,9 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
                     fieldList
                 });
 
-            });
-        });
-    });
+            }); // pg.insert()
+        }); // upload()
+    }); // POST '/api/datasets/uploadTemp'
 
     app.post('/api/datasets', (req, res) => {
         // TODO: log calling this route

@@ -17,7 +17,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         // set the body info
         let body = { cmd: 'get_subset_info' };
@@ -40,7 +40,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         const { subset } = req.body;
 
@@ -68,7 +68,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let subsetId = parseInt(req.params.subset_id);
 
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
         // set the body info
         let body = { cmd: 'get_subset_info', content: { subsetId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -93,7 +93,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let subsetId = parseInt(req.params.subset_id);
 
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         // get dataset information
         // TODO: check schema structure
@@ -134,7 +134,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         };
 
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         // set the body info
         let body = { cmd: 'subset_documents_info', content: { subsetId, query } };

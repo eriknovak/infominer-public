@@ -17,7 +17,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         // set the body info
         let body = { cmd: 'get_method' };
@@ -43,7 +43,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let methodId = parseInt(req.params.method_id);
 
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         // set the body info
         let body = { cmd: 'get_method', content: { methodId } };
@@ -66,7 +66,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
-        let owner = req.user || 'user';
+        let owner = req.user ? req.user.id : 'user';
 
         let { method } = req.body;
 

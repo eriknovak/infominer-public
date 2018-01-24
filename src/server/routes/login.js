@@ -65,16 +65,4 @@ module.exports = function (app, passport) {
         res.end();
     });
 
-    /**
-     * Check if the user is authenticated for
-     * all /api/ subroutes
-     */
-    // app.all('/api/*', (req, res, next) => {
-    //     console.log(req.isAuthenticated());
-    //     // if user is authenticated in the session, carry on
-    //     if (req.isAuthenticated()) { return next(); }
-    //     // if they aren't send an empty response
-    //     res.send({ });
-    // });
-
 };
