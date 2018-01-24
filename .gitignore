@@ -60,7 +60,7 @@ typings/
 # ####################
 # backend ignores
 
-/data/user
+/data
 
 # ####################
 # website ignores
