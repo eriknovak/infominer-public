@@ -1,0 +1,43 @@
+{
+    "description": "The input to open a dataset",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": "integer",
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "open_dataset"
+                },
+                "content": {
+                    "description": "The content used with the specified 'cmd' command",
+                    "type": "object",
+                    "properties": {
+                        "params": {
+                            "description": "The parameters specifically used to create the qminer database",
+                            "type": "object",
+                            "properties": {
+                                "datasetId":   { "type": "number" },
+                                "label":       { "type": "string" },
+                                "description": { "type": ["string", "null"] },
+                                "created":     { "type": "string" },
+                                "mode":        { "type": "string" },
+                                "dbPath":      { "type": "string" }
+                            },
+                            "required": ["datasetId", "label", "created", "mode", "dbPath"]
+                        }
+                    },
+                    "required": ["params"]
+                }
+            },
+            "required": ["cmd", "content"]
+        }
+    },
+    "required": ["reqId", "body"]
+}

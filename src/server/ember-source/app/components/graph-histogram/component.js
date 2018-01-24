@@ -14,7 +14,7 @@ const HistogramComponent = GraphComponent.extend({
     classNames: ['histogram'],
 
     // histogram attributes
-    margin: { top: 10, right: 10, bottom: 20, left: 35 },
+    margin: { top: 10, right: 15, bottom: 20, left: 35 },
 
     /**
      * Object containing the histogram information.
@@ -34,16 +34,6 @@ const HistogramComponent = GraphComponent.extend({
     ///////////////////////////////////////////////////////
     // Helper functions
     ///////////////////////////////////////////////////////
-
-    /**
-     * Round the `value` to `decimals`.
-     * @param {Number} value - The float number to be rounded.
-     * @param {Number} decimals - Number of decimals to be rounded.
-     * @returns {Number} Rounded value.
-     */
-    _roundNumber(value, decimals) {
-        return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
-    },
 
     /**
      * Prepares the data used to generate the histogram.
@@ -183,9 +173,16 @@ const HistogramComponent = GraphComponent.extend({
         percent.append('text')
             .attr('class', 'frequency')
             .attr('dy', '.75em')
-            .attr('y', 6)
+            .attr('y', (d) => {
+                let squareHight = height - yScale(d.percent);
+                return squareHight > 20 ? 6 : -12;
+            })
             .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
             .attr('text-anchor', 'middle')
+            .attr('fill', (d) => {
+                let squareHight = height - yScale(d.percent);
+                return squareHight > 20 ? 'white' : '#2C3539';
+            })
             .text((d) => { return d.frequency ? formatCount(d.frequency) : ''; });
 
 

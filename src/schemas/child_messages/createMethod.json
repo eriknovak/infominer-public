@@ -1,0 +1,41 @@
+{
+    "description": "The input to create a method",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": "integer",
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "create_method"
+                },
+                "content": {
+                    "description": "The content used with the specified 'cmd' command",
+                    "type": "object",
+                    "properties": {
+                        "method": {
+                            "description": "The method creation parameters",
+                            "type": "object",
+                            "properties": {
+                                "type":       { "type": "string" },
+                                "parameters": { "type": "object" },
+                                "result":     { "type": ["object", "null"] },
+                                "appliedOn":  { "type": "integer" }
+                            },
+                            "required": ["type", "parameters", "appliedOn"]
+                        }
+                    },
+                    "required": ["method"]
+                }
+            },
+            "required": ["cmd", "content"]
+        }
+    },
+    "required": ["reqId", "body"]
+}

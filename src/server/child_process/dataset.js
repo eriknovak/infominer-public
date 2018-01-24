@@ -9,6 +9,22 @@ let interval_id = setInterval(() => { }, 10 * 1000);
 // internal modules
 const BaseDataset = require('../../lib/baseDataset');
 
+// json schema validator
+const validator = require('../../lib/jsonValidator')({
+    // the schemas used to validate the input
+    createDataset: require('../../schemas/child_messages/createDataset'),
+    openDataset:   require('../../schemas/child_messages/openDataset'),
+    editDataset:   require('../../schemas/child_messages/editDataset'),
+    getDataset:    require('../../schemas/child_messages/getDataset'),
+    shutdown:      require('../../schemas/child_messages/shutdown'),
+    // subset message schemas
+    createSubset:  require('../../schemas/child_messages/createSubset'),
+
+    // method message schemas
+    getMethod:     require('../../schemas/child_messages/getMethod'),
+    createMethod:  require('../../schemas/child_messages/createMethod')
+});
+
 // database placeholder
 let database = null;
 
@@ -22,11 +38,11 @@ process.on('message', (msg) => {
 });
 process.on('SIGINT', () => {
     console.log('Received SIGINT, this process id = ' + process.pid);
-    shutDownProcess({ reqId: 'SIGINT' });
+    shutdownProcess({ reqId: 'SIGINT' });
 });
 process.on('SIGTERM', () => {
     console.log('Received SIGTERM, this process id = ' + process.pid);
-    shutDownProcess({ reqId: 'SIGTERM' });
+    shutdownProcess({ reqId: 'SIGTERM' });
 });
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,32 +79,40 @@ function handle(msg) {
         break;
     case 'shutdown':
         console.log('Received shutdown command');
-        shutDownProcess(msg);
+        shutdownProcess(msg);
         break;
 
     /////////////////////////////////////////////////////////////////
     // database info retrieving
     /////////////////////////////////////////////////////////////////
 
-    case 'get_dataset_info':
+    case 'get_dataset':
         console.log('Get database info in child process id=', process.pid);
-        getDatasetInfo(msg);
+        getDataset(msg);
+        break;
+    case 'edit_dataset':
+        console.log('Get database info in child process id=', process.pid);
+        editDataset(msg);
         break;
     case 'get_subset_info':
         console.log('Get subset info in child process id=', process.pid);
         getSubsetInfo(msg);
         break;
-    case 'subset_documents_info':
-        console.log('Get subset info in child process id=', process.pid);
-        getSubsetDocuments(msg);
-        break;
     case 'create_subset':
         console.log('Get subset info in child process id=', process.pid);
         createSubset(msg);
         break;
-    case 'get_method_info':
+    case 'edit_subset':
+        console.log('Get subset info in child process id=', process.pid);
+        editSubset(msg);
+        break;
+    case 'subset_documents_info':
+        console.log('Get subset info in child process id=', process.pid);
+        getSubsetDocuments(msg);
+        break;
+    case 'get_method':
         console.log('Get method info in child process id=', process.pid);
-        getMethodInfo(msg);
+        getMethod(msg);
         break;
     case 'create_method':
         console.log('Get method info in child process id=', process.pid);
@@ -103,6 +127,17 @@ function handle(msg) {
 ///////////////////////////////////////
 // database handling cases
 ///////////////////////////////////////
+
+function handleMessageValidation(msg, schema, callback) {
+    // validate message information
+    if (validator.validate(msg, schema)) {
+        callback(msg);
+    } else {
+        // the validation found an inconsistences in the object
+        process.send({ reqId: msg.reqId, error: 'Sent message is not in a correct schema' });
+    }
+}
+
 
 /**
  * The dataset field used in QMiner database.
@@ -126,20 +161,21 @@ function handle(msg) {
  * @param {String} msg.body.content.params.mode - In what mode the database should be opened.
  */
 function openDatabase(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        // get the constructor parameters
-        let { params } = body.content;
-        // create the database
-        database = new BaseDataset(params);
-        // everything is ok
-        process.send({ reqId, content: { datasetId: database.getId() } });
-    } catch (err) {
-        console.log('openDatabase Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.openDataset, function (msg) {
+        // message is in correct format
+        let { reqId, body } = msg;
+        try {
+            // get the constructor parameters
+            let { params } = body.content;
+            database = new BaseDataset(params); // create the database
+            process.send({ reqId, content: { datasetId: database.getId() } });
+        } catch (err) {
+            console.log('openDatabase Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -157,23 +193,26 @@ function openDatabase(msg) {
  * @param {field_instance[]} msg.body.content.fields -  where file for filling the database is.
  */
 function createDatabase(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        // get the constructor parameters
-        let { filePath, fields, params } = body.content;
-        // create the database
-        database = new BaseDataset(params, fields);
-        // fill the database with the records
-        let result = database.pushDocsToBase(filePath, fields);
-        database.aggregateSubset(result.subsets.id);
-        // everything is ok
-        process.send({ reqId, content: { datasetId: database.getId() } });
-    } catch (err) {
-        console.log('createDatabase Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.createDataset, function (msg) {
+        // message is in correct format
+        let { reqId, body } = msg;
+        try {
+            // get the constructor parameters
+            let { filePath, fields, params } = body.content;
+            // create the database
+            database = new BaseDataset(params, fields);
+            // fill the database with the records
+            let result = database.pushDocsToBase(filePath, fields);
+            database.aggregateSubset(result.subsets.id);
+            // everything is ok
+            process.send({ reqId, content: { datasetId: database.getId() } });
+        } catch (err) {
+            console.log('createDatabase Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -184,20 +223,24 @@ function createDatabase(msg) {
  * @param {Object} msg.body - The body of the message.
  * @param {String} msg.body.cmd - What command needs to be executed.
  */
-function shutDownProcess(msg) {
-    let { reqId } = msg;
-    try {
-        let dbPath = null;
-        if (database) {
-            dbPath = database.getDbPath();
-            database.close();
+function shutdownProcess(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.shutdown, function (msg) {
+        // message is in correct format
+        let { reqId } = msg;
+        try {
+            let dbPath = null;
+            if (database) {
+                dbPath = database.getDbPath();
+                database.close();
+            }
+            process.send({ reqId, content: { dbPath } });
+        } catch(err) {
+            process.send({ reqId, error: err.message });
         }
-        process.send({ reqId, content: { dbPath } });
-    } catch(err) {
-        process.send({ reqId, error: err.message });
-    }
-    clearInterval(interval_id);
-    process.exit(0);
+        clearInterval(interval_id);
+        process.exit(0);
+    });
 }
 
 ///////////////////////////////////////////////
@@ -210,17 +253,44 @@ function shutDownProcess(msg) {
  * @param {Number} msg.reqId - The request id - used for for getting the callback
  * what to do with the results.
  */
-function getDatasetInfo(msg) {
-    // TODO: validate json schema
-    let { reqId } = msg;
-    try {
-        let result = database.getDatasetInfo();
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getDatasetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+function getDataset(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.getDataset, function (msg) {
+        let { reqId } = msg;
+        try {
+            let result = database.getDatasetInfo();
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getDatasetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
+}
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.label] - The new dataset label.
+ * @param {Object} [msg.body.content.description] - The new dataset description.
+ */
+function editDataset(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.editDataset, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let datasetInfo = body.content;
+            let result = database.editDatasetInfo(datasetInfo);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('updateDatasetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /////////////////////////////
@@ -255,6 +325,31 @@ function getSubsetInfo(msg) {
  * @param {Number} msg.reqId - The request id - used for for getting the callback
  * what to do with the results.
  * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.subsetId] - The id of the subset.
+ * @param {Object} [msg.body.content.label] - The new subset label.
+ * @param {Object} [msg.body.content.description] - The new subset description.
+ */
+function editSubset(msg) {
+    // TODO: validate json schema
+    let { reqId, body } = msg;
+    try {
+        let subsetInfo = body.content;
+        let result = database.editSubsetInfo(subsetInfo);
+        process.send({ reqId, content: { result } });
+    } catch (err) {
+        console.log('editSubsetInfo Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
  * @param {Object} msg.body.content - The content of the message.
  * @param {Object} msg.body.content.subset - The subset object.
  * @param {Object} msg.body.content.subset.label - The subset label.
@@ -263,19 +358,21 @@ function getSubsetInfo(msg) {
  * @param {Number[]} msg.body.content.subset.documents - Array of document ids the subset contains.
  */
 function createSubset(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let { subset } = body.content;
-        let result = database.createSubset(subset);
-        database.aggregateSubset(result.subsets.id);
-        result = database.getSubsetInfo(result.subsets.id);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getSubsetInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.createSubset, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let { subset } = body.content;
+            let result = database.createSubset(subset);
+            database.aggregateSubset(result.subsets.id);
+            result = database.getSubsetInfo(result.subsets.id);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getSubsetInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -321,18 +418,20 @@ function getSubsetDocuments(msg) {
  * @param {Object} [msg.body.content] - The content of the message.
  * @param {Object} [msg.body.content.methodId] - The id of the subset.
  */
-function getMethodInfo(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let methodId = body.content ? body.content.methodId : null;
-        let result = database.getMethodInfo(methodId);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getMethodInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+function getMethod(msg) {
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.getMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let methodId = body.content ? body.content.methodId : null;
+            let result = database.getMethodInfo(methodId);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getMethod Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }
 
 /**
@@ -349,15 +448,17 @@ function getMethodInfo(msg) {
  * @param {Number} msg.body.content.method.appliedOn - The id of the subset the method was applied on.
  */
 function createMethod(msg) {
-    // TODO: validate json schema
-    let { reqId, body } = msg;
-    try {
-        let { method } = body.content;
-        let result = database.createMethod(method);
-        process.send({ reqId, content: { result } });
-    } catch (err) {
-        console.log('getMethodInfo Error', err.message);
-        // notify parent process about the error
-        process.send({ reqId, error: err.message });
-    }
+    // validate message information
+    handleMessageValidation(msg, validator.schemas.createMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let { method } = body.content;
+            let result = database.createMethod(method);
+            process.send({ reqId, content: { result } });
+        } catch (err) {
+            console.log('getMethodInfo Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
 }

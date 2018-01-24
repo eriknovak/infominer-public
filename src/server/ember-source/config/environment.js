@@ -24,13 +24,15 @@ module.exports = function(environment) {
     },
 
     googleFonts: [
-      'Open+Sans:400,300,600,700'
+      'Open+Sans:400,300,600,700',
+      'Roboto:300,400,500'
     ],
     // Set or update content security policies
     contentSecurityPolicy: {
       'font-src': "'self' fonts.gstatic.com",
       'style-src': "'self' fonts.googleapis.com"
     }
+
   };
 
   if (environment === 'development') {

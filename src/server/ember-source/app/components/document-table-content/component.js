@@ -10,5 +10,4 @@ export default Component.extend({
         this.set('loading-row-width', 1 + this.get('fields.length'));
     }
 
-
 });

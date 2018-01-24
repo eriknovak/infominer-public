@@ -14,9 +14,7 @@ export default Service.extend({
             let length =  components.slice(i, i + maxColNum).length;
             for (let j = 0; j < length; j++) {
                 let columnSize = `col-${viewSize}-${12/length}`;
-                let columnClass = components.objectAt(i+j).columnSize;
-                if (columnClass) { columnSize += ` ${columnClass}`; }
-                Ember.set(components.objectAt(i+j), 'columnSize', columnSize);
+                Ember.set(components.objectAt(i+j), `column${viewSize}`, columnSize);
             }
         }
     }

@@ -5,26 +5,30 @@ export default Component.extend({
     tagName: 'tr',
 
     // possible field values
-    fieldTypes: ['string', 'float'],
     included: true,
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
 
+    init() {
+        this._super(...arguments);
+        this.set('fieldTypes', [
+            { type: 'string', selected: false },
+            { type: 'float', selected: false }
+        ]);
+    },
+
     didReceiveAttrs() {
         this._super(...arguments);
         // get field type and possible field types
         let type = this.get('type');
-        let fieldTypes = this.get('fieldTypes');
+
         // find and set field type to the start of the array
-        let index = fieldTypes.indexOf(type);
-        if (index > -1) {
-            fieldTypes.splice(index, 1);
-            fieldTypes.unshift(type);
+        for (let i = 0; i < this.get('fieldTypes').length; i++) {
+            let obj = this.get('fieldTypes').objectAt(i);
+            if (Ember.get(obj, 'type') === type) { Ember.set(obj, 'selected', true); break; }
         }
-        // set field types
-        this.set('fieldTypes', fieldTypes);
 
         // set element ids
         this.set('nameId', `field-name-${this.get('index')}`);
@@ -42,7 +46,7 @@ export default Component.extend({
          * Changes the model field value.
          */
         changeFieldName() {
-            this.set('name', Ember.$(`#${this.get('nameId')}`).val());
+            this.set('name', Ember.$(`#${this.get('nameId')}`).val().trim());
         },
 
         /**

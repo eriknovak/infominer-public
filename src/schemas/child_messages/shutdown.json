@@ -1,0 +1,23 @@
+{
+    "description": "The input to open a dataset",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": ["integer", "string"],
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "shutdown"
+                }
+            },
+            "required": ["cmd"]
+        }
+    },
+    "required": ["reqId"]
+}

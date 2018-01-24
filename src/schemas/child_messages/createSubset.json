@@ -1,0 +1,54 @@
+{
+    "description": "The input to create a subset",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": "integer",
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "create_subset"
+                },
+                "content": {
+                    "description": "The content used with the specified 'cmd' command",
+                    "type": "object",
+                    "properties": {
+                        "subset": {
+                            "description": "The subset creation parameters",
+                            "type": "object",
+                            "properties": {
+                                "label":       { "type": "string" },
+                                "description": { "type": ["string", "null"] },
+                                "resultedIn":  { "type": "integer" },
+                                "documents": {
+                                    "description": "Array of documents in the subset",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "meta": {
+                                    "description": "Metadata containing cluster info",
+                                    "type": "object",
+                                    "properties": {
+                                        "clusterId": { "type": "integer" }
+                                    }
+                                }
+                            },
+                            "required": ["label", "resultedIn"]
+                        }
+                    },
+                    "required": ["subset"]
+                }
+            },
+            "required": ["cmd", "content"]
+        }
+    },
+    "required": ["reqId", "body"]
+}

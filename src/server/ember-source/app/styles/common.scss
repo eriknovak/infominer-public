@@ -1,13 +1,13 @@
 // common styles for all views
 html, body {
-    height: 100%;
     font-family: $main-font;
     font-weight: 300;
     font-size: 14px;
 }
 
 body {
-    padding-top:50px;
+    padding-top: 50px;
+    padding-bottom: 100px;
     & > .ember-view { height: 100% }
 }
 
@@ -27,40 +27,83 @@ a {
  * Navigation bar
  *************************************/
 
-#header .navbar {
+@mixin navbar-link {
+    &:hover,
+    &:focus,
+    &:active {
+        color: $light-font-color;
+        background-color: lighten($secondary-color, 10%);
+    }
+    color: $light-font-color;
+    display: block;
+    padding: 15px 1em;
+    outline: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-transition: background .4s;
+    transition: background .4s;
+    cursor: pointer;
+    & > i {
+        margin-right: 10px;
+        font-size: 16px;
+    }
+}
+
+.navbar {
     margin-bottom: 0px;
-    border: white solid 0px;
+    border: 0px;
     background-color: $secondary-color;
+
     .navbar-brand {
+        cursor: default;
         color: $light-font-color;
         font-family: $main-font;
         font-weight: 400;
+        &:hover { color: $light-font-color; }
     }
     .navbar-nav {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 400;
-        a {
-            display: block;
-            padding: 1em 1em 1em 1em;
-            outline: 0;
-            color: $light-font-color;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            -webkit-transition: background .4s;
-            transition: background .4s;
-            cursor: pointer;
-            & > i {
-                margin-right: 10px;
-                font-size: 20px;
+        .link {
+            a {
+                @include navbar-link;
+                &.active { background-color: lighten($secondary-color, 10%); }
+            }
+            &.login a {
+                padding: 10px;
+                margin: 5px;
+                &.active { background-color: lighten($secondary-color, 10%); }
             }
         }
-        a:hover {
-            background-color: lighten($secondary-color, 10%);
+        .user-info {
+            &.open > a { background-color: lighten($secondary-color, 10%); }
+            & > a {
+                @include navbar-link;
+                text-transform: none;
+                padding: 10px 20px;
+                img {
+                    border-radius: 50%;
+                    margin-right: 5px;
+                }
+            }
         }
     }
 
     .navbar-toggle {
         border-radius: 0px;
+    }
+    .dropdown-menu {
+        border: 0px;
+        border-radius: 0px;
+        background-color: $quaternary-color;
+
+        a {
+            color: $light-font-color;
+            &:hover {
+                color: $light-font-color;
+                background-color: darken($quaternary-color, 10%);
+            }
+        }
     }
 }
 
@@ -182,6 +225,19 @@ input, select, textarea {
     padding-top: 18%;
     color: $secondary-color;
     text-align: center;
+}
+
+.ember-notify-default {
+    border-radius: 0px;
+    .ember-notify {
+        color: white;
+        border: 0px solid;
+        background-color: $dark-font-color;
+        a { color: white; }
+        .notification {
+            .database-label { text-transform: uppercase; }
+        }
+    }
 }
 
 /**************************************

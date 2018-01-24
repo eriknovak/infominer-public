@@ -16,6 +16,7 @@ Router.map(function() {
       this.route('analysis');
     });
   });
+  this.route('login');
 });
 
 export default Router;

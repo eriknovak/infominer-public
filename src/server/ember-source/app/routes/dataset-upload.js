@@ -1,11 +1,23 @@
 import Route from '@ember/routing/route';
-import ENV from 'ember-source/config/environment';
+import ENV from '../config/environment';
+import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
-export default Route.extend({
-    uploader: Ember.inject.service('file-queue'),
+import { inject as service } from '@ember/service';
+
+/**
+ * For development do not use authentication.
+ * for other environments (production) user authentication.
+ */
+const DatasetUploadRoute = ENV.environment === 'development' ?
+    Route.extend({ }) :
+    Route.extend(AuthenticatedRouteMixin);
+
+
+export default DatasetUploadRoute.extend({
+    uploader: service('file-queue'),
+    notify: service('notify'),
 
     model() {
-        this.resetQueue();
         // the initial model is null
         return null;
     },
@@ -19,11 +31,14 @@ export default Route.extend({
          * Reads dataset and extracts the fields.
          * @param {Object} file - The file blob.
          */
-        readDataset(file) {
-            // save route object
-            // TODO: handle reading with buffers
-            file.readAsText().then((data) => {
-                this.extractFields(file, data);
+        uploadDataset(file) {
+            // set the options and upload
+            file.upload({
+                url: `${ENV.APP.HOSTNAME}/api/datasets/uploadTemp`,
+            }).then(data => {
+                // set dataset model for storing information
+                let model = data.body;
+                this.set('controller.model', model);
             });
         },
 
@@ -31,7 +46,7 @@ export default Route.extend({
          * Resets model and file queue.
          */
         resetModel() {
-            this.resetQueue();
+            this.removeDataset();
             // reset the model
             this.set('controller.model', null);
         },
@@ -40,20 +55,41 @@ export default Route.extend({
          * Pushes metadata and file blob to server.
          * @param {Object} file - File blob.
          */
-        submitDataset(file) {
+        submitDataset() {
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
             // filter out the included fields and prepare the array as
-
             // set the options and upload
-            file.upload({
-                url: `${ENV.APP.HOSTNAME}/api/datasets/new`,
+            Ember.$.post({
+                url: `${ENV.APP.HOSTNAME}/api/datasets`,
                 data: {
                     dataset: JSON.stringify(dataset),
                     fields: JSON.stringify(fieldList)
                 }
             }).then(data => {
-                this.transitionTo('dataset.subset.analysis', data.body.datasetId, 0);
+                // continuously check if dataset is loaded
+                let interval = setInterval(() => {
+                    Ember.$.get(`${ENV.APP.HOSTNAME}/api/datasets/${data.datasetId}/check`)
+                        .then(response => {
+                            // if data loaded change state
+                            if (response.loaded) {
+                                // clear the interval
+                                clearInterval(interval);
+                                this.get('notify').info({
+                                    html: `<div class="notification">
+                                            Dataset <span class="database-label">
+                                                '${response.label}'
+                                            </span> successfully loaded!
+                                        </div>`
+                                });
+
+                                // set dataset loaded property
+                                let dataset = this.get('store').peekRecord('dataset', response.id);
+                                dataset.set('loaded', response.loaded);
+                            }
+                        });
+                }, 3000);
+                this.transitionTo('datasets');
             });
         }
     },
@@ -61,30 +97,9 @@ export default Route.extend({
     // helper functions
 
     /**
-     * Extracts fields, types and update the route model.
-     * @param {String} file - The file blob object.
-     * @param {String} data - The file/data containing the table.
-     */
-    extractFields: function (file, data) {
-        // separate rows and take first row as field names
-        const tableRows = data.split(/\r\n?|\n/g);
-        const fields = tableRows[0].split('|');
-
-        // TODO: set field type recommendation
-        let fieldList = fields.map(field => ({ name: field, type: 'string', included: true }));
-
-        // get dataset name, size and number of documents
-        let label = file.get('name');
-        let size = file.get('size');
-        let numDocs = tableRows.length - 1;
-        // set model of this route
-        this.set('controller.model', { file, dataset: { label, size, numDocs, description: "" }, fieldList });
-    },
-
-    /**
      * Resets file queue.
      */
-    resetQueue: function () {
+    removeDataset: function () {
         // get the dataset queue and set them all to null
         const uploader = this.get('uploader');
         let queue = uploader.find("dataset");

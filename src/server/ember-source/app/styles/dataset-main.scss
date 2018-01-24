@@ -74,6 +74,12 @@
                 color: white;
                 &:hover { background-color: darken($tertiary-color, 10%); }
             }
+
+            &.edit {
+                color: white;
+                background-color: lighten($secondary-color, 10%);
+                &:hover { background-color: $secondary-color; }
+            }
         }
     }
 }

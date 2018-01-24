@@ -38,13 +38,19 @@ InfoMiner is an exploration service for textual data.
     npm run postgres:create
     ```
 
+## Authentication parameters
+
+The application uses the [passport.js](http://www.passportjs.org/) middleware for user authentication. The service supports `google` and `twitter` authentication - both of them use their own configuration parameters such as `secretKey`, `clientId` and other. These parameters are for security reasons not provided in the repository.
+
+Contact your fellow developers so that they can give you the appropriate configuration files.
+
 ## Helpful commands
 
 These commands can be used inside the project folder for quick use.
 
 | command | description |
 | ------- | ----------- |
-| `npm test` | Runs unit tests. Command must be run in `bash`. |
+| `npm test` | Runs unit tests. Command must be run in `bash`! |
 | `npm run server:gui` | Runs `gui-server` located in `src/server`. The server is available on `PORT=3000`. |
 | `npm run server:guiDebug`| Runs `gui-server` in `debug` mode. |
 
@@ -54,6 +60,5 @@ Ember commands are here for easier Ember application development and building.
 
 | command | description |
 | ------- | ----------- |
-| `npm run ember:serve` | Runs a development instance of `Ember` application on `http://localhost:4200`. The instance is in `development` mode and supports `live-reload`. |
-| `npm run ember:build` | Builds the `Ember` application and saves it in `src/server/public` directory. |
-
+| `npm run ember:serve` | Runs a development instance of `Ember` application on `http://localhost:4200`. The instance is in `development` environment and supports `live-reload`. |
+| `npm run ember:build` | Builds the `Ember` application in `production` environment and saves it in `src/server/public` directory. |

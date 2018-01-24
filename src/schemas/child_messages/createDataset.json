@@ -1,0 +1,61 @@
+{
+    "description": "The input to create a dataset",
+    "type": "object",
+    "properties": {
+        "reqId": {
+            "description": "The request id used to identify callback",
+            "type": "integer",
+            "minimum": -1
+        },
+        "body": {
+            "description": "The body of the request sent to the process",
+            "type": "object",
+            "properties": {
+                "cmd": {
+                    "description": "The command used to identify the value",
+                    "constant": "create_dataset"
+                },
+                "content": {
+                    "description": "The content used with the specified 'cmd' command",
+                    "type": "object",
+                    "properties": {
+                        "fields": {
+                            "description": "The fields used for dataset creation",
+                            "type": "array",
+                            "items": {
+                                "description": "The field parameters",
+                                "type": "object",
+                                "properties": {
+                                    "name": { "type": "string" },
+                                    "type": { "type": "string" },
+                                    "included": { "type": "boolean" }
+                                },
+                                "minItems": 1
+                            }
+                        },
+                        "filePath": {
+                            "description": "The path to the dataset",
+                            "type": "string"
+                        },
+                        "params": {
+                            "description": "The parameters specifically used to create the qminer database",
+                            "type": "object",
+                            "properties": {
+                                "datasetId":   { "type": "number" },
+                                "label":       { "type": "string" },
+                                "description": { "type": "string" },
+                                "created":     { "type": "string" },
+                                "mode":        { "type": "string" },
+                                "dbPath":      { "type": "string" }
+                            },
+                            "required": ["datasetId", "label", "created", "mode", "dbPath"]
+                        }
+                    },
+                    "required": ["fields", "filePath", "params"]
+                }
+            },
+            "required": ["cmd", "content"]
+        }
+    },
+    "required": ["reqId", "body"]
+}

@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+
+      <div class="login-options">
+        <h2 class="login-header">Login</h2>
+        <a href="{{model.googleAuth}}" class="btn btn-default google-login">
+          <img src="images/login/g-logo.png" alt="google logo" height="40" width="40">
+          Sign in with Google
+        </a>
+
+        <a href="{{model.twitterAuth}}" class="btn btn-default twitter-login">
+          <i class="fa fa-twitter" aria-hidden="true"></i>
+          Sign in with Twitter
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{{outlet}}
