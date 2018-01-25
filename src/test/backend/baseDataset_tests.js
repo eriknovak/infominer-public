@@ -19,6 +19,7 @@ describe('BaseDataset Tests', function () {
         mode: 'createClean',
         dbPath: './data/user/00',
         label: 'test-dataset',
+        created: '1/1/2018',
         description: 'this is a test description',
         datasetId: 0
     };
@@ -48,7 +49,7 @@ describe('BaseDataset Tests', function () {
         it('should fill the database with dataset', function(done) {
             // create database
             database = new BaseDataset(params, fields);
-            database.pushDocsToBase(filePath, fields);
+            database.pushDocuments(filePath, fields);
             // check if it contains the dataset
             assert.equal(database.base.store('Dataset').length, 3, 'Dataset should contain 3 records');
             assert.equal(database.base.store('Subsets').length, 1, 'Subsets shoud have 0 records');
@@ -62,6 +63,7 @@ describe('BaseDataset Tests', function () {
                 mode: 'open',
                 dbPath: './data/user/00',
                 label: 'test-dataset',
+                created: '1/1/2018',
                 description: 'this is a test description',
                 datasetId: 0
             };
@@ -82,6 +84,7 @@ describe('BaseDataset Tests', function () {
                 mode: 'open',
                 dbPath: './data/user/00',
                 label: 'test-dataset',
+                created: '1/1/2018',
                 description: 'this is a test description',
                 datasetId: 0
             };
@@ -120,7 +123,7 @@ describe('BaseDataset Tests', function () {
             ];
             // create database
             database = new BaseDataset(params, fields);
-            database.pushDocsToBase(filePath, fields);
+            database.pushDocuments(filePath, fields);
         });
 
         // close database after each test
@@ -146,10 +149,10 @@ describe('BaseDataset Tests', function () {
             });
         });
 
-        describe.skip('getDatasetInfo', function () {
+        describe.skip('getDatasetInformation', function () {
             it('should get the dataset info', function (done) {
                 // gets the dataset info
-                let datasetInfo = database.getDatasetInfo();
+                let datasetInfo = database.getDatasetInformation();
                 // TODO: check schema
 
                 // end test
@@ -157,10 +160,10 @@ describe('BaseDataset Tests', function () {
             });
         });
 
-        describe.skip('getSubsetInfo', function () {
+        describe.skip('getSubsetInformation', function () {
             it('should get the info of all subsets', function (done) {
                 // gets the dataset info
-                let subsetsInfo = database.getSubsetInfo();
+                let subsetsInfo = database.getSubsetInformation();
                 // TODO: check schema
 
                 // end test
@@ -168,7 +171,7 @@ describe('BaseDataset Tests', function () {
             });
             it('should get the info of the first subset', function (done) {
                 // gets the dataset info
-                let subsetInfo = database.getSubsetInfo(0);
+                let subsetInfo = database.getSubsetInformation(0);
                 // TODO: check schema
 
                 // end test
@@ -195,20 +198,20 @@ describe('BaseDataset Tests', function () {
             });
         });
 
-        describe('getMethodInfo', function () {
+        describe('getMethodInformation', function () {
             it('should get the info of all methods - empty array', function (done) {
                 // gets the dataset info
-                let methodInfo = database.getMethodInfo();
+                let methodInfo = database.getMethodInformation();
                 // TODO: check schema
                 assert.equal(methodInfo.methods.length, 0, 'methodInfo is not empty');
                 // end test
                 done();
             });
-            it('should get the info of the first methods', function (done) {
+            it('should get the info of the first method', function (done) {
                 // gets the dataset info
-                let methodInfo = database.getMethodInfo(0);
-                // TODO: check schema
-                assert.equal(methodInfo, null, 'methodInfo should be null');
+                let methodInfo = database.getMethodInformation(0);
+                assert.notEqual(methodInfo.errors, null, 'methodInfo should be null');
+
                 // end test
                 done();
             });
