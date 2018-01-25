@@ -21,6 +21,12 @@ class JsonValidator {
 
     }
 
+    /**
+     * message validation function.
+     * @param {Object} object - The validated object.
+     * @param {Object} schema - The schema the message object must follow.
+     * @returns {Boolean} Returns `true` if object matches schema. Otherwise, `false`.
+     */
     validate(object, schema) {
         let self = this;
         let validation = self._validator.validate(object, schema);
