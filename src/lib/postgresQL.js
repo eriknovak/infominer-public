@@ -313,4 +313,6 @@ class PostgreSQL {
     }
 }
 
-module.exports = function (config) { return new PostgreSQL(config); };
+module.exports = function (config) {
+    return new PostgreSQL(config);
+};
