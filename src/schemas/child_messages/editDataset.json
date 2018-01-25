@@ -25,7 +25,7 @@
                         },
                         "description": {
                             "description": "The description of the dataset",
-                            "type": "string"
+                            "type": ["string", "null"]
                         }
                     },
                     "required": ["label"]
