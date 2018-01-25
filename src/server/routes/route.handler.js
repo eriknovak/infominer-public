@@ -68,6 +68,7 @@ module.exports = function (app, pg, processHandler) {
                     callback();
                 });
             } else {
+                // TODO: handle case with zero or multiple results
                 callback({});
             }
         });
@@ -77,8 +78,8 @@ module.exports = function (app, pg, processHandler) {
     // API Routes
     /////////////////////////////////////////////////////////////////////
 
-    require('./v1/v1.dataset.js')(app, pg, processHandler, sendToProcess);
-    require('./v1/v1.subset.js') (app, pg, processHandler, sendToProcess);
-    require('./v1/v1.method.js') (app, pg, processHandler, sendToProcess);
+    require('./v1/v1.dataset')(app, pg, processHandler, sendToProcess);
+    require('./v1/v1.subset') (app, pg, processHandler, sendToProcess);
+    require('./v1/v1.method') (app, pg, processHandler, sendToProcess);
 
 };
