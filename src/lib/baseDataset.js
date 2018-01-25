@@ -129,7 +129,7 @@ class BaseDataset {
      * @private
      */
     _prepareSchema(fields) {
-        let schema = require(`${__dirname}/../config/schema.json`);
+        let schema = require(`${__dirname}/../schemas/schema.json`);
         // filter out included fields
         const inFields = fields.filter(field => field.included);
 
