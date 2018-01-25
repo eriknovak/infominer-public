@@ -1,7 +1,7 @@
 // external modules
 const Validator = require('jsonschema').Validator;
 // internal modules
-// TODO: logger module
+const Logger = require('./loggingHandler')();
 
 /**
  * The JSON validator class.
@@ -18,7 +18,8 @@ class JsonValidator {
         self._validator = new Validator();
         // the json schemas used to validate
         self.schemas = params;
-
+        // create logger instance for validator
+        self.logger = Logger.createInstance('validation', 'info', 'validations');
     }
 
     /**
@@ -31,9 +32,8 @@ class JsonValidator {
         let self = this;
         let validation = self._validator.validate(object, schema);
         if (validation.errors.length) {
-            // TODO: validation found errors - log them
-            console.log(object);
-            console.log(validation.errors);
+            // log the validation errors
+            self.logger.warn('validator found errors', { object, errors: validation.errors });
             return false;
         } else {
             // validation found no errors -
