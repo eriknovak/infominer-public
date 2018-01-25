@@ -1,0 +1,19 @@
+{
+    "description": "The parameters specifically used to create the qminer database",
+    "oneOf": [{
+        "type": "array",
+        "items": {
+            "description": "The field parameters",
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string" },
+                "included": { "type": "boolean" }
+            },
+            "minItems": 1,
+            "required": ["name", "type", "included"]
+        }
+    },{
+        "type": "null"
+    }]
+}

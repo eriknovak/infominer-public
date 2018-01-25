@@ -1,0 +1,21 @@
+{
+    "description": "The query parameters used to filter the subset documents",
+    "type": "object",
+    "properties": {
+        "offset": { "type": ["integer", "null"] },
+        "limit":  { "type": ["integer", "null"] },
+        "page":   { "type": ["integer", "null"] },
+        "sort": {
+            "oneOf": [{
+                "type": "object",
+                "properties": {
+                    "field":    { "type": "string" },
+                    "sortType": { "constant": ["desc", "asc"] }
+                },
+                "required": ["field"]
+            }, {
+                "type": ["string", "null"]
+            }]
+        }
+    }
+}

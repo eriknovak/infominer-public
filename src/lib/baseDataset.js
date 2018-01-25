@@ -3,6 +3,21 @@ const qm = require('qminer');
 // internal modules
 const fileManager = require('./fileManager');
 
+const validator = require('./jsonValidator')({
+    // dataset schemas
+    constructorParams: require('../schemas/base_dataset/constructorParams'),
+    constructorFields: require('../schemas/base_dataset/constructorFields'),
+    constructorStore:  require('../schemas/base_dataset/constructorStore'),
+    editDatasetSchema: require('../schemas/base_dataset/editDatasetSchema'),
+
+    // subset schemas
+    getSubsetDocuments: require('../schemas/base_dataset/getSubsetDocuments'),
+
+    // methods schemas
+    featureSchema:      require('../schemas/base_dataset/featuresSchema'),
+    methodKMeansParams: require('../schemas/base_dataset/methodKMeansParams'),
+});
+
 /**
  * The dataset field used in QMiner database.
  * @typedef field_instance
@@ -22,19 +37,26 @@ class BaseDataset {
      * @param {Object} params - The construction parameters.
      * @param {String} params.dbPath - Path to data folder.
      * @param {String} params.mode - The mode in which the base is opened. Possible: 'open' and 'createClean'.
-     * @param {field_instance[]} [fields] - The fields of the dataset. Must have when `params.init.mode='createClean'`.
+     * @param {field_instance[]} [fields] - The fields of the dataset. Must have when `params.mode='createClean'`.
      * @constructor
      */
     constructor(params, fields) {
         let self = this;
 
-        self.params = params;
-        // TODO: handle parameter values
-        if (!self.params.dbPath) { throw new Error('FieldError: params.dbPath must be defined'); }
-        if (!self.params.mode) { throw new Error('FieldError: params.init.mode must be defined'); }
+        // validate constructor parameters
+        if (validator.validate(params, validator.schemas.constructorParams) &&
+            validator.validate(fields, validator.schemas.constructorFields)) {
+            // constructor parameters are valid - continue with database initialization
+            self.params = params;
+            // loads the base
+            self._loadBase(fields);
+        } else {
+            // constructor parameters mismatch - something went wrong
+            // TODO: log constructor schema mismatch
+            console.log('Constructor parameters are not in specified schema');
+            return { errors: { messages: 'Constructor parameters are not in specified schema' } };
 
-        // loads the base
-        self._loadBase(fields);
+        }
     }
 
     /**
@@ -53,19 +75,27 @@ class BaseDataset {
             // get the schema for database
             const schema = self._prepareSchema(fields);
 
-            // create new database
-            self.base = new qm.Base({
-                mode: self.params.mode,
-                dbPath: self.params.dbPath,
-                schema
-            });
-
+            // validate first item in schema - the one created by the user
+            if (validator.validate(schema[0], validator.schemas.constructorStore)) {
+                // schema is in valid form - continue with database creation
+                self.base = new qm.Base({
+                    mode: self.params.mode,
+                    dbPath: self.params.dbPath,
+                    schema
+                });
+            } else {
+                // schema parameters mismatch - something went wrong
+                // TODO: log subsetInformation schema mismatch
+                console.log('Schema parameters are not in specified form');
+                return { errors: { messages: '_loadBase: Schema parameters are not in specified form' } };
+            }
         } else if (self.params.mode === 'open') {
             // open database and prepare it for analysis
             self.base = new qm.Base({ mode: self.params.mode, dbPath: self.params.dbPath });
         } else {
             // TODO: handle non-supported mode
-            throw new Error('FieldError: params.init.mode must be "createClean", "open" or "openReadOnly"');
+            console.log('Constructor parameters are not in specified schema');
+            return { errors: { messages: '_loadBase: self.params.mode must be "createClean" or "open"' } };
         }
     }
 
@@ -105,7 +135,6 @@ class BaseDataset {
 
         // prepare the dataset fields
         const datasetFields = inFields.map(field => ({ name: field.name, type: field.type, null: true }));
-        // TODO: check fields schema
 
         // replace the schema fields
         schema[0].fields = datasetFields;
@@ -118,7 +147,6 @@ class BaseDataset {
                 datasetKeys.push({ field: field.name, type: 'text' });
             }
         }
-        // TODO: check keys schema
 
         // add keys to the schema
         if (datasetKeys.length) { schema[0].keys = datasetKeys; }
@@ -133,7 +161,7 @@ class BaseDataset {
      * @param {Object} dataset - Dataset information.
      * @returns {Object} Object containing the subset id.
      */
-    pushDocsToBase(filePath, fields) {
+    pushDocuments(filePath, fields) {
         let self = this;
         // check required parameters
         if (!filePath) { throw new Error('FieldError: filePath must be defined'); }
@@ -161,6 +189,7 @@ class BaseDataset {
             description: 'The root subset. Contains all records of dataset.',
             documents: self.base.store('Dataset').allRecords.map(rec => rec.$id)
         };
+        // return subset object
         return self.createSubset(subset);
     }
 
@@ -208,11 +237,11 @@ class BaseDataset {
      * Gets the dataset info with the subsets.
      * @returns {Object} The object containing the dataset and subset info.
      */
-    getDatasetInfo() {
+    getDatasetInformation() {
         let self = this;
         // get all subsets
-        let { subsets } = self.getSubsetInfo();
-        let { methods } = self.getMethodInfo();
+        let { subsets } = self.getSubsetInformation();
+        let { methods } = self.getMethodInformation();
 
         // prepare response object
         let jsonResults = {
@@ -228,13 +257,24 @@ class BaseDataset {
      * Set the dataset info.
      * @returns {Object} The dataset data info.
      */
-    editDatasetInfo(datasetInfo) {
+    editDatasetInformation(datasetInformation) {
         let self = this;
-        // TODO: check datasetInfo schema
 
-        // update database parameter values
-        if (typeof datasetInfo.label === 'string') { self.params.label = datasetInfo.label; }
-        if (typeof datasetInfo.description === 'string') { self.params.description = datasetInfo.description; }
+        // validate input parameter schema
+        if (!validator.validate(datasetInformation, validator.schemas.editDatasetSchema)) {
+            // TODO: log subsetInformation schema mismatch
+            // input parameter is not in correct format - return Error
+            return { error: { message: 'Edit parameters are in incorrect format' } };
+        }
+
+        if (datasetInformation.label) {
+            // update dataset label
+            self.params.label = datasetInformation.label;
+        }
+        if (datasetInformation.description) {
+            // update dataset description
+            self.params.description = datasetInformation.description;
+        }
 
         // return the new dataset info
         return { datasets: self._formatDatasetInfo() };
@@ -244,7 +284,7 @@ class BaseDataset {
      * Gets information about the subsets in the database.
      * @returns {Object} An array of subset representation objects.
      */
-    getSubsetInfo(id) {
+    getSubsetInformation(id) {
         let self = this;
         // get database subsets
         let subsets = self.base.store('Subsets');
@@ -331,17 +371,26 @@ class BaseDataset {
      * @param {String} subsetInfo.label - The new subset label.
      * @param {String} [subsetInfo.description] - The new subset description.
      */
-    editSubsetInfo(sInfo) {
+    editSubsetInformation(subsetInformation) {
         let self = this;
-        // TODO: check subsetInfo schema
+        // validate input parameter schema
+        if (!validator.validate(subsetInformation, validator.schemas.editDatasetSchema)) {
+            // TODO: log subsetInformation schema mismatch
+            // input parameter is not in correct format - return Error
+            return { error: { message: 'Edit parameters are in incorrect format' } };
+        }
 
         // get subset info and update state
-        let subset = self.base.store('Subsets')[sInfo.subsetId];
+        let subset = self.base.store('Subsets')[subsetInformation.subsetId];
 
         // update the subset label and description
-        if (typeof sInfo.label === 'string') { subset.label = sInfo.label; }
-        if (typeof sInfo.description === 'string' || sInfo.description === null) {
-            subset.description = sInfo.description;
+        if (subsetInformation.label) {
+            // update the subset label
+            subset.label = subsetInformation.label;
+        }
+        if (subsetInformation.description || subsetInformation.description === null) {
+            // update the subset description
+            subset.description = subsetInformation.description;
         }
 
         // return the subset information
@@ -362,14 +411,21 @@ class BaseDataset {
      * @returns {Object} The object containing the documents and it's metadata.
      */
     getSubsetDocuments(id, query) {
-        // TODO: log activity
         let self = this;
         // get database subsets
         let subsets = self.base.store('Subsets');
         if (id < 0 || subsets.length <= id) {
-            // TODO: handle this error
-            return null;
+            // TODO: log error
+            return { errors: { message: 'The subset id does not match with any existing subsets' } };
         }
+
+        // validate query parameters
+        if (!validator.validate(query, validator.schemas.getSubsetDocuments)) {
+            // TODO: log query schema mismatch
+            // query parameters does not match schema
+            return { errors: { message: 'The query parameters for document retrieval are invalid' } };
+        }
+
         // prepare the query parameters
         let offset = query.offset ? query.offset : 0;
         let limit = query.limit ? query.limit : 10;
@@ -444,7 +500,7 @@ class BaseDataset {
      * Gets information about the methods in the database.
      * @returns {Object} An object containing the array of method representation objects.
      */
-    getMethodInfo(id) {
+    getMethodInformation(id) {
         // TODO: log activity
         let self = this;
         // get database methods
@@ -455,7 +511,7 @@ class BaseDataset {
             // validate id
             if (id < 0 || methods.length <= id) {
                 // TODO: handle this error
-                return null;
+                return { errors: { message: 'The method id does not match with any existing methods' } };
             }
             // get one method and format it
             let set = methods[id];
@@ -505,15 +561,23 @@ class BaseDataset {
         // get subset on which the method was used
         let subset = self.base.store('Subsets')[method.appliedOn];
         if (subset) {
-            // TODO: run method analysis based on it's type
+
             switch(qMethod.type) {
             case 'clustering.kmeans':
                 self._clusterKMeans(qMethod, subset);
                 break;
             }
-            return self._saveMethod(qMethod, subset);
+
+            // check if qMethod is an error
+            if (qMethod instanceof Error) {
+                // something went wrong return an error
+                throw { errors: { message: 'createMethod: cannot initialize method - invalid method parameters' } };
+            } else {
+                // everything is fine - continue with saving method
+                return self._saveMethod(qMethod, subset);
+            }
         } else {
-            throw new Error(`No subset with id=${method.appliedOn}`);
+            return { errors: { message: `createMethod: No subset with id=${method.appliedOn}` } };
         }
     }
 
@@ -554,7 +618,7 @@ class BaseDataset {
             return self.createMethod(qMethod);
 
         } else {
-            return null;
+            return { errors: { message: `aggregateSubset: No subset with id=${subsetId}` } };
         }
     }
 
@@ -580,7 +644,7 @@ class BaseDataset {
     _formatDatasetInfo() {
         let self = this;
         //  get subset info
-        let { subsets } = self.getSubsetInfo();
+        let { subsets } = self.getSubsetInformation();
         // subset ids used in the dataset info
         let subsetIds = subsets.map(set => set.id);
 
@@ -669,12 +733,14 @@ class BaseDataset {
      * @private
      */
     _formatKMeansResult(result) {
-        return { clusters: result.clusters.map(cluster => ({
-            documentCount: cluster.docIds.length,
-            aggregates: cluster.aggregates,
-            subsetCreated: cluster.subsetCreated,
-            subsetId: cluster.subsetId
-        }))};
+        return {
+            clusters: result.clusters.map(cluster => ({
+                documentCount: cluster.docIds.length,
+                aggregates: cluster.aggregates,
+                subsetCreated: cluster.subsetCreated,
+                subsetId: cluster.subsetId
+            }))
+        };
     }
 
     /**
@@ -712,7 +778,21 @@ class BaseDataset {
         let self = this;
         // create a feature space
         let features = qMethod.parameters.features;
-        features.forEach(feature => { feature.source='Dataset'; });
+        features.forEach(feature => { feature.source = 'Dataset'; });
+
+
+        /////////////////////////////////////////
+        // Validate features object
+        /////////////////////////////////////////
+        if (!self._featuresValidation(features)) {
+            // features object is not in correct schema - set qMethod
+            // TODO: log features schema mismatch
+            // to Error and exit this function
+            qMethod = new Error('Features are not in correct schema');
+            return;
+        }
+
+        // create the feature space using the validated features object
         let featureSpace = self._createFeatureSpace(features);
 
         // get subset elements and update the feature space
@@ -726,6 +806,20 @@ class BaseDataset {
         let methodParams = qMethod.parameters.method;
         // don't allow empty clusters
         methodParams.allowEmpty = false;
+
+
+        /////////////////////////////////////////
+        // Validate KMeans parameter
+        /////////////////////////////////////////
+        if (!validator.validate(methodParams, validator.schemas.methodKMeansParams)) {
+            // TODO: log methodParams schema mismatch
+            // method parameters are not in correct schema - set qMethod
+            // to Error and exist this function
+            qMethod = new Error('KMeans parameters are not in correct schema');
+            return;
+        }
+
+        // create kmeans model and feed it the sparse document matrix
         let KMeans = new qm.analytics.KMeans(methodParams);
         KMeans.fit(spMatrix);
 
@@ -761,6 +855,14 @@ class BaseDataset {
                 qMethod.result.clusters[i].aggregates.push({ field: field.name, type, distribution });
             }
         }
+    }
+
+    /**
+     * Validates the `features` object.
+     * @param {Object} features - The features used to fill the feature space.
+     */
+    _featuresValidation(features) {
+        return validator.validate(features, validator.schemas.featureSchema);
     }
 
 }

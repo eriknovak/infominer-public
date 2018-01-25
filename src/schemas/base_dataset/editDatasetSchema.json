@@ -1,0 +1,8 @@
+{
+    "description": "The dataset edit schema",
+    "type": "object",
+    "properties": {
+        "label": { "type": "string" },
+        "description": { "type": ["string", "null"] }
+    }
+}

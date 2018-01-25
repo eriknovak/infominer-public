@@ -1,0 +1,15 @@
+{
+    "description": "The parameters specifically used to create or open the qminer database",
+    "type": "object",
+    "properties": {
+        "datasetId": { "type": "integer" },
+        "label": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "created": { "type": "string" },
+        "mode": {
+            "constant": ["createClean", "open"]
+        },
+        "dbPath": { "type": "string" }
+    },
+    "required": ["datasetId", "label", "created", "mode", "dbPath"]
+}

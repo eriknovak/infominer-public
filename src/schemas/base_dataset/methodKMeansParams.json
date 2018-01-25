@@ -1,0 +1,9 @@
+{
+    "description": "The KMeans parameters schema",
+    "type": "object",
+    "properties": {
+        "k": { "type": "integer", "minimum": 2 },
+        "distanceType": { "constant": ["Euclid", "cos"] },
+        "allowEmpty": { "constant": false }
+    }
+}

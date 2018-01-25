@@ -1,0 +1,52 @@
+{
+    "description": "The schema defining the database structure",
+    "type": "object",
+    "properties": {
+        "name": { "constant": "Dataset" },
+        "fields": {
+            "desciption": "The fields in the qminer database - defining each document",
+            "type": "array",
+            "items": {
+                "description": "The qminer field parameters",
+                "properties": {
+                    "name": { "type": "string" },
+                    "type": { "constant": ["string", "float"] },
+                    "null": { "constant": true }
+                },
+                "minItems": 1,
+                "required": ["name", "type", "null"]
+            }
+        },
+        "joins": {
+            "description": "The joins to other stores",
+            "type": "array",
+            "items": {
+                "description": "The qminer field parameters",
+                "properties": {
+                    "name":    { "contant": "inSubsets" },
+                    "type":    { "constant": "index" },
+                    "store":   { "constant": "Subsets" },
+                    "inverse": { "constant": "hasElements" }
+                },
+                "minItems": 1,
+                "maxItems": 1,
+                "required": ["name", "type", "store", "inverse"],
+                "additionalItems": false
+            }
+        },
+        "keys": {
+            "desciption": "The keys used to index documents in qminer database",
+            "type": "array",
+            "items": {
+                "description": "The qminer keys parameters",
+                "properties": {
+                    "field": { "type": "string" },
+                    "type": { "constant": ["text"] }
+                },
+                "minItems": 1,
+                "required": ["field", "type"]
+            }
+        }
+    },
+    "required": ["name", "fields", "joins"]
+}

@@ -1,0 +1,28 @@
+{
+    "description": "The features object",
+    "type": "array",
+    "items": {
+        "anyOf": [{
+            "description": "The text feature space",
+            "type": "object",
+            "properties": {
+                "source": { "constant": "Dataset" },
+                "type": { "contant": "text" },
+                "field": { "type": "string" },
+                "normalize": { "contant": [true, false] },
+                "weight": { "constant": ["none", "tf", "idf", "tfidf"] }
+            },
+            "required": ["source", "type", "field"]
+        }, {
+            "type": "object",
+            "properties": {
+                "source": { "constant": "Dataset" },
+                "type": { "constant": "numeric" },
+                "field": { "type": "string" },
+                "normalize": { "constant": ["none", "scale", "var"] }
+            },
+            "required": ["source", "type", "field"]
+        }]
+
+    }
+}
