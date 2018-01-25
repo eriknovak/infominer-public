@@ -52,7 +52,6 @@ class BaseDataset {
             self._loadBase(fields);
         } else {
             // constructor parameters mismatch - something went wrong
-            // TODO: log constructor schema mismatch
             console.log('Constructor parameters are not in specified schema');
             return { errors: { messages: 'Constructor parameters are not in specified schema' } };
 
@@ -85,7 +84,6 @@ class BaseDataset {
                 });
             } else {
                 // schema parameters mismatch - something went wrong
-                // TODO: log subsetInformation schema mismatch
                 console.log('Schema parameters are not in specified form');
                 return { errors: { messages: '_loadBase: Schema parameters are not in specified form' } };
             }
@@ -262,7 +260,6 @@ class BaseDataset {
 
         // validate input parameter schema
         if (!validator.validate(datasetInformation, validator.schemas.editDatasetSchema)) {
-            // TODO: log subsetInformation schema mismatch
             // input parameter is not in correct format - return Error
             return { error: { message: 'Edit parameters are in incorrect format' } };
         }
@@ -375,7 +372,6 @@ class BaseDataset {
         let self = this;
         // validate input parameter schema
         if (!validator.validate(subsetInformation, validator.schemas.editDatasetSchema)) {
-            // TODO: log subsetInformation schema mismatch
             // input parameter is not in correct format - return Error
             return { error: { message: 'Edit parameters are in incorrect format' } };
         }
@@ -421,7 +417,6 @@ class BaseDataset {
 
         // validate query parameters
         if (!validator.validate(query, validator.schemas.getSubsetDocuments)) {
-            // TODO: log query schema mismatch
             // query parameters does not match schema
             return { errors: { message: 'The query parameters for document retrieval are invalid' } };
         }
@@ -786,7 +781,6 @@ class BaseDataset {
         /////////////////////////////////////////
         if (!self._featuresValidation(features)) {
             // features object is not in correct schema - set qMethod
-            // TODO: log features schema mismatch
             // to Error and exit this function
             qMethod = new Error('Features are not in correct schema');
             return;
@@ -812,7 +806,6 @@ class BaseDataset {
         // Validate KMeans parameter
         /////////////////////////////////////////
         if (!validator.validate(methodParams, validator.schemas.methodKMeansParams)) {
-            // TODO: log methodParams schema mismatch
             // method parameters are not in correct schema - set qMethod
             // to Error and exist this function
             qMethod = new Error('KMeans parameters are not in correct schema');
