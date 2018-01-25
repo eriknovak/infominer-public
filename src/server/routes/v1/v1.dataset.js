@@ -1,7 +1,6 @@
 // external modules
 const multer = require('multer'); // accepting files from client
 const path = require('path');
-
 const qm = require('qminer');
 
 // internal modules
@@ -34,13 +33,14 @@ const storage = multer.diskStorage({
  * @param {Object} processHandler - Child process container.
  * @param {Object} sendToProcess - Function handling the process dynamic.
  */
-module.exports = function (app, pg, processHandler, sendToProcess) {
+module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
     /**
      * gets all user defined datasets
      */
     app.get('/api/datasets', (req, res) => {
-        // TODO: log calling this route
+        // log user request to get upload datasets information
+        logger.info('user requests for datasets', { method: req.method, url: req.originalUrl });
 
         // TODO: get username of creator and handle empty user
         // TODO: get user from the login parameters (passport.js - future work)
@@ -48,6 +48,7 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // get user datasets
         pg.select({ owner }, 'datasets', (err, results) => {
             if (err) {
+                logger.error('postgres returned an error', { owner, error: err.message });
                 return res.send({ errors: { msg: err.message } });
             }
             // create JSON API data

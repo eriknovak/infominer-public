@@ -1,3 +1,9 @@
+// internal modules
+const Logger = require('../../lib/loggingHandler')();
+
+// create a logger instance for logging API requests
+const logger = Logger.createInstance('api_requests', 'info', 'api');
+
 /**
  * Adds api routes to express  app.
  * @param {Object} app - Express app.
@@ -78,8 +84,8 @@ module.exports = function (app, pg, processHandler) {
     // API Routes
     /////////////////////////////////////////////////////////////////////
 
-    require('./v1/v1.dataset')(app, pg, processHandler, sendToProcess);
-    require('./v1/v1.subset') (app, pg, processHandler, sendToProcess);
-    require('./v1/v1.method') (app, pg, processHandler, sendToProcess);
+    require('./v1/v1.dataset')(app, pg, processHandler, sendToProcess, logger);
+    require('./v1/v1.subset') (app, pg, processHandler, sendToProcess, logger);
+    require('./v1/v1.method') (app, pg, processHandler, sendToProcess, logger);
 
 };
