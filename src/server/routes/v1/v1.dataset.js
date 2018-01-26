@@ -46,10 +46,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // TODO: get user from the login parameters (passport.js - future work)
         const owner = req.user ? req.user.id : 'user';
         // get user datasets
-        pg.select({ owner }, 'datasets', (err, results) => {
-            if (err) {
-                logger.error('postgres returned an error', { owner, error: err.message });
-                return res.send({ errors: { msg: err.message } });
+        pg.select({ owner }, 'datasets', (error, results) => {
+            if (error) {
+                // log postgres error
+                logger.error('error [postgres]: selecting datasets',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
+                return res.send({ errors: { msg: error.message } });
             }
             // create JSON API data
             let datasets = results.map(rec => {
@@ -77,8 +81,11 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // upload the dataset file
         upload(req, res, function (error) {
             if (error) {
-                // TODO: handle error
-                console.log(error);
+                // log multer error
+                logger.error('error [multer]: uploading file',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
 
@@ -91,11 +98,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             const owner = req.user ? req.user.id : 'user'; // temporary placeholder
 
             // insert temporary file
-            pg.insert({ owner, filepath: file.path, filename: file.filename }, 'tempDatasets', (err) => {
-                if (err) {
-                    // TODO: log error
-                    console.log(err.message);
-                    return res.send({ errors: { msg: err.message } });
+            pg.insert({ owner, filepath: file.path, filename: file.filename }, 'tempDatasets', (xerror) => {
+                if (xerror) {
+                    // log postgres error
+                    logger.error('error [postgres]: inserting temporary dataset file',
+                        logger.formatRequest(req, { error: xerror.message })
+                    );
+                    // send error object to user
+                    return res.send({ errors: { msg: xerror.message } });
                 }
 
                 // get dataset information
@@ -156,7 +166,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
     app.post('/api/datasets', (req, res) => {
         // log user request to get upload datasets information
-        logger.info('user created a new dataset', logger.formatRequest(req));
+        logger.info('user submited data for new dataset', logger.formatRequest(req));
 
         // get dataset info
         let { dataset, fields } = req.body;
@@ -168,11 +178,16 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         const owner = req.user ? req.user.id : 'user'; // temporary placeholder
 
         // get number of datasets the users already has
-        pg.select({ owner }, 'datasets', (err, results) => {
-            if (err) {
-                // TODO: handle error
-                console.log(err); return res.end();
+        pg.select({ owner }, 'datasets', (error, results) => {
+            if (error) {
+                // log postgres error
+                logger.error('error [postgres]: selecting user datasets',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
+                return res.send({ errors: { msg: error.message } });
             }
+
             // number of datasets is the name of the new dataset folder
             const dbFolder = results.length ? results[results.length-1].id : 0;
 
@@ -185,28 +200,35 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             fileManager.createDirectoryPath(dbPath);
 
             // get temporary file
-            pg.select({ owner, filename: dataset.filename }, 'tempDatasets', (xerr, results) => {
-                // if error notify user
-                if (xerr) {
-                    // TODO: log error
-                    console.log(xerr.message);
-                    return res.send({ errors: { msg: xerr.message } });
+            pg.select({ owner, filename: dataset.filename }, 'tempDatasets', (xerror, results) => {
+                if (xerror) {
+                    // log postgres error
+                    logger.error('error [postgres]: selecting user temporary file',
+                        logger.formatRequest(req, { error: xerror.message })
+                    );
+                    // send error object to user
+                    return res.send({ errors: { msg: xerror.message } });
                 }
                 if (results.length !== 1) {
-                    // TODO: log error
-                    console.log('found multiple temporary datasets with', dataset.filename);
-                    return res.send({ errors: { msg: 'found multiple temporary datasets with ' + dataset.filename } });
+                    // log finding multiple results in postgres
+                    logger.error('error [postgres]: multiple files with same name found',
+                        logger.formatRequest(req, { error: 'multiple files found, unable to determine which is required' })
+                    );
+                    // send error object to user
+                    return res.send({ errors: { msg: 'found multiple temporary datasets with name=' + dataset.filename } });
                 }
                 // save temporary dataset file information
                 let tempDataset = results[0];
 
                 // insert dataset value
-                pg.insert({ owner, label, description, dbPath }, 'datasets', (xerr, results) => {
-                    // if error notify user
-                    if (xerr) {
-                        // TODO: log error
-                        console.log(xerr.message);
-                        return res.send({ errors: { msg: xerr.message } });
+                pg.insert({ owner, label, description, dbPath }, 'datasets', (yerror, results) => {
+                    if (yerror) {
+                        // log error when inserting dataset info
+                        logger.error('error [postgres]: inserting dataset info',
+                            logger.formatRequest(req, { error: xerror.message })
+                        );
+                        // send error object to user
+                        return res.send({ errors: { msg: yerror.message } });
                     }
 
                     // initiate child process
@@ -234,21 +256,41 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         }
                     };
                     // create dataset
-                    processHandler.sendAndWait(datasetId, body, function (error) {
-                        if (error) {
-                            // TODO: handle error
-                            console.log('Error', error.message);
+                    processHandler.sendAndWait(datasetId, body, function (zerror) {
+                        if (zerror) {
+                            // log error when inserting dataset info
+                            logger.error('error [node_process]: creating dataset',
+                                logger.formatRequest(req, { error: zerror.message })
+                            );
+                            // delete dataset instance in postgres
                             pg.delete({ id: datasetId, owner }, 'datasets');
                         } else {
+                            // log user request to get upload datasets information
+                            logger.info('user created new dataset',
+                                logger.formatRequest(req, { datasetId: datasetId })
+                            );
+                            // update dataset - it has been loaded
                             pg.update({ loaded: true }, { id: datasetId }, 'datasets');
                         }
-
-                        pg.delete({ id: tempDataset.id, owner }, 'tempDatasets', function (error) {
-                            if (error) {
-                                // TODO: handle error
+                        // delete the temporary file from postgres
+                        pg.delete({ id: tempDataset.id, owner }, 'tempDatasets', function (xxerror) {
+                            if (xxerror) {
+                                // log error on deleting temporary file from postgres
+                                logger.error('error [postgres]: delete temporary dataset file',
+                                    logger.formatRequest(req, { error: xxerror.message })
+                                );
                             }
-                            // remove the temporary file
-                            fileManager.removeFile(tempDataset.filepath);
+
+                            try {
+                                // remove the temporary file
+                                fileManager.removeFile(tempDataset.filepath);
+                            } catch (yyerror) {
+                                // log error on deleting temporary file
+                                logger.error('error [file_manager]: delete temporary dataset file',
+                                    logger.formatRequest(req, { error: xxerror.message })
+                                );
+                            }
+
                         });
                     }); // processHandler.sendAndWait()
 
@@ -275,8 +317,11 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('GET datasets/:datasets_id', error.message);
+                // log error when inserting dataset info
+                logger.error('error [node_process]: getting dataset',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
             return res.send(results);
@@ -306,18 +351,24 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // update the postgres dataset
         pg.update({ label, description }, { id: datasetId }, 'datasets', function (error) {
             if (error) {
-                // TODO: log error
-                console.log('PUT datasets/:datasets_id', error.message);
+                // log error on deleting temporary file from postgres
+                logger.error('error [postgres]: updating dataset info',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
 
             // make update on the process
             let body = { cmd: 'edit_dataset', content: { label, description } };
-            sendToProcess(datasetId, owner, body, function (error, results) {
+            sendToProcess(datasetId, owner, body, function (xerror, results) {
                 // if error notify user
-                if (error) {
-                    // TODO: log error
-                    console.log('PUT datasets/:datasets_id', error.message);
+                if (xerror) {
+                    // log error when inserting dataset info
+                    logger.error('error [node_process]: updating dataset',
+                        logger.formatRequest(req, { error: xerror.message })
+                    );
+                    // send error object to user
                     return res.send({ errors: { msg: error.message } });
                 }
                 return res.send(results);
@@ -346,8 +397,10 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // remove dataset from 'dataset' table
             pg.delete({ id: datasetId, owner }, 'datasets', function (error) {
                 if (error) {
-                    // TODO: handle error
-                    console.log('DELETE datasets/:datasets_id', error.message);
+                    // log error on deleting temporary file from postgres
+                    logger.error('error [postgres]: deleting dataset info',
+                        logger.formatRequest(req, { error: error.message })
+                    );
                 }
                 // return the process
                 res.send({});
@@ -355,7 +408,13 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // shutdown process
                 let body = { cmd: 'shutdown' };
                 // send the request to the process
-                processHandler.sendAndWait(datasetId, body, function (error, dbPath) {
+                processHandler.sendAndWait(datasetId, body, function (xerror, dbPath) {
+                    if (xerror) {
+                        // log error when inserting dataset info
+                        logger.error('error [node_process]: shutdown process',
+                            logger.formatRequest(req, { error: xerror.message })
+                        );
+                    }
                     // delete dataset folder
                     if (dbPath) { fileManager.removeFolder(dbPath); }
                 });
@@ -365,24 +424,41 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // get the dataset information
             pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
                 // TODO: handle error
-                if (error) { console.log('DELETE datasets/:datasets_id', error.message); }
-
-                if (results.length === 1) {
-                    let dataset = results[0];
-
-                    // process is already stopped - just delete from table and remove folder
-                    pg.delete({ id: datasetId, owner }, 'datasets', function (xerror) {
-                        // TODO: handle error
-                        if (xerror) { console.log('DELETE datasets/:datasets_id', xerror.message); }
-                        // return the process
-                        res.send({});
-
-                        // delete dataset folder
-                        if (dataset.dbPath) { fileManager.removeFolder(dataset.dbPath); }
-                    }); // pg.delete({ id, owner }, 'datasets')
-                } else {
-                    // TODO: handle unexisting or multiple datasets
+                if (error) {
+                    // log error on deleting temporary file from postgres
+                    logger.error('error [postgres]: selecting dataset',
+                        logger.formatRequest(req, { error: error.message })
+                    );
                 }
+                if (results.length !== 1) {
+                    // log finding multiple results in postgres
+                    logger.error('error [postgres]: multiple files with same id found',
+                        logger.formatRequest(req, { error: 'multiple dataset with same id found' })
+                    );
+                }
+                let dataset = results[0];
+
+                // process is already stopped - just delete from table and remove folder
+                pg.delete({ id: datasetId, owner }, 'datasets', function (xerror) {
+                    if (xerror) {
+                        // log postgres error
+                        logger.error('error [postgres]: delete dataset',
+                            logger.formatRequest(req, { error: xerror.message })
+                        );
+                    }
+                    // return the process
+                    res.send({});
+
+                    // delete dataset folder
+                    try {
+                        if (dataset.dbPath) { fileManager.removeFolder(dataset.dbPath); }
+                    } catch (yerror) {
+                        // log error on deleting temporary file
+                        logger.error('error [file_manager]: remove folder containing dataset',
+                            logger.formatRequest(req, { error: yerror.message })
+                        );
+                    }
+                }); // pg.delete({ id, owner }, 'datasets')
             }); // pg.select({ id, owner }, 'datasets')
         }
     }); // GET /api/datasets/:dataset_id
@@ -393,30 +469,37 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
-        // TODO: log calling this route
 
         // TODO: get username of creator and handle empty user
-        // TODO: get user from the login parameters (passport.js - future work)
         const owner = req.user ? req.user.id : 'user';
-        // get user datasets
-        pg.select({ id: datasetId, owner }, 'datasets', (err, results) => {
-            // TODO: log error
-            if (err) { return res.send({ errors: { msg: err.message } }); }
-
-            if (results.length === 1) {
-                // there are only one record with that id
-                let rec = results[0];
-                let datasets = {
-                    id: rec.id,
-                    label: rec.label,
-                    created: rec.created,
-                    loaded: rec.loaded
-                };
-                // return the data
-                return res.send(datasets);
-            } else {
-                return res.send({});
+        pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
+            if (error) {
+                // log postgres error
+                logger.error('error [postgres]: selecting dataset',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                return res.send({ errors: { msg: error.message } });
             }
+
+            if (results.length !== 1) {
+                // log finding multiple results in postgres
+                logger.error('error [postgres]: multiple files with same id found',
+                    logger.formatRequest(req, { error: 'multiple dataset with same id found' })
+                );
+                return res.send({ errors: { msg: 'found multiple datasets with same id' } });
+            }
+
+            // there are only one record with that id
+            let rec = results[0];
+            let datasets = {
+                id: rec.id,
+                label: rec.label,
+                created: rec.created,
+                loaded: rec.loaded
+            };
+            // return the data
+            return res.send(datasets);
+
         }); // pg.select({ owner }, 'datasets')
     }); // GET /api/datasets/:dataset_id/check
 };
