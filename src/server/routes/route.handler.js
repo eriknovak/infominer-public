@@ -49,34 +49,33 @@ module.exports = function (app, pg, processHandler) {
         // get the dataset information
         pg.select({ id: childId, owner }, 'datasets', (err, results) => {
             if (err) {
-                // TODO: log error
+                // exit - error occured in postgres
                 return callback(err);
-            } else if (results.length === 1) {
-                let datasetInfo = results[0];
-                // initiate child process
-                processHandler.createChild(childId);
-                // open dataset in child process
-                let openParams = {
-                    cmd: 'open_dataset',
-                    content: {
-                        params: {
-                            datasetId: childId,
-                            label: datasetInfo.label,
-                            description: datasetInfo.description,
-                            created: datasetInfo.created,
-                            mode: 'open',
-                            dbPath: datasetInfo.dbpath
-                        }
-                    }
-                };
-                processHandler.sendAndWait(childId, openParams, function (xerr) {
-                    if (xerr) { return callback(xerr); }
-                    callback();
-                });
-            } else {
-                // TODO: handle case with zero or multiple results
-                callback({});
+            } else if (results.length !== 1) {
+                // exit - more or none results have been found
+                return callback(new Error('Multiple or none results found: ' + results.length));
             }
+            let datasetInfo = results[0];
+            // initiate child process
+            processHandler.createChild(childId);
+            // open dataset in child process
+            let openParams = {
+                cmd: 'open_dataset',
+                content: {
+                    params: {
+                        datasetId: childId,
+                        label: datasetInfo.label,
+                        description: datasetInfo.description,
+                        created: datasetInfo.created,
+                        mode: 'open',
+                        dbPath: datasetInfo.dbpath
+                    }
+                }
+            };
+            processHandler.sendAndWait(childId, openParams, function (xerr) {
+                if (xerr) { return callback(xerr); }
+                return callback();
+            });
         });
     }
 
@@ -84,6 +83,7 @@ module.exports = function (app, pg, processHandler) {
     // API Routes
     /////////////////////////////////////////////////////////////////////
 
+    // TODO: add user authentication validator
     require('./v1/v1.dataset')(app, pg, processHandler, sendToProcess, logger);
     require('./v1/v1.subset') (app, pg, processHandler, sendToProcess, logger);
     require('./v1/v1.method') (app, pg, processHandler, sendToProcess, logger);
