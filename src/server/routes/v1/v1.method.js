@@ -5,35 +5,52 @@
  * @param {Object} processHandler - Child process container.
  * @param {Object} sendToProcess - Function handling the process dynamic.
  */
-module.exports = function (app, pg, processHandler, sendToProcess) {
+module.exports = function (app, pg, processHandler, sendToProcess, logger) {
+
     /**
-     * Get dataset methods
+     * GET all methods of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id/methods', (req, res) => {
+        // log user request
+        logger.info('user requested for all methods',
+            logger.formatRequest(req)
+        );
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+
         // get the user
         let owner = req.user ? req.user.id : 'user';
 
         // set the body info
         let body = { cmd: 'get_method' };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('GET datasets/:datasets_id/methods', error.message);
+                // log error on getting subsets info
+                logger.error('error [node_process]: user request for all methods failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request for all methods successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
 
     }); // GET /api/datasets/:dataset_id/methods
 
     /**
-     * get subset info of dataset with id=dataset_id and subset_id=subset_id
+     * GET method of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id/methods/:method_id', (req, res) => {
+        // log user request
+        logger.info('user requested for method',
+            logger.formatRequest(req)
+        );
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
@@ -45,12 +62,19 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // set the body info
         let body = { cmd: 'get_method', content: { methodId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('GET datasets/:datasets_id/methods/:method_id', error.message);
+                // log error on creating subset
+                logger.error('error [node_process]: user request for method failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request for method successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
 
@@ -60,11 +84,18 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
      * POST a new method to the database
      */
     app.post('/api/datasets/:dataset_id/methods', (req, res) => {
+        // log user request
+        logger.info('user requested to create new method',
+            logger.formatRequest(req)
+        );
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+
         // get the user
         let owner = req.user ? req.user.id : 'user';
 
+        // get method information
         let { method } = req.body;
 
         // change the method type
@@ -74,12 +105,19 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // set the body info
         let body = { cmd: 'create_method', content: { method } };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('POST datasets/:datasets_id/methods', error.message);
+                // log error on creating method
+                logger.error('error [node_process]: user request to create new method failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request to create new method successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
 

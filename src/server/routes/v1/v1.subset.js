@@ -5,26 +5,39 @@
  * @param {Object} processHandler - Child process container.
  * @param {Object} sendToProcess - Function handling the process dynamic.
  */
-module.exports = function (app, pg, processHandler, sendToProcess) {
+module.exports = function (app, pg, processHandler, sendToProcess, logger) {
+
     /**
-     * get ALL subsets info of dataset with id=dataset_id
+     * GET all subsets of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id/subsets', (req, res) => {
+        // log user request
+        logger.info('user requested for all subsets',
+            logger.formatRequest(req)
+        );
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+
         // get the user
         let owner = req.user ? req.user.id : 'user';
 
         // set the body info
         let body = { cmd: 'get_subset' };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('GET datasets/:datasets_id/subsets', error.message);
+                // log error on getting subsets
+                logger.error('error [node_process]: user request for all subsets failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request for all subsets successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets
@@ -33,30 +46,46 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
      * POST a new subset to the databse
      */
     app.post('/api/datasets/:dataset_id/subsets', (req, res) => {
+        // log user request
+        logger.info('user requested to create new subset',
+            logger.formatRequest(req)
+        );
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
         let owner = req.user ? req.user.id : 'user';
-
+        // get data about the new subset
         const { subset } = req.body;
 
         // set the body info
         let body = { cmd: 'create_subset', content: { subset } };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('POST datasets/:datasets_id/subsets', error.message);
+                // log error on creating subset
+                logger.error('error [node_process]: user request to create new subset failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request to create new subset successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
     }); // POST /api/datasets/:dataset_id/subsets
 
     /**
-     * get subset info of dataset with id=dataset_id and subset_id=subset_id
+     * GET subset of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
+        // log user request
+        logger.info('user requested for subset',
+            logger.formatRequest(req)
+        );
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
@@ -67,20 +96,31 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // set the body info
         let body = { cmd: 'get_subset', content: { subsetId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('GET datasets/:datasets_id/subsets/:subset_id', error.message);
+                // log error on getting subset
+                logger.error('error [node_process]: user request for subset failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request for subset successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id
 
     /**
-     * get subset info of dataset with id=dataset_id and subset_id=subset_id
+     * PUT subset of dataset with id=dataset_id
      */
     app.put('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
+        // log user request
+        logger.info('user requested to update subset',
+            logger.formatRequest(req)
+        );
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
@@ -90,7 +130,6 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         let owner = req.user ? req.user.id : 'user';
 
         // get dataset information
-        // TODO: check schema structure
         let subset = req.body.subset;
         let label = subset.label;
         let description = subset.description;
@@ -98,27 +137,37 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         // set the body info
         let body = { cmd: 'edit_subset', content: { subsetId, label, description } };
         sendToProcess(datasetId, owner, body, function (error, results) {
-            // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('PUT datasets/:datasets_id/subsets/:subset_id', error.message);
+                // log error on updating subset
+                logger.error('error [node_process]: user request to update subset failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request to update subset successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
     }); // PUT /api/datasets/:dataset_id/subsets/:subset_id
 
     /**
-     * Gets the subset documents
+     * GET subset documents
      */
     app.get('/api/datasets/:dataset_id/subsets/:subset_id/documents', (req, res) => {
+        // log user request
+        logger.info('user requested for documents in subset',
+            logger.formatRequest(req)
+        );
 
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         let subsetId = parseInt(req.params.subset_id);
 
         // query values
-        // TODO: check if query contains offset, limit or page
         let query = {
             offset: parseInt(req.query.offset),
             limit: parseInt(req.query.limit),
@@ -134,10 +183,17 @@ module.exports = function (app, pg, processHandler, sendToProcess) {
         sendToProcess(datasetId, owner, body, function (error, results) {
             // if error notify user
             if (error) {
-                // TODO: log error
-                console.log('GET datasets/:datasets_id/subsets/:subset_id/documents', error.message);
+                // log error on getting subset documents
+                logger.error('error [node_process]: user request for documents in subset failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
                 return res.send({ errors: { msg: error.message } });
             }
+            // log request success
+            logger.info('user request for documents in subset successful',
+                logger.formatRequest(req)
+            );
+            // send the data
             return res.send(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id/documents
