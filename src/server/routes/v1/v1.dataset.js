@@ -40,7 +40,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      */
     app.get('/api/datasets', (req, res) => {
         // log user request to get upload datasets information
-        logger.info('user requests for datasets', { method: req.method, url: req.originalUrl });
+        logger.info('user requested for datasets', logger.formatRequest(req));
 
         // TODO: get username of creator and handle empty user
         // TODO: get user from the login parameters (passport.js - future work)
@@ -74,12 +74,17 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      */
     const upload = multer({ storage }).single('file');
     app.post('/api/datasets/uploadTemp', (req, res) => {
+        // upload the dataset file
         upload(req, res, function (error) {
             if (error) {
                 // TODO: handle error
                 console.log(error);
                 return res.send({ errors: { msg: error.message } });
             }
+
+            // log user request to get upload datasets information
+            logger.info('user uploaded the dataset file', logger.formatRequest(req));
+
             // the file was successfully uploaded
             let file = req.file;
             // TODO: get username of creator
@@ -150,7 +155,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
     }); // POST /api/datasets/uploadTemp
 
     app.post('/api/datasets', (req, res) => {
-        // TODO: log calling this route
+        // log user request to get upload datasets information
+        logger.info('user created a new dataset', logger.formatRequest(req));
+
         // get dataset info
         let { dataset, fields } = req.body;
 
@@ -235,7 +242,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         } else {
                             pg.update({ loaded: true }, { id: datasetId }, 'datasets');
                         }
-                        pg.delete({ id: tempDataset.id, owner }, 'tempDatasets');
+
+                        pg.delete({ id: tempDataset.id, owner }, 'tempDatasets', function (error) {
+                            if (error) {
+                                // TODO: handle error
+                            }
+                            // remove the temporary file
+                            fileManager.removeFile(tempDataset.filepath);
+                        });
                     }); // processHandler.sendAndWait()
 
                 }); // pg.insert({ owner, label, description, dbPath }, 'datasets')
@@ -249,6 +263,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      * get dataset info of dataset with id=dataset_id
      */
     app.get('/api/datasets/:dataset_id', (req, res) => {
+        // log user request to get upload datasets information
+        logger.info('user requested for a dataset', logger.formatRequest(req));
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
@@ -271,6 +288,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      * modify dataset info of dataset with id=dataset_id
      */
     app.put('/api/datasets/:dataset_id', (req, res) => {
+        // log user request to get upload datasets information
+        logger.info('user modified a dataset', logger.formatRequest(req));
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
@@ -310,6 +330,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      * get dataset info of dataset with id=dataset_id
      */
     app.delete('/api/datasets/:dataset_id', (req, res) => {
+        // log user request to get upload datasets information
+        logger.info('user deleted a dataset', logger.formatRequest(req));
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // get the user
@@ -365,6 +388,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
     }); // GET /api/datasets/:dataset_id
 
     app.get('/api/datasets/:dataset_id/check', (req, res) => {
+        // log user request to get upload datasets information
+        logger.info('user checked the availability of a dataset', logger.formatRequest(req));
+
         // TODO: check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
         // TODO: log calling this route

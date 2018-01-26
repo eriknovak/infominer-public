@@ -181,6 +181,8 @@ class BaseDataset {
             let rec = self._prepareRecord(fValues, fields);
             self.base.store('Dataset').push(rec);
         }
+        // close the input stream - enable file manipulation
+        fileIn.close();
         // create the root subset
         let subset = {
             label: 'root',
