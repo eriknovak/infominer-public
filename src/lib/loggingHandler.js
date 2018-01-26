@@ -55,8 +55,23 @@ class Logger {
         // add a file rotation transport
         logger_transports.push(this._transportCreator(filename, folderPath, level));
 
+        // create a logger instance
+        let logger = new (winston.Logger)({ transports: logger_transports });
+
+        // add a function for creating the reponse object
+        logger.formatRequest = function (request) {
+            return {
+                method:   request.method,
+                url:      request.originalUrl,
+                query:    request.query,
+                body:     request.body,
+                params:   request.params,
+                username: request.user ? request.user.username : 'unknown'
+            };
+        };
+
         // create a logger instance and return it
-        return new (winston.Logger)({ transports: logger_transports });
+        return logger;
     }
 
 }
