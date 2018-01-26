@@ -2,7 +2,7 @@
 const Logger = require('../../lib/loggingHandler')();
 
 // create a logger instance for logging API requests
-const logger = Logger.createInstance('api_requests', 'info', 'api');
+const logger = Logger.createGroupInstance('api_requests', 'api');
 
 /**
  * Adds api routes to express  app.

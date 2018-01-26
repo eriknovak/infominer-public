@@ -507,7 +507,7 @@ class BaseDataset {
         if (!isNaN(parseFloat(id))) {
             // validate id
             if (id < 0 || methods.length <= id) {
-                // TODO: handle this error
+                // handle id missmatch
                 return { errors: { message: 'The method id does not match with any existing methods' } };
             }
             // get one method and format it
@@ -751,7 +751,6 @@ class BaseDataset {
         let self = this;
         let methodId = self.base.store('Methods').push(qMethod);
         self.base.store('Methods')[methodId].$addJoin('appliedOn', subset);
-        // returns
         return { methods: self._formatMethodInfo(self.base.store('Methods')[methodId]) };
     }
 

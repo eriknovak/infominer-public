@@ -44,7 +44,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         );
 
         // TODO: get username of creator and handle empty user
-        // TODO: get user from the login parameters (passport.js - future work)
         const owner = req.user ? req.user.id : 'user';
         // get user datasets
         pg.select({ owner }, 'datasets', (error, results) => {

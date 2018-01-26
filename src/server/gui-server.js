@@ -10,8 +10,11 @@ const session = require('express-session'); // maintaining sessions
 // internal modules
 const pg = require('../lib/postgresQL')(require('../config/pgconfig')); // postgres connection
 
+// parameters given to the process
+const argv = require('minimist')(process.argv.slice(2));
+
 // parameters used on the express app
-const PORT = process.env.PORT || process.env.npm_package_config_portGui || 3000;
+const PORT = argv.PORT || 3000;
 
 // contains the process handler class
 const ProcessHandler = require('../lib/processHandler');
