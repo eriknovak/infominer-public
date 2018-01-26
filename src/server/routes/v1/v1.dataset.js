@@ -13,7 +13,6 @@ const static = require('../../../config/static');
  * Temporary files folder. It stores all of the files that
  * are found there.
  */
-
 // set destination path
 const destinationPath = path.join(__dirname, '../../../../data/temp');
 // create desctination path if not existing
