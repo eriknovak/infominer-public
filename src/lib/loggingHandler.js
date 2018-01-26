@@ -58,16 +58,19 @@ class Logger {
         // create a logger instance
         let logger = new (winston.Logger)({ transports: logger_transports });
 
-        // add a function for creating the reponse object
-        logger.formatRequest = function (request) {
-            return {
+        /**
+         * Add a function for creating the reponse object
+         * @param {Object} request - The request object.
+         */
+        logger.formatRequest = function (request, additionalParams = {}) {
+            return Object.assign({
                 method:   request.method,
                 url:      request.originalUrl,
                 query:    request.query,
                 body:     request.body,
                 params:   request.params,
                 username: request.user ? request.user.username : 'unknown'
-            };
+            }, additionalParams);
         };
 
         // create a logger instance and return it
