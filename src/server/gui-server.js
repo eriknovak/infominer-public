@@ -13,6 +13,11 @@ const pg = require('../lib/postgresQL')(require('../config/pgconfig')); // postg
 // parameters given to the process
 const argv = require('minimist')(process.argv.slice(2));
 
+// internal modules
+const Logger = require('../lib/loggingHandler')();
+// create a logger instance for logging API requests
+const logger = Logger.createGroupInstance('api_requests', 'api');
+
 // parameters used on the express app
 const PORT = argv.PORT || 3000;
 
@@ -29,13 +34,12 @@ let processHandler = new ProcessHandler({
 // TODO: log closing process
 process.on('SIGINT', () => {
     // disconnect each child process
-    processHandler.closeAllProcesses((err) => {
-        // TODO: log error
-        if (err) { console.warn('Error when closing', err); }
-        // close the postgres connection
+    processHandler.closeAllProcesses((error) => {
+        if (error) { logger.warn('error when closing child process', { error: error.message }); }
+
         pg.close(() => {
             // close postgresql connection
-            console.log('Everything closed');
+            logger.info('close postgresql connection and parent process');
             process.exit(0);
         });
 
@@ -71,8 +75,8 @@ app.use(passport.session());
 app.use(express.static(__dirname + '/public/'));
 
 // set login & API routes
-require('./routes/login')(app, passport);
-require('./routes/route.handler')(app, pg, processHandler);
+require('./routes/login')(app, passport, argv.ignoreSecurity);
+require('./routes/route.handler')(app, pg, processHandler, logger);
 
 // handle ember web application
 // IMPORTANT: must be after all routes
@@ -81,4 +85,4 @@ app.get('*', (req, res) => {
 });
 
 // run the express app
-app.listen(PORT, () => console.log('gui-server listening on port', PORT));
+app.listen(PORT, () => logger.info(`gui-server listening on port ${PORT}`));

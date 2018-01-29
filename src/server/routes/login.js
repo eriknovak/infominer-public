@@ -3,7 +3,7 @@
  * @param {Object} app - The express app.
  * @param {Object} passport - The authentication handler.
  */
-module.exports = function (app, passport) {
+module.exports = function (app, passport, ignoreSecurity) {
 
     /////////////////////////////////////////////
     // GOOGLE authentication
@@ -70,5 +70,20 @@ module.exports = function (app, passport) {
         req.logout();
         res.end();
     });
+
+
+    /////////////////////////////////////////////
+    // Handle security checks
+    /////////////////////////////////////////////
+
+    if (!ignoreSecurity) {
+        // if security is enabled - add authentication check
+        app.all('/api/*', function (req, res, next) {
+            // check if user is authenticated - continue with serving data
+            if (req.isAuthenticated()) { return next(); }
+            // otherwise send authentication error
+            return res.send({ errors: { msg: 'User not authenticated' } });
+        });
+    }
 
 };

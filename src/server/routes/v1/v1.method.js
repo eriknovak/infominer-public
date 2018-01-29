@@ -31,7 +31,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
 
         // set the body info
         let body = { cmd: 'get_method' };
@@ -86,7 +86,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
 
         // set the body info
         let body = { cmd: 'get_method', content: { methodId } };
@@ -130,7 +130,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
 
         // get method information
         let { method } = req.body;

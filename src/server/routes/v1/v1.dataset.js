@@ -45,7 +45,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         );
 
         // TODO: get username of creator and handle empty user
-        const owner = req.user ? req.user.id : 'user';
+        const owner = req.user ? req.user.id : 'development';
         // get user datasets
         pg.select({ owner }, 'datasets', (error, results) => {
             if (error) {
@@ -102,7 +102,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // the file was successfully uploaded
             let file = req.file;
             // TODO: get username of creator
-            const owner = req.user ? req.user.id : 'user'; // temporary placeholder
+            const owner = req.user ? req.user.id : 'development'; // temporary placeholder
 
             // insert temporary file
             pg.insert({ owner, filepath: file.path, filename: file.filename }, 'tempDatasets', (xerror) => {
@@ -188,7 +188,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         fields = JSON.parse(fields);
 
         // TODO: get username of creator
-        const owner = req.user ? req.user.id : 'user'; // temporary placeholder
+        const owner = req.user ? req.user.id : 'development'; // temporary placeholder
 
         // get number of datasets the users already has
         pg.select({ owner }, 'datasets', (error, results) => {
@@ -284,12 +284,16 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                             );
                             // update dataset - it has been loaded
                             pg.update({ loaded: true }, { id: datasetId }, 'datasets');
+                            // log request success
+                            logger.info('user request to create new dataset successful',
+                                logger.formatRequest(req)
+                            );
                         }
                         // delete the temporary file from postgres
                         pg.delete({ id: tempDataset.id, owner }, 'tempDatasets', function (xxerror) {
                             if (xxerror) {
                                 // log error on deleting temporary file from postgres
-                                logger.error('error [postgres.delete]: user request to submit data for new dataset failed',
+                                logger.error('error [postgres.delete]: user request to submit data for new dataset - temporary file deletion failed',
                                     logger.formatRequest(req, { error: xxerror.message })
                                 );
                             }
@@ -298,13 +302,13 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                                 // remove the temporary file
                                 fileManager.removeFile(tempDataset.filepath);
                                 // log request success
-                                logger.info('user request to create new dataset successful',
+                                logger.info('user request to create new dataset - temporary file deletion successful',
                                     logger.formatRequest(req)
                                 );
                             } catch (yyerror) {
                                 // log error on deleting temporary file
-                                logger.error('error [file_manager]: user request to submit data for new dataset failed',
-                                    logger.formatRequest(req, { error: xxerror.message })
+                                logger.error('error [file_manager]: user request to submit data for new dataset - temporary file deletion failed',
+                                    logger.formatRequest(req, { error: yyerror.message })
                                 );
                             }
 
@@ -339,7 +343,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        const owner = req.user ? req.user.id : 'user';
+        const owner = req.user ? req.user.id : 'development';
 
         let body = { cmd: 'get_dataset' };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -383,7 +387,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        const owner = req.user ? req.user.id : 'user';
+        const owner = req.user ? req.user.id : 'development';
 
         // get dataset information
         // TODO: check schema structure
@@ -446,7 +450,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        const owner = req.user ? req.user.id : 'user';
+        const owner = req.user ? req.user.id : 'development';
 
         if (processHandler.childExist(datasetId)) {
             // process is already running - just delete from table and
@@ -557,7 +561,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // TODO: get username of creator and handle empty user
-        const owner = req.user ? req.user.id : 'user';
+        const owner = req.user ? req.user.id : 'development';
 
         pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
             if (error) {

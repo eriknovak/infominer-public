@@ -52,7 +52,7 @@ class BaseDataset {
             self._loadBase(fields);
         } else {
             // constructor parameters mismatch - something went wrong
-            console.log('Constructor parameters are not in specified schema');
+            console.error('Constructor parameters are not in specified schema');
             return { errors: { messages: 'Constructor parameters are not in specified schema' } };
 
         }
@@ -84,7 +84,7 @@ class BaseDataset {
                 });
             } else {
                 // schema parameters mismatch - something went wrong
-                console.log('Schema parameters are not in specified form');
+                console.error('Schema parameters are not in specified form');
                 return { errors: { messages: '_loadBase: Schema parameters are not in specified form' } };
             }
         } else if (self.params.mode === 'open') {
@@ -92,7 +92,7 @@ class BaseDataset {
             self.base = new qm.Base({ mode: self.params.mode, dbPath: self.params.dbPath });
         } else {
             // TODO: handle non-supported mode
-            console.log('Constructor parameters are not in specified schema');
+            console.error('Constructor parameters are not in specified schema');
             return { errors: { messages: '_loadBase: self.params.mode must be "createClean" or "open"' } };
         }
     }

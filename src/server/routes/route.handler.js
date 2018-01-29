@@ -1,16 +1,11 @@
-// internal modules
-const Logger = require('../../lib/loggingHandler')();
-
-// create a logger instance for logging API requests
-const logger = Logger.createGroupInstance('api_requests', 'api');
-
 /**
  * Adds api routes to express  app.
  * @param {Object} app - Express app.
  * @param {Object} pg - Postgres wrapper.
  * @param {Object} processHandler - Child process container.
+ * @param {Object} logger - The logger object.
  */
-module.exports = function (app, pg, processHandler) {
+module.exports = function (app, pg, processHandler, logger) {
 
     /////////////////////////////////////////////////////////////////////
     // Functions used for sending messages to child processes
@@ -83,7 +78,6 @@ module.exports = function (app, pg, processHandler) {
     // API Routes
     /////////////////////////////////////////////////////////////////////
 
-    // TODO: add user authentication validator
     require('./v1/v1.dataset')(app, pg, processHandler, sendToProcess, logger);
     require('./v1/v1.subset') (app, pg, processHandler, sendToProcess, logger);
     require('./v1/v1.method') (app, pg, processHandler, sendToProcess, logger);

@@ -19,7 +19,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
@@ -31,7 +31,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
 
         // set the body info
         let body = { cmd: 'get_subset' };
@@ -62,7 +62,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
@@ -74,7 +74,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
         // get data about the new subset
         const { subset } = req.body;
 
@@ -107,7 +107,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
@@ -118,7 +118,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
-        // check if subset_id is a number
+        // check if subset_id is an integer
         let subsetId = parseInt(req.params.subset_id);
         if (!validator.validateInteger(subsetId)) {
             // log error when subsetId is not an integer
@@ -130,7 +130,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
         // set the body info
         let body = { cmd: 'get_subset', content: { subsetId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -160,7 +160,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
@@ -171,7 +171,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
-        // check if subset_id is a number
+        // check if subset_id is an integer
         let subsetId = parseInt(req.params.subset_id);
         if (!validator.validateInteger(subsetId)) {
             // log error when subsetId is not an integer
@@ -183,7 +183,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
 
         // get dataset information
         let subset = req.body.subset;
@@ -219,7 +219,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
@@ -230,7 +230,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
-        // check if subset_id is a number
+        // check if subset_id is an integer
         let subsetId = parseInt(req.params.subset_id);
         if (!validator.validateInteger(subsetId)) {
             // log error when subsetId is not an integer
@@ -250,7 +250,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         };
 
         // get the user
-        let owner = req.user ? req.user.id : 'user';
+        let owner = req.user ? req.user.id : 'development';
 
         // set the body info
         let body = { cmd: 'get_subset_documents', content: { subsetId, query } };
