@@ -24,8 +24,8 @@ module.exports = function (app, pg, processHandler) {
      * @param {Function} callback - The function executed at the end.
      */
     function sendToProcess(childId, owner, msg, callback) {
-        let sendMessage = function (err) {
-            if (err) { return callback(err); }
+        let sendMessage = function (error) {
+            if (error) { return callback(error); }
             processHandler.sendAndWait(childId, msg, callback);
         };
 
@@ -47,10 +47,10 @@ module.exports = function (app, pg, processHandler) {
      */
     function _openProcess(childId, owner, callback) {
         // get the dataset information
-        pg.select({ id: childId, owner }, 'datasets', (err, results) => {
-            if (err) {
+        pg.select({ id: childId, owner }, 'datasets', (error, results) => {
+            if (error) {
                 // exit - error occured in postgres
-                return callback(err);
+                return callback(error);
             } else if (results.length !== 1) {
                 // exit - more or none results have been found
                 return callback(new Error('Multiple or none results found: ' + results.length));
@@ -72,8 +72,8 @@ module.exports = function (app, pg, processHandler) {
                     }
                 }
             };
-            processHandler.sendAndWait(childId, openParams, function (xerr) {
-                if (xerr) { return callback(xerr); }
+            processHandler.sendAndWait(childId, openParams, function (xerror) {
+                if (xerror) { return callback(xerror); }
                 return callback();
             });
         });

@@ -1,3 +1,6 @@
+// internal modules
+const validator = require('../../../lib/validator')();
+
 /**
  * Adds api routes to .
  * @param {Object} app - Express app.
@@ -16,8 +19,16 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for all subsets failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
 
         // get the user
         let owner = req.user ? req.user.id : 'user';
@@ -51,8 +62,17 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to create new subset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
         // get the user
         let owner = req.user ? req.user.id : 'user';
         // get data about the new subset
@@ -87,9 +107,27 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for subset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        // check if subset_id is a number
         let subsetId = parseInt(req.params.subset_id);
+        if (!validator.validateInteger(subsetId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request for subset failed',
+                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+        }
 
         // get the user
         let owner = req.user ? req.user.id : 'user';
@@ -122,9 +160,27 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to update subset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        // check if subset_id is a number
         let subsetId = parseInt(req.params.subset_id);
+        if (!validator.validateInteger(subsetId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request to update subset failed',
+                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+        }
 
         // get the user
         let owner = req.user ? req.user.id : 'user';
@@ -163,9 +219,27 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is a number
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for documents in subset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        // check if subset_id is a number
         let subsetId = parseInt(req.params.subset_id);
+        if (!validator.validateInteger(subsetId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request for documents in subset failed',
+                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+        }
 
         // query values
         let query = {

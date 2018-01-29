@@ -5,6 +5,7 @@ const qm = require('qminer');
 
 // internal modules
 const fileManager = require('../../../lib/fileManager');
+const validator = require('../../../lib/validator')();
 
 // configurations
 const static = require('../../../config/static');
@@ -326,8 +327,17 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for dataset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
         // get the user
         const owner = req.user ? req.user.id : 'user';
 
@@ -361,8 +371,17 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to modify dataset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
         // get the user
         const owner = req.user ? req.user.id : 'user';
 
@@ -415,8 +434,17 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to delete dataset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
         // get the user
         const owner = req.user ? req.user.id : 'user';
 
@@ -517,8 +545,16 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to checked availability of dataset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
 
         // TODO: get username of creator and handle empty user
         const owner = req.user ? req.user.id : 'user';

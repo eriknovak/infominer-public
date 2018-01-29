@@ -3,7 +3,7 @@ const qm = require('qminer');
 // internal modules
 const fileManager = require('./fileManager');
 
-const validator = require('./jsonValidator')({
+const validator = require('./validator')({
     // dataset schemas
     constructorParams: require('../schemas/base_dataset/constructorParams'),
     constructorFields: require('../schemas/base_dataset/constructorFields'),
@@ -44,8 +44,8 @@ class BaseDataset {
         let self = this;
 
         // validate constructor parameters
-        if (validator.validate(params, validator.schemas.constructorParams) &&
-            validator.validate(fields, validator.schemas.constructorFields)) {
+        if (validator.validateSchema(params, validator.schemas.constructorParams) &&
+            validator.validateSchema(fields, validator.schemas.constructorFields)) {
             // constructor parameters are valid - continue with database initialization
             self.params = params;
             // loads the base
@@ -75,7 +75,7 @@ class BaseDataset {
             const schema = self._prepareSchema(fields);
 
             // validate first item in schema - the one created by the user
-            if (validator.validate(schema[0], validator.schemas.constructorStore)) {
+            if (validator.validateSchema(schema[0], validator.schemas.constructorStore)) {
                 // schema is in valid form - continue with database creation
                 self.base = new qm.Base({
                     mode: self.params.mode,
@@ -261,7 +261,7 @@ class BaseDataset {
         let self = this;
 
         // validate input parameter schema
-        if (!validator.validate(datasetInformation, validator.schemas.editDatasetSchema)) {
+        if (!validator.validateSchema(datasetInformation, validator.schemas.editDatasetSchema)) {
             // input parameter is not in correct format - return Error
             return { error: { message: 'Edit parameters are in incorrect format' } };
         }
@@ -373,7 +373,7 @@ class BaseDataset {
     editSubsetInformation(subsetInformation) {
         let self = this;
         // validate input parameter schema
-        if (!validator.validate(subsetInformation, validator.schemas.editDatasetSchema)) {
+        if (!validator.validateSchema(subsetInformation, validator.schemas.editDatasetSchema)) {
             // input parameter is not in correct format - return Error
             return { error: { message: 'Edit parameters are in incorrect format' } };
         }
@@ -418,7 +418,7 @@ class BaseDataset {
         }
 
         // validate query parameters
-        if (!validator.validate(query, validator.schemas.getSubsetDocuments)) {
+        if (!validator.validateSchema(query, validator.schemas.getSubsetDocuments)) {
             // query parameters does not match schema
             return { errors: { message: 'The query parameters for document retrieval are invalid' } };
         }
@@ -806,7 +806,7 @@ class BaseDataset {
         /////////////////////////////////////////
         // Validate KMeans parameter
         /////////////////////////////////////////
-        if (!validator.validate(methodParams, validator.schemas.methodKMeansParams)) {
+        if (!validator.validateSchema(methodParams, validator.schemas.methodKMeansParams)) {
             // method parameters are not in correct schema - set qMethod
             // to Error and exist this function
             qMethod = new Error('KMeans parameters are not in correct schema');
@@ -856,7 +856,7 @@ class BaseDataset {
      * @param {Object} features - The features used to fill the feature space.
      */
     _featuresValidation(features) {
-        return validator.validate(features, validator.schemas.featureSchema);
+        return validator.validateSchema(features, validator.schemas.featureSchema);
     }
 
 }

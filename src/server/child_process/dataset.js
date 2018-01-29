@@ -10,7 +10,7 @@ let interval_id = setInterval(() => { }, 10 * 1000);
 const BaseDataset = require('../../lib/baseDataset');
 
 // json schema validator
-const validator = require('../../lib/jsonValidator')({
+const validator = require('../../lib/validator')({
     // the schemas used to validate the input
     createDataset: require('../../schemas/child_messages/createDataset'),
     openDataset:   require('../../schemas/child_messages/openDataset'),
@@ -138,7 +138,7 @@ function handle(msg) {
  */
 function messageValidation(msg, schema, callback) {
     // validate message information
-    if (validator.validate(msg, schema)) {
+    if (validator.validateSchema(msg, schema)) {
         callback(msg);
     } else {
         // the validation found an inconsistences in the object

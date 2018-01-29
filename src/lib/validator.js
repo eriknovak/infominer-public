@@ -1,12 +1,12 @@
 // external modules
-const Validator = require('jsonschema').Validator;
+const JsonValidator = require('jsonschema').Validator;
 // internal modules
 const Logger = require('./loggingHandler')();
 
 /**
  * The JSON validator class.
  */
-class JsonValidator {
+class Validator {
 
     /**
      * Initializes the JSON validator.
@@ -15,7 +15,7 @@ class JsonValidator {
     constructor(params) {
         let self = this;
         // save the JSON validator
-        self._validator = new Validator();
+        self._validator = new JsonValidator();
         // the json schemas used to validate
         self.schemas = params;
         // create logger instance for validator
@@ -23,12 +23,12 @@ class JsonValidator {
     }
 
     /**
-     * message validation function.
+     * Object validation function.
      * @param {Object} object - The validated object.
      * @param {Object} schema - The schema the message object must follow.
      * @returns {Boolean} Returns `true` if object matches schema. Otherwise, `false`.
      */
-    validate(object, schema) {
+    validateSchema(object, schema) {
         let self = this;
         let validation = self._validator.validate(object, schema);
         if (validation.errors.length) {
@@ -41,9 +41,24 @@ class JsonValidator {
             return true;
         }
     }
+
+    /**
+     * Checks if the object is an integer.
+     * @param {Object} object - The object to be validated.
+     * @returns {Boolean} True if the `object` is an integer. Otherwise, return false.
+     */
+    validateInteger(object) {
+        if (Number.isInteger(object)) {
+            // the object is indeed an integer
+            return true;
+        } else {
+            // the object is certantly not an integer
+            return false;
+        }
+    }
 }
 
 module.exports = function (params) {
-    return new JsonValidator(params);
+    return new Validator(params);
 };
 

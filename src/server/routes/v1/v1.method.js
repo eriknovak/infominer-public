@@ -1,3 +1,6 @@
+// internal modules
+const validator = require('../../../lib/validator')();
+
 /**
  * Adds api routes to .
  * @param {Object} app - Express app.
@@ -16,8 +19,16 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for all methods failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
 
         // get the user
         let owner = req.user ? req.user.id : 'user';
@@ -52,9 +63,27 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for method failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        // check if method_id is an integer
         let methodId = parseInt(req.params.method_id);
+        if (!validator.validateInteger(methodId)) {
+            // log error when methodId is not an integer
+            logger.error('error [route_parameter]: user request for method failed',
+                logger.formatRequest(req, { error: 'Parameter method_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter method_id is not an integer' } });
+        }
 
         // get the user
         let owner = req.user ? req.user.id : 'user';
@@ -89,8 +118,16 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // TODO: check if dataset_id is a number
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to create new method failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
 
         // get the user
         let owner = req.user ? req.user.id : 'user';
