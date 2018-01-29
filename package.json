@@ -6,10 +6,11 @@
   "scripts": {
     "test": "cd src/test && sh tests.sh",
     "preinstall": "npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g",
-    "postinstall": "cd src/server/ember-source && npm install",
-    "ember:serve": "cd src/server/ember-source && ember serve",
-    "ember:build": "cd src/server/ember-source && ember build --output-path=../public --environment=production",
+    "postinstall": "cd src/server/ember-application && npm install",
+    "ember:serve": "cd src/server/ember-application && ember serve",
+    "ember:build": "cd src/server/ember-application && ember build --output-path=../public --environment=production",
     "server:gui": "cd src/server && node gui-server.js",
+    "server:guiDev": "cd src/server && node gui-server.js --ignoreSecurity",
     "server:guiDebug": "cd src/server && node debug gui-server.js",
     "postgres:create": "cd src/load && node create_postgres_tables.js"
   },
