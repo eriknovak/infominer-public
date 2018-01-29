@@ -39,7 +39,7 @@ process.on('SIGINT', () => {
 
         pg.close(() => {
             // close postgresql connection
-            logger.info('close postgresql connection and parent process');
+            logger.info('close postgresql connection and stop server');
             process.exit(0);
         });
 
