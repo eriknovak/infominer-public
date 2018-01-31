@@ -31,7 +31,6 @@ let processHandler = new ProcessHandler({
 });
 
 // on manual process exit
-// TODO: log closing process
 process.on('SIGINT', () => {
     // disconnect each child process
     processHandler.closeAllProcesses((error) => {
