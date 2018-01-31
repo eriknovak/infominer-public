@@ -1,5 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
+import { set } from '@ember/object';
 
 // d3 visualizations
 import { min, max } from 'd3-array';
@@ -16,17 +17,16 @@ const WordCloudComponent = GraphComponent.extend({
     // wordcloud font size
     maxFontSize: 40,
     minFontSize: 12,
-    colorClass: ['small', 'medium', 'large'],
-
-    /**
-     *  Array of text to render
-     * [ {text: String, weight: Number } ]
-     */
-    data: [],
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
+
+    init() {
+        this._super(...arguments);
+        set(this, 'data', []);
+        set(this, 'colorClass', ['small', 'medium', 'large']);
+    },
 
     didReceiveAttrs() {
         this._super(...arguments);

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "cd src/test && sh tests.sh",
-    "preinstall": "npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g",
+    "preinstall": "npm list ember-cli@2.18.1 -g || npm install ember-cli@2.18.1 -g",
     "postinstall": "cd src/server/ember-application && npm install",
     "ember:serve": "cd src/server/ember-application && ember serve",
     "ember:build": "cd src/server/ember-application && ember build --output-path=../public --environment=production",

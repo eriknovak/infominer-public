@@ -8,9 +8,6 @@ $light-font-color: #e7e7e7;
 $dark-font-color: #2C3539;
 $main-font: 'Open Sans';
 
-// bootstrap
-@import 'ember-bootstrap/bootstrap';
-
 // mixins
 @mixin label {
     margin: 0;
@@ -18,6 +15,8 @@ $main-font: 'Open Sans';
     font-weight: 300;
     text-transform: uppercase;
 }
+
+@import "ember-bootstrap/bootstrap";
 
 // component style
 @import 'common.scss';

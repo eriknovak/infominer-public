@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
@@ -23,7 +24,7 @@ export default Component.extend({
         // set element width
         self._handleResize();
         // set window resize listener
-        Ember.$(window).on('resize', function () {
+        $(window).on('resize', function () {
             clearTimeout(self.get('resizeTimer'));
             self.set('resizeTimer', setTimeout(function () {
                 self._handleResize();
@@ -33,7 +34,7 @@ export default Component.extend({
 
     willDestroyElement() {
         this._super(...arguments);
-        Ember.$(window).off('resize');
+        $(window).off('resize');
     },
 
     ///////////////////////////////////////////////////////
@@ -44,8 +45,8 @@ export default Component.extend({
      * Resizes the width and height.
      */
     _handleResize() {
-        this.set('width', Ember.$(this.element).width());
-        this.set('height', Ember.$(this.element).height());
+        this.set('width', $(this.element).width());
+        this.set('height', $(this.element).height());
         this.drawGraph();
     },
 

@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
@@ -31,14 +32,14 @@ export default Component.extend({
          * Change subset name.
          */
         changeSubsetName() {
-            this.set('subsetName', Ember.$(`#${this.get('id')} input`).val());
+            this.set('subsetName', $(`#${this.get('id')} input`).val());
         },
 
         /**
          * Change subset description.
          */
         changeSubsetDescription() {
-            this.set('subsetDescription', Ember.$(`#${this.get('id')} textarea`).val());
+            this.set('subsetDescription', $(`#${this.get('id')} textarea`).val());
         },
 
         /**

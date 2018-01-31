@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+import $ from 'jquery';
 
 export default Route.extend({
 
@@ -25,7 +26,7 @@ export default Route.extend({
                 appliedOn: parentSubset
             });
 
-            Ember.$('.modal.analysis-modal').modal('toggle');
+            $('.modal.analysis-modal').modal('toggle');
             method.save().then(function () {
                 // // transition to subset analysis
                 // self.transitionTo('dataset.subset.analysis', self.modelFor('dataset'), parentSubset);
@@ -50,7 +51,7 @@ export default Route.extend({
                 });
                 // set cluster id to send as metadata
                 subset.set('clusterId', subsetInfo.clusterId);
-                Ember.$(`#${subsetInfo.modalId}`).modal('toggle');
+                $(`#${subsetInfo.modalId}`).modal('toggle');
 
                 // save the cluster
                 subset.save();

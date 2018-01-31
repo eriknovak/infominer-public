@@ -1,6 +1,7 @@
 import Route from '@ember/routing/route';
 import ENV from '../config/environment';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
+import $ from 'jquery';
 
 /**
  * For development do not use authentication.
@@ -17,8 +18,8 @@ export default DatasetRoute.extend({
         let { dataset_id } = params;
         const namespace = `api/datasets/${dataset_id}`;
         // modify namespace for subset and method model
-        let subsetAdapter = this.store.adapterFor('subset');
-        let methodAdapter = this.store.adapterFor('method');
+        let subsetAdapter = this.get('store').adapterFor('subset');
+        let methodAdapter = this.get('store').adapterFor('method');
 
         // check if the namespace has changed
         if (subsetAdapter.get('namespace') !== namespace) {
@@ -41,7 +42,7 @@ export default DatasetRoute.extend({
             // calls DELETE /api/datasets/:dataset_id
             this.modelFor(this.routeName).destroyRecord().then(() => {
                 // remove modal backdrop and redirect to dataset library
-                Ember.$('#delete-dataset-modal').modal('toggle');
+                $('#delete-dataset-modal').modal('toggle');
                 this.transitionTo('datasets');
             });
         }

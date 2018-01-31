@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+import $ from 'jquery';
 
 export default Route.extend({
 
@@ -96,7 +97,7 @@ export default Route.extend({
             const selectedDocs = self.get('store').peekAll('document').filterBy('selected', true);
 
             // get warning container
-            let warningContent = Ember.$('#create-subset-documents-modal div.warning');
+            let warningContent = $('#create-subset-documents-modal div.warning');
             // empty warning container
             warningContent.empty();
 
@@ -133,7 +134,7 @@ export default Route.extend({
                     resultedIn: method
                 });
 
-                Ember.$('#create-subset-documents-modal').modal('toggle');
+                $('#create-subset-documents-modal').modal('toggle');
                 // save method
                 method.save().then(function () {
                     // save subset

@@ -3,6 +3,8 @@ import ENV from '../config/environment';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 import { inject as service } from '@ember/service';
+import { A } from '@ember/array';
+import $ from 'jquery';
 
 /**
  * For development do not use authentication.
@@ -60,7 +62,7 @@ export default DatasetUploadRoute.extend({
             let { dataset, fieldList } = this.get('controller.model');
             // filter out the included fields and prepare the array as
             // set the options and upload
-            Ember.$.post({
+            $.post({
                 url: `${ENV.APP.HOSTNAME}/api/datasets`,
                 data: {
                     dataset: JSON.stringify(dataset),
@@ -69,7 +71,7 @@ export default DatasetUploadRoute.extend({
             }).then(data => {
                 // continuously check if dataset is loaded
                 let interval = setInterval(() => {
-                    Ember.$.get(`${ENV.APP.HOSTNAME}/api/datasets/${data.datasetId}/check`)
+                    $.get(`${ENV.APP.HOSTNAME}/api/datasets/${data.datasetId}/check`)
                         .then(response => {
                             // if data loaded change state
                             if (response.loaded) {
@@ -105,7 +107,7 @@ export default DatasetUploadRoute.extend({
         let queue = uploader.find("dataset");
         if (queue) {
             queue.get('files').forEach((file) => file.set('queue', null));
-            queue.set('files', Ember.A());
+            queue.set('files', A());
         }
     }
 

@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from 'jquery';
 
 export default Component.extend({
 
@@ -28,14 +29,14 @@ export default Component.extend({
          * Change dataset label.
          */
         changeDatasetLabel() {
-            this.set('datasetLabel', Ember.$(`#edit-dataset-modal input`).val());
+            this.set('datasetLabel', $(`#edit-dataset-modal input`).val());
         },
 
         /**
          * Change dataset description.
          */
         changeDatasetDescription() {
-            this.set('datasetDescription', Ember.$(`#edit-dataset-modal textarea`).val());
+            this.set('datasetDescription', $(`#edit-dataset-modal textarea`).val());
         },
 
         /**
@@ -44,7 +45,7 @@ export default Component.extend({
         submitDatasetChanges() {
 
             // get warning and clean container
-            let warningContent = Ember.$('#edit-dataset-modal div.warning');
+            let warningContent = $('#edit-dataset-modal div.warning');
             warningContent.empty();
 
             if (this.get('datasetLabel').length === 0) {
@@ -55,7 +56,7 @@ export default Component.extend({
                 this.set('dataset.label', this.get('datasetLabel'));
                 this.set('dataset.description', this.get('datasetDescription'));
                 // submit changes made to the dataset
-                Ember.$('#edit-dataset-modal').modal('toggle');
+                $('#edit-dataset-modal').modal('toggle');
                 this.get('dataset').save();
             }
         },

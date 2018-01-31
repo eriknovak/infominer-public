@@ -1,5 +1,6 @@
 import Component from '@ember/component';
-import { observer } from '@ember/object';
+import { observer, get, set } from '@ember/object';
+import { once } from '@ember/runloop';
 
 export default Component.extend({
     // component attributes
@@ -30,9 +31,9 @@ export default Component.extend({
             this.get('featureOptions').objectAt(0):
             this.get('featureOptions').objectAt(1);
         // set the option default value
-        Ember.set(option, 'selected', true);
+        set(option, 'selected', true);
         // set the selected feature parameter
-        this.set('selectedFeatureOption', Ember.get(option, 'type'));
+        this.set('selectedFeatureOption', get(option, 'type'));
         // save the feature options
         this._saveFeatureOptions();
     },
@@ -43,7 +44,7 @@ export default Component.extend({
 
     // observes the feature changes for that field
     _observeFeatureChanges: observer('included', 'selectedFeatureOption', function () {
-        Ember.run.once(this, '_saveFeatureOptions');
+        once(this, '_saveFeatureOptions');
     }),
 
     actions: {

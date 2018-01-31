@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
@@ -11,7 +12,7 @@ export default Component.extend({
     actions: {
         emptyWarningContainer() {
             // get warning container
-            let warningContent = Ember.$('#create-subset-documents-modal div.warning');
+            let warningContent = $('#create-subset-documents-modal div.warning');
             // empty warning container
             warningContent.empty();
         }

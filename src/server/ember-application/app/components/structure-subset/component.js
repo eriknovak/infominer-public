@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { observer } from '@ember/object';
+import { observer, set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
@@ -7,8 +7,6 @@ export default Component.extend({
     classNameBindings: ['parent'],
     collapsed: false,
     parent: false,
-
-    featureOptions: { },
 
     _parentState: observer('subset.usedBy.@each.produced.[]', function () {
         this.get('usedBy').then(methods => {
@@ -26,8 +24,9 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
-        this.set('collapsed', false);
-        this.set('parent', false);
+        set(this, 'collapsed', false);
+        set(this, 'parent', false);
+        set(this, 'featureOptions', { });
     },
 
     didReceiveAttrs() {

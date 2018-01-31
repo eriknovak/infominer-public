@@ -1,4 +1,5 @@
 import Service from '@ember/service';
+import { set } from '@ember/object';
 
 export default Service.extend({
 
@@ -14,7 +15,7 @@ export default Service.extend({
             let length =  components.slice(i, i + maxColNum).length;
             for (let j = 0; j < length; j++) {
                 let columnSize = `col-${viewSize}-${12/length}`;
-                Ember.set(components.objectAt(i+j), `column${viewSize}`, columnSize);
+                set(components.objectAt(i+j), `column${viewSize}`, columnSize);
             }
         }
     }

@@ -1,5 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
+import { set } from '@ember/object';
 
 // d3 visualizations
 import { select } from 'd3-selection';
@@ -13,9 +14,6 @@ const HistogramComponent = GraphComponent.extend({
     // component attributes
     classNames: ['histogram'],
 
-    // histogram attributes
-    margin: { top: 10, right: 15, bottom: 20, left: 35 },
-
     /**
      * Object containing the histogram information.
      */
@@ -24,6 +22,11 @@ const HistogramComponent = GraphComponent.extend({
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
+
+    init() {
+        this._super(...arguments);
+        set(this, 'margin', { top: 10, right: 15, bottom: 20, left: 35 });
+    },
 
     didReceiveAttrs() {
         this._super(...arguments);

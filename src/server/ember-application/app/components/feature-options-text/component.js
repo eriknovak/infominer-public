@@ -1,12 +1,9 @@
 import Component from '@ember/component';
-import { observer } from '@ember/object';
+import { observer, get, set } from '@ember/object';
+import { once } from '@ember/runloop';
 
 export default Component.extend({
     classNames: ['feature-option-text'],
-
-    // feature options
-    weightOptions: ['tfidf', 'tf', 'idf', 'none'],
-    normalizeOptions: [true, false],
 
     // selected parameters
     normalize: true,
@@ -15,6 +12,12 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
+
+    init() {
+        this._super(...arguments);
+        set(this, 'weightOptions', ['tfidf', 'tf', 'idf', 'none']);
+        set(this, 'normalizeOptions', [true, false]);
+    },
 
     didReceiveAttrs() {
         this._super(...arguments);
@@ -26,17 +29,17 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     _observeFeatureOptions: observer('normalize', 'weight', function () {
-        Ember.run.once(this, '_saveFeatures');
+        once(this, '_saveFeatures');
     }),
 
     actions: {
         // sets normalize value
         changeNormalizeValue(index) {
-            this.set('normalize', Ember.get(this, 'normalizeOptions').objectAt(index));
+            this.set('normalize', get(this, 'normalizeOptions').objectAt(index));
         },
         // sets weight value
         changeWeightValue(index) {
-            this.set('weight', Ember.get(this, 'weightOptions').objectAt(index));
+            this.set('weight', get(this, 'weightOptions').objectAt(index));
         }
     },
 
