@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
@@ -18,14 +19,14 @@ export default Component.extend({
          * Set the model dataset name.
          */
         changeDatasetName() {
-            this.set("dataset.label", Ember.$("#dataset-label").val().trim());
+            this.set("dataset.label", $("#dataset-label").val().trim());
         },
 
         /**
          * Set the model dataset description.
          */
         changeDatasetDescription() {
-            this.set("dataset.description", Ember.$("#dataset-description").val().trim());
+            this.set("dataset.description", $("#dataset-description").val().trim());
         }
     }
 

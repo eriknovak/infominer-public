@@ -1,17 +1,18 @@
 import Component from '@ember/component';
+import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
     tagName: 'tr',
 
-    // how the
-    sortOptions: ['desc', 'asc'],
-
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
 
-
+    init() {
+        this._super(...arguments);
+        set(this, 'sortOptions', ['desc', 'asc']);
+    },
 
     ///////////////////////////////////////////////////////
     // Actions

@@ -5,10 +5,6 @@ import { once } from '@ember/runloop';
 export default Component.extend({
     classNames: ['feature-option-text'],
 
-    // selected parameters
-    normalize: true,
-    weight: 'tfidf',
-
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
@@ -16,7 +12,9 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         set(this, 'weightOptions', ['tfidf', 'tf', 'idf', 'none']);
+        set(this, 'weight', get(this, 'weightOptions')[0]);
         set(this, 'normalizeOptions', [true, false]);
+        set(this, 'normalize', get(this, 'normalizeOptions')[0]);
     },
 
     didReceiveAttrs() {

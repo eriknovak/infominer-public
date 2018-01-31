@@ -66,7 +66,7 @@ export default Component.extend({
          */
         removeModalWarnings() {
             // get warning container
-            let warningContent = Ember.$('#edit-dataset-modal div.warning');
+            let warningContent = $('#edit-dataset-modal div.warning');
             // empty warning container
             warningContent.empty();
         }

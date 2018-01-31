@@ -3,6 +3,7 @@ import ENV from '../config/environment';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 import { inject as service } from '@ember/service';
+import { run } from '@ember/runloop';
 import { A } from '@ember/array';
 import $ from 'jquery';
 
@@ -91,7 +92,7 @@ export default DatasetUploadRoute.extend({
                             }
                         });
                 }, 3000);
-                this.transitionTo('datasets');
+                run(() => { this.transitionTo('datasets'); });
             });
         }
     },

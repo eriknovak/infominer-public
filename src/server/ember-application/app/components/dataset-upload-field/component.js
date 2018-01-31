@@ -1,4 +1,6 @@
 import Component from '@ember/component';
+import { get, set } from '@ember/object';
+import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
@@ -27,7 +29,7 @@ export default Component.extend({
         // find and set field type to the start of the array
         for (let i = 0; i < this.get('fieldTypes').length; i++) {
             let obj = this.get('fieldTypes').objectAt(i);
-            if (Ember.get(obj, 'type') === type) { Ember.set(obj, 'selected', true); break; }
+            if (get(obj, 'type') === type) { set(obj, 'selected', true); break; }
         }
 
         // set element ids
@@ -46,21 +48,21 @@ export default Component.extend({
          * Changes the model field value.
          */
         changeFieldName() {
-            this.set('name', Ember.$(`#${this.get('nameId')}`).val().trim());
+            this.set('name', $(`#${this.get('nameId')}`).val().trim());
         },
 
         /**
          * Changes the field type value.
          */
         changeFieldType() {
-            this.set('type', Ember.$(`#${this.get('typeId')}`).val());
+            this.set('type', $(`#${this.get('typeId')}`).val());
         },
 
         /**
          * Changes flag for field inclusion.
          */
         changeFieldInclusion() {
-            this.set('included', Ember.$(`#${this.get('checkboxId')}`).is(':checked'));
+            this.set('included', $(`#${this.get('checkboxId')}`).is(':checked'));
         }
     }
 });

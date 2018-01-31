@@ -1,22 +1,23 @@
 import Component from '@ember/component';
-import { observer } from '@ember/object';
+import { observer, get, set } from '@ember/object';
+import { once } from '@ember/runloop';
 
 export default Component.extend({
     // component attributes
 
-    // parameter options
-    distanceMetrics: [
-        { fullName: 'Euclidian', name: 'Euclid' },
-        { fullName: 'Cosine', name: 'Cos' }
-    ],
-
-    // method parameters
-    chosenMetrics: 'Euclid',
-    k: 2,
-
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
+
+    init() {
+        this._super(...arguments);
+        set(this, 'distanceMetrics', [
+            { fullName: 'Euclidian', name: 'Euclid' },
+            { fullName: 'Cosine', name: 'Cos' }
+        ]);
+        set(this, 'chosenMetrics', 'Euclid');
+        set(this, 'k', 2);
+    },
 
     didReceiveAttrs() {
         this._super(...arguments);
@@ -29,13 +30,13 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     _observeParameterChanges: observer('chosenMetrics', 'k', function () {
-        Ember.run.once(this, '_setParameters');
+        once(this, '_setParameters');
     }),
 
     actions: {
         // sets the distance metrics
         selectDistanceMetrics(index) {
-            let chosenMetrics = Ember.get(this.get('distanceMetrics').objectAt(index), 'name');
+            let chosenMetrics = get(this.get('distanceMetrics').objectAt(index), 'name');
             this.set('chosenMetrics', chosenMetrics);
         },
 

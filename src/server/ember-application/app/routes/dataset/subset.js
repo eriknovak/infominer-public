@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+import $ from 'jquery';
 
 export default Route.extend({
 
@@ -14,11 +15,11 @@ export default Route.extend({
          */
         submitSubsetInfo() {
             // get subset label and description
-            let label = Ember.$('#edit-subset-modal input').val();
-            let description = Ember.$('#edit-subset-modal textarea').val();
+            let label = $('#edit-subset-modal input').val();
+            let description = $('#edit-subset-modal textarea').val();
 
             // get warning and clean container
-            let warningContent = Ember.$('#edit-subset-modal div.warning');
+            let warningContent = $('#edit-subset-modal div.warning');
             warningContent.empty();
 
             if (label.length === 0) {
@@ -34,13 +35,13 @@ export default Route.extend({
 
                 // save the subset for persistance
                 subset.save();
-                Ember.$('#edit-subset-modal').modal('toggle');
+                $('#edit-subset-modal').modal('toggle');
             }
         },
 
         removeModalWarnings() {
             // get warning container
-            let warningContent = Ember.$('#edit-subset-modal div.warning');
+            let warningContent = $('#edit-subset-modal div.warning');
             // empty warning container
             warningContent.empty();
         }
