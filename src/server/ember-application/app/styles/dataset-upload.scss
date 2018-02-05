@@ -37,7 +37,7 @@
     &.add-new {
         border: 2px dashed $tertiary-color;
         padding: 8px;
-        height: 158px;
+        height: 166px;
         background-color: white;
         color: $tertiary-color;
         &:hover {
@@ -82,4 +82,9 @@
     }
 
     label { @include label; }
+
+    .field.type select {
+        width: 40%;
+        margin: auto;
+    }
 }

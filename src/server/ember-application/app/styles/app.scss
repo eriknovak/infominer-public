@@ -16,6 +16,7 @@ $main-font: 'Open Sans';
     text-transform: uppercase;
 }
 
+// import bootstrap library
 @import "ember-bootstrap/bootstrap";
 
 // component style
@@ -27,5 +28,4 @@ $main-font: 'Open Sans';
 @import 'table.scss';
 @import 'analysis.scss';
 @import 'graph.scss';
-
 

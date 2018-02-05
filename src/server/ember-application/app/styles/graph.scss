@@ -11,10 +11,11 @@ $height: 250px;
     text-align: center;
     -webkit-transition: background .4s;
     transition: background .4s;
+    color: $tertiary-color !important;
 
     &:hover {
         background-color: $primary-color;
-        color: $secondary-color;
+        color: $secondary-color !important;
     }
 
     .content {
@@ -30,7 +31,7 @@ $height: 250px;
     &.wordcloud {
         margin: -1px; // for border space
         border: 1px solid $primary-color;
-        font-weight: 500;
+        font-weight: 600;
         text.small { fill: darken($primary-color, 35%); }
         text.medium { fill: $tertiary-color; }
         text.large { fill: $dark-font-color; }

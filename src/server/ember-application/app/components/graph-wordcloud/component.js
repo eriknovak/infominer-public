@@ -94,7 +94,7 @@ const WordCloudComponent = GraphComponent.extend({
             .rotate(0)
             .random(() => 0.5)
             .font('Open Sans')
-            .fontWeight(500)
+            .fontWeight(600)
             .fontSize(function(d) { return d.size; })
             .on('end', this._createWordCloud.bind(this))
             .start();

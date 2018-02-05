@@ -26,10 +26,10 @@
     </div><!-- .dataset-description -->
 
     <div class="dataset-statistics">
-      {{dataset.numDocs}} documents, {{dataset.size}} bytes
+      {{dataset.size}} bytes
     </div>
 
-  </div><!-- .col-lg-offset-2.col-lg-8 -->
+  </div><!-- .col-lg-12 -->
 </div><!-- .row -->
 
 <div class="row">
@@ -38,9 +38,9 @@
     <table class="table">
       <thead>
         <tr>
-          <th>field name</th>
-          <th class="center">type</th>
-          <th class="center">included</th>
+          <th scope="col">field name</th>
+          <th scope="col" class="center">type</th>
+          <th scope="col" class="center">included</th>
         </tr>
       </thead>
       <tbody>
@@ -50,14 +50,14 @@
       </tbody>
     </table>
 
-  </div><!-- .col-lg-offset-2.col-lg-8 -->
+  </div><!-- .col-lg-12 -->
 </div><!-- .row -->
 
 <div class="row">
   <div class="col-lg-12">
     <button {{action submitDataset}} class="btn btn-primary pull-right">Save Dataset</button>
     <button {{action resetList}} class="btn btn-default pull-right">Cancel</button>
-  </div><!-- .col-lg-offset-2.col-lg-8 -->
+  </div><!-- .col-lg-12 -->
 </div><!-- .row -->
 
 {{yield}}

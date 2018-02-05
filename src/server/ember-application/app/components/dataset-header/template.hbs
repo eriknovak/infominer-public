@@ -1,6 +1,6 @@
 <div class="container-fluid dataset-header">
   <div class="row dataset-header-information">
-    <div class="col-sm-12 col-lg-offset-1 col-lg-11">
+    <div class="col-sm-12 offset-lg-1 col-lg-11">
       <div class="row">
         <div class="col-sm-5 col-md-4 col-lg-3">
           <!-- Dataset title and information -->
@@ -8,6 +8,7 @@
 
           <button class="btn btn-primary pull-right" data-toggle="modal"
             data-target="#delete-dataset-modal">Delete</button>
+
           <button class="btn btn-primary pull-right" data-toggle="modal"
             data-target="#edit-dataset-modal" {{action 'removeModalWarnings'}}>Edit</button>
 
@@ -37,11 +38,12 @@
     <div class="modal-content">
       <!-- modal header -->
       <div class="modal-header">
+        <!-- modal title -->
+        <h4 class="modal-title warning">Deleting dataset</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         <!-- modal title -->
-        <h4 class="modal-title warning">Deleting dataset</h4>
       </div>
       <div class="modal-body">
         <p>Are you sure you want to delete dataset: <b class="uppercase">{{dataset.label}}</b>? You will not be able to revert this action.</p>
@@ -63,11 +65,13 @@
     <div class="modal-content">
       <!-- modal header -->
       <div class="modal-header">
+        <!-- modal title -->
+        <h4 class="modal-title">Edit dataset</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         <!-- modal title -->
-        <h4 class="modal-title">Edit dataset</h4>
+
       </div>
       <div class="modal-body new-subset">
         <div class="container-fluid">
