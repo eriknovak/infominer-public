@@ -1,7 +1,1 @@
-{
-  "name": "ember-source",
-  "dependencies": {
-    "ember-addons.bs_for_ember": "~0.7.0",
-    "bootstrap": "^4.0.0"
-  }
-}
+{"name":"ember-application","dependencies":{"ember-addons.bs_for_ember":"~0.7.0"}}
