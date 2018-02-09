@@ -266,11 +266,11 @@ class BaseDataset {
             return { error: { message: 'Edit parameters are in incorrect format' } };
         }
 
-        if (datasetInformation.label) {
+        if (typeof datasetInformation.label === 'string') {
             // update dataset label
             self.params.label = datasetInformation.label;
         }
-        if (datasetInformation.description) {
+        if (typeof datasetInformation.description === 'string') {
             // update dataset description
             self.params.description = datasetInformation.description;
         }
