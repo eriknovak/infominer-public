@@ -2,7 +2,7 @@
 const winston = require('winston');
 const path = require('path');
 // internal modules
-const fileManager = require('./fileManager');
+const fileManager = require('./file-manager');
 
 // add daily rotate file configuration
 require('winston-daily-rotate-file');
@@ -49,7 +49,7 @@ class Logger {
     createInstance(filename, level='info', subfolder='', consoleFlag=true) {
         let logger_transports = [];
         // initialize folder path and create it
-        let folderPath = `${this.folder}/${subfolder}`;
+        let folderPath = path.join(this.folder, subfolder);
         fileManager.createDirectoryPath(folderPath);
         // add console logging transport to the instance
         if (consoleFlag) { logger_transports.push(new (winston.transports.Console)({ level, colorize: true })); }
@@ -87,7 +87,7 @@ class Logger {
     createGroupInstance(filename, subfolder='', consoleFlag=true) {
         let logger_transports = [];
         // initialize folder path and create it
-        let folderPath = `${this.folder}/${subfolder}`;
+        let folderPath = path.join(this.folder, subfolder);
         fileManager.createDirectoryPath(folderPath);
         // add console logging transport to the instance
         if (consoleFlag) { logger_transports.push(new (winston.transports.Console)({ level: 'info', colorize: true })); }

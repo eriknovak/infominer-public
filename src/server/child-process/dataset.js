@@ -7,7 +7,7 @@ console.log('Starting child process, id= ' + process.pid);
 let interval_id = setInterval(() => { }, 10 * 1000);
 
 // internal modules
-const BaseDataset = require('../../lib/baseDataset');
+const BaseDataset = require('../../lib/base-dataset');
 
 // json schema validator
 const validator = require('../../lib/validator')({

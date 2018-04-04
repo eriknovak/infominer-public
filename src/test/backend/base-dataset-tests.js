@@ -1,8 +1,8 @@
 // external modules
 const assert = require('assert');
 // internal modules
-const BaseDataset = require('../../lib/baseDataset');
-const fileManager = require('../../lib/fileManager');
+const BaseDataset = require('../../lib/base-dataset');
+const fileManager = require('../../lib/file-manager');
 
 
 describe('BaseDataset Tests', function () {

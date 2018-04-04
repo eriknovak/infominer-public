@@ -1,7 +1,7 @@
 // external modules
 const qm = require('qminer');
 // internal modules
-const fileManager = require('./fileManager');
+const fileManager = require('./file-manager');
 
 const validator = require('./validator')({
     // dataset schemas

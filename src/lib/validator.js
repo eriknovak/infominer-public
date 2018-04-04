@@ -1,7 +1,7 @@
 // external modules
 const JsonValidator = require('jsonschema').Validator;
 // internal modules
-const Logger = require('./loggingHandler')();
+const Logger = require('./logging-handler')();
 
 /**
  * The JSON validator class.

@@ -14,7 +14,7 @@ const pg = require('../lib/postgresQL')(require('../config/pgconfig')); // postg
 const argv = require('minimist')(process.argv.slice(2));
 
 // internal modules
-const Logger = require('../lib/loggingHandler')();
+const Logger = require('../lib/logging-handler')();
 // create a logger instance for logging API requests
 const logger = Logger.createGroupInstance('api_requests', 'api');
 
@@ -22,7 +22,7 @@ const logger = Logger.createGroupInstance('api_requests', 'api');
 const PORT = argv.PORT || 3000;
 
 // contains the process handler class
-const ProcessHandler = require('../lib/processHandler');
+const ProcessHandler = require('../lib/process-handler');
 // create an instance of the process handler
 let processHandler = new ProcessHandler({
     processPath: path.join(__dirname, '/child_process/dataset.js'),

@@ -4,7 +4,7 @@ const path = require('path');
 const qm = require('qminer');
 
 // internal modules
-const fileManager = require('../../../lib/fileManager');
+const fileManager = require('../../../lib/file-manager');
 const validator = require('../../../lib/validator')();
 
 // configurations
@@ -16,6 +16,7 @@ const static = require('../../../config/static');
  */
 // set destination path
 const destinationPath = path.join(__dirname, '../../../../data/temp');
+console.log(destinationPath);
 // create desctination path if not existing
 fileManager.createDirectoryPath(destinationPath);
 
@@ -205,9 +206,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             const dbFolder = results.length ? results[results.length-1].id : 0;
 
             // set pg dataset values
-            const label = dataset.label;                                // the user defined dataset label
-            const description = dataset.description;                    // the description of the dataset
-            const dbPath = `${static.dataPath}\\${owner}\\${dbFolder}`; // dataset directory
+            const label = dataset.label;             // the user defined dataset label
+            const description = dataset.description; // the description of the dataset
+            const dbPath = path.join(static.dataPath, owner.toString(), dbFolder.toString()); // dataset directory
 
             // create dataset directory
             fileManager.createDirectoryPath(dbPath);
