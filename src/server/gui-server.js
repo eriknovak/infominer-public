@@ -25,7 +25,7 @@ const PORT = argv.PORT || 3000;
 const ProcessHandler = require('../lib/process-handler');
 // create an instance of the process handler
 let processHandler = new ProcessHandler({
-    processPath: path.join(__dirname, '/child_process/dataset.js'),
+    processPath: path.join(__dirname, '/child-process/dataset.js'),
     cleanupMilliseconds: 30*60*1000, // 30 minutes
     processMaxAge:     2*60*60*1000  // 2 hours
 });
