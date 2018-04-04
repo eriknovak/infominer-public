@@ -16,6 +16,8 @@ export default Route.extend({
          */
         startAnalysis(analysisParams) {
             let self = this;
+            // toggle the modal - giving the user control
+            $('.modal.analysis-modal').modal('toggle');
             // get parent subset - to save method
             let parentSubset = self.modelFor('dataset.subset');
             // create a new method
@@ -25,12 +27,8 @@ export default Route.extend({
                 parameters: analysisParams.parameters,
                 appliedOn: parentSubset
             });
-
-            $('.modal.analysis-modal').modal('toggle');
-            method.save().then(function () {
-                // // transition to subset analysis
-                // self.transitionTo('dataset.subset.analysis', self.modelFor('dataset'), parentSubset);
-            });
+            // save the model
+            method.save();
         },
 
         /**
@@ -39,6 +37,8 @@ export default Route.extend({
          */
         createSubset(subsetInfo) {
             let self = this;
+            // toggle the modal - giving the user control
+            $(`#${subsetInfo.modalId}`).modal('toggle');
             // update method internal state
             this.get('store').findRecord('method', subsetInfo.methodId).then(method => {
                 // create new subset
@@ -47,14 +47,14 @@ export default Route.extend({
                     label: subsetInfo.label,
                     description: subsetInfo.description,
                     resultedIn: method,
-                    clusterId: subsetInfo.clusterId
+                    clusterId: subsetInfo.clusterId,
+                    documentCount: subsetInfo.documentCount
                 });
                 // set cluster id to send as metadata
                 subset.set('clusterId', subsetInfo.clusterId);
-                $(`#${subsetInfo.modalId}`).modal('toggle');
-
                 // save the cluster
                 subset.save();
+
             });
         }
     }

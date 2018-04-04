@@ -1,6 +1,6 @@
 // common styles for all views
 html, body {
-    font-family: $main-font;
+    font-family: $font-primary;
     font-weight: 300;
     font-size: 14px;
 }
@@ -59,7 +59,7 @@ a {
     .navbar-brand {
         cursor: default;
         color: $light-font-color !important;
-        font-family: $main-font;
+        font-family: $font-primary;
         font-weight: 400;
         &:hover { color: $light-font-color; }
     }

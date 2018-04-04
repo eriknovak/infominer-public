@@ -131,18 +131,18 @@ const HistogramComponent = GraphComponent.extend({
          * Cumulative sum of the percentage attribute
          **************************************************/
 
-        // create the percentage sum histogram placeholder
-        let percentSum = content.selectAll('.percentSum')
-            .data(data.values)
-          .enter().append('g')
-            .attr('class', 'percentSum')
-            .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d.percentSum)})`);
+        // // create the percentage sum histogram placeholder
+        // let percentSum = content.selectAll('.percentSum')
+        //     .data(data.values)
+        //   .enter().append('g')
+        //     .attr('class', 'percentSum')
+        //     .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d.percentSum)})`);
 
-        // create histogram rectangle
-        percentSum.append('rect')
-            .attr('x', 0)
-            .attr('width', xScale(data.values[0].max) - xScale(data.values[0].min))
-            .attr('height', (d) => height - yScale(d.percentSum));
+        // // create histogram rectangle
+        // percentSum.append('rect')
+        //     .attr('x', 0)
+        //     .attr('width', xScale(data.values[0].max) - xScale(data.values[0].min))
+        //     .attr('height', (d) => height - yScale(d.percentSum));
 
 
         /**************************************************
@@ -200,7 +200,7 @@ const HistogramComponent = GraphComponent.extend({
         // set horizontal axis
         content.append('g')
             .attr('transform', `translate(0,${height})`)
-            .call(axisBottom(xScale).ticks(5));
+            .call(axisBottom(xScale).ticks(5).tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); }));
     }
 
 });

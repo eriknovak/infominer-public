@@ -1,4 +1,4 @@
-{{#if method.produced }}
+{{#if ontology.length }}
   <!-- button for toggling collapse -->
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleBranch'}}>
@@ -6,13 +6,22 @@
   </button>
 {{else}}
   <!-- placeholder for the toggle -->
-  <span class="navigation-button-placeholder"></span>
+  <span class="navigation-button-placeholder">
+    <i class="fa fa-circle-o-notch fa-spin"></i>
+  </span>
 {{/if}}
 <!-- method type/label -->
 {{ method.methodType }}
+{{#if selectedFields}}
+  <small>({{ selectedFields }})</small>
+{{/if}}
 
 {{#bs-collapse collapsed=collapsed class="tree-branch"}}
-  {{#each method.produced as |subset| }}
-    {{ structure-subset subset=subset usedBy=subset.usedBy }}
+  {{#each ontology as |onto| }}
+    {{#if onto.subsetCreated }}
+      {{ structure-subset subset=onto.subset usedBy=onto.subset.usedBy }}
+    {{else}}
+      {{ structure-unsaved label=onto.subsetLabel type='subset' }}
+    {{/if}}
   {{/each}}
 {{/bs-collapse}}

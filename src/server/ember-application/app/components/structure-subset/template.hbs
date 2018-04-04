@@ -1,4 +1,4 @@
-{{#if parent }}
+{{#if ontology.length }}
   <!-- button for toggling collapse -->
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleBranch'}}>
@@ -24,12 +24,10 @@
 {{/if}}
 
 {{#bs-collapse collapsed=collapsed class="tree-branch"}}
-  {{#each usedBy as |method| }}
+  {{#each ontology as |method| }}
 
-    {{#if method.produced}}
-      <!-- subsets are joined to this method -->
-      {{ structure-method method=method }}
-    {{/if}}
+    <!-- subsets are joined to this method -->
+    {{ structure-method method=method }}
 
   {{/each}}
 {{/bs-collapse}}

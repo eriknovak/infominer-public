@@ -16,8 +16,8 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         // get cluster id and set subset name
-        let clusterId = this.get('clusterId');
-        let subsetName = clusterId != null ? `Cluster #${clusterId+1}` : 'Subset';
+        let cluster = this.get('cluster');
+        let subsetName = cluster.clusterLabel != null ? cluster.clusterLabel : 'Subset';
         // set parameters
         this.set('subsetName', subsetName);
         this.set('subsetDescription', '');
@@ -52,7 +52,8 @@ export default Component.extend({
                 description: this.get('subsetDescription'),
                 modalId: this.get('elementId'),
                 methodId: this.get('methodId'),
-                clusterId: this.get('clusterId')
+                clusterId: this.get('clusterId'),
+                documentCount: this.get('cluster.documentCount')
             };
             // invoke the route action on subset info
             this.get('createSubset')(subsetInfo);

@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { observer, set } from '@ember/object';
+import { observer, computed, set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
@@ -8,13 +8,20 @@ export default Component.extend({
     collapsed: false,
     parent: false,
 
-    _parentState: observer('subset.usedBy.@each.produced.[]', function () {
+    _parentState: observer('subset.usedBy.@each.produced', function () {
         this.get('usedBy').then(methods => {
             let producedSubsets = methods.filter((item) => {
                 return item.hasMany('produced').ids().length > 0;
             });
             let isParent = producedSubsets.get('length') > 0;
             this.set('parent', isParent);
+        });
+    }),
+
+    ontology: computed('subset.usedBy', function () {
+        return this.get('usedBy').filter(method => {
+            return method.get('methodType').includes('clustering') ||
+                   method.get('methodType').includes('filter');
         });
     }),
 

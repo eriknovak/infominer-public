@@ -1,84 +1,95 @@
-.tree-structure {
+.dataset-navigation {
 
-    margin: 0;
-    padding: 0;
+    .tree-structure {
 
-    .btn {
-        width: 20px;
-        height: 20px;
-        padding: 0px;
-        border-radius: 50%;
-        text-align: center;
-        background-color: transparent;
-        &.rotate {
-            -webkit-transition: all .2s linear;
-            -moz-transition: all .2s linear;
-            transition: all .2s linear;
-            &.right{
-                -ms-transform: rotate(-90deg);
-                -moz-transform: rotate(-90deg);
-                -webkit-transform: rotate(-90deg);
-                transform: rotate(-90deg);
+        margin: 0;
+        padding: 0;
+
+        .btn {
+            width: 20px;
+            height: 20px;
+            padding: 0px;
+            border-radius: 50%;
+            text-align: center;
+            background-color: transparent;
+            &.rotate {
+                -webkit-transition: all .2s linear;
+                -moz-transition: all .2s linear;
+                transition: all .2s linear;
+                &.right{
+                    -ms-transform: rotate(-90deg);
+                    -moz-transform: rotate(-90deg);
+                    -webkit-transform: rotate(-90deg);
+                    transform: rotate(-90deg);
+                }
+            }
+            &:hover {
+                background-color: $primary-color;
+            }
+            i { margin: auto; }
+        }
+
+        .tree-branch {
+            margin-left: 20px;
+        }
+        .subset-structure-placeholder {
+            padding: 0 5px;
+        }
+        .navigation-button-placeholder {
+            display: inline-block;
+            text-align: center;
+            width: 20px;
+        }
+
+        & > .child:first-child {
+            &:after { border-left: 0px solid; }
+            &:before { border-top: 0px solid; }
+        }
+
+        .parent,
+        .child {
+            position: relative;
+            & .tree-branch > .child:last-child:after {
+                height: 8px;
             }
         }
-        &:hover {
-            background-color: $primary-color;
-        }
-        i { margin: auto; }
-    }
 
-    .tree-branch {
-        margin-left: 20px;
-    }
-    .subset-structure-placeholder {
-        padding: 0 5px;
-    }
-    .navigation-button-placeholder {
-        display: inline-block;
-        text-align: center;
-        width: 20px;
-    }
+        .child {
+            position: relative;
 
-    & > .child:first-child {
-        &:after { border-left: 0px solid; }
-        &:before { border-top: 0px solid; }
-    }
+            &:before,
+            &:after {
+                content: '';
+                position: absolute;
+                left: -11px;
+            }
 
-    .parent,
-    .child {
-        position: relative;
-        & .tree-branch > .child:last-child:after {
-            height: 8px;
-        }
-    }
+            &:before {
+                border-top: 1px solid;
+                top: 10px;
+                width: 8px;
+                height: 0;
+            }
 
-    .child {
-        position: relative;
-
-        &:before,
-        &:after {
-            content: '';
-            position: absolute;
-            left: -11px;
+            &:after {
+                border-left: 1px solid;
+                height: 100%;
+                width: 0px;
+                top: 2px;
+            }
         }
 
-        &:before {
-            border-top: 1px solid;
-            top: 10px;
-            width: 8px;
-            height: 0;
+        .method, .subset, .unsaved {
+            font-family: $font-primary;
+            padding: 1px;
         }
 
-        &:after {
-            border-left: 1px solid;
-            height: 100%;
-            width: 0px;
-            top: 2px;
+        .method > button > .fa { color: green; }
+        .subset > button > .fa { color: $tertiary-color; }
+        .unsaved {
+            padding: 0px 5px;
+            .label { color: black }
         }
+
     }
-
-    .method > button > .fa { color: green; }
-    .subset > button > .fa { color: $tertiary-color; }
-
-
 }

@@ -43,7 +43,7 @@ $height: 250px;
                 fill: $tertiary-color;
             }
             .frequency {
-                font: 10px $main-font;
+                font: 10px $font-primary;
                 cursor: default;
             }
         }
@@ -59,10 +59,44 @@ $height: 250px;
         }
         .tick {
             line { stroke: $dark-font-color; }
-            text { font-family: $main-font; }
+            text { font-family: $font-primary; }
         }
-
     }
+
+    &.radial-tree {
+        height: 2.5*$height;
+        margin: -1px; // for border space
+        border: 1px solid $primary-color;
+
+        .node {
+            text { font: 10px $font-primary; }
+
+            body {
+                background-color: transparent;
+                .description {
+                    .subset-label { font-family: $font-primary; }
+                    font: 10px $font-primary;
+                 }
+            }
+
+
+            &.subset circle { fill: $tertiary-color; }
+            &.method circle { fill: green; }
+          }
+
+          .node-internal {
+              circle { fill: #555; }
+              text { text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff; }
+          }
+
+          .link {
+            fill: none;
+            stroke: #555;
+            stroke-opacity: 0.4;
+            stroke-width: 1.5px;
+          }
+    }
+
 }
 
 /**************************************

@@ -5,12 +5,21 @@ import { computed } from '@ember/object';
 
 export default Component.extend({
     // component attributes
-    classNames: ['col-lg-12 clustering'],
+    classNames: ['col-lg-12', 'clustering'],
 
     // services
     columnWidth: service('column-size'),
+    store: service('store'),
 
-    clusters: computed('method.result.clusters', function () {
+
+    didReceiveAttrs() {
+        this._super(...arguments);
+
+        this._setClusters();
+        this._setSelectedFields();
+    },
+
+    _setClusters() {
         let clusters = this.get('method.result.clusters');
         // prepare the layout of the components
         for (let i = 0; i < clusters.length; i++) {
@@ -19,7 +28,22 @@ export default Component.extend({
             this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
             this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');
         }
-        return clusters;
-    })
+        // get subset names
+        clusters.forEach(cluster => {
+            if (cluster.subsetId) {
+                Ember.set(cluster, 'clusterLabel', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
+            } else if (cluster.clusterLabel) {
+                // do nothing - cluster already has a clusterLabel
+            }
+        });
+
+        this.set('clusters', clusters);
+    },
+
+    _setSelectedFields() {
+        const selectedFields = this.get('method.parameters.features').map(feature => feature.field).join(', ');
+        this.set('selectedFields', selectedFields);
+    }
+
 
 });
