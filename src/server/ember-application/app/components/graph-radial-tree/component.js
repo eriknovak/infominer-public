@@ -7,7 +7,7 @@ import { observer, computed, set } from '@ember/object';
 import { select, event } from 'd3-selection';
 import { stratify, tree } from 'd3-hierarchy';
 import { linkRadial } from 'd3-shape';
-import { zoom } from 'd3-zoom';
+import { transition } from 'd3-transition';
 
 
 
@@ -231,7 +231,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 ` : '';
             });
 
-       
+        
 
         function relax() {
             let again = false;

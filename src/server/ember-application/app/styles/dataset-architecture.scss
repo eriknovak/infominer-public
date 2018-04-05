@@ -1,11 +1,8 @@
 .dataset-header {
     border-bottom: 1px solid #cccccc;
-    .dataset-header-information{
-        padding-bottom: 20px;
-        .dataset-description {
-            max-height: 150px;
-            overflow-y: auto;
-        }
+    .dataset-header-information .dataset-description {
+        // max-height: 150px;
+        // overflow-y: auto;
     }
 }
 .description-header {
@@ -35,9 +32,7 @@
         background-color: white;
         -webkit-transition: background .4s;
         transition: background .4s;
-        &:hover {
-            background-color: $primary-color;
-        }
+        &:hover { background-color: $primary-color; }
 
         &.active {
             background-color: $color;

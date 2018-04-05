@@ -80,8 +80,8 @@ export default DatasetUploadRoute.extend({
                                 clearInterval(interval);
                                 this.get('notify').info({
                                     html: `<div class="notification">
-                                            Dataset <span class="database-label">
-                                                '${response.label}'
+                                            Dataset <span class="label">
+                                                ${response.label}
                                             </span> successfully loaded!
                                         </div>`
                                 });

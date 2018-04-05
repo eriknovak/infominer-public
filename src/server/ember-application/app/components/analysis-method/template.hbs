@@ -1,6 +1,1 @@
-<!-- render component based on method type -->
-{{#if method.result}}
-  {{ component methodComponent method=method subset=subset dataset=dataset createSubset=createSubset }}
-{{else}}
-  {{ component methodComponent method=method subset=subset dataset=dataset }}
-{{/if}}
+{{ component methodComponent method=method subset=subset dataset=dataset createSubset=createSubset }}
