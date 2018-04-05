@@ -2,9 +2,6 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 
 export default Component.extend({
-    // component attributes
-    classNames: ['col-lg-12'],
-
     // services
     columnWidth: service('column-size'),
 

@@ -120,9 +120,10 @@
         h3 { border-bottom: 1px solid #cccccc; }
         .clusters {
             .cluster-content {
-                margin: 5px auto;
+                margin: 10px auto;
                 .cluster-header {
                     color: $secondary-color;
+                    margin-bottom: 0px;
                 }
             }
 

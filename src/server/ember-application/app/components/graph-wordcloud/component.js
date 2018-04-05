@@ -1,6 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
-import { set } from '@ember/object';
+import { observer, set } from '@ember/object';
 
 // d3 visualizations
 import { min, max } from 'd3-array';
@@ -15,8 +15,8 @@ const WordCloudComponent = GraphComponent.extend({
     classNames: ['wordcloud'],
 
     // wordcloud font size
-    maxFontSize: 40,
-    minFontSize: 12,
+    maxFontSize: 36,
+    minFontSize: 10,
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -33,7 +33,6 @@ const WordCloudComponent = GraphComponent.extend({
         this.prepareText(this.get('keywords'));
     },
 
-
     ///////////////////////////////////////////////////////
     // Helper functions
     ///////////////////////////////////////////////////////
@@ -43,9 +42,10 @@ const WordCloudComponent = GraphComponent.extend({
      * @param {Object[]} keywords - Array of `keyword` and `weight` values.
      */
     prepareText(keywords) {
+        keywords = keywords.slice(0, 50);
         // get minimum and maximum weights
-        let minWeight = min(keywords, (d) => d.weight);
-        let maxWeight = max(keywords, (d) => d.weight);
+        let minWeight = min(keywords, d => d.weight);
+        let maxWeight = max(keywords, d => d.weight);
         // get minimum and maximum font size
         let minFontSize = this.get('minFontSize');
         let maxFontSize = this.get('maxFontSize');
@@ -65,7 +65,7 @@ const WordCloudComponent = GraphComponent.extend({
         // get keywords data
         let data = keywords.map(function(d) {
             return {
-                text: d.keyword,
+                text: d.keyword.toUpperCase(),
                 size: minWeight === maxWeight ?
                     maxFontSize : fontScale(d.weight),
                 colorClass: minWeight === maxWeight ?
@@ -76,6 +76,11 @@ const WordCloudComponent = GraphComponent.extend({
         // set the data
         this.set('data', data);
     },
+
+    dataObserver: observer('data', 'width', 'height', function () {
+        let self = this;
+        Ember.run.once(function () { setTimeout(function () { self.drawGraph(); }, 2000); });
+    }),
 
     /**
      * Prepares the cloud canvas.
@@ -94,8 +99,7 @@ const WordCloudComponent = GraphComponent.extend({
             .rotate(0)
             .random(() => 0.5)
             .font('Open Sans')
-            .fontWeight(600)
-            .fontSize(function(d) { return d.size; })
+            .fontSize(d => d.size)
             .on('end', this._createWordCloud.bind(this))
             .start();
     },
@@ -121,11 +125,11 @@ const WordCloudComponent = GraphComponent.extend({
           .selectAll('text')
             .data(words)
           .enter().append('text')
-            .style('font-size', (d) => `${d.size}px`)
-            .attr('class', (d) => d.colorClass)
+            .style('font-size', d => `${d.size}px`)
+            .attr('class', d => d.colorClass)
             .attr('text-anchor', 'middle')
-            .attr('transform', (d) => `translate(${d.x},${d.y})`)
-            .text((d) => d.text);
+            .attr('transform', d => `translate(${d.x},${d.y})`)
+            .text(d => d.text);
     }
 
 });

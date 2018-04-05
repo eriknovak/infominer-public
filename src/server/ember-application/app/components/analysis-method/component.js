@@ -2,7 +2,7 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 export default Component.extend({
     // component attributes
-    classNames: ['row', 'analysis'],
+    classNames: ['analysis'],
 
     methodComponent: computed('method.{methodType,result}', function () {
          // get type of the method

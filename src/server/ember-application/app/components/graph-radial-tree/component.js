@@ -125,7 +125,6 @@ const RadialTreeComponent = GraphComponent.extend({
         for (let i = 0; i < methods.length; i++) {
             this._addMethodToHierarchy(methods.objectAt(i), hierarchy);
         }
-        console.log(hierarchy);
         // return the hierarchy prepared for consumption
         return stratify().id(d => d.id)
             .parentId(d => d.parentId)(hierarchy);
@@ -203,8 +202,7 @@ const RadialTreeComponent = GraphComponent.extend({
         node.append('circle')
             .attr('r', d => d.data.numberOfDocuments ? nodeSize(d.data.numberOfDocuments) : 3);
 
-
-            let foreignObjects = node.append('foreignObject')
+        let foreignObjects = node.append('foreignObject')
             .attr('x', d => {
                 if (!d.parent) { return radialPoint(d.x, d.y)[0]; }
                 return d.x < Math.PI === !d.children ? 8 : -100;
@@ -214,6 +212,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 return !(d.x < Math.PI / 2 || Math.PI * 3 / 2 < d.x)  === !d.children ? 0 : -25;
             })
             .attr('width', 150);
+
 
         let htmlDOMs = foreignObjects.append('xhtml:body')
             .style('margin', 0)
@@ -226,24 +225,20 @@ const RadialTreeComponent = GraphComponent.extend({
             .attr('class', 'description')
             .html((d, i) => {
                 return d.data.type === 'subset' && !(d.parent && d.children) ? `
-                    <span class="subset-label">${d.data.label}</span><br>
+                    <span class="title">${d.data.label}</span><br>
                     <span class="attribute-label">documents</span> =
                     <span class="attribute-value">${d.data.numberOfDocuments}</span>
                 ` : '';
             });
 
-        function moveCircleLocation(g, x, y) {
-            g.attr('x', parseFloat(g.attr('x')) + x);
-            g.attr('y', parseFloat(g.attr('y')) + y);
-            g.attr('transform', `translate()`);
-
-        }
+       
 
         function relax() {
             let again = false;
             let spaceh = 120;
             let spacev = 28;
             let alpha = 0.5;
+
             node.each(function (d, i) {
                 let a = this;
                 let da = select(a);
@@ -282,23 +277,12 @@ const RadialTreeComponent = GraphComponent.extend({
             });
             // Adjust our line leaders here
             // so that they follow the labels.
-            if(again) { console.log('again'); setTimeout(relax, 20); } else { console.log('done'); }
+            if(again) { setTimeout(relax, 20); }
         }
 
+        // start relaxing
         relax();
-
-        // container.append('rect')
-        //     .attr('class', 'zoom-rect')
-        //     .attr('width', totalWidth)
-        //     .attr('height', totalHeight)
-        //     .style("fill", "none")
-        //     .style("pointer-events", "all")
-        //     .call(zoom().scaleExtent([1 / 2, 4])
-        //         .on("zoom", () => { content.attr('transform', event.transform); })
-        //     );
-
-
-        }
+    }
 
 });
 

@@ -110,21 +110,21 @@ const HistogramComponent = GraphComponent.extend({
          **************************************************/
 
         // initialize percent sum outline
-        let percentSumOutline = line()
+        let percentOutline = line()
             .x(d => xScale(d.min))
-            .y(d => yScale(d.percentSum))
+            .y(d => yScale(d.percent))
             .curve(curveStepAfter);
 
         // add first and last points to the path
         let pathValues = data.values.slice();
-        pathValues.push({ min: data.max, percentSum: 0 });
-        pathValues = [{ min: data.min, percentSum: 0 }].concat(pathValues);
+        pathValues.push({ min: data.max, percent: 0 });
+        pathValues = [{ min: data.min, percent: 0 }].concat(pathValues);
 
         // create the outline of percentSum
         content.append('path')
             .datum(pathValues)
-            .attr('class', 'percentSumOutline')
-            .attr('d', percentSumOutline);
+            .attr('class', 'percentOutline')
+            .attr('d', percentOutline);
 
 
         /**************************************************
@@ -157,15 +157,10 @@ const HistogramComponent = GraphComponent.extend({
             .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d.percent)})`);
 
         // create histogram rectangle
-        percent.append('rect')
-            .attr('x', 0)
-            .attr('width', xScale(data.values[0].max) - xScale(data.values[0].min))
-            .attr('height', (d) => height - yScale(d.percent));
-
-
-        /**************************************************
-         * Percentage attributes
-         **************************************************/
+        // percent.append('rect')
+        //     .attr('x', 0)
+        //     .attr('width', xScale(data.values[0].max) - xScale(data.values[0].min))
+        //     .attr('height', (d) => height - yScale(d.percent));
 
         // set frequency format
         function formatCount(value) {
@@ -182,11 +177,11 @@ const HistogramComponent = GraphComponent.extend({
             })
             .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
             .attr('text-anchor', 'middle')
-            .attr('fill', (d) => {
+            .attr('fill', d => {
                 let squareHight = height - yScale(d.percent);
                 return squareHight > 20 ? 'white' : '#2C3539';
             })
-            .text((d) => { return d.frequency ? formatCount(d.frequency) : ''; });
+            .text(d => { return d.frequency ? formatCount(d.frequency) : ''; });
 
 
         /**************************************************

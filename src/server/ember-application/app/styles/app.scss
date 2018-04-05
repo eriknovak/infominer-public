@@ -3,7 +3,7 @@ $primary-color: #e7e7e7;
 $secondary-color: #003399;
 $tertiary-color: #3366CC;
 $quaternary-color: #6699FF;
-// fonts
+// fonts colors
 $light-font-color: #e7e7e7;
 $dark-font-color: #2C3539;
 $font-primary: 'Open Sans';
@@ -24,7 +24,7 @@ $font-primary: 'Open Sans';
 @import 'login.scss';
 @import 'tree-structure.scss';
 @import 'dataset-upload.scss';
-@import 'dataset-main.scss';
+@import 'dataset-architecture.scss';
 @import 'table.scss';
 @import 'analysis.scss';
 @import 'graph.scss';

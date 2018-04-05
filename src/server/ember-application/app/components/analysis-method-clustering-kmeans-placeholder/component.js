@@ -3,7 +3,7 @@ import { inject as service } from '@ember/service';
 
 export default Component.extend({
     // component attributes
-    classNames: ['col-lg-12 clustering'],
+    classNames: ['clustering'],
 
     // services
     router: service('-routing'),

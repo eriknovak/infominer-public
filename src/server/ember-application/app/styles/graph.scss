@@ -48,9 +48,9 @@ $height: 250px;
             }
         }
 
-        .percentSumOutline,
+        .percentOutline,
         .percentSum rect {
-            fill: darken($primary-color, 2%);
+            fill: darken($tertiary-color, 2%);
         }
 
         .domain {
@@ -74,7 +74,7 @@ $height: 250px;
             body {
                 background-color: transparent;
                 .description {
-                    .subset-label { font-family: $font-primary; }
+                    .title { font-weight: bold; }
                     font: 10px $font-primary;
                  }
             }

@@ -1,10 +1,4 @@
-#database-container {
-    a {
-        &:hover {
-            background-color: $quaternary-color;
-        }
-    }
-}
+#database-container a:hover { background-color: $quaternary-color; }
 
 @mixin dataset-square {
     margin-top: 20px;
@@ -19,12 +13,9 @@
 
 .dataset {
     @include dataset-square;
-
     color: white;
     background-color: $quaternary-color;
-    &:hover {
-        background-color: darken($quaternary-color, 10%);
-    }
+    &:hover { background-color: darken($quaternary-color, 10%); }
     .fa {
         margin: 20px;
         font-size: 40px;
