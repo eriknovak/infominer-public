@@ -1,28 +1,5 @@
 $wordcloud-font: 'Passion One';
-
 $height: 250px;
-
-.method-selection {
-    display: block;
-    height: $height;
-    margin: -1px;
-    margin-top: 30px;
-    border: 1px dashed $primary-color;
-    text-align: center;
-    -webkit-transition: background .4s;
-    transition: background .4s;
-    color: $tertiary-color !important;
-
-    &:hover {
-        background-color: $primary-color;
-        color: $secondary-color !important;
-    }
-
-    .content {
-        display: inline-block;
-        margin: 89px 0;
-    }
-}
 
 .graph {
     width: 100%;
@@ -32,31 +9,23 @@ $height: 250px;
         margin: -1px; // for border space
         border: 1px solid $primary-color;
         font-weight: 600;
-        text.small { fill: darken($primary-color, 35%); }
+        text.small  { fill: darken($primary-color, 35%); }
         text.medium { fill: $tertiary-color; }
-        text.large { fill: $dark-font-color; }
+        text.large  { fill: $dark-font-color; }
     }
 
     &.histogram {
         .percent {
-            rect {
-                fill: $tertiary-color;
-            }
+            rect { fill: $tertiary-color; }
             .frequency {
                 font: 10px $font-primary;
                 cursor: default;
             }
         }
 
-        .percentOutline,
-        .percentSum rect {
-            fill: darken($tertiary-color, 2%);
-        }
+        .percentOutline { fill: darken($tertiary-color, 2%); }
 
-        .domain {
-            stroke: $dark-font-color;
-
-        }
+        .domain { stroke: $dark-font-color; }
         .tick {
             line { stroke: $dark-font-color; }
             text { font-family: $font-primary; }
@@ -74,27 +43,27 @@ $height: 250px;
             body {
                 background-color: transparent;
                 .description {
-                    .title { font-weight: bold; }
                     font: 10px $font-primary;
+                    .title { font-weight: bold; }
                  }
             }
 
 
             &.subset circle { fill: $tertiary-color; }
             &.method circle { fill: green; }
-          }
+        }
 
-          .node-internal {
-              circle { fill: #555; }
-              text { text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff; }
-          }
+        .node-internal {
+            circle { fill: #555; }
+            text { text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff; }
+        }
 
-          .link {
+        .link {
             fill: none;
             stroke: #555;
             stroke-opacity: 0.4;
             stroke-width: 1.5px;
-          }
+        }
     }
 
 }
@@ -102,17 +71,15 @@ $height: 250px;
 /**************************************
  * analysis results
  *************************************/
-.clustering {
-    .graph { height: calc(#{$height} - 100px); }
-}
+.clustering .graph { height: calc(#{$height} - 100px); }
 
 /**************************************
  * placeholder style
  *************************************/
 
  @keyframes pulse {
-    0% { background-color: lighten($primary-color, 5%); }
-    50% { background-color: $primary-color; }
+    0%   { background-color: lighten($primary-color, 5%); }
+    50%  { background-color: $primary-color; }
     100% { background-color: lighten($primary-color, 5%); }
 }
 

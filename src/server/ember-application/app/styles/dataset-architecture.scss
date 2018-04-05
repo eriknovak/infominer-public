@@ -97,3 +97,24 @@
         margin-bottom: 5px;
     }
 }
+
+.method-selection {
+    display: block;
+    height: 250px;
+    margin: -1px;
+    border: 1px dashed $primary-color;
+    text-align: center;
+    -webkit-transition: background .4s;
+    transition: background .4s;
+    color: $tertiary-color !important;
+
+    &:hover {
+        background-color: $primary-color;
+        color: $secondary-color !important;
+    }
+
+    .content {
+        display: inline-block;
+        margin: 89px 0;
+    }
+}

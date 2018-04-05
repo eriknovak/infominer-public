@@ -67,15 +67,9 @@
             label {
                 background-color: white;
                 border-color: $primary-color;
-                &.include-label {
-                    margin: 1px 5px 2px 0;
-                }
+                &.include-label { margin: 1px 5px 2px 0; }
             }
-            .checkbox {
-                label:after {
-                    top: 5px;
-                }
-            }
+            .checkbox label:after { top: 5px; }
 
         }
 
@@ -117,16 +111,13 @@
 .analysis {
     margin: 10px auto;
     .clustering {
-        h3 { border-bottom: 1px solid #cccccc; }
-        .clusters {
-            .cluster-content {
-                margin: 10px auto;
-                .cluster-header {
-                    color: $secondary-color;
-                    margin-bottom: 0px;
-                }
+        h4 { border-bottom: 1px solid #cccccc; }
+        .clusters .cluster-content {
+            margin: 10px auto;
+            .cluster-header {
+                color: $secondary-color;
+                margin-bottom: 0px;
             }
-
         }
     }
 }
