@@ -111,7 +111,11 @@
 .analysis {
     margin: 10px auto;
     .clustering {
-        h4 { border-bottom: 1px solid #cccccc; }
+        margin-top: 20px;
+        h3 { 
+            border-bottom: 1px solid #cccccc; 
+            color: green;
+        }
         .clusters .cluster-content {
             margin: 10px auto;
             .cluster-header {

@@ -26,7 +26,10 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
 
   // bootstrap libraries
-  app.import(`${app.bowerDirectory}/bootstrap/dist/js/bootstrap.min.js`);
+  app.import({
+    development:'node_modules/bootstrap/dist/js/bootstrap.js',
+    production: 'node_modules/bootstrap/dist/js/bootstrap.min.js'
+  });
 
   return app.toTree();
 };

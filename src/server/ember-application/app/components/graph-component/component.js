@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { observer } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
@@ -20,15 +21,15 @@ export default Component.extend({
 
     didInsertElement() {
         let self = this;
-        this._super(...arguments);
         // set element width
+        self._super(...arguments);
         self._handleResize();
         // set window resize listener
         $(window).on('resize', function () {
             clearTimeout(self.get('resizeTimer'));
             self.set('resizeTimer', setTimeout(function () {
-                self._handleResize();
-            }, 100));
+                Ember.run.scheduleOnce('afterRender', function () { self._handleResize(); });
+            }, 500));
         });
     },
 
@@ -45,10 +46,14 @@ export default Component.extend({
      * Resizes the width and height.
      */
     _handleResize() {
+        let self = this;
         this.set('width', $(this.element).width());
         this.set('height', $(this.element).height());
-        this.drawGraph();
     },
+
+    resizeObserver: observer('width', 'height', function () {
+        // Ember.run.once(this, 'drawGraph');
+    }),
 
     /**
      * Draws the graph

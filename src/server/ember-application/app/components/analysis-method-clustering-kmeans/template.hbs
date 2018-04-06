@@ -1,4 +1,4 @@
-<h4>Clustering KMeans</h4>
+<h3 class="method-type">Clustering KMeans</h3>
 <div class="method-parameters">
   <span>SELECTED FIELDS: </span>
   <span class="parameter-values">{{selectedFields}}</span>
@@ -11,12 +11,12 @@
         <div class="cluster-content">
 
           {{#if cluster.subsetCreated}}
-              {{#link-to 'dataset.subset' dataset cluster.subsetId class="btn btn-secondary pull-right" }}
-                Go to Subset
-              {{/link-to}}
-            {{else}}
-              <button class="btn btn-primary pull-right" data-toggle="modal"
-                data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
+            {{#link-to 'dataset.subset' dataset cluster.subsetId class="btn btn-secondary pull-right" }}
+              Go to Subset
+            {{/link-to}}
+          {{else}}
+            <button class="btn btn-primary pull-right" data-toggle="modal"
+              data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
           {{/if}}
 
           <h5 class="cluster-header">

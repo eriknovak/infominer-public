@@ -3,6 +3,7 @@ html, body {
     font-family: $font-primary;
     font-weight: 200;
     font-size: 13px;
+    color: $font-color-dark;
 }
 
 body {
@@ -11,16 +12,12 @@ body {
     & > .ember-view { height: 100% }
 }
 
-h1, h2, h3, h4, h5, h6 {
-    text-transform: uppercase;
-}
+h1, h2, h3, h4, h5, h6 { text-transform: uppercase; }
 
 a {
     text-decoration: none;
     cursor: pointer;
-    &:active, &:hover, &:focus {
-        text-decoration: none;
-    }
+    &:active, &:hover, &:focus { text-decoration: none; }
 }
 
 /**************************************
@@ -110,13 +107,9 @@ a {
     }
 }
 
-p.modal-subtitle {
-    margin-bottom: 0px;
-}
+p.modal-subtitle { margin-bottom: 0px; }
 
-.modal-content {
-    border-radius: 0px;
-}
+.modal-content { border-radius: 0px; }
 
 /**************************************
  * Custom checkbox style - component 'checkbox-select'
@@ -147,9 +140,7 @@ p.modal-subtitle {
         border-radius: 3px;
         margin: 0px;
 
-        &:hover::after {
-            opacity: 0.5;
-        }
+        &:hover::after { opacity: 0.5; }
 
         &:after {
             opacity: 0;
@@ -203,13 +194,11 @@ p.modal-subtitle {
     }
 
     &.btn-tertiary {
-        color: $dark-font-color;
+        color: $font-color-dark;
         @include button-type($primary-color);
     }
 
-    &.pull-right {
-        margin-left: 10px;
-    }
+    &.pull-right { margin-left: 10px; }
 }
 
 /**************************************
@@ -239,7 +228,7 @@ input, select, textarea {
     .ember-notify {
         color: white;
         border: 0px solid;
-        background-color: $dark-font-color;
+        background-color: $font-color-dark;
         a { color: white; }
         .notification {
             .label { 
@@ -255,135 +244,21 @@ input, select, textarea {
  * Helper classes
  *************************************/
 
-.uppercase {
-    text-transform: uppercase;
-}
+.uppercase { text-transform: uppercase; }
 
-.warning {
-    color: red;
-}
+.warning { color: red; }
 
-.center {
-    text-align: center;
-}
+.center { text-align: center; }
 
-.medium-size {
-    font-size: 16px;
-}
+.medium-size { font-size: 16px; }
 
-.highlight-text-only {
-    font-weight: 600;
-}
+.highlight-text-only { font-weight: 600; }
 
-.bottom-space {
-    margin-bottom: 10px;
-}
+.bottom-space { margin-bottom: 10px; }
 
 // highlights part of the text
 .highlight {
     background-color: $primary-color;
     font-weight: 500;
     padding: 0px 2px;
-}
-
-/**************************************
- * Helper classes
- *************************************/
-
-.dataset-header {
-    border-bottom: 1px solid #cccccc;
-    .dataset-header-information{
-        padding-bottom: 20px;
-        .dataset-description {
-            max-height: 150px;
-            overflow-y: auto;
-        }
-    }
-}
-.description-header {
-    margin-top: 15px;
-}
-
-.dataset-content {
-    .container-fluid {
-        display:table;
-        width: 100%;
-        margin-top: -50px;
-        padding: 50px 0 0 0; /*set left/right padding according to needs*/
-        box-sizing: border-box;
-    }
-
-    .row {
-        height: 100%;
-        display: table-row;
-    }
-}
-
-@mixin link-style ($color) {
-    font-weight: 600;
-    color: $color;
-    a {
-        padding: 0 5px;
-        background-color: white;
-        -webkit-transition: background .4s;
-        transition: background .4s;
-        &:hover {
-            background-color: $primary-color;
-        }
-
-        &.active {
-            background-color: $color;
-            color: white;
-        }
-    }
-}
-
-.method {
-    @include link-style(green);
-}
-.subset {
-    @include link-style($tertiary-color);
-}
-
-.subset-information{
-    border-bottom: 1px solid #cccccc;
-
-    .subset-basic-information {
-        margin-top: 10px;
-    }
-
-    .subset-navigation {
-        margin-top: 20px;
-        .btn {
-            background-color: $primary-color;
-            color: $dark-font-color;
-            margin-bottom: -1px;
-            margin-right: 5px;
-            &:hover { background-color: darken($primary-color, 10%); }
-
-            &.active {
-                background-color: $tertiary-color;
-                color: white;
-                &:hover { background-color: darken($tertiary-color, 10%); }
-            }
-
-            &.edit {
-                color: white;
-                background-color: lighten($secondary-color, 10%);
-                &:hover { background-color: $secondary-color; }
-            }
-        }
-    }
-}
-
-@media (max-width: 767px) {
-    .subset-information{ border-left: 0px solid; }
-}
-
-.new-subset {
-    label { @include label; }
-    .new-subset-information { margin-bottom: 10px; }
-    .warning-content {
-        margin-bottom: 5px;
-    }
 }

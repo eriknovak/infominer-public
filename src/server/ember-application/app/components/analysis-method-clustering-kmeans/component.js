@@ -32,8 +32,6 @@ export default Component.extend({
         clusters.forEach(cluster => {
             if (cluster.subsetId) {
                 Ember.set(cluster, 'clusterLabel', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
-            } else if (cluster.clusterLabel) {
-                // do nothing - cluster already has a clusterLabel
             }
         });
 

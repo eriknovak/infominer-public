@@ -10,7 +10,6 @@ import { linkRadial } from 'd3-shape';
 import { transition } from 'd3-transition';
 
 
-
 // declare new graph component
 const RadialTreeComponent = GraphComponent.extend({
     // component attributes
@@ -27,6 +26,12 @@ const RadialTreeComponent = GraphComponent.extend({
         this._super(...arguments);
         set(this, 'margin', { top: 50, right: 50, bottom: 50, left: 50 });
         this.get('hierarchy');
+    },
+
+    didRender() {
+        this._super(...arguments);
+        
+
     },
 
     ///////////////////////////////////////////////////////
@@ -219,9 +224,6 @@ const RadialTreeComponent = GraphComponent.extend({
             .style('padding', 0);
 
         let htmlContainers = htmlDOMs.append('div')
-            .attr('class', 'htmlContainers');
-
-        htmlContainers.append('p')
             .attr('class', 'description')
             .html((d, i) => {
                 return d.data.type === 'subset' && !(d.parent && d.children) ? `
@@ -235,25 +237,30 @@ const RadialTreeComponent = GraphComponent.extend({
 
         function relax() {
             let again = false;
-            let spaceh = 120;
+            let spaceh = 150;
             let spacev = 28;
             let alpha = 0.5;
 
-            node.each(function (d, i) {
+            node.each(function (d1, i) {
                 let a = this;
                 let da = select(a);
-                let radial_a = radialPoint(d.x, d.y);
+                let radial_a = radialPoint(d1.x, d1.y);
                 let dac = da.selectAll('foreignObject');
                 let x1 = radial_a[0] + parseFloat(dac.attr('x'));
                 let y1 = radial_a[1] + parseFloat(dac.attr('y'));
-                node.each(function (d, j) {
+                // get object height
+                let da_height = dac.select('body').style('height');
+
+                node.each(function (d2, j) {
                     let b = this;
                     // a & b are the same element and don't collide.
                     if (a == b) return;
                     let db = select(b);
-                    let radial_b = radialPoint(d.x, d.y);
+                    let radial_b = radialPoint(d2.x, d2.y);
                     let dbc = db.selectAll('foreignObject');
-
+                    // get object height
+                    let db_height = dbc.select('body').style('height');
+                    
                     // a & b are on opposite sides of the chart and don't collide
                     if (dac.attr('x') !== dbc.attr('x')) return;
                     // Now let's calculate the distance between these elements
@@ -264,7 +271,7 @@ const RadialTreeComponent = GraphComponent.extend({
                     let deltaY = y1 - y2;
                     // Our spacing is greater than our specified spacing,
                     // so they don't collide
-                    if (Math.abs(deltaX) > spaceh || Math.abs(deltaY) > spacev) return;
+                    if (Math.abs(deltaX) > Math.max(da_height, db_height) || Math.abs(deltaY) > spacev) return;
 
                     // If the labels collide, we'll push each
                     // of the two labels up and down a little bit.

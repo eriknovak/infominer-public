@@ -1,6 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
-import { set } from '@ember/object';
+import { observer, set } from '@ember/object';
 
 // d3 visualizations
 import { select } from 'd3-selection';
@@ -67,6 +67,11 @@ const HistogramComponent = GraphComponent.extend({
         // set the data
         this.set('data', data);
     },
+
+    dataObserver: observer('data', 'width', 'height', function () {
+        let self = this;
+        Ember.run.scheduleOnce('afterRender', function () { self.drawGraph(); });
+    }),
 
     drawGraph() {
         // get the container size

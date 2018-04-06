@@ -50,11 +50,9 @@ export default Route.extend({
                     clusterId: subsetInfo.clusterId,
                     documentCount: subsetInfo.documentCount
                 });
-                // set cluster id to send as metadata
-                subset.set('clusterId', subsetInfo.clusterId);
                 // save the cluster
                 subset.save();
-
+                this.transitionTo('dataset.subset', subset);
             });
         }
     }

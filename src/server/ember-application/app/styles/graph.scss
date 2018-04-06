@@ -11,23 +11,23 @@ $height: 250px;
         font-weight: 600;
         text.small  { fill: darken($primary-color, 35%); }
         text.medium { fill: $tertiary-color; }
-        text.large  { fill: $dark-font-color; }
+        text.large  { fill: $font-color-dark; }
     }
 
     &.histogram {
         .percent {
             rect { fill: $tertiary-color; }
             .frequency {
-                font: 10px $font-primary;
+                font: 9px $font-primary;
                 cursor: default;
             }
         }
 
         .percentOutline { fill: darken($tertiary-color, 2%); }
 
-        .domain { stroke: $dark-font-color; }
+        .domain { stroke: $font-color-dark; }
         .tick {
-            line { stroke: $dark-font-color; }
+            line { stroke: $font-color-dark; }
             text { font-family: $font-primary; }
         }
     }
