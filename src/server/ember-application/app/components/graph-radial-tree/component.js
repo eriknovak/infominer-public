@@ -2,13 +2,12 @@
 import GraphComponent from '../graph-component/component';
 import { inject as service } from '@ember/service';
 import { observer, computed, set } from '@ember/object';
+import { scheduleOnce } from '@ember/runloop';
 
 // d3 visualizations
-import { select, event } from 'd3-selection';
+import { select } from 'd3-selection';
 import { stratify, tree } from 'd3-hierarchy';
 import { linkRadial } from 'd3-shape';
-import { transition } from 'd3-transition';
-
 
 // declare new graph component
 const RadialTreeComponent = GraphComponent.extend({
@@ -30,7 +29,7 @@ const RadialTreeComponent = GraphComponent.extend({
 
     didRender() {
         this._super(...arguments);
-        
+
 
     },
 
@@ -137,7 +136,7 @@ const RadialTreeComponent = GraphComponent.extend({
 
     hierarchyUpdated: observer('hierarchy', 'width', 'height', function () {
         let self = this;
-        Ember.run.scheduleOnce('afterRender', function () { self.drawGraph(); });
+        scheduleOnce('afterRender', function () { self.drawGraph(); });
     }),
 
     drawGraph() {
@@ -190,7 +189,7 @@ const RadialTreeComponent = GraphComponent.extend({
 
         let root = radialTree(hierarchy);
 
-        let link = content.selectAll('.link')
+        content.selectAll('.link')
             .data(root.links())
             .enter().append('path')
             .attr('class', 'link')
@@ -223,9 +222,9 @@ const RadialTreeComponent = GraphComponent.extend({
             .style('margin', 0)
             .style('padding', 0);
 
-        let htmlContainers = htmlDOMs.append('div')
+        htmlDOMs.append('div')
             .attr('class', 'description')
-            .html((d, i) => {
+            .html(d => {
                 return d.data.type === 'subset' && !(d.parent && d.children) ? `
                     <span class="title">${d.data.label}</span><br>
                     <span class="attribute-label">documents</span> =
@@ -233,15 +232,14 @@ const RadialTreeComponent = GraphComponent.extend({
                 ` : '';
             });
 
-        
+
 
         function relax() {
             let again = false;
-            let spaceh = 150;
             let spacev = 28;
             let alpha = 0.5;
 
-            node.each(function (d1, i) {
+            node.each(function (d1) {
                 let a = this;
                 let da = select(a);
                 let radial_a = radialPoint(d1.x, d1.y);
@@ -251,7 +249,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 // get object height
                 let da_height = dac.select('body').style('height');
 
-                node.each(function (d2, j) {
+                node.each(function (d2) {
                     let b = this;
                     // a & b are the same element and don't collide.
                     if (a == b) return;
@@ -260,7 +258,7 @@ const RadialTreeComponent = GraphComponent.extend({
                     let dbc = db.selectAll('foreignObject');
                     // get object height
                     let db_height = dbc.select('body').style('height');
-                    
+
                     // a & b are on opposite sides of the chart and don't collide
                     if (dac.attr('x') !== dbc.attr('x')) return;
                     // Now let's calculate the distance between these elements

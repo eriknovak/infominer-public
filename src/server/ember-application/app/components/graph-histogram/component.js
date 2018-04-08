@@ -1,5 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
+import { scheduleOnce } from '@ember/runloop';
 import { observer, set } from '@ember/object';
 
 // d3 visualizations
@@ -70,7 +71,7 @@ const HistogramComponent = GraphComponent.extend({
 
     dataObserver: observer('data', 'width', 'height', function () {
         let self = this;
-        Ember.run.scheduleOnce('afterRender', function () { self.drawGraph(); });
+        scheduleOnce('afterRender', function () { self.drawGraph(); });
     }),
 
     drawGraph() {

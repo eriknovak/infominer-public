@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { set } from '@ember/object';
 
 
 export default Component.extend({
@@ -31,7 +31,7 @@ export default Component.extend({
         // get subset names
         clusters.forEach(cluster => {
             if (cluster.subsetId) {
-                Ember.set(cluster, 'clusterLabel', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
+                set(cluster, 'clusterLabel', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
             }
         });
 

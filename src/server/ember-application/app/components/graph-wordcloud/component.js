@@ -1,6 +1,7 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
 import { observer, set } from '@ember/object';
+import { scheduleOnce } from '@ember/runloop';
 
 // d3 visualizations
 import { min, max } from 'd3-array';
@@ -30,12 +31,7 @@ const WordCloudComponent = GraphComponent.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-    },
-
-    didRender() {
-        this._super(...arguments);
         this.prepareText(this.get('keywords'));
-        
     },
 
     ///////////////////////////////////////////////////////
@@ -85,7 +81,7 @@ const WordCloudComponent = GraphComponent.extend({
     dataObserver: observer('data', 'width', 'height', function () {
         let self = this;
         this._setLoadingState();
-        Ember.run.once(function () { setTimeout(function () { self.drawGraph(); }, 1000); });
+        scheduleOnce('afterRender', function () { setTimeout(function () { self.drawGraph(); }, 10); });
     }),
 
     /**
@@ -101,6 +97,7 @@ const WordCloudComponent = GraphComponent.extend({
 
         // prepare wordcloud
         cloud().size([width, height])
+            .timeInterval(100)
             .words(data)
             .rotate(0)
             .random(() => 0.5)
@@ -157,7 +154,7 @@ const WordCloudComponent = GraphComponent.extend({
             .attr('transform', d => `translate(${d.x},${d.y})`)
             .text(d => d.text)
             .style('font-size', d => `${d.size}px`);
-            
+
     }
 
 });
