@@ -110,17 +110,22 @@
 // analysis results
 .analysis {
     margin: 10px auto;
+
+    .parameter-label { font-weight: 600; }
+
     .clustering {
         margin-top: 20px;
-        h3 { 
-            border-bottom: 1px solid #cccccc; 
+        h3 {
+            border-bottom: 1px solid #cccccc;
             color: green;
+            @include collapse-toggle(green, 20px);
         }
         .clusters .cluster-content {
             margin: 10px auto;
             .cluster-header {
                 color: $secondary-color;
                 margin-bottom: 0px;
+                @include collapse-toggle($secondary-color, 19px);
             }
         }
     }

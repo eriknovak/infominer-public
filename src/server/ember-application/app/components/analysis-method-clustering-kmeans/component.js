@@ -11,6 +11,10 @@ export default Component.extend({
     columnWidth: service('column-size'),
     store: service('store'),
 
+    init() {
+        this._super(...arguments);
+        set(this, 'collapsed', false);
+    },
 
     didReceiveAttrs() {
         this._super(...arguments);
@@ -41,7 +45,10 @@ export default Component.extend({
     _setSelectedFields() {
         const selectedFields = this.get('method.parameters.features').map(feature => feature.field).join(', ');
         this.set('selectedFields', selectedFields);
-    }
+    },
 
+    actions: {
+        toggleInformation() { this.toggleProperty('collapsed'); }
+    }
 
 });

@@ -1,0 +1,35 @@
+{{#if cluster.subsetCreated}}
+  {{#link-to 'dataset.subset' dataset cluster.subsetId class="btn btn-secondary pull-right" }}
+    Go to Subset
+  {{/link-to}}
+{{else}}
+  <button class="btn btn-primary pull-right" data-toggle="modal"
+    data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
+{{/if}}
+
+<h5 class="cluster-header">
+  <!-- button for toggling collapse -->
+  <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
+    aria-expanded="false" onclick={{action 'toggleInformation'}}>
+    <i class="fa fa-chevron-down"></i>
+  </button>
+
+  {{cluster.clusterLabel}}
+</h5>
+<p>{{cluster.documentCount}} documents</p>
+
+{{#bs-collapse collapsed=collapsed}}
+  <div class="row">
+    {{#each cluster.aggregates as |aggregate index|}}
+      {{#if aggregate.distribution}}
+        <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
+          {{ component
+              (concat "aggregate-" aggregate.type)
+              field=aggregate.field
+              distribution=aggregate.distribution
+          }}
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+{{/bs-collapse}}

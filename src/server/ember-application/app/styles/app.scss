@@ -16,6 +16,31 @@ $font-primary: 'Open Sans';
     text-transform: uppercase;
 }
 
+@mixin collapse-toggle($color, $size) {
+    .btn {
+        color: $color;
+        width: $size;
+        height: $size;
+        padding: 0px;
+        border-radius: 50%;
+        text-align: center;
+        background-color: transparent;
+        &.rotate {
+            -webkit-transition: all .2s linear;
+            -moz-transition: all .2s linear;
+            transition: all .2s linear;
+            &.right{
+                -ms-transform: rotate(-90deg);
+                -moz-transform: rotate(-90deg);
+                -webkit-transform: rotate(-90deg);
+                transform: rotate(-90deg);
+            }
+        }
+        &:hover { background-color: $primary-color; }
+        i { margin: auto; }
+    }
+}
+
 // import bootstrap library
 @import "ember-bootstrap/bootstrap";
 

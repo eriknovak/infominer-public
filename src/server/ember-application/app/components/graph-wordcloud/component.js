@@ -1,7 +1,7 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
 import { observer, set } from '@ember/object';
-import { scheduleOnce } from '@ember/runloop';
+import { once } from '@ember/runloop';
 
 // d3 visualizations
 import { min, max } from 'd3-array';
@@ -81,7 +81,7 @@ const WordCloudComponent = GraphComponent.extend({
     dataObserver: observer('data', 'width', 'height', function () {
         let self = this;
         this._setLoadingState();
-        scheduleOnce('afterRender', function () { setTimeout(function () { self.drawGraph(); }, 10); });
+        once(function () { setTimeout(function () { self.drawGraph(); }, 1000); });
     }),
 
     /**
@@ -97,7 +97,7 @@ const WordCloudComponent = GraphComponent.extend({
 
         // prepare wordcloud
         cloud().size([width, height])
-            .timeInterval(100)
+            .timeInterval(1000)
             .words(data)
             .rotate(0)
             .random(() => 0.5)

@@ -1,52 +1,43 @@
-<h3 class="method-type">Clustering KMeans</h3>
-<div class="method-parameters">
-  <span>SELECTED FIELDS: </span>
-  <span class="parameter-values">{{selectedFields}}</span>
+<h3 class="method-type">
+  <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
+    aria-expanded="false" onclick={{action 'toggleInformation'}}>
+    <i class="fa fa-chevron-down"></i>
+  </button>
+
+  Clustering KMeans
+</h3>
+
+<div class="row">
+
+  <div class="col-md-6 method-parameters">
+    <div class="parameter">
+      <span class="parameter-label">NUMBER OF CLUSTERS: </span>
+      <span class="parameter-value">{{clusters.length}}</span>
+    </div>
+    <div class="parameter">
+      <span class="parameter-label">SELECTED FIELDS: </span>
+      <span class="parameter-value">{{selectedFields}}</span>
+    </div>
+  </div>
+
 </div>
 
-<div class="clusters">
-  {{#each clusters as |cluster index|}}
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="cluster-content">
+{{#bs-collapse collapsed=collapsed}}
+  <div class="clusters">
+    {{#each clusters as |cluster index|}}
+      <div class="row">
+        <div class="col-lg-12">
+          {{ analysis-clustering-kmeans-cluster dataset=dataset method=method cluster=cluster index=index }}
 
-          {{#if cluster.subsetCreated}}
-            {{#link-to 'dataset.subset' dataset cluster.subsetId class="btn btn-secondary pull-right" }}
-              Go to Subset
-            {{/link-to}}
-          {{else}}
-            <button class="btn btn-primary pull-right" data-toggle="modal"
-              data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
-          {{/if}}
+          {{ create-subset-modal-from-method id=(concat "create-subset-kmeans-" method.id "-" index)
+            methodId=method.id clusterId=index cluster=cluster
+            createSubset=createSubset type="KMeans Clustering"}}
 
-          <h5 class="cluster-header">
-            {{cluster.clusterLabel}}
-          </h5>
+        </div><!-- .col-lg-12 -->
+      </div><!-- .row -->
 
-          <p>{{cluster.documentCount}} documents</p>
+    {{/each}}
+  </div>
+{{/bs-collapse}}
 
-          <div class="row">
-            {{#each cluster.aggregates as |aggregate index|}}
-              {{#if aggregate.distribution}}
-                <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
-                  {{ component
-                      (concat "aggregate-" aggregate.type)
-                      field=aggregate.field
-                      distribution=aggregate.distribution
-                  }}
-                </div>
-              {{/if}}
-            {{/each}}
-          </div>
-        </div><!-- .cluster-content -->
-
-        {{ create-subset-modal-from-method id=(concat "create-subset-kmeans-" method.id "-" index)
-          methodId=method.id clusterId=index cluster=cluster
-          createSubset=createSubset type="KMeans Clustering"}}
-
-      </div><!-- .col-lg-12 -->
-    </div><!-- .row -->
-
-  {{/each}}
-</div>
 {{yield}}

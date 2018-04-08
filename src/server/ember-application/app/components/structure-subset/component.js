@@ -5,8 +5,6 @@ export default Component.extend({
     // component attributes
     classNames: ['subset', 'child'],
     classNameBindings: ['parent'],
-    collapsed: false,
-    parent: false,
 
     _parentState: observer('subset.usedBy.@each.produced', function () {
         this.get('usedBy').then(methods => {

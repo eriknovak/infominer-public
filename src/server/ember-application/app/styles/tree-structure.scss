@@ -4,30 +4,7 @@
 
         margin: 0;
         padding: 0;
-
-        .btn {
-            width: 20px;
-            height: 20px;
-            padding: 0px;
-            border-radius: 50%;
-            text-align: center;
-            background-color: transparent;
-            &.rotate {
-                -webkit-transition: all .2s linear;
-                -moz-transition: all .2s linear;
-                transition: all .2s linear;
-                &.right{
-                    -ms-transform: rotate(-90deg);
-                    -moz-transform: rotate(-90deg);
-                    -webkit-transform: rotate(-90deg);
-                    transform: rotate(-90deg);
-                }
-            }
-            &:hover {
-                background-color: $primary-color;
-            }
-            i { margin: auto; }
-        }
+        @include collapse-toggle($secondary-color, 19px);
 
         .tree-branch {
             margin-left: 20px;
