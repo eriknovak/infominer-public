@@ -42,7 +42,7 @@ module.exports = function (app, pg, processHandler, logger) {
      */
     function _openProcess(childId, owner, callback) {
         // get the dataset information
-        pg.select({ id: childId, owner }, 'datasets', (error, results) => {
+        pg.select({ id: childId, owner }, 'infominer_datasets', (error, results) => {
             if (error) {
                 // exit - error occured in postgres
                 return callback(error);
