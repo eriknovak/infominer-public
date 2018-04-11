@@ -38,7 +38,7 @@ export default Component.extend({
                 set(cluster, 'clusterLabel', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
             }
         });
-
+        // set clusters values
         this.set('clusters', clusters);
     },
 

@@ -16,7 +16,7 @@
   {{else}}
     <!-- if documents are available show them -->
     {{#each documents as |document| }}
-      {{ document-table-row document=document fields=fields }}
+      {{ document-table-row             document=document fields=fields }}
       {{ document-table-row-information document=document fields=fields }}
     {{/each}}
   {{/if}}

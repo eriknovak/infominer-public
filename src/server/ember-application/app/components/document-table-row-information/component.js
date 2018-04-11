@@ -14,18 +14,18 @@ export default Component.extend({
 
         // get document valueObject and fields
         const fields = this.get('fields');
-        let rowWidth = 1 + fields.length;
-        this.set('rowWidth', rowWidth);
+        let numberOfColumns = 1 + fields.length;
+        this.set('numberOfColumns', numberOfColumns);
 
         // save document values
         const document = this.get('document');
-        let docValues = [ ];
+        let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
-            docValues.push({ value: document.get(`values.${field.name}`), field: field.name });
+            documentValues.push({ value: document.get(`values.${field.name}`), field: field.name });
         }
         // save values
-        this.set('docValues', docValues);
+        this.set('documentValues', documentValues);
         this.set('collapseId', `document-${document.id}`);
     },
 

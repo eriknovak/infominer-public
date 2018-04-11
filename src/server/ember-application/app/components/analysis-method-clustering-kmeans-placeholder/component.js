@@ -1,16 +1,26 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
     classNames: ['clustering'],
 
     // services
-    router: service('-routing'),
     columnWidth: service('column-size'),
+
+    init() {
+        this._super(...arguments);
+        set(this, 'collapsed', false);
+    },
 
     didReceiveAttrs() {
         this._super(...arguments);
+        this._setClusters();
+        this._setSelectedFields();
+    },
+
+    _setClusters() {
         let method = this.get('method');
         // get number of clusters
         let clusterNumber = method.get('parameters.method.k');
@@ -28,6 +38,15 @@ export default Component.extend({
         }
         // set placeholders
         this.set('clusters', placeholders);
+    },
+
+    _setSelectedFields() {
+        const selectedFields = this.get('method.parameters.features').map(feature => feature.field).join(', ');
+        this.set('selectedFields', selectedFields);
+    },
+
+    actions: {
+        toggleInformation() { this.toggleProperty('collapsed'); }
     }
 
 });

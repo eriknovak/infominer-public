@@ -1,29 +1,53 @@
-<h4>Clustering KMeans</h4>
-<div class="clusters">
-  {{#each clusters as |cluster index|}}
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="cluster-content">
-          <div class="subset-button pull-right placeholder"></div>
+<h3 class="method-type">
+  <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
+    aria-expanded="false" onclick={{action 'toggleInformation'}}>
+    <i class="fa fa-chevron-down"></i>
+  </button>
 
-          <h5 class="cluster-header">
-            <p class="placeholder"></p>
-          </h5>
+  Clustering KMeans
+</h3>
 
-          <p class="document-number placeholder"></p>
-
-          <div class="row">
-            {{#each cluster as |placeholder index|}}
-              <div class="{{concat placeholder.columnlg ' ' placeholder.columnsm}}">
-                <h6 class="field-title placeholder"></h6>
-                <div class="graph placeholder"></div>
-              </div>
-            {{/each}}
-          </div>
-        </div><!-- .cluster-content -->
-      </div><!-- .col-lg-12 -->
-    </div><!-- .row -->
-
-  {{/each}}
+<div class="row">
+  <div class="col-md-6 method-parameters">
+    <div class="parameter">
+      <span class="parameter-label">NUMBER OF CLUSTERS: </span>
+      <span class="parameter-value">{{clusters.length}}</span>
+    </div>
+    <div class="parameter">
+      <span class="parameter-label">SELECTED FIELDS: </span>
+      <span class="parameter-value">{{selectedFields}}</span>
+    </div>
+  </div>
 </div>
+
+{{#bs-collapse collapsed=collapsed}}
+  <div class="clusters">
+    {{#each clusters as |cluster index|}}
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="cluster-content">
+            <div class="subset-button pull-right placeholder"></div>
+
+            <h5 class="cluster-header">
+              <p class="placeholder"></p>
+            </h5>
+
+            <p class="document-number placeholder"></p>
+
+            <div class="row">
+              {{#each cluster as |placeholder index|}}
+                <div class="content {{concat placeholder.columnlg ' ' placeholder.columnsm}}">
+                  <h6 class="field-title placeholder"></h6>
+                  <div class="graph placeholder"></div>
+                </div>
+              {{/each}}
+            </div>
+          </div><!-- .cluster-content -->
+        </div><!-- .col-lg-12 -->
+      </div><!-- .row -->
+
+    {{/each}}
+  </div>
+{{/bs-collapse}}
+
 {{yield}}
