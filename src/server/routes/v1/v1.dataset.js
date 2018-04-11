@@ -16,7 +16,6 @@ const static = require('../../../config/static');
  */
 // set destination path
 const destinationPath = path.join(__dirname, '../../../../data/temp');
-console.log(destinationPath);
 // create desctination path if not existing
 fileManager.createDirectoryPath(destinationPath);
 
@@ -26,6 +25,64 @@ const storage = multer.diskStorage({
         cb(null, destinationPath);
     }
 });
+
+/**
+ * Detects the delimiter of the file.
+ * @param {String} filePath - The path to the file.
+ * @param {String} delimiters - Possible delimiters.
+ * @returns {String|Null} The delimiter used in the dataset or null if none are found.
+ */
+function detectDelimiter(filePath, delimiters = [',', ';', '\t', '|', '~']) {
+    // go through all delimiters
+    let validDelimiters = [];
+    for (let delimiter of delimiters) {
+        // get the dataset information from the file
+        let datasetIn = qm.fs.openRead(filePath);
+
+        // get number of attributes using the number of delimiters
+        let header = datasetIn.readLine().trim();
+
+        // does the header contain only one attribute
+        if (header.search(/[^a-zA-Z0-9]/g) === -1) {
+            datasetIn.close();
+            return '\nww';
+        }
+
+        // get the number of attributes and set initial
+        let numberOfAttributes = header.split(delimiter).length,
+            validDelimiter = true,
+            rowCount = 0;
+
+        // check the first 10 lines within the dataset
+        while (!datasetIn.eof) {
+            if (rowCount >= 10) { break; }
+            // get the next row in the dataset
+            let document = datasetIn.readLine();
+            // skip empty lines
+            if (document.length === 0) { continue; }
+
+            // check if number of attributes and values match
+            let numberOfValues = document.split(delimiter).length;
+            if (numberOfAttributes !== numberOfValues) {
+                validDelimiter = false; break;
+            }
+            rowCount++;
+        }
+        // if the delimiter is valid and the file header contains the delimiter
+        if (validDelimiter && header.includes(delimiter)) {
+            validDelimiters.push([delimiter, numberOfAttributes]);
+        }
+        // close the dataset file
+        datasetIn.close();
+    }
+
+    // if not valid delimiters were found
+    if (!validDelimiters.length) { return null; }
+    // select the delimiter with the largest number of attributes
+    return validDelimiters.reduce((maximum, current) => {
+        return current[1] > maximum[1] ? current : maximum;
+    }, validDelimiters[0])[0];
+}
 
 /**
  * Adds api routes to .
@@ -80,7 +137,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
     /**
      * POST file and creates a new dataset
-     * TODO: ensure handling large datasets
      */
     const upload = multer({ storage }).single('file');
     app.post('/api/datasets/uploadTemp', (req, res) => {
@@ -105,8 +161,24 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // TODO: get username of creator
             const owner = req.user ? req.user.id : 'development'; // temporary placeholder
 
+            // get the delimiter within the
+            let delimiter = detectDelimiter(file.path);
+            if (!delimiter) {
+                // delimiter is not recognized - send warning to user
+                fileManager.removeFile(file.path);
+                // log multer error
+                logger.warn('warn [file.format]: unknown delimiter',
+                    logger.formatRequest(req, { error: 'unknown delimiter' })
+                );
+                // send error object to user
+                return res.send({ errors: {
+                    msg: 'unknown delimiter, check if the delimiter is one of the following options ",", ";", "\t", "|", "~"' }
+                });
+            }
+
+
             // insert temporary file
-            pg.insert({ owner, filepath: file.path, filename: file.filename }, 'tempDatasets', (xerror) => {
+            pg.insert({ owner, filepath: file.path, filename: file.filename, delimiter: delimiter }, 'temporary_files', (xerror) => {
                 if (xerror) {
                     // log postgres error
                     logger.error('error [postgres.insert]: user request to upload dataset failed',
@@ -127,7 +199,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // read the file
                 let datasetFIn = qm.fs.openRead(file.path);
                 // get first row in the document - the fields
-                const fields = datasetFIn.readLine().split('|');
+                const fields = datasetFIn.readLine().trim().split(delimiter);
                 // set field types container
                 let fieldTypes = fields.map(() => 'float');
                 // set limit - read first limit rows to determine field types
@@ -140,7 +212,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     // document values to determine type of field
                     let document = datasetFIn.readLine().trim();
                     if (document.length === 0) { count++; continue; }
-                    let docValues = document.split('|');
+                    let docValues = document.split(delimiter);
                     for (let j = 0; j < docValues.length; j++) {
                         let value = docValues[j];
                         // check if value is a float
@@ -150,7 +222,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     // we read a document - increment the count
                     count++;
                 }
-
+                // the dataset file is not needed anymore
+                datasetFIn.close();
                 // set field list containing field name and type
                 let fieldList = [];
                 for (let i = 0; i < fields.length; i++) {
@@ -182,7 +255,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             logger.formatRequest(req)
         );
 
-        // get dataset info
+        // get dataset information
         let { dataset, fields } = req.body;
 
         dataset = JSON.parse(dataset);
@@ -210,11 +283,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             const description = dataset.description; // the description of the dataset
             const dbPath = path.join(static.dataPath, owner.toString(), dbFolder.toString()); // dataset directory
 
-            // create dataset directory
-            fileManager.createDirectoryPath(dbPath);
-
             // get temporary file
-            pg.select({ owner, filename: dataset.filename }, 'tempDatasets', (xerror, results) => {
+            pg.select({ owner, filename: dataset.filename }, 'temporary_files', (xerror, results) => {
                 if (xerror) {
                     // log postgres error
                     logger.error('error [postgres.select]: user request to submit data for new dataset failed',
@@ -259,6 +329,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         content: {
                             fields,
                             filePath: tempDataset.filepath,
+                            delimiter: tempDataset.delimiter,
                             params: {
                                 datasetId,
                                 label,
@@ -291,7 +362,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                             );
                         }
                         // delete the temporary file from postgres
-                        pg.delete({ id: tempDataset.id, owner }, 'tempDatasets', function (xxerror) {
+                        pg.delete({ id: tempDataset.id, owner }, 'temporary_files', function (xxerror) {
                             if (xxerror) {
                                 // log error on deleting temporary file from postgres
                                 logger.error('error [postgres.delete]: user request to submit data for new dataset - temporary file deletion failed',

@@ -207,11 +207,11 @@ function createDatabase(msg) {
         let { reqId, body } = msg;
         try {
             // get the constructor parameters
-            let { filePath, fields, params } = body.content;
+            let { filePath, fields, params, delimiter } = body.content;
             // create the database
             database = new BaseDataset(params, fields);
             // fill the database with the records
-            let result = database.pushDocuments(filePath, fields);
+            let result = database.pushDocuments(filePath, delimiter, fields);
             database.aggregateSubset(result.subsets.id);
             // everything is ok
             process.send({ reqId, content: database.getId() });

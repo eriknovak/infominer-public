@@ -156,11 +156,11 @@ class BaseDataset {
     /**
      * Pushes each row of the document to database.
      * @param {String} filePath - File path.
+     * @param {String} delimiter - The delimiter used to create the dataset.
      * @param {field_instance[]} fields - Dataset fields.
-     * @param {Object} dataset - Dataset information.
      * @returns {Object} Object containing the subset id.
      */
-    pushDocuments(filePath, fields) {
+    pushDocuments(filePath, delimiter, fields) {
         let self = this;
         // check required parameters
         if (!filePath) { throw new Error('FieldError: filePath must be defined'); }
@@ -177,7 +177,7 @@ class BaseDataset {
             // skip empty lines
             if (newLine.trim() === '') { continue; }
 
-            let fValues = newLine.trim().split('|');
+            let fValues = newLine.trim().split(delimiter);
             // prepare and push record to dataset
             let rec = self._prepareRecord(fValues, fields);
             self.base.store('Dataset').push(rec);
@@ -246,7 +246,7 @@ class BaseDataset {
 
         // prepare response object
         let jsonResults = {
-            datasets: self._formatDatasetInfo(),
+            datasets: self._formatDatasetInformation(),
             subsets,
             methods
         };
@@ -277,7 +277,7 @@ class BaseDataset {
         }
 
         // return the new dataset info
-        return { datasets: self._formatDatasetInfo() };
+        return { datasets: self._formatDatasetInformation() };
     }
 
     /**
@@ -294,17 +294,17 @@ class BaseDataset {
             // get one subset and format it
             let set = subsets[id];
             if (!set) { return null; }
-            setObj.subsets = self._formatSubsetInfo(set);
+            setObj.subsets = self._formatSubsetInformation(set);
             // prepare methods handler
             setObj.methods = [ ];
             if (set.resultedIn) {
                 // set the resulted in method
-                let resultedInMethod = [self._formatMethodInfo(set.resultedIn)];
+                let resultedInMethod = [self._formatMethodInformation(set.resultedIn)];
                 setObj.methods = setObj.methods.concat(resultedInMethod);
             }
             if (set.usedBy.length) {
                 // get methods that used the subset
-                let usedByMethods = set.usedBy.map(method => self._formatMethodInfo(method));
+                let usedByMethods = set.usedBy.map(method => self._formatMethodInformation(method));
                 setObj.methods = setObj.methods.concat(usedByMethods);
             }
             // remove the 'methods' property if none were given
@@ -312,7 +312,7 @@ class BaseDataset {
 
         } else {
             setObj.subsets = subsets.allRecords
-                .map(rec => self._formatSubsetInfo(rec));
+                .map(rec => self._formatSubsetInformation(rec));
         }
         // return the subsets
         return setObj;
@@ -394,7 +394,7 @@ class BaseDataset {
         }
 
         // return the subset information
-        return { subsets: self._formatSubsetInfo(subset) };
+        return { subsets: self._formatSubsetInformation(subset) };
 
     }
 
@@ -489,7 +489,7 @@ class BaseDataset {
         subsetDocuments.trunc(limit, offset);
 
         // format the documents
-        setObj.documents = subsetDocuments.map(rec => self._formatDocumentInfo(rec));
+        setObj.documents = subsetDocuments.map(rec => self._formatDocumentInformation(rec));
 
         // return documents and metadata
         return setObj;
@@ -514,18 +514,18 @@ class BaseDataset {
             }
             // get one method and format it
             let set = methods[id];
-            methodObj.methods = self._formatMethodInfo(set);
+            methodObj.methods = self._formatMethodInformation(set);
             // subset information
             methodObj.subsets = [ ];
 
             if (!set.appliedOn.empty) {
                 // set the resulted in method
-                let appliedOnSubsets = set.appliedOn.map(subset => self._formatSubsetInfo(subset));
+                let appliedOnSubsets = set.appliedOn.map(subset => self._formatSubsetInformation(subset));
                 methodObj.subsets = methodObj.subsets.concat(appliedOnSubsets);
             }
             if (!set.produced.empty) {
                 // get methods that used the subset
-                let producedSubsets = set.produced.map(subset => self._formatSubsetInfo(subset));
+                let producedSubsets = set.produced.map(subset => self._formatSubsetInformation(subset));
                 methodObj.subsets = methodObj.subsets.concat(producedSubsets);
             }
             // remove the 'methods' property if none were given
@@ -533,7 +533,7 @@ class BaseDataset {
 
         } else {
             methodObj.methods = methods.allRecords
-                .map(rec => self._formatMethodInfo(rec));
+                .map(rec => self._formatMethodInformation(rec));
         }
         // return the methods
         return methodObj;
@@ -640,7 +640,7 @@ class BaseDataset {
      * @returns {Object} The dataset json representation.
      * @private
      */
-    _formatDatasetInfo() {
+    _formatDatasetInformation() {
         let self = this;
         //  get subset info
         let { subsets } = self.getSubsetInformation();
@@ -664,7 +664,7 @@ class BaseDataset {
      * @returns {Object} The subset json representation.
      * @private
      */
-    _formatSubsetInfo(rec) {
+    _formatSubsetInformation(rec) {
         return {
             id: rec.$id,
             type: 'subsets',
@@ -682,7 +682,7 @@ class BaseDataset {
      * @returns {Object} The document json representation.
      * @private
      */
-    _formatDocumentInfo(rec) {
+    _formatDocumentInformation(rec) {
         return {
             id: rec.$id,
             type: 'documents',
@@ -697,7 +697,7 @@ class BaseDataset {
      * @returns {Object} The method json representation.
      * @private
      */
-    _formatMethodInfo(rec) {
+    _formatMethodInformation(rec) {
         return {
             id: rec.$id,
             type: 'methods',
@@ -719,7 +719,7 @@ class BaseDataset {
     _formatMethodResults(type, result) {
         switch(type) {
         case 'clustering.kmeans':
-            return this._formatKMeansResult(result);
+            return this._formatKMeansClustering(result);
         default:
             return result;
         }
@@ -731,7 +731,7 @@ class BaseDataset {
      * @returns {Object} The formated results.
      * @private
      */
-    _formatKMeansResult(result) {
+    _formatKMeansClustering(result) {
         return {
             clusters: result.clusters.map(cluster => ({
                 documentCount: cluster.docIds.length,
@@ -754,7 +754,7 @@ class BaseDataset {
         let self = this;
         let methodId = self.base.store('Methods').push(methodParams);
         self.base.store('Methods')[methodId].$addJoin('appliedOn', subset);
-        return { methods: self._formatMethodInfo(self.base.store('Methods')[methodId]) };
+        return { methods: self._formatMethodInformation(self.base.store('Methods')[methodId]) };
     }
 
     /**
