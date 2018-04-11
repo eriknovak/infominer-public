@@ -105,7 +105,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // TODO: get username of creator and handle empty user
         const owner = req.user ? req.user.id : 'development';
         // get user datasets
-        pg.select({ owner }, 'datasets', (error, results) => {
+        pg.select({ owner }, 'infominer_datasets', (error, results) => {
             if (error) {
                 // log postgres error
                 logger.error('error [postgres.select]: user request for datasets failed',
@@ -130,7 +130,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             );
             // send the data
             return res.send({ datasets });
-        }); // pg.select({ owner }, 'datasets')
+        }); // pg.select({ owner }, 'infominer_datasets')
 
     }); // GET /api/datasets
 
@@ -178,7 +178,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
 
             // insert temporary file
-            pg.insert({ owner, filepath: file.path, filename: file.filename, delimiter: delimiter }, 'temporary_files', (xerror) => {
+            pg.insert({ owner, filepath: file.path, filename: file.filename, delimiter: delimiter }, 'infominer_temporary_files', (xerror) => {
                 if (xerror) {
                     // log postgres error
                     logger.error('error [postgres.insert]: user request to upload dataset failed',
@@ -265,7 +265,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         const owner = req.user ? req.user.id : 'development'; // temporary placeholder
 
         // get number of datasets the users already has
-        pg.select({ owner }, 'datasets', (error, results) => {
+        pg.select({ owner }, 'infominer_datasets', (error, results) => {
             if (error) {
                 // log postgres error
                 logger.error('error [postgres.select]: user request to submit data for new dataset failed',
@@ -284,7 +284,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             const dbPath = path.join(static.dataPath, owner.toString(), dbFolder.toString()); // dataset directory
 
             // get temporary file
-            pg.select({ owner, filename: dataset.filename }, 'temporary_files', (xerror, results) => {
+            pg.select({ owner, filename: dataset.filename }, 'infominer_temporary_files', (xerror, results) => {
                 if (xerror) {
                     // log postgres error
                     logger.error('error [postgres.select]: user request to submit data for new dataset failed',
@@ -305,7 +305,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 let tempDataset = results[0];
 
                 // insert dataset value
-                pg.insert({ owner, label, description, dbPath }, 'datasets', (yerror, results) => {
+                pg.insert({ owner, label, description, dbPath }, 'infominer_datasets', (yerror, results) => {
                     if (yerror) {
                         // log error when inserting dataset info
                         logger.error('error [postgres.insert]: user request to submit data for new dataset failed',
@@ -348,21 +348,21 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                                 logger.formatRequest(req, { error: zerror.message })
                             );
                             // delete dataset instance in postgres
-                            pg.delete({ id: datasetId, owner }, 'datasets');
+                            pg.delete({ id: datasetId, owner }, 'infominer_datasets');
                         } else {
                             // log user success
                             logger.info('user created new dataset',
                                 logger.formatRequest(req, { datasetId: datasetId })
                             );
                             // update dataset - it has been loaded
-                            pg.update({ loaded: true }, { id: datasetId }, 'datasets');
+                            pg.update({ loaded: true }, { id: datasetId }, 'infominer_datasets');
                             // log request success
                             logger.info('user request to create new dataset successful',
                                 logger.formatRequest(req)
                             );
                         }
                         // delete the temporary file from postgres
-                        pg.delete({ id: tempDataset.id, owner }, 'temporary_files', function (xxerror) {
+                        pg.delete({ id: tempDataset.id, owner }, 'infominer_temporary_files', function (xxerror) {
                             if (xxerror) {
                                 // log error on deleting temporary file from postgres
                                 logger.error('error [postgres.delete]: user request to submit data for new dataset - temporary file deletion failed',
@@ -387,9 +387,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         });
                     }); // processHandler.sendAndWait()
 
-                }); // pg.insert({ owner, label, description, dbPath }, 'datasets')
+                }); // pg.insert({ owner, label, description, dbPath }, 'infominer_datasets')
             }); // pg.select({ owner, filename }, 'tempDatasets')
-        }); // pg.select({ owner }, 'datasets')
+        }); // pg.select({ owner }, 'infominer_datasets')
 
     }); // POST /api/datasets
 
@@ -469,7 +469,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         let description = dataset.description;
 
         // update the postgres dataset
-        pg.update({ label, description }, { id: datasetId }, 'datasets', function (error) {
+        pg.update({ label, description }, { id: datasetId }, 'infominer_datasets', function (error) {
             if (error) {
                 // log error on deleting temporary file from postgres
                 logger.error('error [postgres.update]: user request to modify dataset failed',
@@ -497,7 +497,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // send results
                 return res.send(results);
             }); // sendToProcess
-        }); // pg.update({ label, description }, 'datasets')
+        }); // pg.update({ label, description }, 'infominer_datasets')
 
     }); // PUT /api/datasets/:dataset_id
 
@@ -529,7 +529,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // shutdown process and remove folder
 
             // remove dataset from 'dataset' table
-            pg.delete({ id: datasetId, owner }, 'datasets', function (error) {
+            pg.delete({ id: datasetId, owner }, 'infominer_datasets', function (error) {
                 if (error) {
                     // log error on deleting temporary file from postgres
                     logger.error('error [postgres.delete]: user request to delete dataset failed',
@@ -563,11 +563,11 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         );
                     }
                 });
-            }); // pg.delete({ id, owner }, 'datasets')
+            }); // pg.delete({ id, owner }, 'infominer_datasets')
 
         } else {
             // get the dataset information
-            pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
+            pg.select({ id: datasetId, owner }, 'infominer_datasets', (error, results) => {
                 if (error) {
                     // log error on deleting temporary file from postgres
                     logger.error('error [postgres.select]: user request to delete dataset failed',
@@ -583,7 +583,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 let dataset = results[0];
 
                 // process is already stopped - just delete from table and remove folder
-                pg.delete({ id: datasetId, owner }, 'datasets', function (xerror) {
+                pg.delete({ id: datasetId, owner }, 'infominer_datasets', function (xerror) {
                     if (xerror) {
                         // log postgres error
                         logger.error('error [postgres.delete]: user request to delete dataset failed',
@@ -607,8 +607,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         );
                     }
 
-                }); // pg.delete({ id, owner }, 'datasets')
-            }); // pg.select({ id, owner }, 'datasets')
+                }); // pg.delete({ id, owner }, 'infominer_datasets')
+            }); // pg.select({ id, owner }, 'infominer_datasets')
         }
     }); // GET /api/datasets/:dataset_id
 
@@ -635,7 +635,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // TODO: get username of creator and handle empty user
         const owner = req.user ? req.user.id : 'development';
 
-        pg.select({ id: datasetId, owner }, 'datasets', (error, results) => {
+        pg.select({ id: datasetId, owner }, 'infominer_datasets', (error, results) => {
             if (error) {
                 // log postgres error
                 logger.error('error [postgres.select]: user request to checked availability of dataset failed',
@@ -669,6 +669,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // send the data
             return res.send(datasets);
 
-        }); // pg.select({ owner }, 'datasets')
+        }); // pg.select({ owner }, 'infominer_datasets')
     }); // GET /api/datasets/:dataset_id/check
 };
