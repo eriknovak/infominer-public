@@ -278,6 +278,9 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 }
                 // remove the temporary file
                 fileManager.removeFile(filepath);
+                logger.info('user request to delete temporary file successful',
+                    logger.formatRequest(req)
+                );
             });
         });
     }); // DELETE /api/datasets/temporary_file

@@ -40,10 +40,8 @@ export default DatasetUploadRoute.extend({
                 url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file`,
             }).then(response => {
                 let model = response.body;
-                console.log(model);
                 // set dataset model for storing information
                 if (model.errors) {
-
                     this.get('notify').info({
                         html: `<div class="notification">
                                 <span class="fa fa-exclamation-circle"></span>
@@ -52,7 +50,6 @@ export default DatasetUploadRoute.extend({
                                 </span> is not in correct format!
                             </div>`
                     });
-
                     return this.removeDataset();
                 }
 
@@ -64,9 +61,8 @@ export default DatasetUploadRoute.extend({
          * Resets model and file queue.
          */
         resetModel() {
-            this.removeDataset();
             // reset the model
-            this.set('controller.model', null);
+            this.removeDataset();
         },
 
         /**
@@ -132,6 +128,7 @@ export default DatasetUploadRoute.extend({
             url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file?filename=${dataset.filename}`,
             type: 'DELETE'
         });
+        this.set('controller.model', null);
     }
 
 });

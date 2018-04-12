@@ -84,4 +84,4 @@ app.get('*', (req, res) => {
 });
 
 // run the express app
-app.listen(PORT, () => logger.info(`gui-server listening on port ${PORT}`));
+app.listen(PORT, () => logger.info(`infominer listening on port ${PORT}`));
