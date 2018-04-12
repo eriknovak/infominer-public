@@ -1,45 +1,43 @@
 <!-- Navigation bar top -->
-<nav class="navbar navbar-expand-sm fixed-top">
-  <a class="navbar-brand">InfoMiner</a>
+<a class="navbar-brand">InfoMiner</a>
 
-  <!-- Brand and toggle get grouped for better mobile display -->
-  <button type="button" class="navbar-toggler" data-toggle="collapse"
-    data-target="#website-header" aria-controls="website-header" aria-expanded="false">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+<!-- Brand and toggle get grouped for better mobile display -->
+<button type="button" class="navbar-toggler" data-toggle="collapse"
+  data-target="#website-header" aria-controls="website-header" aria-expanded="false">
+  <span class="navbar-toggler-icon"></span>
+</button>
 
-  <!-- Collect the nav links, forms, and other content for toggling -->
-  <div class="collapse navbar-collapse" id="website-header">
+<!-- Collect the nav links, forms, and other content for toggling -->
+<div class="collapse navbar-collapse" id="website-header">
 
-    <ul class="navbar-nav mt-auto mr-auto">
-      <li class="nav-item">
-        {{#link-to "datasets" class="nav-link"}}
-          <i class="fa fa-database"></i>datasets
-        {{/link-to}}
-      </li>
-    </ul>
+  <ul class="navbar-nav mt-auto mr-auto">
+    <li class="nav-item">
+      {{#link-to "datasets" class="nav-link"}}
+        <i class="fa fa-database"></i>datasets
+      {{/link-to}}
+    </li>
+  </ul>
 
-    {{#if session.isAuthenticated}}
-      <div class="nav-item user-info dropdown">
-        <!-- user information and logout -->
-        <a class="nav-link dropdown-toggle" id="accountDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-exanded="false">
-          <img src="{{ session.data.authenticated.userImage }}"
-            onError="this.src='images/login/blank-profile.png'" alt="user image" height="30" width="30">
-          {{ session.data.authenticated.username }}
-        </a>
-        <div class="dropdown-menu" aria-labelledby="accountDropdown">
-          <a class="dropdown-item" {{action 'invalidateSession'}}>Logout</a>
-        </div>
+  {{#if session.isAuthenticated}}
+    <div class="nav-item user-info dropdown">
+      <!-- user information and logout -->
+      <a class="nav-link dropdown-toggle" id="accountDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-exanded="false">
+        <img src="{{ session.data.authenticated.userImage }}"
+          onError="this.src='images/login/blank-profile.png'" alt="user image" height="30" width="30">
+        {{ session.data.authenticated.username }}
+      </a>
+      <div class="dropdown-menu" aria-labelledby="accountDropdown">
+        <a class="dropdown-item" {{action 'invalidateSession'}}>Logout</a>
       </div>
-    {{else}}
-      <div class="nav-item login">
-        {{#link-to "login" class="nav-link btn"}}
-          Sign In
-        {{/link-to}}
-      </div>
-    {{/if}}
+    </div>
+  {{else}}
+    <div class="nav-item login">
+      {{#link-to "login" class="nav-link btn"}}
+        Sign In
+      {{/link-to}}
+    </div>
+  {{/if}}
 
-  </div><!-- .navbar-collapse -->
-</nav>
+</div><!-- .navbar-collapse -->
 
 {{yield}}

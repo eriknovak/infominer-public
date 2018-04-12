@@ -37,10 +37,25 @@ export default DatasetUploadRoute.extend({
         uploadDataset(file) {
             // set the options and upload
             file.upload({
-                url: `${ENV.APP.HOSTNAME}/api/datasets/uploadTemp`,
-            }).then(data => {
+                url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file`,
+            }).then(response => {
+                let model = response.body;
+                console.log(model);
                 // set dataset model for storing information
-                let model = data.body;
+                if (model.errors) {
+
+                    this.get('notify').info({
+                        html: `<div class="notification">
+                                <span class="fa fa-exclamation-circle"></span>
+                                Uploaded file <span class="label">
+                                    ${model.errors.filename}
+                                </span> is not in correct format!
+                            </div>`
+                    });
+
+                    return this.removeDataset();
+                }
+
                 this.set('controller.model', model);
             });
         },
@@ -102,7 +117,9 @@ export default DatasetUploadRoute.extend({
     /**
      * Resets file queue.
      */
-    removeDataset: function () {
+    removeDataset() {
+        // get dataset information
+        let { dataset } = this.get('controller.model');
         // get the dataset queue and set them all to null
         const uploader = this.get('uploader');
         let queue = uploader.find("dataset");
@@ -110,6 +127,11 @@ export default DatasetUploadRoute.extend({
             queue.get('files').forEach((file) => file.set('queue', null));
             queue.set('files', A());
         }
+        // delete dataset file on the server side
+        $.ajax({
+            url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file?filename=${dataset.filename}`,
+            type: 'DELETE'
+        });
     }
 
 });
