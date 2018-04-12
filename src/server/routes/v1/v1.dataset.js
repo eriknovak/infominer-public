@@ -15,7 +15,7 @@ const static = require('../../../config/static');
  * are found there.
  */
 // set destination path
-const destinationPath = path.join(__dirname, '../../../../data/temp');
+const destinationPath = path.join(__dirname, '../../../../data/temporary-files');
 // create desctination path if not existing
 fileManager.createDirectoryPath(destinationPath);
 
@@ -139,7 +139,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      * POST file and creates a new dataset
      */
     const upload = multer({ storage }).single('file');
-    app.post('/api/datasets/uploadTemp', (req, res) => {
+    app.post('/api/datasets/temporary_file', (req, res) => {
         // upload the dataset file
         upload(req, res, function (error) {
             if (error) {
@@ -172,6 +172,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 );
                 // send error object to user
                 return res.send({ errors: {
+                    filename: file.originalname,
                     msg: 'unknown delimiter, check if the delimiter is one of the following options ",", ";", "\t", "|", "~"' }
                 });
             }
@@ -191,7 +192,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // get dataset information
                 let label = file.originalname;
                 let filename = file.filename; // used only to access from postgres
-                let size = file.size;
 
                 /////////////////////////////////////////////
                 // get fields from uploaded dataset
@@ -238,8 +238,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 return res.send({
                     dataset: {
                         label,
-                        filename,
-                        size
+                        filename
                     },
                     fieldList
                 });
@@ -247,7 +246,41 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             }); // pg.insert()
         }); // upload()
 
-    }); // POST /api/datasets/uploadTemp
+    }); // POST /api/datasets/temporary_file
+
+    app.delete('/api/datasets/temporary_file', (req, res) => {
+        // log user request
+        logger.info('user requested to delete temporary file',
+            logger.formatRequest(req)
+        );
+        let { filename } = req.query;
+        // get the temporary files and delete it
+        const owner = req.user ? req.user.id : 'development'; // temporary placeholder
+        pg.select({ owner, filename }, 'infominer_temporary_files', (error, results) => {
+            if (error) {
+                // log postgres error
+                logger.error('error [postgres.select]: user request to delete temporary file failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
+                return res.send({ errors: { msg: error.message } });
+            }
+            // get the path to the temporary file
+            let filepath = results[0].filepath;
+            pg.delete({ owner, filename: filename }, 'infominer_temporary_files', (xerror) => {
+                if (xerror) {
+                    // log postgres error
+                    logger.error('error [postgres.delete]: user request to delete temporary file failed',
+                        logger.formatRequest(req, { error: xerror.message })
+                    );
+                    // send error object to user
+                    return res.send({ errors: { msg: xerror.message } });
+                }
+                // remove the temporary file
+                fileManager.removeFile(filepath);
+            });
+        });
+    }); // DELETE /api/datasets/temporary_file
 
     app.post('/api/datasets', (req, res) => {
         // log user request
