@@ -265,7 +265,17 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // send error object to user
                 return res.send({ errors: { msg: error.message } });
             }
-            // get the path to the temporary file
+
+            // check if results are not null
+            if (!results.length) {  
+                // log empty results file
+                logger.warn('error [postgres.results]: user request to delete temporary file failed',
+                    logger.formatRequest(req, { error: 'no such file found' })
+                );
+                // send error object to user
+                return res.send({ errors: { msg: 'no such file found' } });
+            }
+
             let filepath = results[0].filepath;
             pg.delete({ owner, filename: filename }, 'infominer_temporary_files', (xerror) => {
                 if (xerror) {
