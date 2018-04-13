@@ -55,7 +55,6 @@ export default DatasetUploadRoute.extend({
                 }
                 // set all fields to valid - modify values in child components
                 model.fieldList.forEach(field => { field.invalid = false; });
-                console.log(model);
                 this.set('controller.model', model);
             });
         },
@@ -77,7 +76,6 @@ export default DatasetUploadRoute.extend({
             let { dataset, fieldList } = this.get('controller.model');
 
             if (fieldList.map(field => field.invalid).includes(true)) {
-                console.log(fieldList.map(field => field.invalid));
                 $('#submittion-error').addClass('show');
                 return;
             }

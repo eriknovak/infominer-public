@@ -82,6 +82,10 @@
             &.show { visibility: visible; }
         }
     }
+
+    .tr:hover { background-color: transparent !important; }
+
+    .checkbox label { margin-top: 5px !important; }
 }
 
 #submittion-error {
