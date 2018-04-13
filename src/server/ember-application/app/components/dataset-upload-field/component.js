@@ -36,7 +36,11 @@ export default Component.extend({
         this.set('nameId', `field-name-${this.get('index')}`);
         this.set('typeId', `field-type-${this.get('index')}`);
         this.set('checkboxId', `field-included-${this.get('index')}`);
+    },
 
+    didInsertElement() {
+        this._super(...arguments);
+        this.validateFieldName();
     },
 
     ///////////////////////////////////////////////////////
@@ -49,6 +53,7 @@ export default Component.extend({
          */
         changeFieldName() {
             this.set('name', $(`#${this.get('nameId')}`).val().trim());
+            this.validateFieldName();
         },
 
         /**
@@ -64,5 +69,13 @@ export default Component.extend({
         changeFieldInclusion() {
             this.set('included', $(`#${this.get('checkboxId')}`).is(':checked'));
         }
+    },
+
+    validateFieldName() {
+        // allowed pattern for field names
+        const allowedPattern = /[^a-zA-Z\_]/g;
+        this.set('invalid', this.get('name').search(allowedPattern) !== -1);
+        console.log(this.get('invalid'));
     }
+
 });

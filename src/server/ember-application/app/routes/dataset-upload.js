@@ -4,6 +4,7 @@ import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-rout
 
 import { inject as service } from '@ember/service';
 import { run } from '@ember/runloop';
+import { set } from '@ember/object';
 import { A } from '@ember/array';
 import $ from 'jquery';
 
@@ -52,7 +53,9 @@ export default DatasetUploadRoute.extend({
                     });
                     return this.removeDataset();
                 }
-
+                // set all fields to valid - modify values in child components
+                model.fieldList.forEach(field => { field.invalid = false; });
+                console.log(model);
                 this.set('controller.model', model);
             });
         },
@@ -72,6 +75,13 @@ export default DatasetUploadRoute.extend({
         submitDataset() {
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
+
+            if (fieldList.map(field => field.invalid).includes(true)) {
+                console.log(fieldList.map(field => field.invalid));
+                $('#submittion-error').addClass('show');
+                return;
+            }
+
             // filter out the included fields and prepare the array as
             // set the options and upload
             $.post({

@@ -1,5 +1,6 @@
 <td scope="col" class="field name">
-  <input type="text" id="{{nameId}}" class="form-control" oninput={{action "changeFieldName"}} value={{name}}>
+  <input type="text" id="{{nameId}}" class="form-control {{if invalid 'invalid-value'}}" oninput={{action "changeFieldName"}} value={{name}}>
+  <div class="pull-right field-name-warning {{if invalid 'show'}}">Contains invalid characters</div>
 </td>
 
 <td class="center field type">

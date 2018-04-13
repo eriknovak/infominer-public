@@ -41,7 +41,7 @@
       </thead>
       <tbody>
         {{#each fieldList as |field index|}}
-          {{dataset-upload-field name=field.name type=field.type included=field.included index=index}}
+          {{dataset-upload-field name=field.name type=field.type included=field.included invalid=field.invalid index=index}}
         {{/each}}
       </tbody>
     </table>
@@ -53,6 +53,7 @@
   <div class="col-lg-12">
     <button {{action submitDataset}} class="btn btn-primary pull-right">Save Dataset</button>
     <button {{action resetList}} class="btn btn-default pull-right">Cancel</button>
+    <div id="submittion-error" class="pull-right">Invalid field names</div>
   </div><!-- .col-lg-12 -->
 </div><!-- .row -->
 
