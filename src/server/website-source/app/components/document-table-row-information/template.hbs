@@ -2,18 +2,22 @@
 <td class="clickable" data-toggle="collapse" data-target="#{{collapseId}}"></td>
 
 <!-- document values content -->
-<td colspan="{{numberOfColumns}}" class="clickable" data-toggle="collapse"
-    data-target="#{{collapseId}}">
+<td class="clickable" data-toggle="collapse" data-target="#{{collapseId}}" 
+  colspan="{{numberOfColumns}}">
 
-  <div class="collapse document-values" id="{{collapseId}}">
+  <div class="collapse document-attributes" id="{{collapseId}}">
 
     <!-- Fill the container with documents -->
-    {{#each documentValues as |value|}}
-      <p>
-        <span class="subset field-value">{{value.field}}</span>
-        <span>{{value.value}}</span>
-      </p>
-    {{/each}}
+      <div class="container">
+        {{#each documentValues as |value|}}
+        <div class="row">
+          <div class="col-1 subset field-value">{{value.field}}</div>
+          <div class="col">{{value.value}}</div>
+        </div>
+        {{/each}}
+      </div>
+
+    
 
   </div><!-- .collapse -->
 </td>
