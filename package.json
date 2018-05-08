@@ -6,9 +6,9 @@
   "scripts": {
     "test": "cd src/test && sh tests.sh",
     "preinstall": "npm list ember-cli@2.18.1 -g || npm install ember-cli@2.18.1 -g",
-    "postinstall": "cd src/server/ember-application && npm install && bower install",
-    "ember:serve": "cd src/server/ember-application && ember serve",
-    "ember:build": "cd src/server/ember-application && ember build --output-path=../public --environment=production",
+    "postinstall": "cd src/server/website-source && npm install && bower install",
+    "ember:serve": "cd src/server/website-source && ember serve",
+    "ember:build": "cd src/server/website-source && ember build --output-path=../public --environment=production",
     "server:gui": "cd src/server && node gui-server.js",
     "server:guiDev": "cd src/server && node gui-server.js --ignoreSecurity",
     "server:guiDebug": "cd src/server && node debug gui-server.js",

@@ -71,23 +71,23 @@ typings/
 # ember ignore files
 
 # compiled output
-/src/server/ember-application/dist
-/src/server/ember-application/tmp
+/src/server/website-source/dist
+/src/server/website-source/tmp
 
 # dependencies
-/src/server/ember-application/node_modules
-/src/server/ember-application/bower_components
+/src/server/ewebsite-source/node_modules
+/src/server/website-source/bower_components
 
 # misc
-/src/server/ember-application/sass-cache
-/src/server/ember-application/connect.lock
-/src/server/ember-application/coverage/*
-/src/server/ember-application/libpeerconnection.log
-/src/server/ember-application/npm-debug.log*
-/src/server/ember-application/yarn-error.log
-/src/server/ember-application/testem.log
+/src/server/website-source/sass-cache
+/src/server/website-source/connect.lock
+/src/server/website-source/coverage/*
+/src/server/website-source/libpeerconnection.log
+/src/server/website-source/npm-debug.log*
+/src/server/website-source/yarn-error.log
+/src/server/website-source/testem.log
 
 # ember-try
-/src/server/ember-application/node_modules.ember-try/
-/src/server/ember-application/bower.json.ember-try
-/src/server/ember-application/package.json.ember-try
+/src/server/website-source/node_modules.ember-try/
+/src/server/website-source/bower.json.ember-try
+/src/server/website-source/package.json.ember-try
