@@ -44,53 +44,61 @@
     }
 }
 
-.dropzone {
-    @include dataset-square;
-    padding: 5% 0;
-    margin: 20px 0;
-    border: 2px dashed $tertiary-color;
-    label { margin-bottom: 0; }
-    #upload-dataset { font-weight: 600; }
+.dataset-upload {
 
-    .progress {
-        width: 70%;
-        border-radius: 0px;
-        margin: auto;
-        .progress-bar { border-radius: 0px; }
-    }
-}
+    .dropzone {
+        @include dataset-square;
+        padding: 5% 0;
+        margin: 20px 0;
+        border: 2px dashed $tertiary-color;
+        label { margin-bottom: 0; }
+        #upload-dataset { font-weight: 600; }
 
-.dataset-field-list {
-
-    .dataset-label,
-    .dataset-description {
-        margin: 10px 0;
-    }
-
-    label { @include label; }
-
-    .field.type select {
-        width: 40%;
-        margin: auto;
-    }
-
-    .field.name {
-        input.invalid-value { border: 1px solid red; }
-        .field-name-warning { 
-            color: red; 
-            visibility: hidden;
-            &.show { visibility: visible; }
+        .progress {
+            width: 70%;
+            height: 24px;
+            border-radius: 0px;
+            margin: auto;
+            font-size: 10px;
+            .progress-bar { border-radius: 0px; }
         }
     }
 
-    .tr:hover { background-color: transparent !important; }
+    .dataset-field-list {
 
-    .checkbox label { margin-top: 5px !important; }
-}
+        .dataset-label,
+        .dataset-description {
+            margin: 10px 0;
+        }
 
-#submittion-error {
-    color: red;
-    padding: 4.875px 0px;
-    visibility: hidden;
-    &.show { visibility: visible; }
+        label { @include label; }
+
+        .document-table {
+            .table td { vertical-align: top; }
+            .field.type select { margin: auto; }
+            @media (min-width: 880px) {
+                .field.type select { width: 40%; }
+            }
+            .field.name {
+                input.invalid-value { border: 1px solid red; }
+                .field-name-warning {
+                    color: red;
+                    visibility: hidden;
+                    &.show { visibility: visible; }
+                }
+            }
+
+            .tr:hover { background-color: transparent !important; }
+
+            .checkbox label { margin-top: 5px !important; }
+        }
+    }
+
+    #submittion-error {
+        color: red;
+        padding: 4.875px 0px;
+        visibility: hidden;
+        &.show { visibility: visible; }
+    }
+
 }

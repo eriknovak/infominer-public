@@ -9,7 +9,7 @@
           <button class="btn btn-secondary pull-right" data-toggle="modal"
             data-target="#edit-dataset-modal" {{action 'removeModalWarnings'}}>Edit</button>
 
-          <button class="btn btn-light pull-right" data-toggle="modal"    
+          <button class="btn btn-light pull-right" data-toggle="modal"
             data-target="#delete-dataset-modal">Delete</button>
 
           <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
@@ -51,7 +51,7 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Go back</button>
+        <button type="button" class="btn btn-light" data-dismiss="modal">Go back</button>
         <button type="button" class="btn btn-danger" onclick={{action deleteDataset}}>Yes, delete dataset</button>
       </div>
 
