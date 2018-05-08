@@ -17,7 +17,9 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         set(this, 'selectedMethod', 'clustering.kmeans');
-        set(this, 'availableMethods', ['clustering.kmeans', 'visualization']);
+        set(this, 'availableMethods', [
+            { method: 'clustering.kmeans', name: 'clustering' }
+        ]);
         set(this, 'methodSelectionId', 'method-selection');
         set(this, 'parameters', {});
     },
@@ -38,13 +40,14 @@ export default Component.extend({
             let parameters = this.get('parameters');
             // get feature parameters
             let features = get(parameters, 'features').filterBy('included', true)
-                .map(param => get(param, 'features'));
+                .map(param => get(param, 'field'));
             // get method parameters
             let method = get(parameters, 'method');
             // get the method type
             let methodType = this.get('selectedMethod');
             // send the parameters to the route
-            this.get('action')({ methodType, parameters: { features, method } });
+            console.log({ methodType, parameters: { features, method } });
+            // this.get('action')({ methodType, parameters: { features, method } });
 
         }
     }

@@ -6,6 +6,7 @@
 
     .method-selection-label {
         font-weight: 400;
+        margin-right: 5px;
         &.parameter {
             font-weight: 600;
             font-size: 12px;
@@ -54,56 +55,23 @@
     }
 }
 
-.feature-options {
-    .field-features {
-        border: 1px solid $primary-color;
-        margin-top: 20px;
-        padding: 0 10px;
-        font-size: 12px;
-
-        .include-field {
-            padding-right: 10px;
-            margin-top: -10px;
-            label {
-                background-color: white;
-                border-color: $primary-color;
-                &.include-label { margin: 1px 5px 2px 0; }
-            }
-            .checkbox label:after { top: 5px; }
-
-        }
-
-        .field-feature-options {
-            margin-top: -11px;
-            border-color: $primary-color;
-            &:disabled {
-                color:  $primary-color;
-                cursor: not-allowed;
-            }
-        }
-        .field-feature {
-            width: fit-content;
-            padding: 0 5px 5px;
-            margin: -9px 0px 0px -5px;
-            color: $quaternary-color;
-            text-transform: uppercase;
+.field-features {
+    font-size: 12px;
+    vertical-align: middle;
+    .include-field {
+        label {
             background-color: white;
-            font-weight: 600;
-
-            select {
-                padding-top: 0px;
-                padding-bottom: 0px;
-                height: 14px;
-            }
+            border-color: $primary-color;
+            &.include-label { margin: 1px 5px 2px 0; }
         }
+        .checkbox label:after { top: 5px; }
     }
-    p.description { margin: 20px 0; }
-
-    .feature-selection-label {
+  
+    .field-feature {
+        padding: 1px 0 5px;
+        color: $quaternary-color;
+        text-transform: capitalize;
         font-weight: 600;
-        &.parameter {
-            margin-bottom: 2px;
-        }
     }
 }
 

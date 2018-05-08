@@ -1,0 +1,13 @@
+<div clas="field-features">
+    <span class="include-field pull-right">
+        <label class="include-label">include</label>
+        {{ checkbox-select class="pull-right"
+            checkboxId=(concat "field-feature-" index)
+            checkboxAction=(action "toggleFieldInclusion")
+            checked=features.included
+        }}
+    </span>
+    <div class="field-feature">
+        {{features.field}}
+    </div>
+</div>

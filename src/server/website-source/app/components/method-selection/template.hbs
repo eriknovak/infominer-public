@@ -19,7 +19,7 @@
                 <label class="method-selection-label">Method</label>
                 <select id="{{methodSelectionId}}" class="form-control" onchange={{action "changeMethodSelection"}}>
                   {{#each availableMethods as |method|}}
-                    <option>{{method}}</option>
+                    <option value="{{method.method}}">{{method.name}}</option>
                   {{/each}}
                 </select>
               </div><!-- .form-inline -->

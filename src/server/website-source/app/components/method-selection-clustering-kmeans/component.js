@@ -11,12 +11,15 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'distanceMetrics', [
-            { fullName: 'Euclidian', name: 'Euclid' },
-            { fullName: 'Cosine', name: 'Cos' }
-        ]);
-        set(this, 'chosenMetrics', 'Euclid');
+        // set default cluster number
         set(this, 'k', 2);
+        // set possible clustering types
+        set(this, 'clusteringTypes', [
+            { fullName: 'Text', name: 'text' },
+            { fullName: 'Number', name: 'number' }
+        ]);
+        // set default clustering type
+        set(this, 'chosenClusteringType', 'text');
     },
 
     didReceiveAttrs() {
@@ -29,21 +32,22 @@ export default Component.extend({
     // Actions
     ///////////////////////////////////////////////////////
 
-    _observeParameterChanges: observer('chosenMetrics', 'k', function () {
+    _observeParameterChanges: observer('chosenClusteringType', 'k', function () {
         once(this, '_setParameters');
     }),
 
     actions: {
-        // sets the distance metrics
-        selectDistanceMetrics(index) {
-            let chosenMetrics = get(this.get('distanceMetrics').objectAt(index), 'name');
-            this.set('chosenMetrics', chosenMetrics);
-        },
 
         // sets the number of clusters
         selectNumberOfClusters(number) {
             let k = parseInt(number) < 2 ? 2 : parseInt(number);
             this.set('k', k);
+        },
+
+        // sets the clustering type
+        selectClusteringType(index) {
+            let chosenType = get(this.get('clusteringTypes').objectAt(index), 'name');
+            this.set('chosenClusteringType', chosenType);
         }
     },
 
@@ -53,7 +57,7 @@ export default Component.extend({
 
     _setParameters() {
         // set parameter values
-        this.set('parameters.method', { distanceType: this.get('chosenMetrics'),  k: this.get('k') });
+        this.set('parameters.method', { clusteringType: this.get('chosenClusteringType'),  k: this.get('k') });
 
     }
 });

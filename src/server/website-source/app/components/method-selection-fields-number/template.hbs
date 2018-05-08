@@ -1,0 +1,5 @@
+{{#each parameters.features as |features index| }}
+    {{method-selection-fields features=features index=index}}
+{{/each}}
+
+{{yield}}
