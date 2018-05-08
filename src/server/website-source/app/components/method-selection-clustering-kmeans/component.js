@@ -19,7 +19,7 @@ export default Component.extend({
             { fullName: 'Number', name: 'number' }
         ]);
         // set default clustering type
-        set(this, 'chosenClusteringType', 'text');
+        set(this, 'chosenClusteringType', get(this.get('clusteringTypes').objectAt(0), 'name'));
     },
 
     didReceiveAttrs() {

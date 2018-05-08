@@ -1,3 +1,8 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
 // common styles for all views
 html, body {
     font-family: $font-primary;
@@ -8,8 +13,11 @@ html, body {
 
 body {
     padding-top: 64px;
-    padding-bottom: 100px;
-    & > .ember-view { height: 100% }
+    & > .ember-view { 
+        main {
+            padding-bottom: 120px;
+        }
+    }
 }
 
 h1, h2, h3, h4, h5, h6 { text-transform: uppercase; }
@@ -238,6 +246,23 @@ input, select, textarea {
         }
     }
 }
+
+/**************************************
+ * Footer
+ *************************************/
+
+ .footer {
+    position: absolute;
+
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 10px;
+
+    background-color: transparent;
+    color: $font-color-dark;
+    border: none;
+}
+
 
 /**************************************
  * Helper classes
