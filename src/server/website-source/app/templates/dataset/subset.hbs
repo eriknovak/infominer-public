@@ -3,7 +3,10 @@
 
     <div class="row">
       <div class="col-lg-10">
-        <h3 class="description-header">{{ model.label }}</h3>
+        <h3 class="description-header">{{ model.label }}
+          <button class="btn btn-secondary edit pull-right" data-toggle="modal"
+          data-target="#edit-subset-modal" {{action 'removeModalWarnings'}}>Edit</button>
+        </h3>
 
         <div class="row">
           <div class="col-lg-3">
@@ -30,8 +33,6 @@
         {{#link-to "dataset.subset.analysis" model class="btn btn-primary"}}Analysis{{/link-to}}
         {{#link-to "dataset.subset.documents" model class="btn btn-primary"}}Documents{{/link-to}}
 
-        <button class="btn btn-primary edit pull-right" data-toggle="modal"
-        data-target="#edit-subset-modal" {{action 'removeModalWarnings'}}>Edit</button>
       </div>
     </div>
   </div>

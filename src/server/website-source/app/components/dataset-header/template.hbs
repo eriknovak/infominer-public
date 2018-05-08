@@ -6,11 +6,11 @@
           <!-- Dataset title and information -->
           <h2 class="description-header">{{dataset.label}}</h2>
 
-          <button class="btn btn-primary pull-right" data-toggle="modal"
-            data-target="#delete-dataset-modal">Delete</button>
-
-          <button class="btn btn-primary pull-right" data-toggle="modal"
+          <button class="btn btn-secondary pull-right" data-toggle="modal"
             data-target="#edit-dataset-modal" {{action 'removeModalWarnings'}}>Edit</button>
+
+          <button class="btn btn-light pull-right" data-toggle="modal"    
+            data-target="#delete-dataset-modal">Delete</button>
 
           <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
           <span class="dataset-created">Created: {{dataset.date}}</span>
