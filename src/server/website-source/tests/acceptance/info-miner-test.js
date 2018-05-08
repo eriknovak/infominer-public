@@ -1,5 +1,5 @@
 import { test } from 'qunit';
-import moduleForAcceptance from 'ember-source/tests/helpers/module-for-acceptance';
+import moduleForAcceptance from 'infominer-website/tests/helpers/module-for-acceptance';
 
 moduleForAcceptance('Acceptance | info miner');
 

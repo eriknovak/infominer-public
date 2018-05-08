@@ -1,5 +1,5 @@
 import DS from 'ember-data';
-import ENV from 'ember-source/config/environment';
+import ENV from 'infominer-website/config/environment';
 
 export default DS.RESTAdapter.extend({
     host: ENV.APP.HOSTNAME,

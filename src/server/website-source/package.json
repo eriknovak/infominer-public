@@ -1,8 +1,8 @@
 {
-  "name": "ember-source",
+  "name": "infominer-website",
   "version": "0.0.0",
   "private": true,
-  "description": "Small description for ember-source goes here",
+  "description": "Contains the source code of the InfoMiner web application",
   "license": "MIT",
   "author": "",
   "directories": {

@@ -19,12 +19,12 @@ InfoMiner is an exploration service for textual data.
         # same as running
         npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g
         ```
-    - Additionally, it will automatically run `npm run postinstall` and install local ember dependencies. It is same as navigating to `src/server/ember-source` and running `npm install`
+    - Additionally, it will automatically run `npm run postinstall` and install local ember dependencies. It is same as navigating to `src/server/website-source` and running `npm install`
         ```bash
         # running the command
         npm run postinstall
         # same as
-        cd src/website/ember-source
+        cd src/website/website-source
         npm install
         ```
 

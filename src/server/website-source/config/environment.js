@@ -3,7 +3,7 @@
 
 module.exports = function(environment) {
   let ENV = {
-    modulePrefix: 'ember-source',
+    modulePrefix: 'infominer-website',
     environment,
     rootURL: '/',
     locationType: 'auto',
