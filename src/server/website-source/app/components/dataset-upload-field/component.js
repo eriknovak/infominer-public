@@ -75,7 +75,6 @@ export default Component.extend({
         // allowed pattern for field names
         const allowedPattern = /[^a-zA-Z\_]/g;
         this.set('invalid', this.get('name').search(allowedPattern) !== -1);
-        console.log(this.get('invalid'));
     }
 
 });

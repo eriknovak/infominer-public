@@ -19,7 +19,7 @@
     "ember:build": "ember build --output-path=../public --environment=production"
   },
   "devDependencies": {
-    "bootstrap": "^4.0.0",
+    "bootstrap": "^4.1.1",
     "broccoli-asset-rev": "^2.4.5",
     "d3-cloud": "^1.2.4",
     "ember-ajax": "^3.0.0",
