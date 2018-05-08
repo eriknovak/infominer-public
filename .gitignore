@@ -63,6 +63,12 @@ typings/
 /data
 
 # ####################
+# configuration ignores
+
+/src/config/auth*.js
+/src/config/pgconfig.js
+
+# ####################
 # website ignores
 
 /src/server/public
