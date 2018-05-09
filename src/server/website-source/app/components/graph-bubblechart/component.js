@@ -42,7 +42,6 @@ const WordCloudComponent = GraphComponent.extend({
     }),
     
     _setBubbleData(bubblechart) {
-        console.log(bubblechart);
         this.set('data', bubblechart);
     },
 

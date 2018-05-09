@@ -34,6 +34,12 @@ const WordCloudComponent = GraphComponent.extend({
         this.prepareText(this.get('keywords'));
     },
 
+    willDestroyElement() {
+        // clears timeout when creating the graph
+        clearTimeout(this.get('creationTimeout'));
+    },
+
+
     ///////////////////////////////////////////////////////
     // Helper functions
     ///////////////////////////////////////////////////////
@@ -81,7 +87,10 @@ const WordCloudComponent = GraphComponent.extend({
     dataObserver: observer('data', 'width', 'height', function () {
         let self = this;
         this._setLoadingState();
-        once(function () { setTimeout(function () { self.drawGraph(); }, 1000); });
+        once(function () { 
+            let creationTimeout = setTimeout(function () { self.drawGraph(); }, 1000); 
+            self.set('creationTimeout', creationTimeout);
+        });
     }),
 
     /**
