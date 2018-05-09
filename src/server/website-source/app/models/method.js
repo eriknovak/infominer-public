@@ -9,5 +9,12 @@ export default DS.Model.extend({
     appliedOn: DS.belongsTo('subset', { inverse: 'usedBy' }),
     analysisAppropriate: computed('methodType', function () {
         return !this.get('methodType').includes('filter');
+    }),
+    label: computed('methodType', function () {
+        if (this.get('methodType').includes('kmeans')) {
+            return 'clustering';
+        } else {
+            return this.get('methodType');
+        }
     })
 });

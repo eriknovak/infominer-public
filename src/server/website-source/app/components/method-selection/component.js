@@ -39,15 +39,14 @@ export default Component.extend({
             // get the parameters
             let parameters = this.get('parameters');
             // get feature parameters
-            let features = get(parameters, 'features').filterBy('included', true)
+            let fields = get(parameters, 'features').filterBy('included', true)
                 .map(param => get(param, 'field'));
             // get method parameters
             let method = get(parameters, 'method');
             // get the method type
             let methodType = this.get('selectedMethod');
             // send the parameters to the route
-            console.log({ methodType, parameters: { features, method } });
-            // this.get('action')({ methodType, parameters: { features, method } });
+            this.get('action')({ methodType, parameters: { fields, method } });
 
         }
     }

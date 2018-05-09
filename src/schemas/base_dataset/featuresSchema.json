@@ -8,7 +8,7 @@
             "properties": {
                 "source": { "constant": "Dataset" },
                 "type": { "contant": "text" },
-                "field": { "type": "string" },
+                "field": { "type": ["string", "array"] },
                 "normalize": { "contant": [true, false] },
                 "weight": { "constant": ["none", "tf", "idf", "tfidf"] }
             },

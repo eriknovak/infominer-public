@@ -177,7 +177,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 });
             }
 
-
             // insert temporary file
             pg.insert({ owner, filepath: file.path, filename: file.filename, delimiter: delimiter }, 'infominer_temporary_files', (xerror) => {
                 if (xerror) {

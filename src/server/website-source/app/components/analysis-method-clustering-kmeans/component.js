@@ -43,7 +43,7 @@ export default Component.extend({
     },
 
     _setSelectedFields() {
-        const selectedFields = this.get('method.parameters.features').map(feature => feature.field).join(', ');
+        const selectedFields = this.get('method.parameters.fields').join(', ');
         this.set('selectedFields', selectedFields);
     },
 

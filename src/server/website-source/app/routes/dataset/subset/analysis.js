@@ -51,8 +51,9 @@ export default Route.extend({
                     documentCount: subsetInfo.documentCount
                 });
                 // save the cluster
-                subset.save();
-                this.transitionTo('dataset.subset', subset);
+                subset.save().then(() => {
+                    this.transitionTo('dataset.subset', subset);
+                });
             });
         }
     }

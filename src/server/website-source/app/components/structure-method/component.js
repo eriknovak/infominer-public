@@ -19,7 +19,6 @@ export default Component.extend({
 
         const method = this.get('method');
         if (method.get('methodType').includes('clustering')) {
-
             // method does not have any results at the moment
             if (!method.get('result')) { return ontology; }
             // method is a clustering method - get all results
@@ -31,6 +30,7 @@ export default Component.extend({
                 } else {
                     clusterObj.subsetLabel = cluster.clusterLabel;
                 }
+                // add cluster info to ontology
                 ontology.push(clusterObj);
             }
         } else if (method.get('methodType').includes('filter')) {

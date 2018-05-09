@@ -32,16 +32,10 @@ let processHandler = new ProcessHandler({
 
 // on manual process exit
 process.on('SIGINT', () => {
-    // disconnect each child process
-    processHandler.closeAllProcesses((error) => {
-        if (error) { logger.warn('error when closing child process', { error: error.message }); }
-
-        pg.close(() => {
-            // close postgresql connection
-            logger.info('close postgresql connection and stop server');
-            process.exit(0);
-        });
-
+    pg.close(() => {
+        // close postgresql connection
+        logger.info('close postgresql connection and stop server');
+        process.exit(0);
     });
 });
 

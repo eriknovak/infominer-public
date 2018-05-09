@@ -96,6 +96,26 @@ class BaseDataset {
             console.error('Constructor parameters are not in specified schema');
             return { errors: { messages: '_loadBase: self.params.mode must be "createClean" or "open"' } };
         }
+        self.fields = self._getDatasetFields();
+    }
+
+    _getDatasetFields() {
+        let fields = this.base.store('Dataset').fields;
+        
+        // set aggregate types for each field
+        fields.forEach(field => {
+            if (field.type === 'float') { 
+                field.aggregate = 'histogram'; 
+            } else if (field.type === 'string') {
+                // on a sample check how many different values 
+                // there is for that field
+                let sampleSet = this.base.store('Dataset').allRecords;
+                let aggregate = sampleSet.aggr({ name: `sample_${field.name}`, field: field.name, type: 'count' });
+                field.aggregate = aggregate && aggregate.values.length < 10 ? 'count' : 'keywords';
+                console.log(field.aggregate);
+            }
+        });
+        return fields;
     }
 
     /**
@@ -184,12 +204,17 @@ class BaseDataset {
         }
         // close the input stream - enable file manipulation
         fileIn.close();
+
+        // set dataset fields - and aggregates
+        self.fields = self._getDatasetFields();
+
         // create the root subset
         let subset = {
             label: 'root',
             description: 'The root subset. Contains all records of dataset.',
             documents: self.base.store('Dataset').allRecords.map(rec => rec.$id)
         };
+
         // return subset object
         return self.createSubset(subset);
     }
@@ -542,7 +567,7 @@ class BaseDataset {
     /**
      * Creates a method record in the database.
      * @param {Object} method - The method to store.
-     * @param {String} method.methodType - The type of the method.
+     * @param {String} method.type - The type of the method.
      * @param {Object} method.parameters - The parameters of the method.
      * @param {Object} method.result - The result of the method.
      * @param {Number} method.appliedOn - The id of the subset the method was applied on.
@@ -605,12 +630,10 @@ class BaseDataset {
             };
 
             // iterate through the fields
-            for (let field of fields) {
-                // TODO: intelligent way to select aggregation type
-                let type = field.type === 'string' ? 'keywords' : 'histogram';
+            for (let field of self.fields) {
                 // get aggregate distribution
-                let distribution = self._aggregateByField(elements, field.name, type);
-                qMethod.result.aggregates.push({ field: field.name, type, distribution });
+                let distribution = self._aggregateByField(elements, field);
+                qMethod.result.aggregates.push({ field: field.name, type: field.aggregate, distribution });
             }
 
             // save the method
@@ -629,9 +652,11 @@ class BaseDataset {
      * @returns The results of the aggregation.
      * @private
      */
-    _aggregateByField(elements, field, type) {
+    _aggregateByField(elements, field) {
         // TODO: check if field exists
-        let distribution = elements.aggr({ name: `${field}_${type}`, field, type });
+        const fieldName = field.name;
+        const aggregate = field.aggregate;
+        let distribution = elements.aggr({ name: `${aggregate}_${fieldName}`, field: fieldName, type: aggregate });
         return distribution;
     }
 
@@ -775,10 +800,25 @@ class BaseDataset {
      */
     _clusteringKMeans(query, subset) {
         let self = this;
-        // create a feature space
-        let features = query.parameters.features;
-        features.forEach(feature => { feature.source = 'Dataset'; });
 
+        // set placeholder for feature space parameters
+        let features;
+        // set kmeans and features space parameters
+        switch (query.parameters.method.clusteringType) {
+            case 'text':
+                // set kmeans and features space parameters
+                query.parameters.method.distanceType = 'Cos';
+                features = [{
+                    type: 'text', field: query.parameters.fields, 
+                    ngrams: 2, hashDimension: 200000
+                }]; break;
+            case 'number':
+                query.parameters.method.distanceType = 'Euclid';
+                features = query.parameters.fields.map(fieldName => ({
+                    type: 'numeric', field: fieldName
+                })); break;
+        }
+        features.forEach(feature => { feature.source = 'Dataset'; });
 
         /////////////////////////////////////////
         // Validate features object
@@ -794,22 +834,19 @@ class BaseDataset {
         let featureSpace = self._createFeatureSpace(features);
 
         // get subset elements and update the feature space
-        let documents = subset.hasElements;
+        const documents = subset.hasElements;
         featureSpace.updateRecords(documents);
 
         // get matrix representation of the documents
-        let spMatrix = featureSpace.extractSparseMatrix(documents);
+        const spMatrix = featureSpace.extractSparseMatrix(documents);
 
-        // prepare the KMeans method and run the clustering
-        let methodParams = query.parameters.method;
-        // don't allow empty clusters
-        methodParams.allowEmpty = false;
-
+        // finalize kmeans clustering parameters
+        query.parameters.method.allowEmpty = false; // don't allow empty clusters
 
         /////////////////////////////////////////
         // Validate KMeans parameter
         /////////////////////////////////////////
-        if (!validator.validateSchema(methodParams, validator.schemas.methodKMeansParams)) {
+        if (!validator.validateSchema(query.parameters.method, validator.schemas.methodKMeansParams)) {
             // method parameters are not in correct schema - set query
             // to Error and exist this function
             query = new Error('KMeans parameters are not in correct schema');
@@ -817,44 +854,40 @@ class BaseDataset {
         }
 
         // create kmeans model and feed it the sparse document matrix
-        let KMeans = new qm.analytics.KMeans(methodParams);
+        let KMeans = new qm.analytics.KMeans(query.parameters.method);
         KMeans.fit(spMatrix);
-
         // get the document-cluster affiliation
         const idxv = KMeans.getModel().idxv;
         // prepare clusters array in the results
         query.result = {
-            clusters: Array.apply(null, Array(methodParams.k))
+            clusters: Array.apply(null, Array(query.parameters.method.k))
                 .map(() => ({ docIds: [ ], aggregates: [ ], subsetCreated: false }))
         };
 
         // populate the result clusters
         for (let id = 0; id < idxv.length; id++) {
-            let docId = documents[id].$id;
-            let clusterId = idxv[id];
+            const docId = documents[id].$id;
+            const clusterId = idxv[id];
             // store the document id in the correct cluster
             query.result.clusters[clusterId].docIds.push(docId);
         }
 
         // for each cluster calculate the aggregates
-        const fields = self.base.store('Dataset').fields;
         for (let i = 0; i < query.result.clusters.length; i++) {
             // get elements in the cluster
-            let docIds = new qm.la.IntVector(query.result.clusters[i].docIds);
-            let clusterElements = self.base.store('Dataset').newRecordSet(docIds);
+            const docIds = new qm.la.IntVector(query.result.clusters[i].docIds);
+            const clusterElements = self.base.store('Dataset').newRecordSet(docIds);
 
             // iterate through the fields
-            for (let field of fields) {
-                // TODO: intelligent way to select aggregation type
-                let type = field.type === 'string' ? 'keywords' : 'histogram';
+            for (let field of self.fields) {
                 // get aggregate distribution
-                let distribution = self._aggregateByField(clusterElements, field.name, type);
-                query.result.clusters[i].aggregates.push({ field: field.name, type, distribution });
+                let distribution = self._aggregateByField(clusterElements, field);
+                query.result.clusters[i].aggregates.push({ field: field.name, type: field.aggregate, distribution });
             }
             // set cluster label out of the first keyword cloud
             let clusterLabel;
             for (let aggregate of query.result.clusters[i].aggregates) {
-                if (aggregate.type === 'keywords') {
+                if (aggregate.type === 'keywords' && aggregate.distribution) {
                     clusterLabel = aggregate.distribution.keywords.slice(0, 3)
                         .map(keyword => keyword.keyword).join(', ');
                     break;

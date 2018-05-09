@@ -3,7 +3,7 @@
     "type": "object",
     "properties": {
         "k": { "type": "integer", "minimum": 2 },
-        "distanceType": { "constant": ["Euclid", "cos"] },
+        "distanceType": { "constant": ["Euclid", "Cos"] },
         "allowEmpty": { "constant": false }
     }
 }

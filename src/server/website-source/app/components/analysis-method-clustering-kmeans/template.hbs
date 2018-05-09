@@ -4,19 +4,25 @@
     <i class="fa fa-chevron-down"></i>
   </button>
 
-  Clustering KMeans
+  Clustering
 </h3>
 
 <div class="row">
   <div class="col-md-6 method-parameters">
+    
     <div class="parameter">
-      <span class="parameter-label">NUMBER OF CLUSTERS: </span>
+      <span class="parameter-label">Type of clustering: </span>
+      <span class="parameter-value">
+        {{method.parameters.method.clusteringType}}
+        ({{selectedFields}})
+        </span>
+    </div>
+
+    <div class="parameter">
+      <span class="parameter-label">Number of clusters: </span>
       <span class="parameter-value">{{clusters.length}}</span>
     </div>
-    <div class="parameter">
-      <span class="parameter-label">SELECTED FIELDS: </span>
-      <span class="parameter-value">{{selectedFields}}</span>
-    </div>
+    
   </div>
 </div>
 

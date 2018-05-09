@@ -184,7 +184,7 @@ const RadialTreeComponent = GraphComponent.extend({
 
         // create radial tree
         let radialTree = tree()
-            .size([2*Math.PI, (height < width ? height : width) / 2])
+            .size([2*Math.PI, Math.min(height, width) / 2])
             .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
 
         let root = radialTree(hierarchy);
