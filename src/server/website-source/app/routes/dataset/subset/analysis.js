@@ -37,8 +37,6 @@ export default Route.extend({
          */
         createSubset(subsetInfo) {
             let self = this;
-            // toggle the modal - giving the user control
-            $(`#${subsetInfo.modalId}`).modal('toggle');
             // update method internal state
             this.get('store').findRecord('method', subsetInfo.methodId).then(method => {
                 // create new subset
@@ -52,6 +50,8 @@ export default Route.extend({
                 });
                 // save the cluster
                 subset.save().then(() => {
+                    // toggle the modal - giving the user control
+                    $(`#${subsetInfo.modalId}`).modal('toggle');
                     this.transitionTo('dataset.subset', subset);
                 });
             });

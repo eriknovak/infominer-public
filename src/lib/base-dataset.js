@@ -111,7 +111,7 @@ class BaseDataset {
                 // there is for that field
                 let sampleSet = this.base.store('Dataset').allRecords;
                 let aggregate = sampleSet.aggr({ name: `sample_${field.name}`, field: field.name, type: 'count' });
-                field.aggregate = aggregate && aggregate.values.length < 10 ? 'count' : 'keywords';
+                field.aggregate = aggregate && aggregate.values.length < 20 ? 'count' : 'keywords';
                 console.log(field.aggregate);
             }
         });

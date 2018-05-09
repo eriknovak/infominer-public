@@ -46,8 +46,14 @@ export default Component.extend({
             // get the method type
             let methodType = this.get('selectedMethod');
             // send the parameters to the route
-            this.get('action')({ methodType, parameters: { fields, method } });
 
+            if (fields.length) {
+                // parameters are set - make a method request
+                this.get('action')({ methodType, parameters: { fields, method } });
+            } else {
+                // there are no fields selected - warn the user
+                $('#analysis-warning').removeClass('d-none');
+            }
         }
     }
 

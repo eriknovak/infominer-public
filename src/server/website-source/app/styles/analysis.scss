@@ -17,6 +17,11 @@
     .method-description {
         text-align: justify;
     }
+
+    #analysis-warning {
+        color: red;
+        font-weight: 400;
+    }
 }
 
 .feature-selection {
@@ -72,6 +77,12 @@
         color: $quaternary-color;
         text-transform: capitalize;
         font-weight: 600;
+        &.warning { 
+            font-weight: 300;
+            text-transform: none;
+            color: $font-color-dark; 
+            b { font-weight: 600; }
+        }
     }
 }
 
