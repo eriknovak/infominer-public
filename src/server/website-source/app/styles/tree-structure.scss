@@ -41,11 +41,18 @@
                 left: -11px;
             }
 
+            &.method:after, 
+            &.method:before { border-color: $tertiary-color; }
+
+            &.subset:after, 
+            &.subset:before { border-color: green; }
+
             &:before {
                 border-top: 1px solid;
                 top: 10px;
                 width: 8px;
                 height: 0;
+                &.method { color: $tertiary-color; }
             }
 
             &:after {

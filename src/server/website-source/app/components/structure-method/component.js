@@ -54,9 +54,9 @@ export default Component.extend({
         if (method.hasMany('produced').ids().length > 0) { this.set('parent', true); }
 
         // get the fields used for feature space creation
-        if (method.get('parameters.features')) {
-            let fields = method.get('parameters.features').map(feature => feature.field);
-            this.set('selectedFields', fields.join(', '));
+        if (method.get('parameters.fields')) {
+            let selectedFields = method.get('parameters.fields').join(', ');
+            this.set('selectedFields', selectedFields);
         }
     },
 

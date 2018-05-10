@@ -5,7 +5,7 @@ import { observer, set } from '@ember/object';
 
 // d3 visualizations
 import { select } from 'd3-selection';
-import { scaleQuantize } from 'd3-scale';
+import { scaleThreshold } from 'd3-scale';
 import { pack, hierarchy } from 'd3-hierarchy';
 
 // declare new graph component
@@ -24,7 +24,7 @@ const WordCloudComponent = GraphComponent.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'margin', { top: 20, right: 20, bottom: 20, left: 20 });
+        set(this, 'margin', { top: 10, right: 10, bottom: 10, left: 10 });
     },
 
     didReceiveAttrs() {
@@ -66,11 +66,11 @@ const WordCloudComponent = GraphComponent.extend({
 
         // calculates the size of the bubble
         function bubbleSize(node) {
-            return Math.min(width, height) / 240 * node.value + 12;
+            return Math.min(width, height) / 600 * node.value + 16;
         }
         // calculates the size of the text within the bubble
         function fontSize(node) {
-            return 30 / 100 * node.value + 10;
+            return 18 / 100 * node.value + 10;
         }
 
         // create a new histogram container
@@ -79,17 +79,17 @@ const WordCloudComponent = GraphComponent.extend({
             .attr('height', totalHeight);
 
         // color scale for bubbles
-        const colorBubble = scaleQuantize()
-            .domain([0, Math.min(width, height) / 2.4 + 12])
+        const colorBubble = scaleThreshold()
+            .domain([100/3, 200/3])
             .range(["#e7e7e7", "#3366CC", "#000000"]);
         
         // color scale for text
-        const colorText = scaleQuantize()
-            .domain([0, 40])
+        const colorText = scaleThreshold()
+            .domain([100/3, 200/3])
             .range(["#000000", "#FFFFFF", "#FFFFFF"]);
 
         const dataPack = pack()
-            .size([totalWidth, totalHeight])
+            .size([width, height])
             .padding(1.5)
             .radius(bubbleSize);
 
@@ -105,18 +105,23 @@ const WordCloudComponent = GraphComponent.extend({
         node.append("circle")
             .attr("id", d => d.data.value)
             .attr("r", d => d.r)
-            .style("fill", d => colorBubble(bubbleSize(d)));
+            .style("fill", d => colorBubble(d.value));
 
+        node.append("clipPath")
+            .attr("id", d => `${this.get('elementId')}-${d.data.value}`);
 
         node.append("text")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'central')
-            .attr('fill', d => colorText(fontSize(d)))
-            .style('font-size', d => `${fontSize(d)}px`)
-            .style('text-transform', 'uppercase')
-            .text(d => d.data.value);
+              .attr('fill', d => colorText(d.value))
+              .attr("clip-path", d => `${this.get('elementId')}-${d.data.value}`)
+            .selectAll("tspan")
+            .data(d => [{ name: d.data.value, value: d.value }, { name: d.data.frequency, value: d.value }])
+            .enter().append("tspan")
+              .attr("x", 0)
+              .attr("y", (d, i, nodes) => 18 + (i - nodes.length / 2 - 0.5) * 12)
+              .attr('text-anchor', 'middle')
+              .style('text-transform', 'uppercase')
+              .style('font-size', (d, i) => { console.log(d, i); return i===0 ? `${fontSize(d)}px` : '10px'; })
+              .text(d => d.name);
             
       
     }
