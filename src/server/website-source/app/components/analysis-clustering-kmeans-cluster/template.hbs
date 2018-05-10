@@ -2,7 +2,7 @@
   {{#link-to 'dataset.subset' dataset cluster.subsetId class="btn btn-secondary pull-right" }}
     Go to Subset
   {{/link-to}}
-{{else}}
+{{else if cluster.documentCount}}
   <button class="btn btn-primary pull-right" data-toggle="modal"
     data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
 {{/if}}
