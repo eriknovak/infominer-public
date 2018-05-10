@@ -4,6 +4,12 @@ import $ from 'jquery';
 export default Route.extend({
 
     model(params) {
+        // set a on scroll listener
+        $(window).on('scroll', function () {
+            // change display if the user scrolled down enough
+            let display = $(document).scrollTop() > 500  ? 'block' : 'none';
+            $('#go-to-top').css('display', display);
+        });
         // get the subset info
         return this.get('store').findRecord('subset', params.subset_id);
     },
@@ -44,6 +50,10 @@ export default Route.extend({
             let warningContent = $('#edit-subset-modal div.warning');
             // empty warning container
             warningContent.empty();
+        },
+
+        backToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
     }
