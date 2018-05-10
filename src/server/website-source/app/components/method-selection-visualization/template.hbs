@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-lg-12">
+
+    <p class="method-description">
+      <span class="highlight-text-only">Visualizations</span> are used to show
+      patterns within the data in an insightful way. From the <span class="highlight">type</span>
+      list select the visualization you wish to create for the given subset.
+    </p>
+
+  </div><!-- .col-lg-12 -->
+</div><!-- .row -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="form-inline">
+            <label class="method-selection-label">Visualization type</label>
+            <select class="form-control" onchange={{action "changeVisualization" value='target.value'}}>
+                {{#each availableVisualizations as |visualization|}}
+                    <option value="{{visualization.type}}">{{visualization.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div><!-- .col-lg-6 -->
+</div><!-- .row -->
+

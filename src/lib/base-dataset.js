@@ -589,6 +589,8 @@ class BaseDataset {
             case 'clustering.kmeans':
                 self._clusteringKMeans(queryMethod, subset);
                 break;
+            case 'visualization':
+                self._visualizationSetup(queryMethod, subset);
             }
 
             // check if queryMethod is an error
@@ -898,6 +900,10 @@ class BaseDataset {
             // set the cluster label
             query.result.clusters[i].clusterLabel = clusterLabel;
         }
+    }
+
+    _visualizationSetup(query, subset) {
+        query.result = 'visualization';
     }
 
     /**

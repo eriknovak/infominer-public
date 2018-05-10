@@ -34,8 +34,6 @@ $height: 250px;
 
     &.radial-tree {
         height: 2.5*$height;
-        margin: -1px; // for border space
-        border: 1px solid $primary-color;
 
         .node {
             text { font: 10px $font-primary; }

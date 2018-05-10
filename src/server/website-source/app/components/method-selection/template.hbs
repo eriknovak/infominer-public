@@ -17,7 +17,7 @@
 
               <div class="form-inline">
                 <label class="method-selection-label">Method</label>
-                <select id="{{methodSelectionId}}" class="form-control" onchange={{action "changeMethodSelection"}}>
+                <select class="form-control" onchange={{action "changeMethodSelection" value='target.value'}}>
                   {{#each availableMethods as |method|}}
                     <option value="{{method.method}}">{{method.name}}</option>
                   {{/each}}

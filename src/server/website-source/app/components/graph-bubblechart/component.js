@@ -120,10 +120,8 @@ const WordCloudComponent = GraphComponent.extend({
               .attr("y", (d, i, nodes) => 18 + (i - nodes.length / 2 - 0.5) * 12)
               .attr('text-anchor', 'middle')
               .style('text-transform', 'uppercase')
-              .style('font-size', (d, i) => { console.log(d, i); return i===0 ? `${fontSize(d)}px` : '10px'; })
+              .style('font-size', (d, i) => i===0 ? `${fontSize(d)}px` : '10px')
               .text(d => d.name);
-            
-      
     }
 
 });

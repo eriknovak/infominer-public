@@ -57,7 +57,9 @@ export default Component.extend({
 
     _setParameters() {
         // set parameter values
-        this.set('parameters.method', { clusteringType: this.get('chosenClusteringType'),  k: this.get('k') });
-
+        this.set('parameters.method', { 
+            clusteringType: this.get('chosenClusteringType'), 
+            k: this.get('k') 
+        });
     }
 });

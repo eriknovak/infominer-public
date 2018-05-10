@@ -16,11 +16,11 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'selectedMethod', 'clustering.kmeans');
         set(this, 'availableMethods', [
-            { method: 'clustering.kmeans', name: 'clustering' }
+            { method: 'clustering.kmeans', name: 'clustering' },
+            { method: 'visualization', name: 'visualization' },
         ]);
-        set(this, 'methodSelectionId', 'method-selection');
+        set(this, 'selectedMethod', this.get('availableMethods').objectAt(0).method);
         set(this, 'parameters', {});
     },
 
@@ -30,31 +30,54 @@ export default Component.extend({
 
     actions: {
         // change the method options
-        changeMethodSelection() {
-            this.set('selectedMethod', $(`#${this.get('methodSelectionId')}`).val());
+        changeMethodSelection(value) {
+            set(this, 'parameters', {});
+            this.set('selectedMethod', value);
         },
 
         // send the method parameters to the user
         startAnalysis() {
-            // get the parameters
-            let parameters = this.get('parameters');
-            // get feature parameters
-            let fields = get(parameters, 'features').filterBy('included', true)
-                .map(param => get(param, 'field'));
+
+            // prepare parameters placeholder
+            let parameters;
             // get method parameters
-            let method = get(parameters, 'method');
-            // get the method type
             let methodType = this.get('selectedMethod');
+            if (methodType.includes('clustering')) {
+                parameters = this._prepareClusteringParams();
+            } else if (methodType.includes('visualization')) {
+                parameters = this._prepareVisualizationParams();
+            }
             // send the parameters to the route
 
-            if (fields.length) {
+            console.log({ methodType, parameters });
+
+            if (methodType.includes('clustering') && parameters.fields.length || 
+                methodType.includes('visualization')) {
                 // parameters are set - make a method request
-                this.get('action')({ methodType, parameters: { fields, method } });
+                this.get('action')({ methodType, parameters });
             } else {
                 // there are no fields selected - warn the user
                 $('#analysis-warning').removeClass('d-none');
             }
         }
+    },
+
+    _prepareClusteringParams() {
+        const parameters = this.get('parameters');
+        // get feature parameters
+        let fields = get(parameters, 'features')
+                .filterBy('included', true)
+                .map(param => get(param, 'field'));
+        // get method parameters
+        let method = get(parameters, 'method');
+        return { fields, method };
+    },
+
+    _prepareVisualizationParams() {
+        const parameters = this.get('parameters');
+        // get method parameters
+        let method = get(parameters, 'method');
+        return { method };
     }
 
 });
