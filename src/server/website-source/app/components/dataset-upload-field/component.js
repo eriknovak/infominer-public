@@ -1,13 +1,18 @@
 import Component from '@ember/component';
-import { get, set } from '@ember/object';
+import { computed, get, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
+    classNameBindings: ['included::disabled'],
     tagName: 'tr',
 
     // possible field values
     included: true,
+    
+    disabled: computed('included', function () {
+        return !this.get('included');
+    }),
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -19,18 +24,23 @@ export default Component.extend({
             { type: 'string', selected: false },
             { type: 'float', selected: false }
         ]);
-    },
-
-    didReceiveAttrs() {
-        this._super(...arguments);
         // get field type and possible field types
         let type = this.get('type');
 
         // find and set field type to the start of the array
         for (let i = 0; i < this.get('fieldTypes').length; i++) {
             let obj = this.get('fieldTypes').objectAt(i);
-            if (get(obj, 'type') === type) { set(obj, 'selected', true); break; }
+            if (get(obj, 'type') === type) { 
+                set(obj, 'selected', true); 
+                // modify fieldTypes to reflect the possible type options
+                this.set('fieldTypes', this.get('fieldTypes').slice(0, i+1));
+                break; 
+            }
         }
+    },
+
+    didReceiveAttrs() {
+        this._super(...arguments);
 
         // set element ids
         this.set('nameId', `field-name-${this.get('index')}`);
@@ -53,7 +63,8 @@ export default Component.extend({
          */
         changeFieldName() {
             this.set('name', $(`#${this.get('nameId')}`).val().trim());
-            this.validateFieldName();
+            // validate field name if included in dataset
+            if (this.get('included')) { this.validateFieldName(); }
         },
 
         /**
@@ -68,13 +79,23 @@ export default Component.extend({
          */
         changeFieldInclusion() {
             this.set('included', $(`#${this.get('checkboxId')}`).is(':checked'));
+
+            if (this.get('included')) {
+                // validate field name if field is included
+                this.validateFieldName();
+            } else {
+                // ignore field validation - field will not be present
+                this.set('invalidCharacters', '');
+                this.set('invalid', this.get('invalidCharacters'));
+            }
         }
     },
 
     validateFieldName() {
         // allowed pattern for field names
-        const allowedPattern = /[^a-zA-Z\_]/g;
-        this.set('invalid', this.get('name').search(allowedPattern) !== -1);
+        const notAllowed = /[^a-zA-Z\_]/g;
+        this.set('invalidCharacters', this.get('name').match(notAllowed));
+        this.set('invalid', this.get('invalidCharacters') ? true : false);
     }
 
 });

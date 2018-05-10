@@ -1,13 +1,16 @@
 <td class="field name">
-  <input type="text" id="{{nameId}}" class="form-control {{if invalid 'invalid-value'}}" oninput={{action "changeFieldName"}} value={{name}}>
-  <div class="pull-right field-name-warning {{if invalid 'show'}}">Contains invalid characters</div>
+  <input type="text" id="{{nameId}}" class="form-control {{if invalid 'invalid-value'}}" 
+    oninput={{action "changeFieldName"}} value={{name}} disabled={{disabled}}>
+  
+  <div class="field-name-warning {{if invalidCharacters 'show'}}">
+    Contains invalid characters: {{invalidCharacters}}
+  </div>
 </td>
 
 <td class="center field type">
-  <select id="{{typeId}}" class="form-control" onchange={{action "changeFieldType"}}>
+  <select id="{{typeId}}" class="form-control" onchange={{action "changeFieldType"}} disabled={{disabled}}>
     {{#each fieldTypes as |typeOption|}}
-      <option value='{{typeOption.type}}'
-        selected={{if typeOption.selected 'selected'}}>
+      <option value='{{typeOption.type}}' selected={{if typeOption.selected 'selected'}}>
         {{typeOption.type}}
       </option>
     {{/each}}

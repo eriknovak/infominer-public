@@ -87,8 +87,18 @@
                     &.show { visibility: visible; }
                 }
             }
+            .table tr {  
+                &:hover { background-color: transparent !important; }
+                &.disabled { 
+                    select, input { 
+                        border-color: $primary-color; 
+                        color: $primary-color;
+                        background-color: transparent;
+                    }  
+                }
 
-            .tr:hover { background-color: transparent !important; }
+            }
+            
 
             .checkbox label { margin-top: 5px !important; }
         }

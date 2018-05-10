@@ -75,7 +75,8 @@ export default DatasetUploadRoute.extend({
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
 
-            if (fieldList.map(field => field.invalid).includes(true)) {
+            if (fieldList.filter(field => field.included)
+                .map(field => field.invalid).includes(true)) {
                 $('#submittion-error').addClass('show');
                 return;
             }
