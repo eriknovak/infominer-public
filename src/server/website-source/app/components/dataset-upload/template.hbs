@@ -41,7 +41,7 @@
       </thead>
       <tbody>
         {{#each fieldList as |field index|}}
-          {{dataset-upload-field name=field.name type=field.type included=field.included invalid=field.invalid index=index}}
+          {{dataset-upload-field fieldList=fieldList name=field.name type=field.type included=field.included invalid=field.invalid index=index}}
         {{/each}}
       </tbody>
     </table>

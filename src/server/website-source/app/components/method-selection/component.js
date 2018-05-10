@@ -48,9 +48,6 @@ export default Component.extend({
                 parameters = this._prepareVisualizationParams();
             }
             // send the parameters to the route
-
-            console.log({ methodType, parameters });
-
             if (methodType.includes('clustering') && parameters.fields.length || 
                 methodType.includes('visualization')) {
                 // parameters are set - make a method request

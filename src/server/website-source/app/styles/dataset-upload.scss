@@ -75,7 +75,10 @@
 
         .document-table {
             .table td { vertical-align: top; }
-            .field.type select { margin: auto; }
+            .field.type select { 
+                margin: auto; 
+                cursor: pointer;
+            }
             @media (min-width: 880px) {
                 .field.type select { width: 40%; }
             }
@@ -84,6 +87,7 @@
                 .field-name-warning {
                     color: red;
                     visibility: hidden;
+                    height: 10px;
                     &.show { visibility: visible; }
                 }
             }
@@ -94,12 +98,11 @@
                         border-color: $primary-color; 
                         color: $primary-color;
                         background-color: transparent;
+                        cursor: not-allowed;
                     }  
                 }
-
             }
             
-
             .checkbox label { margin-top: 5px !important; }
         }
     }

@@ -9,7 +9,7 @@ export default Component.extend({
 
     // possible field values
     included: true,
-    
+
     disabled: computed('included', function () {
         return !this.get('included');
     }),
@@ -41,7 +41,6 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-
         // set element ids
         this.set('nameId', `field-name-${this.get('index')}`);
         this.set('typeId', `field-type-${this.get('index')}`);
@@ -86,16 +85,25 @@ export default Component.extend({
             } else {
                 // ignore field validation - field will not be present
                 this.set('invalidCharacters', '');
-                this.set('invalid', this.get('invalidCharacters'));
+                this.set('invalid', false);
             }
         }
     },
 
     validateFieldName() {
-        // allowed pattern for field names
+        // check if field name exists
+        this.set('nameNotExists', this.get('name').length === 0);
+
+        // check if the field name is already in use
+        const numberOfSameName = this.get('fieldList')
+            .map(field => field.name === this.get('name') ? 1 : 0)
+            .reduce((total, number) => total + number, 0);
+        this.set('multipleNames', numberOfSameName !== 1);
+
+        // check if there are invalid characters in field
         const notAllowed = /[^a-zA-Z\_]/g;
         this.set('invalidCharacters', this.get('name').match(notAllowed));
-        this.set('invalid', this.get('invalidCharacters') ? true : false);
+        this.set('invalid', this.get('invalidCharacters') || this.get('multipleNames') || this.get('nameNotExists'));
     }
 
 });
