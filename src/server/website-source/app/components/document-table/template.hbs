@@ -2,7 +2,7 @@
   <div class="col-lg-12">
     <div class="row">
       <div class="col-lg-12 table-options">
-        {{ query-options fields=fields action=changeQuery }}
+        {{ query-options fields=fields query=query action=changeQuery }}
         {{ pagination-limit limit=pagination.limit changeLimit=changeLimit }}
       </div>
     </div>

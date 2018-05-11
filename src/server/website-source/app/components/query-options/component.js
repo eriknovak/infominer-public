@@ -5,17 +5,16 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
+        const query = this.get('query');
         this.set('textFields', this.get('fields').filterBy('type', 'string')
-            .map(field => ({ name: field.name, included: true }))
+            .map(field => {
+                const included = query && query.text ? query.text.fields.includes(field.name) : true; 
+                return { name: field.name, included };
+            })
         );
         this.set('numberFields', this.get('fields').filterBy('type', 'float'));
-        // set the query parameter
-        this.set('query', { text: null });
-    },
-
-    didReceiveAttrs() {
-        this._super(...arguments);
-
+        const keywords = query && query.text ? query.text.keywords : null;
+        this.set('keywords', keywords);
     },
 
     didInsertElement() {
@@ -32,7 +31,7 @@ export default Component.extend({
             const keywords = $(`#${this.get('elementId')} input[data-purpose="keywords"]`).val();
             const textFields = this.get('textFields').filterBy('included', true).map(field => field.name);
             let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;
-            this.set('query.text', text);
+            this.set('query', { text });
 
             this.get('action')(this.get('query'));
         }
