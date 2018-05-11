@@ -12,6 +12,7 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         set(this, 'sortOptions', ['desc', 'asc']);
+        set(this, 'columnWidth', 100 / this.get('fields.length'));
     },
 
     ///////////////////////////////////////////////////////

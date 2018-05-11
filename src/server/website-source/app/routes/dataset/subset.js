@@ -15,7 +15,6 @@ export default Route.extend({
     },
 
     actions: {
-
         /**
          * Submits the changes to the subset information.
          */
@@ -44,7 +43,9 @@ export default Route.extend({
                 $('#edit-subset-modal').modal('toggle');
             }
         },
-
+        /**
+         * Removes the warning message within the subset creation model 
+         */
         removeModalWarnings() {
             // get warning container
             let warningContent = $('#edit-subset-modal div.warning');
@@ -52,6 +53,9 @@ export default Route.extend({
             warningContent.empty();
         },
 
+        /**
+         * Moves the window to the top of the page, smoothly.
+         */
         backToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
