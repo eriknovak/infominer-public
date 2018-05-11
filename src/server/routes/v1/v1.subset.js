@@ -250,8 +250,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             query: req.query.query
         };
 
-        console.log(req.query);
-
         // get the user
         let owner = req.user ? req.user.id : 'development';
 

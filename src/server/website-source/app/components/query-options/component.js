@@ -34,7 +34,6 @@ export default Component.extend({
             let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;
             this.set('query.text', text);
 
-            console.log(this.get('query'));
             this.get('action')(this.get('query'));
         }
     }
