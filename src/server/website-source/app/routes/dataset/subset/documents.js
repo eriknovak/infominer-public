@@ -7,11 +7,13 @@ export default Route.extend({
     defaultPage: 1,
     defaultLimit: 10,
     defaultSortTarget: null,
+    defaultQuery: null,
 
     // current parameters
     page: 1,
     limit: 10,
     sortTarget: null,
+    query: null,
 
     beforeModel(transition) {
         // modify namespace for subset model
@@ -27,6 +29,7 @@ export default Route.extend({
             this.set('page', this.defaultPage);
             this.set('limit', this.defaultlimit);
             this.set('sortTarget', this.defaultSortTarget);
+            this.set('query', this.defaultQuery);
             // set all documents as un-selected
             this.get('store').peekAll('document')
                 .forEach(doc => doc.set('selected', false));
@@ -37,8 +40,13 @@ export default Route.extend({
     },
 
     model() {
+        let query = { };
+        if (this.get('page')) { query.page = this.get('page'); }
+        if (this.get('limit')) { query.limit = this.get('limit'); }
+        if (this.get('sortTarget')) { query.sort = this.get('sortTarget'); }
+        if (this.get('query')) { query.query = this.get('query'); }
         // get documents
-        return this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') });
+        return this.get('store').query('document', query);
     },
 
     actions: {
@@ -147,17 +155,30 @@ export default Route.extend({
                     });
 
             }
-        }
-    },
+        },
 
+        changeQuery(params) {
+            // check what are the parameters
+            const query = params.text ? params : null;
+            //set the query parameters
+            this.set('query', query);
+            // we don't know how many results there will be
+            // set to first page and remove sorting
+            this.set('page', 1);
+            this.set('sortTarget', null);
+            
+            // update model
+            this._updateModel();
+        }
+
+    },
+    
     // helper functions
     _updateModel() {
         // empty table and add a loading row
         this.set('controller.model.loading', true);
-
         // request for data and update the model
-        this.get('store').query('document', { page: this.get('page'), limit: this.get('limit'), sort: this.get('sortTarget') })
-            .then(model => this.set('controller.model', model));
+        this.model().then(model => this.set('controller.model', model));
     }
 
 

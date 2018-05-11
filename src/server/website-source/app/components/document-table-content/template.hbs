@@ -13,11 +13,17 @@
         </div>
       </td>
     </tr>
-  {{else}}
+  {{else if documents.length}}
     <!-- if documents are available show them -->
     {{#each documents as |document| }}
       {{ document-table-row             document=document fields=fields }}
       {{ document-table-row-information document=document fields=fields }}
     {{/each}}
+  {{else}}
+     <tr>
+      <td colspan="{{loading-row-width}}">
+        <p>No documents found for given query parameters</p>
+      </td>
+    </tr>
   {{/if}}
 </tbody>

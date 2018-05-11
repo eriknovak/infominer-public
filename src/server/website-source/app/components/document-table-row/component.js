@@ -57,7 +57,6 @@ export default Component.extend({
          */
         selectDocument() {
             // get checkbox status
-            this.toggleProperty('selected');
             this.set('document.selected', this.get('selected'));
 
         }

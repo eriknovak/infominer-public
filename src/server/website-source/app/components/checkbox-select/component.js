@@ -11,6 +11,11 @@ export default Component.extend({
 
     actions: {
         // Run checkbox action
-        onClick() { this.get('checkboxAction')(); }
+        onClick() { 
+            this.toggleProperty('checked');
+            if (this.get('checkboxAction')) {
+                this.get('checkboxAction')();
+            } 
+        }
     }
 });

@@ -45,7 +45,7 @@ export default Component.extend({
         this.set('onLastPage', page === lastPage);
 
         // how many documents are shown
-        const startDisplay = 1 + (page-1)*limit;
+        const startDisplay = count ? 1 + (page-1)*limit : 0;
         const endDisplay = page*limit > count ? count : page*limit;
 
         // set display information

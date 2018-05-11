@@ -246,8 +246,11 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             offset: parseInt(req.query.offset),
             limit: parseInt(req.query.limit),
             page: parseInt(req.query.page),
-            sort: req.query.sort
+            sort: req.query.sort,
+            query: req.query.query
         };
+
+        console.log(req.query);
 
         // get the user
         let owner = req.user ? req.user.id : 'development';

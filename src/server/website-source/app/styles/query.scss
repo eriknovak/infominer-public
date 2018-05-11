@@ -1,0 +1,16 @@
+.query-options {
+
+    .dropdown-toggle {
+        background-color: $quaternary-color !important;
+        &:focus { background-color: darken($quaternary-color, 20%) !important; } 
+        &:focus { box-shadow: none !important; }
+    }
+
+    .dropdown-item {
+        text-transform: capitalize;
+        &:hover { 
+            background-color: white; 
+            color: $font-color-dark;
+        }
+    }
+}

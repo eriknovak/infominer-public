@@ -162,7 +162,7 @@ class BaseDataset {
         for (let field of inFields) {
             // string fields are used for keys
             if (field.type === 'string') {
-                datasetKeys.push({ field: field.name, type: 'text' });
+                datasetKeys.push({ field: field.name, type: 'text_position' });
             }
         }
 
@@ -480,7 +480,17 @@ class BaseDataset {
             qmQuery.$sort[field] = ascFlag;
         }
 
-        // TODO: allow filtering documents
+        // add additional queries
+        if (query.query && query.query.text) {
+            qmQuery.$or = [];
+            for (let field of query.query.text.fields) {
+                // add field and value to the query
+                let fieldQuery = {};
+                fieldQuery[field] = query.query.text.keywords;
+                qmQuery.$or.push(fieldQuery);
+            }
+        }
+        
 
         // get the subset documents
         let subsetDocuments = self.base.search(qmQuery);

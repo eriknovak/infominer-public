@@ -16,6 +16,17 @@
             }, {
                 "type": ["string", "null"]
             }]
+        },
+        "query": { 
+            "oneOf": [{
+                "type": "object",
+                "properties": {
+                    "text": { "type": ["object", "null"] }
+                },
+                "required": ["text"]
+            },{
+                "type": "null"
+            }]
         }
     }
 }
