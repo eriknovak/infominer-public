@@ -6,8 +6,8 @@
         {{ pagination-limit limit=pagination.limit changeLimit=changeLimit }}
       </div>
     </div>
-    {{ document-table-content limit=pagination.limit documents=documents fields=fields sortByField=sortByField }}
-    {{ pagination-navigation pagination=pagination documents=documents changePage=changePage }}
+    {{ document-table-content documents=documents limit=pagination.limit fields=fields sortByField=sortByField query=query }}
+    {{ pagination-navigation documents=documents pagination=pagination changePage=changePage }}
   </div>
     {{ document-table-create-subset createSubset=createSubset }}
 </div>

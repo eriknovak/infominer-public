@@ -281,10 +281,9 @@ input, select, textarea {
 
 .bottom-space { margin-bottom: 10px; }
 
-// highlights part of the text
 .highlight {
-    background-color: $primary-color;
-    font-weight: 500;
+    background-color: darken($primary-color, 2%);
+    font-weight: 600;
     padding: 0px 2px;
 }
 

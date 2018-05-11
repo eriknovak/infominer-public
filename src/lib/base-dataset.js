@@ -481,16 +481,16 @@ class BaseDataset {
         }
 
         // add additional queries
-        if (query.query && query.query.text) {
+        let queryParams = query.query;
+        if (queryParams && queryParams.text) {
             qmQuery.$or = [];
-            for (let field of query.query.text.fields) {
+            for (let field of queryParams.text.fields) {
                 // add field and value to the query
                 let fieldQuery = {};
-                fieldQuery[field] = query.query.text.keywords;
+                fieldQuery[field] = queryParams.text.keywords;
                 qmQuery.$or.push(fieldQuery);
             }
         }
-        
 
         // get the subset documents
         let subsetDocuments = self.base.search(qmQuery);
@@ -515,8 +515,9 @@ class BaseDataset {
                 pagination: {
                     page,
                     limit,
-                    documentCount: subsetDocuments.length
-                }
+                    documentCount: subsetDocuments.length,
+                },
+                query: queryParams && queryParams.text ? queryParams : null
             }
         };
         // truncate the documents using the query

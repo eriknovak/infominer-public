@@ -17,13 +17,25 @@ export default Component.extend({
         let numberOfColumns = 1 + fields.length;
         this.set('numberOfColumns', numberOfColumns);
 
+        // get query parameters
+        const query = this.get('query');
+
         // save document values
         const document = this.get('document');
         let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
-            documentValues.push({ value: document.get(`values.${field.name}`), field: field.name });
+            let value = document.get(`values.${field.name}`);
+            if (query) {
+                // find the selected query value, find and highligh the text
+                if (query.text && query.text.fields.includes(field.name)) {
+                    const pattern = new RegExp(query.text.keywords, 'gi');
+                    value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
+                }
+            }
+            documentValues.push({ value, field: field.name });
         }
+        console.log(documentValues);
         // save values
         this.set('documentValues', documentValues);
         this.set('collapseId', `document-${document.id}`);

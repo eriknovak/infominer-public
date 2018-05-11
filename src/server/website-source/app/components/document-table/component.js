@@ -13,6 +13,7 @@ export default Component.extend({
         this.set('documents', model);
         this.set('fields', model.get('meta.fields'));
         this.set('pagination', model.get('meta.pagination'));
+        this.set('query', model.get('meta.query'));
     }
 
     ///////////////////////////////////////////////////////

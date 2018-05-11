@@ -30,18 +30,28 @@ export default Component.extend({
         const document = this.get('document');
         const fields = this.get('fields');
 
+        // get query parameters
+        const query = this.get('query');
+
         // save document values
-        let docValues = [ ];
+        let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
             let value = document.get(`values.${field.name}`);
             if (field.type == 'string') { value = this._trimContent(value, this.get('nWords')); }
-            docValues.push({ value: value, field: field.name });
+            if (query) {
+                // find the selected query value, find and highligh the text
+                if (query.text && query.text.fields.includes(field.name)) {
+                    const pattern = new RegExp(query.text.keywords, 'gi');
+                    value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
+                }
+            }
+            documentValues.push({ value: value, field: field.name });
         }
         // save values
         this.set('index', document.get('id'));
         this.set('selected', document.get('selected'));
-        this.set('docValues', docValues);
+        this.set('documentValues', documentValues);
 
         // set link with expanded info
         this.set('dataTarget', `#document-${document.id}`);
@@ -58,7 +68,6 @@ export default Component.extend({
         selectDocument() {
             // get checkbox status
             this.set('document.selected', this.get('selected'));
-
         }
     },
 
