@@ -12,7 +12,7 @@ export default Component.extend({
     // component tag
     tagName: 'tr',
 
-    nWords: 10,
+    nChar: 80,
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -38,7 +38,7 @@ export default Component.extend({
         // get values in the fields order
         for (let field of fields) {
             let value = document.get(`values.${field.name}`);
-            if (field.type == 'string') { value = this._trimContent(value, this.get('nWords')); }
+            if (field.type == 'string') { value = this._trimContent(value, this.get('nChar')); }
             if (query) {
                 // find the selected query value, find and highligh the text
                 if (query.text && query.text.fields.includes(field.name)) {
@@ -73,16 +73,15 @@ export default Component.extend({
 
     /**
      *
-     * @param {String} content - Content to be trimmed.
-     * @param {Number} nWords - How many words the content can contain.
+     * @param {String} string - Content to be trimmed.
+     * @param {Number} nChar - How many words the content can contain.
      * @returns {String} Trimmed content.
      */
-
-    _trimContent(string, nWords) {
-        const stringWords = string.split(' ');
-        if (stringWords.length < nWords) { return string; }
-        let newWords = stringWords.slice(0, nWords);
-        return newWords.join(' ') + ' ...';
+    _trimContent(string, nChar) {
+        let substring = string.substring(0, nChar);
+        if (substring.length === string.length) { return string; }
+        let lastSpace = substring.lastIndexOf(' ');
+        return substring.substring(0, lastSpace) + ' ...';
     }
 
 });

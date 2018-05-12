@@ -2,15 +2,30 @@
 
     .dropdown-toggle {
         background-color: $quaternary-color !important;
-        &:focus { background-color: darken($quaternary-color, 20%) !important; } 
+        &:focus { background-color: darken($quaternary-color, 20%) !important; }
         &:focus { box-shadow: none !important; }
     }
 
     .dropdown-item {
         text-transform: capitalize;
-        &:hover { 
-            background-color: white; 
+        &:hover {
+            background-color: white;
             color: $font-color-dark;
         }
+        label.query-field-selection {
+            margin-left: 5px;
+        }
     }
+
+    .number-circle {
+        display: inline-block;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        padding: 1px;
+        background: $secondary-color;
+        color: white;
+        text-align: center;
+        vertical-align: baseline;
+      }
 }

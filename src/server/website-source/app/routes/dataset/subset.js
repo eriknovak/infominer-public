@@ -44,7 +44,7 @@ export default Route.extend({
             }
         },
         /**
-         * Removes the warning message within the subset creation model 
+         * Removes the warning message within the subset creation model
          */
         removeModalWarnings() {
             // get warning container

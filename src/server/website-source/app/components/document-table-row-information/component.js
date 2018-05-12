@@ -26,16 +26,13 @@ export default Component.extend({
         // get values in the fields order
         for (let field of fields) {
             let value = document.get(`values.${field.name}`);
-            if (query) {
-                // find the selected query value, find and highligh the text
-                if (query.text && query.text.fields.includes(field.name)) {
-                    const pattern = new RegExp(query.text.keywords, 'gi');
-                    value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
-                }
+            // find the selected query value, find and highligh the text
+            if (query && query.text && query.text.fields.includes(field.name)) {
+                const pattern = new RegExp(query.text.keywords, 'gi');
+                value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
             }
             documentValues.push({ value, field: field.name });
         }
-        console.log(documentValues);
         // save values
         this.set('documentValues', documentValues);
         this.set('collapseId', `document-${document.id}`);

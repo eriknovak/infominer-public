@@ -101,13 +101,13 @@ class BaseDataset {
 
     _getDatasetFields() {
         let fields = this.base.store('Dataset').fields;
-        
+
         // set aggregate types for each field
         fields.forEach(field => {
-            if (field.type === 'float') { 
-                field.aggregate = 'histogram'; 
+            if (field.type === 'float') {
+                field.aggregate = 'histogram';
             } else if (field.type === 'string') {
-                // on a sample check how many different values 
+                // on a sample check how many different values
                 // there is for that field
                 let sampleSet = this.base.store('Dataset').allRecords;
                 let aggregate = sampleSet.aggr({ name: `sample_${field.name}`, field: field.name, type: 'count' });
@@ -163,6 +163,8 @@ class BaseDataset {
             // string fields are used for keys
             if (field.type === 'string') {
                 datasetKeys.push({ field: field.name, type: 'text_position' });
+            } else if (field.type === 'float') {
+                datasetKeys.push({ field: field.name, type: 'linear' });
             }
         }
 
@@ -821,7 +823,7 @@ class BaseDataset {
                 // set kmeans and features space parameters
                 query.parameters.method.distanceType = 'Cos';
                 features = [{
-                    type: 'text', field: query.parameters.fields, 
+                    type: 'text', field: query.parameters.fields,
                     ngrams: 2, hashDimension: 200000
                 }]; break;
             case 'number':

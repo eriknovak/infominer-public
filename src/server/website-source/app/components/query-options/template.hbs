@@ -6,15 +6,18 @@
         <div class="input-group">
             <input type="text" class="form-control" data-purpose="keywords" value="{{keywords}}">
             <div class="input-group-append">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Selected Fields</button>
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Selected Fields
+                    <span class="number-circle">{{numberOfSelectedFields}}</span>
+                </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     {{#each textFields as |field index|}}
-                        <div class="dropdown-item"> 
+                        <div class="dropdown-item">
                             {{ checkbox-select
                                 checkboxId=(concat "query-checkbox-" index)
                                 checked=field.included
                             }}
-                            <label>{{field.name}}</label>
+                            <label class="query-field-selection">{{field.name}}</label>
                         </div>
                     {{/each}}
                 </div>

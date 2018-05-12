@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 
 export default Component.extend({
     classNames: ['query-options'],
@@ -8,7 +9,7 @@ export default Component.extend({
         const query = this.get('query');
         this.set('textFields', this.get('fields').filterBy('type', 'string')
             .map(field => {
-                const included = query && query.text ? query.text.fields.includes(field.name) : true; 
+                const included = query && query.text ? query.text.fields.includes(field.name) : true;
                 return { name: field.name, included };
             })
         );
@@ -24,6 +25,10 @@ export default Component.extend({
         });
     },
 
+    numberOfSelectedFields: computed('textFields.@each.included', function () {
+        return this.get('textFields').map(field => field.included ? 1 : 0)
+                    .reduce((total, current) => total + current, 0);
+    }),
 
     actions: {
         changeQuery() {
