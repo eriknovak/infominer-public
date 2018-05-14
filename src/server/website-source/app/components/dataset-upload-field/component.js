@@ -77,8 +77,6 @@ export default Component.extend({
          * Changes flag for field inclusion.
          */
         changeFieldInclusion() {
-            this.set('included', $(`#${this.get('checkboxId')}`).is(':checked'));
-
             if (this.get('included')) {
                 // validate field name if field is included
                 this.validateFieldName();
@@ -95,7 +93,7 @@ export default Component.extend({
         this.set('nameNotExists', this.get('name').length === 0);
 
         // check if the field name is already in use
-        const numberOfSameName = this.get('fieldList')
+        const numberOfSameName = this.get('fieldList').filterBy('included', true)
             .map(field => field.name === this.get('name') ? 1 : 0)
             .reduce((total, number) => total + number, 0);
         this.set('multipleNames', numberOfSameName !== 1);

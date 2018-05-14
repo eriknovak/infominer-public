@@ -276,17 +276,21 @@ const RadialTreeComponent = GraphComponent.extend({
                     again = true;
                     let sign = deltaY > 0 ? 1 : -1;
                     let adjust = sign * alpha;
-                    dac.attr("y", parseFloat(dac.attr('y')) + adjust);
-                    dbc.attr("y", parseFloat(dbc.attr('y')) - adjust);
+                    dac.attr('y', parseFloat(dac.attr('y')) + adjust);
+                    dbc.attr('y', parseFloat(dbc.attr('y')) - adjust);
                 });
             });
             // Adjust our line leaders here
             // so that they follow the labels.
-            if(again) { setTimeout(relax, 20); }
+            return again;
         }
 
-        // start relaxing
-        relax();
+        // start relaxing - iterate only ten times
+        for (let i = 0; i < 10; i++) {
+            // if not needed break out of the loop
+            const again = relax();
+            if (!again) { break; }
+        }
     }
 
 });

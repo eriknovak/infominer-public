@@ -66,11 +66,6 @@
 
     .dataset-field-list {
 
-        .dataset-label,
-        .dataset-description {
-            margin: 10px 0;
-        }
-
         label { @include label; }
 
         .document-table {
