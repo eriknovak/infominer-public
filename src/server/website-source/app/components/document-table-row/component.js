@@ -42,9 +42,7 @@ export default Component.extend({
             // find the selected query value, find and highligh the text
             if (query && query.text && query.text.fields.includes(field.name)) {
                 const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');
-                console.log(pattern);
                 value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
-                console.log(value);
             }
             documentValues.push({ value: value, field: field.name });
         }

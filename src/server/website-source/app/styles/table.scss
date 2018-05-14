@@ -1,13 +1,10 @@
 .document-table {
     .table-options {
-        padding-top: 10px;
+        padding-top: 20px;
         padding-bottom: 10px;
-        span {
-            margin: 4px 0;
-            select { 
-                width: 60px; 
-                background-color: white;
-            }
+        span select { 
+            width: 60px; 
+            background-color: white;
         }
     }
 

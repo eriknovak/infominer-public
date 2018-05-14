@@ -1,5 +1,7 @@
 .query-options {
 
+    .col-form-label { line-height: 16px; }
+
     .dropdown-toggle {
         background-color: $quaternary-color !important;
         &:focus { background-color: darken($quaternary-color, 20%) !important; }

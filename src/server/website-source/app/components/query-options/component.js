@@ -19,9 +19,15 @@ export default Component.extend({
     },
 
     didInsertElement() {
-        this._super(...arguments);
-        $(`#${this.get('elementId')} .dropdown-menu`).click(function(e) {
+        let self = this;
+        self._super(...arguments);
+        // allow showing the dropdown menu after clicking on it's element
+        $(`#${self.get('elementId')} .dropdown-menu`).click(function(e) {
             e.stopPropagation();
+        });
+        // on enter execute query
+        $(`#${self.get('elementId')} input.keywords-input`).on('keyup', function (e) {
+            if (e.keyCode == 13) { self.changeQuery(); }
         });
     },
 
@@ -31,14 +37,16 @@ export default Component.extend({
     }),
 
     actions: {
-        changeQuery() {
-            // get keywords and selected fields
-            const keywords = $(`#${this.get('elementId')} input[data-purpose="keywords"]`).val();
-            const textFields = this.get('textFields').filterBy('included', true).map(field => field.name);
-            let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;
-            this.set('query', { text });
+        changeQuery() { this.changeQuery(); }   
+    },
 
-            this.get('action')(this.get('query'));
-        }
+    changeQuery() {
+        // get keywords and selected fields
+        const keywords = $(`#${this.get('elementId')} input[data-purpose="keywords"]`).val();
+        const textFields = this.get('textFields').filterBy('included', true).map(field => field.name);
+        let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;
+        this.set('query', { text });
+
+        this.get('action')(this.get('query'));
     }
 });
