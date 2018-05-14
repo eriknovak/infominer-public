@@ -38,14 +38,16 @@ $height: 250px;
         .node {
             text { font: 10px $font-primary; }
 
-            body {
-                background-color: transparent;
-                .description {
-                    font: 10px $font-primary;
-                    .title { font-weight: bold; }
-                 }
+            foreignObject { 
+                cursor: move;
+                body {
+                    background-color: transparent;
+                    .description {
+                        font: 10px $font-primary;
+                        .title { font-weight: bold; }
+                    }
+                }
             }
-
 
             &.subset circle { fill: $tertiary-color; }
             &.method circle { fill: green; }

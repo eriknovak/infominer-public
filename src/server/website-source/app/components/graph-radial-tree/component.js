@@ -8,6 +8,8 @@ import { scheduleOnce } from '@ember/runloop';
 import { select } from 'd3-selection';
 import { stratify, tree } from 'd3-hierarchy';
 import { linkRadial } from 'd3-shape';
+import { drag } from 'd3-drag';
+
 
 // declare new graph component
 const RadialTreeComponent = GraphComponent.extend({
@@ -152,7 +154,8 @@ const RadialTreeComponent = GraphComponent.extend({
          */
         function nodeSize(numberOfDocuments) {
             let maxSize = self.get('subset.documentCount');
-            return Math.max(numberOfDocuments / maxSize * 10, 2.5);
+            let minValue = 2.5;
+            return Math.max(numberOfDocuments / maxSize * 20 + minValue, minValue);
         }
 
         // get hierarchy data
@@ -215,7 +218,12 @@ const RadialTreeComponent = GraphComponent.extend({
                 if (!d.parent) { return radialPoint(d.x, d.y)[1]; }
                 return !(d.x < Math.PI / 2 || Math.PI * 3 / 2 < d.x)  === !d.children ? 0 : -25;
             })
-            .attr('width', 150);
+            .attr('width', 150)
+            .call(drag().on("drag", function (d) {
+                let obj = select(this);
+                obj.attr('x', parseFloat(obj.attr('x')) + event.movementX);
+                obj.attr('y', parseFloat(obj.attr('y')) + event.movementY);
+            }));
 
 
         let htmlDOMs = foreignObjects.append('xhtml:body')
@@ -231,6 +239,8 @@ const RadialTreeComponent = GraphComponent.extend({
                     <span class="attribute-value">${d.data.numberOfDocuments}</span>
                 ` : '';
             });
+
+        
 
 
 
