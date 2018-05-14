@@ -296,3 +296,15 @@ input, select, textarea {
     right: 30px;
     z-index: 99;
 }
+
+.form-control {
+    &.editing {
+        width: fit-content;
+        display: inline-block;
+        line-height: 1 !important;
+    }
+}
+
+.fa.edit { cursor: pointer; }
+.confirm-editing { color: green; }
+.cancel-editing { color: darken($primary-color, 15%); }

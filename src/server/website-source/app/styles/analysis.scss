@@ -95,6 +95,11 @@
                 color: $secondary-color;
                 margin-bottom: 0px;
                 @include collapse-toggle($secondary-color, 19px);
+                .edit-cluster-label {
+                    display: none;
+                    &.show { display: inline-block; }
+
+                }
             }
         }
     }
