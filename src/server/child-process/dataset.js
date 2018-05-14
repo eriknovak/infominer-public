@@ -24,7 +24,8 @@ const validator = require('../../lib/validator')({
     getSubsetDocuments: require('../../schemas/child_messages/getSubsetDocuments'),
     // method message schemas
     getMethod:     require('../../schemas/child_messages/getMethod'),
-    createMethod:  require('../../schemas/child_messages/createMethod')
+    createMethod:  require('../../schemas/child_messages/createMethod'),
+    editMethod:    require('../../schemas/child_messages/edit-method')
 });
 
 // database placeholder
@@ -119,6 +120,10 @@ function handle(msg) {
     case 'create_method':
         console.log('Get method info in child process id=', process.pid);
         createMethod(msg);
+        break;
+    case 'edit_method':
+        console.log('Get method info in child process id=', process.pid);
+        editMethod(msg);
         break;
     default:
         console.log('Unknown cmd in child process, cmd=' + msg.body.cmd);
@@ -471,6 +476,34 @@ function createMethod(msg) {
             process.send({ reqId, results });
         } catch (err) {
             console.log('createMethod Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
+}
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.method - The subset object.
+ * @param {String} msg.body.content.method.methodType - The type of the method.
+ * @param {Object} msg.body.content.method.parameters - The parameters of the method.
+ * @param {Object} msg.body.content.method.result - The result of the method.
+ */
+function editMethod(msg) {
+    // validate message information
+    messageValidation(msg, validator.schemas.editMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let method = body.content;
+            let results = database.editMethod(method);
+            process.send({ reqId, results });
+        } catch (err) {
+            console.log('editMethod Error', err.message);
             // notify parent process about the error
             process.send({ reqId, error: err.message });
         }

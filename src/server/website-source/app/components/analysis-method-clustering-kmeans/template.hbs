@@ -9,7 +9,7 @@
 
 <div class="row">
   <div class="col-md-6 method-parameters">
-    
+
     <div class="parameter">
       <span class="parameter-label">Type of clustering: </span>
       <span class="parameter-value">
@@ -20,15 +20,15 @@
 
     <div class="parameter">
       <span class="parameter-label">Number of clusters: </span>
-      <span class="parameter-value">{{clusters.length}}</span>
+      <span class="parameter-value">{{method.result.clusters.length}}</span>
     </div>
-    
+
   </div>
 </div>
 
 {{#bs-collapse collapsed=collapsed}}
   <div class="clusters">
-    {{#each clusters as |cluster index|}}
+    {{#each method.result.clusters as |cluster index|}}
       <div class="row">
         <div class="col-lg-12">
           {{ analysis-clustering-kmeans-cluster dataset=dataset method=method cluster=cluster index=index }}

@@ -7,7 +7,7 @@
     data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
 {{/if}}
 
-<h5 class="cluster-header">
+<h4 class="cluster-header">
   <!-- button for toggling collapse -->
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleInformation'}}>
@@ -15,14 +15,14 @@
   </button>
   {{#if editing-cluster-label}}
     <input class="form-control editing" type="text" value="{{cluster.clusterLabel}}">
-    <i class="fa fa-check-square edit confirm-editing" aria-hidden="true" {{action 'editClusterLabel'}}></i>
+    <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveClusterLabel'}}></i>
     <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editClusterLabel'}}></i>
   {{else}}
     <span class="cluster-label">{{cluster.clusterLabel}}</span>
-    <i class="fa fa-pencil-square-o edit edit-cluster-label" aria-hidden="true" {{action 'editClusterLabel'}}></i>
+    <i class="fa fa-pencil edit edit-cluster-label" aria-hidden="true" {{action 'editClusterLabel'}}></i>
   {{/if}}
 
-</h5>
+</h4>
 <p>{{cluster.documentCount}} documents</p>
 
 {{#bs-collapse collapsed=collapsed}}

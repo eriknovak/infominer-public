@@ -29,12 +29,6 @@ const RadialTreeComponent = GraphComponent.extend({
         this.get('hierarchy');
     },
 
-    didRender() {
-        this._super(...arguments);
-
-
-    },
-
     ///////////////////////////////////////////////////////
     // Helper functions
     ///////////////////////////////////////////////////////
@@ -219,7 +213,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 return !(d.x < Math.PI / 2 || Math.PI * 3 / 2 < d.x)  === !d.children ? 0 : -25;
             })
             .attr('width', 150)
-            .call(drag().on("drag", function (d) {
+            .call(drag().on('drag', function (d) {
                 let obj = select(this);
                 obj.attr('x', parseFloat(obj.attr('x')) + event.movementX);
                 obj.attr('y', parseFloat(obj.attr('y')) + event.movementY);
@@ -240,7 +234,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 ` : '';
             });
 
-        
+
 
 
 

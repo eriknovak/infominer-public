@@ -619,6 +619,26 @@ class BaseDataset {
         }
     }
 
+    editMethod(methodInformation) {
+        // TODO: log activity
+        let self = this;
+        console.log(methodInformation);
+        // get method information and update state
+        let method = self.base.store('Methods')[methodInformation.methodId];
+
+        if (methodInformation.result) {
+            let result = method.result;
+            if (method.type === 'clustering.kmeans') {
+                for (let clusterId = 0; clusterId < result.clusters.length; clusterId++) {
+                    result.clusters[clusterId].clusterLabel = methodInformation.result.clusters[clusterId].clusterLabel;
+                }
+            }
+            method.result = result;
+        }
+        console.log(method.result.clusters[1]);
+        return { methods: self._formatMethodInformation(method) };
+    }
+
     /**
      * Calculates the aggregates on the subset.
      * @param {Number} subsetId - The subset id.

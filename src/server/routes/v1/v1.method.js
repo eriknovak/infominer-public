@@ -159,4 +159,65 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         });
 
     }); // POST /api/datasets/:dataset_id/methods
+
+    /**
+     * PUT a new method to the database
+     */
+    app.put('/api/datasets/:dataset_id/methods/:method_id', (req, res) => {
+        // log user request
+        logger.info('user requested to update method',
+            logger.formatRequest(req)
+        );
+
+        // check if dataset_id is an integer
+        let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to update method failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        // check if subset_id is an integer
+        let methodId = parseInt(req.params.method_id);
+        if (!validator.validateInteger(methodId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request to update method failed',
+                logger.formatRequest(req, { error: 'Parameter method_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter method_id is not an integer' } });
+        }
+
+        // get the user
+        let owner = req.user ? req.user.id : 'development';
+
+        // get dataset information
+        let method = req.body.method;
+        let type = method.methodType;
+        let parameters = method.parameters;
+        let result = method.result;
+
+        // set the body info
+        let body = { cmd: 'edit_method', content: { methodId, type, parameters, result } };
+        sendToProcess(datasetId, owner, body, function (error, results) {
+            if (error) {
+                // log error on creating method
+                logger.error('error [node_process]: user request to create new method failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
+                return res.send({ errors: { msg: error.message } });
+            }
+            // log request success
+            logger.info('user request to create new method successful',
+                logger.formatRequest(req)
+            );
+            // send the data
+            return res.send(results);
+        });
+
+    }); // PUT /api/datasets/:dataset_id/methods
 };

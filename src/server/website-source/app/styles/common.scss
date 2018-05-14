@@ -20,8 +20,8 @@ body {
     }
 }
 
-h1, h2, h3, h4, h5, h6 { 
-    text-transform: uppercase; 
+h1, h2, h3, h4, h5, h6 {
+    text-transform: uppercase;
     margin-bottom: 6px;
 }
 
@@ -299,6 +299,7 @@ input, select, textarea {
 
 .form-control {
     &.editing {
+        padding: 2px 0.75rem;
         width: fit-content;
         display: inline-block;
         line-height: 1 !important;

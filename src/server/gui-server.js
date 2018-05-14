@@ -32,10 +32,12 @@ let processHandler = new ProcessHandler({
 
 // on manual process exit
 process.on('SIGINT', () => {
-    pg.close(() => {
-        // close postgresql connection
-        logger.info('close postgresql connection and stop server');
-        process.exit(0);
+    processHandler.closeAllProcesses(() => {
+        pg.close(() => {
+            // close postgresql connection
+            logger.info('close postgresql connection and stop server');
+            process.exit(0);
+        });
     });
 });
 
