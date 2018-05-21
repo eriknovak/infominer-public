@@ -99,7 +99,7 @@ export default Component.extend({
         this.set('multipleNames', numberOfSameName !== 1);
 
         // check if there are invalid characters in field
-        const notAllowed = /[^a-zA-Z\_]/g;
+        const notAllowed = /[^a-zA-Z_]/g;
         this.set('invalidCharacters', this.get('name').match(notAllowed));
         this.set('invalid', this.get('invalidCharacters') || this.get('multipleNames') || this.get('nameNotExists'));
     }

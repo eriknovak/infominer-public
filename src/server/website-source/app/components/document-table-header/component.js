@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import { computed, set } from '@ember/object';
+import { htmlSafe } from '@ember/string';
 
 export default Component.extend({
     // component attributes
@@ -15,7 +16,7 @@ export default Component.extend({
     },
 
     columnWidth: computed('fields.length', function () {
-        return Ember.String.htmlSafe(`width:${100 / this.get('fields.length')}%`);
+        return htmlSafe(`width:${100 / this.get('fields.length')}%`);
     }),
 
     ///////////////////////////////////////////////////////

@@ -48,10 +48,12 @@ export default Route.extend({
                     clusterId: subsetInfo.clusterId,
                     documentCount: subsetInfo.documentCount
                 });
+
+                // toggle the modal - giving the user control
+                $(`#${subsetInfo.modalId}`).modal('toggle');
                 // save the cluster
                 subset.save().then(() => {
-                    // toggle the modal - giving the user control
-                    $(`#${subsetInfo.modalId}`).modal('toggle');
+                    console.log(subsetInfo.modalId);
                     this.transitionTo('dataset.subset', subset);
                 });
             });

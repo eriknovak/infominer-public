@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { set } from '@ember/object';
+import $ from 'jquery';
 
 export default Component.extend({
     classNames: ['cluster-content'],

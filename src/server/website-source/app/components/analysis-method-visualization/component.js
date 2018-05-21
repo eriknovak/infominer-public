@@ -12,7 +12,7 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        this.set('visualizationType', this.get('method.parameters.method.type').replace(/\-/g, ' '));
+        this.set('visualizationType', this.get('method.parameters.method.type').replace(/-/g, ' '));
     },
 
     actions: {

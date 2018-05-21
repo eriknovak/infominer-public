@@ -55,6 +55,11 @@ export default Component.extend({
                 clusterId: this.get('clusterId'),
                 documentCount: this.get('cluster.documentCount')
             };
+            // make it loading
+            console.log($(`#${this.elementId} .modal-footer .btn-primary`).html(
+                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
+            ));
+
             // invoke the route action on subset info
             this.get('createSubset')(subsetInfo);
         }

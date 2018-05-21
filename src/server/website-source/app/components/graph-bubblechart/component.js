@@ -93,7 +93,7 @@ const WordCloudComponent = GraphComponent.extend({
             .padding(1.5)
             .radius(bubbleSize);
 
-        const root = hierarchy({ children: this.get('data') })
+        const root = hierarchy({ children: data })
             .sum(d => d.precent);
             
         let node = content.selectAll(".node")
