@@ -215,8 +215,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     for (let j = 0; j < docValues.length; j++) {
                         let value = docValues[j];
                         // check if value is a float
-                        // TODO: handle examples like '1aa212'
-                        if (isNaN(parseFloat(value))) { fieldTypes[j] = 'string'; }
+                        if (value.match(/[^0-9,\.]+/gi)) { fieldTypes[j] = 'string'; }
                     }
                     // we read a document - increment the count
                     count++;

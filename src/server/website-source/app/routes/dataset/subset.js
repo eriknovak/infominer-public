@@ -31,6 +31,7 @@ export default Route.extend({
                 // TODO: handle data omitence
                 warningContent.append('<p class="warning-content">Subset label must be given!</p>');
             } else {
+                $('#edit-subset-modal').modal('toggle');
                 // get the current subset
                 let subset = this.modelFor(this.routeName);
 
@@ -40,7 +41,6 @@ export default Route.extend({
 
                 // save the subset for persistance
                 subset.save();
-                $('#edit-subset-modal').modal('toggle');
             }
         },
         /**

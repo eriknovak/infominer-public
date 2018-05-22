@@ -4,7 +4,6 @@ import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-rout
 
 import { inject as service } from '@ember/service';
 import { run } from '@ember/runloop';
-import { set } from '@ember/object';
 import { A } from '@ember/array';
 import $ from 'jquery';
 
@@ -76,7 +75,7 @@ export default DatasetUploadRoute.extend({
             let { dataset, fieldList } = this.get('controller.model');
 
             if (fieldList.filter(field => field.included)
-                .map(field => field.invalid).includes(true)) {
+                .map(field => field.invalid.length > 0).includes(true)) {
                 $('#submittion-error').addClass('show');
                 return;
             }

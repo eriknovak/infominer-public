@@ -33,6 +33,7 @@
             & > td {
                 border-top: 0px !important;
                 vertical-align: middle;
+                word-break: break-word;
                 .checkbox label { margin-bottom: 0; }
             }
             .clickable { cursor: pointer; }
