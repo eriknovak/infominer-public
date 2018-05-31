@@ -15,11 +15,11 @@ export default Component.extend({
         set(this, 'k', 2);
         // set possible clustering types
         set(this, 'clusteringTypes', [
-            { fullName: 'Text', name: 'text' },
-            { fullName: 'Number', name: 'number' }
+            { fullName: 'Text', name: 'text', type: 'string' },
+            { fullName: 'Number', name: 'number', type: 'float' }
         ]);
         // set default clustering type
-        set(this, 'chosenClusteringType', get(this.get('clusteringTypes').objectAt(0), 'name'));
+        set(this, 'chosenClusteringType', this.get('clusteringTypes').objectAt(0));
     },
 
     didReceiveAttrs() {
@@ -46,7 +46,7 @@ export default Component.extend({
 
         // sets the clustering type
         selectClusteringType(index) {
-            let chosenType = get(this.get('clusteringTypes').objectAt(index), 'name');
+            let chosenType = this.get('clusteringTypes').objectAt(index);
             this.set('chosenClusteringType', chosenType);
         }
     },
@@ -58,7 +58,7 @@ export default Component.extend({
     _setParameters() {
         // set parameter values
         this.set('parameters.method', { 
-            clusteringType: this.get('chosenClusteringType'), 
+            clusteringType: this.get('chosenClusteringType.name'), 
             k: this.get('k') 
         });
     }

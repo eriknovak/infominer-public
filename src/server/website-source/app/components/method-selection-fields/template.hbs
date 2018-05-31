@@ -1,12 +1,19 @@
-<div clas="field-features">
-    <span class="include-field pull-right">
-        <label class="include-label">include</label>
-        {{ checkbox-select class="pull-right"
-            checkboxId=(concat "field-feature-" index)
-            checked=features.included
-        }}
-    </span>
-    <div class="field-feature">
-        {{features.field}}
-    </div>
-</div>
+{{#if parameters.features.length}}
+    {{#each parameters.features as |features index| }}
+        <div clas="field-features">
+            <span class="include-field pull-right">
+                <label class="include-label">include</label>
+                {{ checkbox-select class="pull-right"
+                    checkboxId=(concat "field-feature-" index)
+                    checked=features.included
+                }}
+            </span>
+            <div class="field-feature">
+                {{features.field}}
+            </div>
+        </div>
+    {{/each}}
+{{else}}
+    <div class="field-feature warning">No fields of type <b>{{type.name}}</b> found</div>
+{{/if}}
+{{yield}}
