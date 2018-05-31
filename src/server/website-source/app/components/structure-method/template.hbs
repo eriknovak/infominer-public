@@ -21,7 +21,10 @@
     {{#if onto.created }}
       {{ structure-subset subset=onto.subset usedBy=onto.subset.usedBy }}
     {{else}}
-      {{ structure-unsaved label=onto.label type='subset' }}
+      <div class="unsaved child">
+        <span class="navigation-button-placeholder"></span>
+        <span class="label">{{ onto.label }}</span>
+      </div>
     {{/if}}
   {{/each}}
 {{/bs-collapse}}

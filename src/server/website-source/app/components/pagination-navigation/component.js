@@ -2,7 +2,7 @@ import Component from '@ember/component';
 
 export default Component.extend({
     // component attributes
-    classNames: ["table-pagination"],
+    classNames: ['table-pagination'],
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -25,6 +25,7 @@ export default Component.extend({
         this.set('firstPage', 1);
         this.set('prevPage', page-1);
         this.set('nextPage', page+1);
+        
         // set last page
         let lastPage = count/limit;
         if (lastPage % 1 !== 0) { lastPage = Math.floor(lastPage) + 1; }
@@ -34,8 +35,7 @@ export default Component.extend({
         let quickSelect = [ ];
         for (let pageN = page - 2; pageN < page + 3; pageN++) {
             if (pageN < 1) { continue; }     // go to next page
-            if (pageN > lastPage) { break; } // other pages are larger
-
+            if (pageN > lastPage) { break; } // other pages are greater
             quickSelect.push({ pageN, active: pageN === page });
         }
         this.set('quickSelect', quickSelect);
@@ -60,16 +60,12 @@ export default Component.extend({
     actions: {
         /**
          * Gets the documents on the requested page.
-         * @param {Number} pageNumber - The requested page.
+         * @param {Number} page - The requested page.
          */
-        getDocuments(pageNumber) {
-            // get new limit and use it
-            let changePage = this.get('changePage');
-            // execute new search
-            changePage(pageNumber);
+        getDocuments(page) {
+            // change page
+            this.get('changePage')(page);
         }
-
-
 
     }
 

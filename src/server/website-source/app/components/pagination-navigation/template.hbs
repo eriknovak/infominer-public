@@ -24,7 +24,8 @@
       <!-- Set buttons to navigate through pages -->
       {{#each quickSelect as |quickPage|}}
         <button class="btn btn-tertiary {{if quickPage.active 'active'}}"
-          onclick={{action 'getDocuments' quickPage.pageN}}>
+          onclick={{action 'getDocuments' quickPage.pageN}}
+        >
           {{quickPage.pageN}}
         </button>
       {{/each}}
