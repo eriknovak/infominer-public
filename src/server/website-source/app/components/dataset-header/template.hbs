@@ -7,7 +7,7 @@
           <h2 class="description-header">{{dataset.label}}</h2>
 
           <button class="btn btn-secondary pull-right" data-toggle="modal"
-            data-target="#edit-dataset-modal" {{action 'removeModalWarnings'}}>Edit</button>
+            data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
 
           <button class="btn btn-light pull-right" data-toggle="modal"
             data-target="#delete-dataset-modal">Delete</button>
@@ -47,12 +47,17 @@
         <!-- modal title -->
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete dataset: <b class="uppercase">{{dataset.label}}</b>? You will not be able to revert this action.</p>
+        <p>
+          Are you sure you want to delete dataset <b class="uppercase">{{dataset.label}}</b>? 
+          You will not be able to revert this action.
+        </p>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-dismiss="modal">Go back</button>
-        <button type="button" class="btn btn-danger" onclick={{action deleteDataset}}>Yes, delete dataset</button>
+        <button type="button" class="btn btn-danger" onclick={{action deleteDataset}}>
+          Yes, delete dataset
+        </button>
       </div>
 
     </div><!-- /.modal-content -->
@@ -82,8 +87,8 @@
             <div class="col-lg-6">
               <label>Dataset Label</label>
               <input type="text" class="form-control"
-                oninput={{action 'changeDatasetLabel'}}
-                value={{datasetLabel}}
+                oninput={{action 'editLabel'}}
+                value={{label}}
                 placeholder="Add dataset label">
             </div>
           </div>
@@ -94,8 +99,8 @@
               <div class="form-group">
                 <label>Description</label>
                 <textarea class="form-control" rows="5"
-                  oninput={{action 'changeDatasetDescription'}}
-                  value={{datasetDescription}}
+                  oninput={{action 'editDescription'}}
+                  value={{description}}
                   placeholder="Add dataset description (optional)">
                 </textarea>
               </div>
@@ -115,7 +120,7 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" {{action 'submitDatasetChanges'}}>Edit dataset</button>
+        <button type="button" class="btn btn-primary" {{action 'updateDataset'}}>Edit dataset</button>
       </div>
 
     </div><!-- /.modal-content -->

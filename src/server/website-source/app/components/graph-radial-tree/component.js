@@ -82,12 +82,12 @@ const RadialTreeComponent = GraphComponent.extend({
             for (let i = 0; i < method.get('result.clusters').length; i++) {
 
                 let cluster = method.get('result.clusters').objectAt(i);
-                if (cluster.subsetCreated) {
-                    let subset = this.get('store').peekRecord('subset', cluster.subsetId);
+                if (cluster.subset.created) {
+                    let subset = this.get('store').peekRecord('subset', cluster.subset.id);
                     this._addSubsetToHierarchy(subset, hierarchy);
                 } else {
                     let numberOfDocuments = cluster.documentCount;
-                    hierarchy.push({ label: cluster.clusterLabel, type: 'subset',
+                    hierarchy.push({ label: cluster.label, type: 'subset',
                         numberOfDocuments, id: `${id}-${i}`, parentId: id });
                 }
             }
