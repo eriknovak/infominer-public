@@ -46,7 +46,6 @@ export default Component.extend({
         toggleInformation() { this.toggleProperty('collapsed'); },
         editLabel() { this.toggleProperty('editing-label'); },
         saveLabel() { this._saveLabel(); }
-
     },
 
     _setCluster() {

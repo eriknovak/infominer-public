@@ -10,10 +10,8 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        let distribution = this.get('distribution');
         // get keywords and their tf-idf values
-        let bubblechart = distribution.values;
-        // sets the values
-        this.set('bubblechart', bubblechart);
+        let distribution = this.get('distribution');
+        this.set('bubblechart', distribution.values);
     }
 });

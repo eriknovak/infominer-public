@@ -10,10 +10,8 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        let distribution = this.get('distribution');
         // get keywords and their tf-idf values
-        let keywords = distribution.keywords;
-        // sets the values
-        this.set('keywords', keywords);
+        let distribution = this.get('distribution');
+        this.set('keywords', distribution.keywords);
     }
 });
