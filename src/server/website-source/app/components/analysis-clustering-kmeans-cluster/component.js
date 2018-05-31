@@ -11,7 +11,7 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         set(this, 'collapsed', false);
-        set(this, 'editing-cluster-label', false);
+        set(this, 'editing-label', false);
     },
 
     didReceiveAttrs() {
@@ -33,10 +33,10 @@ export default Component.extend({
     didRender() {
         this._super(...arguments);
         let self = this;
-        if (self.get('editing-cluster-label')) {
+        if (self.get('editing-label')) {
             // save cluster label change on enter
             $(`#${self.get('elementId')} input.editing`).on('keyup', function (e) {
-                if (e.keyCode == 13) { self._saveClusterLabel(); }
+                if (e.keyCode == 13) { self._saveLabel(); }
             });
         }
     },
@@ -44,8 +44,8 @@ export default Component.extend({
 
     actions: {
         toggleInformation() { this.toggleProperty('collapsed'); },
-        editClusterLabel() { this.toggleProperty('editing-cluster-label'); },
-        saveClusterLabel() { this._saveClusterLabel(); }
+        editLabel() { this.toggleProperty('editing-label'); },
+        saveLabel() { this._saveLabel(); }
 
     },
 
@@ -58,13 +58,13 @@ export default Component.extend({
         this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');
         // get subset names
         if (cluster.subsetId) {
-            set(cluster, 'clusterLabel', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
+            set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
         }
         // set clusters values
         this.set('cluster', cluster);
     },
 
-    _saveClusterLabel() {
+    _saveLabel() {
         const elementId = this.get('elementId');
         const label = $(`#${elementId} input.editing`).val();
         let method = this.get('method');
@@ -73,10 +73,10 @@ export default Component.extend({
             let subset = this.get('store').peekRecord('subset', cluster.subsetId);
             subset.set('label', label); subset.save();
         }
-        this.set('cluster.clusterLabel', label);
+        this.set('cluster.label', label);
         // save method changes
         method.save();
-        this.toggleProperty('editing-cluster-label');
+        this.toggleProperty('editing-label');
     }
 
 });

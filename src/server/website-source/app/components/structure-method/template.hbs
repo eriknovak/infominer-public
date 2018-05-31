@@ -18,10 +18,10 @@
 
 {{#bs-collapse collapsed=collapsed class="tree-branch"}}
   {{#each ontology as |onto| }}
-    {{#if onto.subsetCreated }}
+    {{#if onto.created }}
       {{ structure-subset subset=onto.subset usedBy=onto.subset.usedBy }}
     {{else}}
-      {{ structure-unsaved label=onto.subsetLabel type='subset' }}
+      {{ structure-unsaved label=onto.label type='subset' }}
     {{/if}}
   {{/each}}
 {{/bs-collapse}}

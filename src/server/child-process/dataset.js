@@ -12,20 +12,20 @@ const BaseDataset = require('../../lib/base-dataset');
 // json schema validator
 const validator = require('../../lib/validator')({
     // the schemas used to validate the input
-    createDataset: require('../../schemas/child_messages/createDataset'),
-    openDataset:   require('../../schemas/child_messages/openDataset'),
-    editDataset:   require('../../schemas/child_messages/editDataset'),
-    getDataset:    require('../../schemas/child_messages/getDataset'),
-    shutdown:      require('../../schemas/child_messages/shutdown'),
+    createDataset: require('../../schemas/child-messages/dataset-create'),
+    openDataset:   require('../../schemas/child-messages/dataset-open'),
+    editDataset:   require('../../schemas/child-messages/dataset-edit'),
+    getDataset:    require('../../schemas/child-messages/dataset-get'),
+    shutdown:      require('../../schemas/child-messages/shutdown'),
     // subset message schemas
-    createSubset:  require('../../schemas/child_messages/createSubset'),
-    getSubset:     require('../../schemas/child_messages/getSubset'),
-    editSubset:    require('../../schemas/child_messages/editSubset'),
-    getSubsetDocuments: require('../../schemas/child_messages/getSubsetDocuments'),
+    createSubset:  require('../../schemas/child-messages/subset-create'),
+    getSubset:     require('../../schemas/child-messages/subset-get'),
+    editSubset:    require('../../schemas/child-messages/subset-edit'),
+    getSubsetDocuments: require('../../schemas/child-messages/subset-get-documents'),
     // method message schemas
-    getMethod:     require('../../schemas/child_messages/getMethod'),
-    createMethod:  require('../../schemas/child_messages/createMethod'),
-    editMethod:    require('../../schemas/child_messages/edit-method')
+    createMethod:  require('../../schemas/child-messages/method-create'),
+    getMethod:     require('../../schemas/child-messages/method-get'),
+    editMethod:    require('../../schemas/child-messages/method-edit')
 });
 
 // database placeholder
@@ -70,18 +70,14 @@ function handle(msg) {
     /////////////////////////////////////////////////////////////////
 
     case 'init':
-        console.log('Initialize child process id=', process.pid);
         break;
     case 'create_dataset':
-        console.log('Creating database in child process id=', process.pid);
         createDatabase(msg);
         break;
     case 'open_dataset':
-        console.log('Opening database in child process id=', process.pid);
         openDatabase(msg);
         break;
     case 'shutdown':
-        console.log('Received shutdown command');
         shutdownProcess(msg);
         break;
 
@@ -90,43 +86,33 @@ function handle(msg) {
     /////////////////////////////////////////////////////////////////
 
     case 'get_dataset':
-        console.log('Get database info in child process id=', process.pid);
         getDataset(msg);
         break;
     case 'edit_dataset':
-        console.log('Get database info in child process id=', process.pid);
         editDataset(msg);
         break;
     case 'get_subset':
-        console.log('Get subset info in child process id=', process.pid);
         getSubset(msg);
         break;
     case 'create_subset':
-        console.log('Get subset info in child process id=', process.pid);
         createSubset(msg);
         break;
     case 'edit_subset':
-        console.log('Get subset info in child process id=', process.pid);
         editSubset(msg);
         break;
     case 'get_subset_documents':
-        console.log('Get subset info in child process id=', process.pid);
         getSubsetDocuments(msg);
         break;
     case 'get_method':
-        console.log('Get method info in child process id=', process.pid);
         getMethod(msg);
         break;
     case 'create_method':
-        console.log('Get method info in child process id=', process.pid);
         createMethod(msg);
         break;
     case 'edit_method':
-        console.log('Get method info in child process id=', process.pid);
         editMethod(msg);
         break;
     default:
-        console.log('Unknown cmd in child process, cmd=' + msg.body.cmd);
         break;
     }
 }
@@ -271,7 +257,7 @@ function getDataset(msg) {
     messageValidation(msg, validator.schemas.getDataset, function (msg) {
         let { reqId } = msg;
         try {
-            let results = database.getDatasetInformation();
+            let results = database.getDataset();
             process.send({ reqId, results });
         } catch (err) {
             console.log('getDataset Error', err.message);
@@ -296,7 +282,7 @@ function editDataset(msg) {
         let { reqId, body } = msg;
         try {
             let datasetInfo = body.content;
-            let results = database.editDatasetInformation(datasetInfo);
+            let results = database.editDataset(datasetInfo);
             process.send({ reqId, results });
         } catch (err) {
             console.log('editDataset Error', err.message);
@@ -324,7 +310,7 @@ function getSubset(msg) {
         let { reqId, body } = msg;
         try {
             let subsetId = body.content ? body.content.subsetId : null;
-            let results = database.getSubsetInformation(subsetId);
+            let results = database.getSubset(subsetId);
             process.send({ reqId, results });
         } catch (err) {
             console.log('getSubset Error', err.message);
@@ -351,7 +337,7 @@ function editSubset(msg) {
         let { reqId, body } = msg;
         try {
             let subsetInfo = body.content;
-            let results = database.editSubsetInformation(subsetInfo);
+            let results = database.editSubset(subsetInfo);
             process.send({ reqId, results });
         } catch (err) {
             console.log('editSubset Error', err.message);
@@ -382,7 +368,7 @@ function createSubset(msg) {
             let { subset } = body.content;
             let results = database.createSubset(subset);
             database.aggregateSubset(results.subsets.id);
-            results = database.getSubsetInformation(results.subsets.id);
+            results = database.getSubset(results.subsets.id);
             process.send({ reqId, results });
         } catch (err) {
             console.log('createSubset Error', err.message);
@@ -443,7 +429,7 @@ function getMethod(msg) {
         let { reqId, body } = msg;
         try {
             let methodId = body.content ? body.content.methodId : null;
-            let results = database.getMethodInformation(methodId);
+            let results = database.getMethod(methodId);
             process.send({ reqId, results });
         } catch (err) {
             console.log('getMethod Error', err.message);
