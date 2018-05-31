@@ -17,7 +17,7 @@ export default Component.extend({
         this._super(...arguments);
         // get cluster id and set subset name
         let cluster = this.get('cluster');
-        let subsetName = cluster.clusterLabel != null ? cluster.clusterLabel : 'Subset';
+        let subsetName = cluster.label != null ? cluster.label : 'Subset';
         // set parameters
         this.set('subsetName', subsetName);
         this.set('subsetDescription', '');
@@ -56,9 +56,9 @@ export default Component.extend({
                 documentCount: this.get('cluster.documentCount')
             };
             // make it loading
-            console.log($(`#${this.elementId} .modal-footer .btn-primary`).html(
+            $(`#${this.elementId} .modal-footer .btn-primary`).html(
                 '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
-            ));
+            );
 
             // invoke the route action on subset info
             this.get('createSubset')(subsetInfo);

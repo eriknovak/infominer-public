@@ -24,11 +24,11 @@ export default Component.extend({
             // method is a clustering method - get all results
             for (let cluster of method.get('result.clusters')) {
                 // create a subset
-                let clusterObj = { subsetCreated: cluster.subsetCreated };
-                if (clusterObj.subsetCreated) {
-                    clusterObj.subset = this.get('store').peekRecord('subset', cluster.subsetId);
+                let clusterObj = { created: cluster.subset.created };
+                if (clusterObj.created) {
+                    clusterObj.subset = this.get('store').peekRecord('subset', cluster.subset.id);
                 } else {
-                    clusterObj.subsetLabel = cluster.clusterLabel;
+                    clusterObj.label = cluster.label;
                 }
                 // add cluster info to ontology
                 ontology.push(clusterObj);
@@ -37,7 +37,7 @@ export default Component.extend({
             // method is a filtering method - again get all results
             for (let i = 0; i < method.get('produced.length'); i++) {
                 let subset = method.get('produced').objectAt(i);
-                ontology.push({ subsetCreated: true, subset });
+                ontology.push({ created: true, subset });
             }
         }
 
