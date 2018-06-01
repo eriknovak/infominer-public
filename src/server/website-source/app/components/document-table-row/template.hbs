@@ -1,4 +1,4 @@
-<!-- document selection checkbox -->
+{{! document selection checkbox }}
 <td>
   {{ checkbox-select
     checkboxId=(concat "checkbox-" index)
@@ -7,8 +7,10 @@
   }}
 </td>
 
-<!-- document values -->
+{{! document values }}
 {{#each documentValues as |value|}}
   <td class="{{value.field}} clickable" data-toggle="collapse"
-    data-target="{{dataTarget}}">{{{value.value}}}</td>
+    data-target="{{dataTarget}}">
+    {{{value.value}}}
+  </td>
 {{/each}}

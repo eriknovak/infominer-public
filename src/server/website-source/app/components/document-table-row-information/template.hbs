@@ -1,25 +1,25 @@
-<!-- empty data table -->
+{{! empty data table }}
 <td></td>
 
-<!-- document values content -->
+{{! document values content }}
 <td colspan="{{numberOfColumns}}">
 
   <div class="collapse document-attributes" id="{{collapseId}}">
 
-    <!-- Fill the container with documents -->
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-            <h6 class="subset">Document values</h6>
-          </div>
+    {{! Fill the container with documents }}
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h6 class="subset">Document values</h6>
         </div>
-        {{#each documentValues as |value|}}
+      </div>
+      {{#each documentValues as |value|}}
         <div class="row">
           <div class="col-lg-2 subset field-value">{{value.field}}</div>
           <div class="col-lg-10">{{{value.value}}}</div>
         </div>
-        {{/each}}
-      </div><!-- .container -->
+      {{/each}}
+    </div>{{! .container }}
 
-  </div><!-- .collapse -->
+  </div>{{! .collapse }}
 </td>

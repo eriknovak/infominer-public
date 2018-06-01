@@ -3,12 +3,12 @@
     <div class="row">
       <div class="col-lg-12 table-options">
         {{ query-options fields=fields query=query action=changeQuery }}
-        {{ pagination-limit limit=pagination.limit changeLimit=changeLimit }}
+        {{ pagination-limit limit=limit changeLimit=changeLimit }}
       </div>
     </div>
 
     <table class="table table-hover">
-      <!-- Header -->
+      {{! table header }}
       <thead>
         <tr>
           <th class="checkbox-header" style="width:1%;"></th>
@@ -19,7 +19,7 @@
           {{/each}}
         </tr>
       </thead>
-      <!-- Body -->
+      {{! table body }}
       <tbody>
         {{#if documents.loading }}
           <tr class="loading">
@@ -31,7 +31,7 @@
             </td>
           </tr>
         {{else if documents.length}}
-          <!-- if documents are available show them -->
+          {{! if documents are available show them }}
           {{#each documents as |document| }}
             {{ document-table-row             document=document fields=fields query=query }}
             {{ document-table-row-information document=document fields=fields query=query }}
@@ -46,8 +46,56 @@
       </tbody>
     </table>
 
-    {{ pagination-navigation documents=documents pagination=pagination changePage=changePage }}
-  </div>
+    {{! indeces of displayed documents and navigation bar }}
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-3">
+        <!-- which documents are shown -->
+        <div class="document-display-info">
+          <p>Displaying {{startDisplay}}-{{endDisplay}} of {{count}}</p>
+        </div>
+      </div>{{! .col-xs-12.col-sm-12.col-md-3 }}
+
+      <div class="col-xs-12 col-sm-12 col-md-6">
+        {{! navigation }}
+        <div class="navigation-buttons pull-center">
+          {{! Go to first page }}
+          <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+            onclick={{if onFirstPage null (action 'getDocuments' firstPage)}}>
+            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+          </button>
+
+          {{! Go to previous page }}
+          <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+            onclick={{if onFirstPage null (action 'getDocuments' prevPage)}}>
+            <i class="fa fa-angle-left" aria-hidden="true"></i>
+          </button>
+
+          {{! Set buttons to navigate through pages }}
+          {{#each quickSelect as |quickPage|}}
+            <button class="btn btn-tertiary {{if quickPage.active 'active'}}"
+              onclick={{action 'getDocuments' quickPage.pageN}}
+            >
+              {{quickPage.pageN}}
+            </button>
+          {{/each}}
+
+          {{! Go to next page }}
+          <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
+            onclick={{if onLastPage null (action 'getDocuments' nextPage)}}>
+            <i class="fa fa-angle-right" aria-hidden="true"></i>
+          </button>
+
+          {{! Go to last page }}
+          <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
+            onclick={{if onLastPage null (action 'getDocuments' lastPage)}}>
+            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>{{! .col-xs-12.col-sm-12.col-md-6 }}
+
+  </div>{{! .row }}
     {{!-- {{ document-table-create-subset createSubset=createSubset }} --}}
 </div>
 
