@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-12 offset-lg-1 col-lg-10">
 
-      <!-- title -->
+      {{! title }}
       <div class="row">
         <div class="col-sm-12">
           <h2 class="description-header">Datasets</h2>
@@ -10,15 +10,15 @@
         </div>
       </div>
 
-      <!-- datasets list -->
+      {{! datasets list }}
       <div id="datasets-container">
         <div class="row">
           <div class="col-sm-12">
             <div class="row">
 
-              <!-- Add new dataset -->
+              {{! Add new dataset }}
               <div class="col-xs-6 col-sm-4 col-lg-2">
-                <!-- Button trigger modal -->
+                {{! Button trigger modal }}
                 {{#link-to 'dataset-upload'}}
                   <div class="dataset add-new">
                     <i class="fa fa-plus" aria-hidden="true"></i>
@@ -28,10 +28,10 @@
               </div>
 
               {{#each model as |dataset|}}
-                <!-- Add new dataset -->
+                {{! Add new dataset }}
                 <div class="col-xs-6 col-sm-4 col-lg-2">
                   {{#if dataset.loaded}}
-                    <!-- Button trigger modal -->
+                    {{! Button trigger modal }}
                     {{#link-to 'dataset.subset.analysis' dataset.id 0 }}
                       <div class="dataset {{unless dataset.loaded 'loading'}}">
                         <i class="fa fa-database" aria-hidden="true"></i>
@@ -49,14 +49,14 @@
                 </div>
               {{/each}}
 
-            </div><!-- .row -->
+            </div>{{! .row }}
           </div>
         </div>
 
-      </div><!-- .datasets-container -->
+      </div>{{! .datasets-container }}
 
-    </div><!-- .col-sm-12.offset-lg-1.col-lg-10 -->
-  </div><!-- .row -->
-</div><!-- .container-fluid -->
+    </div>{{! .col-sm-12.offset-lg-1.col-lg-10 }}
+  </div>{{! .row }}
+</div>{{! .container-fluid }}
 
 {{outlet}}
