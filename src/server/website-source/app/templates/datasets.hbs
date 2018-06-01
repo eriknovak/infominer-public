@@ -29,7 +29,24 @@
 
               {{#each model as |dataset|}}
                 <!-- Add new dataset -->
-                {{ dataset-instance dataset=dataset }}
+                <div class="col-xs-6 col-sm-4 col-lg-2">
+                  {{#if dataset.loaded}}
+                    <!-- Button trigger modal -->
+                    {{#link-to 'dataset.subset.analysis' dataset.id 0 }}
+                      <div class="dataset {{unless dataset.loaded 'loading'}}">
+                        <i class="fa fa-database" aria-hidden="true"></i>
+                        <p class="dataset-label">{{ dataset.label }}</p>
+                        <p class="dataset-created">Created: {{ dataset.date }}</p>
+                      </div>
+                    {{/link-to}}
+                  {{else}}
+                    <div class="dataset loading">
+                      <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw" aria-hidden="true"></i>
+                      <p class="dataset-label">{{ dataset.label }}</p>
+                      <p class="dataset-created">Loading...</p>
+                    </div>
+                  {{/if}}
+                </div>
               {{/each}}
 
             </div><!-- .row -->
