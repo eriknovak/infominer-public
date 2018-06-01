@@ -11,6 +11,13 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         set(this, 'sortOptions', ['desc', 'asc']);
+        this.set('possibleLimits', [
+            { value: 1,  selected: false },
+            { value: 5,  selected: false },
+            { value: 10, selected: false },
+            { value: 25, selected: false },
+            { value: 50, selected: false }
+        ]);
     },
 
 
@@ -70,6 +77,17 @@ export default Component.extend({
         this.set('startDisplay', startDisplay);
         this.set('endDisplay', endDisplay);
 
+        /*************************************
+         * pagination limit parameters
+         ************************************/
+
+        let possibleLimits = this.get('possibleLimits');
+        // set the default limit value
+        for (let option of possibleLimits) {
+            if (option.value === limit) { set(option, 'selected', true); break; }
+        }
+        // save changes to possible limits
+        this.set('possibleLimits', possibleLimits);
     },
 
     columnWidth: computed('fields.length', function () {
@@ -107,6 +125,16 @@ export default Component.extend({
         getDocuments(page) {
             // change page
             this.get('changePage')(page);
+        },
+
+        /**
+         * Changes the number of documents shown in the table.
+         */
+        changeLimit() {
+            // get new limit and use it
+            let newLimit = parseInt(this.$('#table-show-limit').find(':selected').val());
+            // execute new search
+            this.get('changeLimit')(newLimit);
         }
 
     }
