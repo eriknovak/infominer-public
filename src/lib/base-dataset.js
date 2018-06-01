@@ -230,23 +230,32 @@ class BaseDataset {
 
     _getDatasetFields() {
         let fields = this.base.store('Dataset').fields;
-
+        // prepare full dataset 
+        let dataset = this.base.store('Dataset').allRecords;
         // set aggregate types for each field
         fields.forEach(field => {
             if (field.type === 'float') {
                 // aggregate field of type float with histogram
                 field.aggregate = 'histogram';
+                // get the min and max value found within the field
+                let aggregate = dataset.aggr({ 
+                    name: `sample_${field.name}`, 
+                    field: field.name, 
+                    type: field.aggregate 
+                });
+                // store the aggregate values
+                const { min, max } = aggregate;
+                field.metadata = { min, max };
+
             } else if (field.type === 'string') {
-                // on a sample check how many different values
                 // there is for that field
-                let sampleSet = this.base.store('Dataset').allRecords;
-                let aggregate = sampleSet.aggr({ 
+                let aggregate = dataset.aggr({ 
                     name: `sample_${field.name}`, 
                     field: field.name, 
                     type: 'count' 
                 });
 
-                field.aggregate = aggregate && aggregate.values.length < Math.min(15, sampleSet.length) ? 
+                field.aggregate = aggregate && aggregate.values.length < Math.min(15, dataset.length) ? 
                     'count' : 'keywords';
             }
         });
@@ -406,7 +415,7 @@ class BaseDataset {
      * @returns {Object} The object containing the documents and it's metadata.
      */
     getSubsetDocuments(id, query) {
-        return subsetHandler.documents(this.base, id, query);
+        return subsetHandler.documents(this.base, id, query, this.fields);
     }
 
 

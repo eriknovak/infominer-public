@@ -150,6 +150,7 @@ module.exports = {
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
+                console.log(field);
                 let distribution = this._aggregateByField(elements, field);
                 method.result.aggregates.push({ 
                     field: field.name, 

@@ -130,7 +130,7 @@ module.exports = {
      * @param {String} [query.sort.sortType] - The flag specifiying is sort is done. Possible: `asc` or `desc`.
      * @returns {Object} The object containing the documents and it's metadata.
      */
-    documents(base, id, query) {
+    documents(base, id, query, fields) {
         // get database subsets
 
         if (id < 0 || base.store('Subsets').length <= id) {
@@ -179,12 +179,21 @@ module.exports = {
                 qmQuery.$or.push(fieldQuery);
             }
         }
-
+        // add additional queries - ranges
+        if (queryParams && queryParams.number) {
+            for (let field of queryParams.number) {
+                // add field and value to the query
+                qmQuery[field.field] = { 
+                    $gt: parseFloat(field.values[0]), 
+                    $lt: parseFloat(field.values[1]) 
+                };
+            }
+        }
         // get the subset documents
         let subsetDocuments = base.search(qmQuery);
 
         // prepare field metadata
-        let fields = base.store('Dataset').fields
+        let metaFields = fields
             .map(field => {
                 let sortType = null;
                 // if the documents were sorted by the field
@@ -195,7 +204,8 @@ module.exports = {
                 return { 
                     name: field.name, 
                     type: field.type, 
-                    sortType 
+                    sortType,
+                    aggregate: field.aggregate
                 };
             });
 

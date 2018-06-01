@@ -159,14 +159,16 @@ export default Route.extend({
 
         changeQuery(params) {
             // check what are the parameters
-            const query = params.text ? params : null;
+            const query = { };
+            if (params.text) { query.text = params.text; }
+            if (params.number.length) { query.number = params.number; }
+            
             //set the query parameters
             this.set('query', query);
             // we don't know how many results there will be
             // set to first page and remove sorting
             this.set('page', 1);
             this.set('sortTarget', null);
-            
             // update model
             this._updateModel();
         }

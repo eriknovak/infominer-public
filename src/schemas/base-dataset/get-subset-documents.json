@@ -21,9 +21,9 @@
             "oneOf": [{
                 "type": "object",
                 "properties": {
-                    "text": { "type": ["object", "null"] }
-                },
-                "required": ["text"]
+                    "text": { "type": ["object", "null"] },
+                    "number": { "type": ["object", "array", "null"] }
+                }
             },{
                 "type": "null"
             }]

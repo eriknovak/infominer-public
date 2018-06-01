@@ -14,7 +14,11 @@ export default Component.extend({
                 return { name: field.name, included };
             })
         );
-        this.set('numberFields', this.get('fields').filterBy('type', 'float'));
+        this.set('numberFields', this.get('fields').filterBy('type', 'float').map(field => {
+            field.value = [field.metadata.min, field.metadata.max];
+            return field;
+        }));
+
         const keywords = query && query.text ? query.text.keywords : null;
         this.set('keywords', keywords);
     },
@@ -45,8 +49,11 @@ export default Component.extend({
         // get keywords and selected fields
         const keywords = $(`#${this.get('elementId')} input[data-purpose="keywords"]`).val();
         const textFields = this.get('textFields').filterBy('included', true).map(field => field.name);
+        
+        const number = this.get('numberFields')
+            .map(field => ({ field: field.name, values: field.value }));
         let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;
-        this.set('query', { text });
+        this.set('query', { text, number });
 
         this.get('action')(this.get('query'));
     }
