@@ -26,7 +26,7 @@
             <td colspan="{{loading-row-width}}">
               <div class="loading">
                 <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
-                <span class="sr-only">Getting documents...</span>
+                <p>Getting documents...</p>
               </div>
             </td>
           </tr>
@@ -57,7 +57,7 @@
 
       <div class="col-xs-12 col-sm-12 col-md-6">
         {{! navigation }}
-        <div class="navigation-buttons pull-center">
+        <div class="navigation-buttons text-center">
           {{! Go to first page }}
           <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
             onclick={{if onFirstPage null (action 'getDocuments' firstPage)}}>
