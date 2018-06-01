@@ -45,7 +45,19 @@ export default Component.extend({
     actions: {
         toggleInformation() { this.toggleProperty('collapsed'); },
         editLabel() { this.toggleProperty('editing-label'); },
-        saveLabel() { this._saveLabel(); }
+        saveLabel() { this._saveLabel(); },
+
+        updateSubsetCreationParams() {
+            this.set('parameters', {
+                label: this.get('cluster.label'),
+                type: 'Clustering',
+                methodId: this.get('method.id'),
+                clusterId: this.get('index'),
+                documentCount: this.get('cluster.documentCount')
+            });
+            this.get('parameters');
+        }
+
     },
 
     _setCluster() {

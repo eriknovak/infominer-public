@@ -15,8 +15,18 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
-        this.set('subsetName', 'Subset');
-        this.set('subsetDescription', '');
+        this.set('name', 'Subset');
+        this.set('description', '');
+    },
+
+    didReceiveAttrs() {
+        this._super(...arguments);
+        // get cluster id and set subset name
+        let parameters = this.get('parameters');
+        let name = parameters.label != null ? parameters.label : 'Subset';
+        // set parameters
+        this.set('name', name);
+        this.set('description', '');
     },
 
     ///////////////////////////////////////////////////////
@@ -28,14 +38,14 @@ export default Component.extend({
          * Change subset name.
          */
         changeSubsetName() {
-            this.set('subsetName', $(`#${this.get('id')} input`).val());
+            this.set('name', $(`#${this.get('id')} input`).val());
         },
 
         /**
          * Change subset description.
          */
         changeSubsetDescription() {
-            this.set('subsetDescription', $(`#${this.get('id')} textarea`).val());
+            this.set('description', $(`#${this.get('id')} textarea`).val());
         },
 
         /**
@@ -43,12 +53,21 @@ export default Component.extend({
          */
         saveSubset() {
             // prepare subset info object
-            const subsetInfo = {
-                label: this.get('subsetName'),
-                description: this.get('subsetDescription')
+            const subset = {
+                label: this.get('name'),
+                description: this.get('description'),
+                methodId: this.get('parameters.methodId'),
+                clusterId: this.get('parameters.clusterId'),
+                documentCount: this.get('parameters.documentCount')
             };
+
+            // make it loading
+            $(`#${this.elementId} .modal-footer .btn-primary`).html(
+                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
+            );
+
             // invoke the route action on subset info
-            this.get('createSubset')(subsetInfo);
+            this.get('createSubset')(subset);
         }
     }
 

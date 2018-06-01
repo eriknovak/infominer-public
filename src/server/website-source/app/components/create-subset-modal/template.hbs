@@ -20,7 +20,7 @@
             <div class="col-lg-6">
               <label>Subset Name</label>
               <input type="text" class="form-control"
-                oninput={{action 'changeSubsetName'}} value={{subsetName}}
+                oninput={{action 'changeSubsetName'}} value={{name}}
                 placeholder="Add subset name">
             </div>
           </div>
@@ -32,7 +32,8 @@
                 <label>Description</label>
                 <textarea class="form-control" rows="5"
                    oninput={{action 'changeSubsetDescription'}}
-                  placeholder="Add subset description (optional)"></textarea>
+                  placeholder="Add subset description (optional)"
+                  value={{description}}></textarea>
               </div>
             </div>
           </div>

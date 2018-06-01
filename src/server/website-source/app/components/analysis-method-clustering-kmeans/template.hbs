@@ -31,12 +31,13 @@
     {{#each method.result.clusters as |cluster index|}}
       <div class="row">
         <div class="col-lg-12">
-          {{ analysis-clustering-kmeans-cluster dataset=dataset method=method cluster=cluster index=index }}
-
-          {{ create-subset-modal-from-method id=(concat "create-subset-kmeans-" method.id "-" index)
-            methodId=method.id clusterId=index cluster=cluster
-            createSubset=createSubset type="KMeans Clustering"}}
-
+          {{ analysis-clustering-kmeans-cluster 
+            dataset=dataset 
+            method=method 
+            cluster=cluster 
+            index=index 
+            parameters=parameters
+          }}
         </div><!-- .col-lg-12 -->
       </div><!-- .row -->
 

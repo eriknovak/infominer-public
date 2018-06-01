@@ -1,6 +1,11 @@
 {{#each model.subset.usedBy as |method|}}
   {{#if method.analysisAppropriate}}
-    {{ analysis-method method=method subset=model.subset dataset=model.dataset createSubset=(route-action "createSubset") }}
+    {{ analysis-method 
+      method=method 
+      subset=model.subset 
+      dataset=model.dataset 
+      parameters=model.parameters
+    }}
   {{/if}}
 {{/each}}
 
@@ -21,6 +26,12 @@
   id="select-analysis-modal"
   action=(route-action 'startAnalysis')
   dataset=model.dataset
+}}
+
+{{ create-subset-modal
+  id="subset-create-modal"
+  parameters=model.parameters
+  createSubset=(route-action "createSubset") 
 }}
 
 {{outlet}}
