@@ -1,37 +1,51 @@
-<div class="form-group row">
+{{#if textFields}}
+  <div class="form-group row">
     <label class="col-sm-2 col-form-label">Keywords</label>
     <div class="col-sm-10">
-        <div class="input-group">
-            <input class="form-control keywords-input" type="text" autocomplete="on" data-purpose="keywords" value="{{keywords}}">
-            <div class="input-group-append">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Selected Fields
-                    <span class="number-circle">{{numberOfSelectedFields}}</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    {{#each textFields as |field index|}}
-                        <div class="dropdown-item">
-                            {{ checkbox-select
-                                checkboxId=(concat "query-checkbox-" index)
-                                checked=field.included
-                            }}
-                            <label class="query-field-selection">{{field.name}}</label>
-                        </div>
-                    {{/each}}
-                </div>
-            </div>
+      <div class="input-group">
+        <input class="form-control keywords-input" type="text" autocomplete="on" data-purpose="keywords" value="{{keywords}}">
+        <div class="input-group-append">
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Selected Fields
+            <span class="number-circle">{{numberOfSelectedFields}}</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            {{#each textFields as |field index|}}
+              <div class="dropdown-item">
+                {{ checkbox-select
+                  checkboxId=(concat "query-checkbox-" index)
+                  checked=field.included
+                }}
+                <label class="query-field-selection">{{field.name}}</label>
+              </div>
+            {{/each}}
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+{{/if}}
 
-{{!-- <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Ranges</label>
-    <div class="col-sm-8">
-        {{#each numberFields as |field index|}}
-            <div class="range">{{field.name}}</div>
-        {{/each}}
+{{#if numberFields}}
+  <div class="form-group row">
+    <div class="offset-sm-2 col-sm-10">
+      {{#each numberFields as |field index|}}
+        <div class="query-ranges">
+          <label>{{field.name}}</label>
+          {{ range-slider 
+            value=field.value
+            min=field.metadata.min
+            max=field.metadata.max
+            tooltipPosition='bottom'
+            tooltipSplit=true
+            focus=false
+            mood='info'
+          }}
+        </div>
+      {{/each}}
     </div>
-</div> --}}
+  </div>
+{{/if}}
 
 <button class="btn btn-primary pull-right" {{action "changeQuery"}}>
     Start Query

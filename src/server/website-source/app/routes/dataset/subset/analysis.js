@@ -6,15 +6,15 @@ export default Route.extend({
     model() {
         let subset = this.modelFor('dataset.subset');
         let dataset = this.modelFor('dataset');
-        return { subset, dataset };
+        return { subset, dataset, subsetCreationParams: { }, clusterValues: { } };
     },
 
     actions: {
         /**
          * Starts the analysis.
-         * @param {Object} analysisParams - Parameters for the analysis.
+         * @param {Object} params - Parameters for the analysis.
          */
-        startAnalysis(analysisParams) {
+        startAnalysis(params) {
             let self = this;
             // toggle the modal - giving the user control
             $('.modal.analysis-modal').modal('toggle');
@@ -23,8 +23,8 @@ export default Route.extend({
             // create a new method
             const method = self.get('store').createRecord('method', {
                 id: self.get('store').peekAll('method').get('length'),
-                methodType: analysisParams.methodType,
-                parameters: analysisParams.parameters,
+                methodType: params.methodType,
+                parameters: params.parameters,
                 appliedOn: parentSubset
             });
             // save the model
@@ -33,27 +33,27 @@ export default Route.extend({
 
         /**
          * Creates a subset and stores it on the backend.
-         * @param {Object} subsetInfo - The subset information parameters.
+         * @param {Object} params - The subset information parameters.
          */
-        createSubset(subsetInfo) {
+        createSubset(params) {
             let self = this;
             // update method internal state
-            this.get('store').findRecord('method', subsetInfo.methodId).then(method => {
+            this.get('store').findRecord('method', params.methodId).then(method => {
                 // create new subset
                 const subset = self.get('store').createRecord('subset', {
                     id: self.get('store').peekAll('subset').get('length'),
-                    label: subsetInfo.label,
-                    description: subsetInfo.description,
+                    label: params.label,
+                    description: params.description,
                     resultedIn: method,
-                    clusterId: subsetInfo.clusterId,
-                    documentCount: subsetInfo.documentCount
+                    clusterId: params.clusterId,
+                    documentCount: params.documentCount
                 });
 
-                // toggle the modal - giving the user control
-                $(`#${subsetInfo.modalId}`).modal('toggle');
                 // save the cluster
                 subset.save().then(() => {
-                    console.log(subsetInfo.modalId);
+                    // toggle the modal - giving the user control
+                    $('#subset-create-modal').modal('toggle');
+                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save Subset');
                     this.transitionTo('dataset.subset', subset);
                 });
             });

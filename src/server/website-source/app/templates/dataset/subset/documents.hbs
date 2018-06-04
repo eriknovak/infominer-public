@@ -1,5 +1,7 @@
-{{ document-table
-  model=model
+{{ 
+  document-table
+  documents=model.documents
+  metadata=model.metadata
   changeQuery=(route-action 'changeQuery')
   changeLimit=(route-action 'changeLimit')
   changePage=(route-action 'changePage')
@@ -7,4 +9,13 @@
   createSubset=(route-action 'createSubset')
 }}
 
+<div class="row mt-5">
+  <div class="col">
+    <h5>Query Aggregates</h5>
+    {{
+      analysis-method-aggregate-subset
+      method=model.method
+    }}
+  </div>
+</div>
 {{outlet}}

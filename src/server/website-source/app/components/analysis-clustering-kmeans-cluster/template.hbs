@@ -1,25 +1,41 @@
-{{#if cluster.subsetCreated}}
-  {{#link-to 'dataset.subset' dataset cluster.subsetId class="btn btn-secondary pull-right" }}
+{{#if cluster.subset.created}}
+  {{#link-to 'dataset.subset' dataset cluster.subset.id class="btn btn-secondary pull-right" }}
     Go to Subset
   {{/link-to}}
+  <button class="btn btn-default pull-right" data-toggle="modal"
+    data-target="#cluster-inspect-modal"
+    onclick={{action 'showClusterValues'}}
+  >
+    Inspect Cluster
+  </button>
 {{else if cluster.documentCount}}
   <button class="btn btn-primary pull-right" data-toggle="modal"
-    data-target="{{concat '#create-subset-kmeans-' method.id '-' index}}">Create Subset</button>
+    data-target="#subset-create-modal"
+    onclick={{action 'updateSubsetCreationParams'}}
+  >
+    Create Subset
+  </button>
+  <button class="btn btn-default pull-right" data-toggle="modal"
+    data-target="#cluster-inspect-modal"
+    onclick={{action 'showClusterValues'}}
+  >
+    Inspect Cluster
+  </button>
 {{/if}}
 
 <h4 class="cluster-header">
-  <!-- button for toggling collapse -->
+  {{! button for toggling collapse }}
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleInformation'}}>
     <i class="fa fa-chevron-down"></i>
   </button>
-  {{#if editing-cluster-label}}
-    <input class="form-control editing" type="text" value="{{cluster.clusterLabel}}">
-    <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveClusterLabel'}}></i>
-    <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editClusterLabel'}}></i>
+  {{#if editing-label}}
+    <input class="form-control editing" type="text" value="{{cluster.label}}">
+    <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
+    <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
   {{else}}
-    <span class="cluster-label">{{cluster.clusterLabel}}</span>
-    <i class="fa fa-pencil edit edit-cluster-label" aria-hidden="true" {{action 'editClusterLabel'}}></i>
+    <span class="cluster-label">{{cluster.label}}</span>
+    <i class="fa fa-pencil edit edit-cluster-label" aria-hidden="true" {{action 'editLabel'}}></i>
   {{/if}}
 
 </h4>

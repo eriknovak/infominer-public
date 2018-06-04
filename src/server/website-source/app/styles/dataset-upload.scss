@@ -77,15 +77,6 @@
             @media (min-width: 880px) {
                 .field.type select { width: 40%; }
             }
-            .field.name {
-                input.invalid-value { border: 1px solid red; }
-                .field-name-warning {
-                    color: red;
-                    visibility: hidden;
-                    height: 10px;
-                    &.show { visibility: visible; }
-                }
-            }
             .table tr {  
                 &:hover { background-color: transparent !important; }
                 &.disabled { 

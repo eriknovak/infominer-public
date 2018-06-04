@@ -21,11 +21,10 @@ export default Component.extend({
         const query = this.get('query');
 
         // save document values
-        const document = this.get('document');
         let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
-            let value = document.get(`values.${field.name}`);
+            let value = this.get(`document.values.${field.name}`);
             // find the selected query value, find and highligh the text
             if (query && query.text && query.text.fields.includes(field.name)) {
                 const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');
@@ -35,7 +34,7 @@ export default Component.extend({
         }
         // save values
         this.set('documentValues', documentValues);
-        this.set('collapseId', `document-${document.id}`);
+        this.set('collapseId', `document-${this.get('document.id')}`);
     },
 
     ///////////////////////////////////////////////////////

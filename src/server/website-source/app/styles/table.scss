@@ -1,6 +1,27 @@
 .document-table {
+
+    .range {
+        .slider .tooltip {
+            &.top { margin-top: -25px; }
+            &.bottom { margin-top: 1px; }
+        }
+        .tooltip { font-family: inherit; }
+        .slider-track {
+            border-radius: 0px;
+        }
+    }
+    
+
+    .query-ranges {
+        margin: 10px 0;
+        label { 
+            text-transform: capitalize; 
+            font-weight: 400;
+        }
+    }
+
     .table-options {
-        padding-top: 20px;
+        padding-top: 10px;
         padding-bottom: 10px;
         span select { 
             width: 60px; 

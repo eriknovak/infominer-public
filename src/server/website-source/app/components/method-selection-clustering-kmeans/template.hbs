@@ -40,9 +40,11 @@
     <label class="method-selection-label parameter">
       Select fields used for clustering
     </label>
-    {{ component (concat "method-selection-fields-" chosenClusteringType) 
+    {{ 
+      method-selection-fields
       parameters=parameters
       dataset=dataset
+      type=chosenClusteringType
     }}
   </div>
 </div>

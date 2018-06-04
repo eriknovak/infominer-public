@@ -10,8 +10,8 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         //set new dataset label & description
-        this.set('datasetLabel', this.get('dataset.label'));
-        this.set('datasetDescription', this.get('dataset.description'));
+        this.set('label', this.get('dataset.label'));
+        this.set('description', this.get('dataset.description'));
     },
 
     didReceiveAttrs() {
@@ -28,33 +28,33 @@ export default Component.extend({
         /**
          * Change dataset label.
          */
-        changeDatasetLabel() {
-            this.set('datasetLabel', $(`#edit-dataset-modal input`).val());
+        editLabel() {
+            this.set('label', $(`#edit-dataset-modal input`).val());
         },
 
         /**
          * Change dataset description.
          */
-        changeDatasetDescription() {
-            this.set('datasetDescription', $(`#edit-dataset-modal textarea`).val());
+        editDescription() {
+            this.set('description', $(`#edit-dataset-modal textarea`).val());
         },
 
         /**
          * Submit dataset info changes.
          */
-        submitDatasetChanges() {
+        updateDataset() {
 
             // get warning and clean container
-            let warningContent = $('#edit-dataset-modal div.warning');
-            warningContent.empty();
+            let warning = $('#edit-dataset-modal div.warning');
+            warning.empty();
 
-            if (this.get('datasetLabel').length === 0) {
+            if (this.get('label').length === 0) {
                 // TODO: notify the user the subset label is missing
-                warningContent.append('<p class="warning-content">Dataset label must be given!</p>');
+                warning.append('<p class="warning-content">Dataset label must be given!</p>');
             } else {
-                // set dataset info
-                this.set('dataset.label', this.get('datasetLabel'));
-                this.set('dataset.description', this.get('datasetDescription'));
+                // update dataset attributes
+                this.set('dataset.label', this.get('label'));
+                this.set('dataset.description', this.get('description'));
                 // submit changes made to the dataset
                 $('#edit-dataset-modal').modal('toggle');
                 this.get('dataset').save();
@@ -64,11 +64,8 @@ export default Component.extend({
         /**
          * Remove the modal warnings.
          */
-        removeModalWarnings() {
-            // get warning container
-            let warningContent = $('#edit-dataset-modal div.warning');
-            // empty warning container
-            warningContent.empty();
+        removeWarnings() {
+            $('#edit-dataset-modal div.warning').empty();
         }
     },
 

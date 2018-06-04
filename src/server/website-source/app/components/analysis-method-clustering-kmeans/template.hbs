@@ -20,7 +20,7 @@
 
     <div class="parameter">
       <span class="parameter-label">Number of clusters: </span>
-      <span class="parameter-value">{{method.result.clusters.length}}</span>
+      <span class="parameter-value">{{method.parameters.method.k}}</span>
     </div>
 
   </div>
@@ -31,12 +31,14 @@
     {{#each method.result.clusters as |cluster index|}}
       <div class="row">
         <div class="col-lg-12">
-          {{ analysis-clustering-kmeans-cluster dataset=dataset method=method cluster=cluster index=index }}
-
-          {{ create-subset-modal-from-method id=(concat "create-subset-kmeans-" method.id "-" index)
-            methodId=method.id clusterId=index cluster=cluster
-            createSubset=createSubset type="KMeans Clustering"}}
-
+          {{ analysis-clustering-kmeans-cluster 
+            dataset=dataset 
+            method=method 
+            cluster=cluster 
+            index=index 
+            subsetCreationParams=subsetCreationParams
+            clusterValues=clusterValues
+          }}
         </div><!-- .col-lg-12 -->
       </div><!-- .row -->
 

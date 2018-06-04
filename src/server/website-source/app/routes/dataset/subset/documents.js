@@ -46,7 +46,12 @@ export default Route.extend({
         if (this.get('sortTarget')) { query.sort = this.get('sortTarget'); }
         if (this.get('query')) { query.query = this.get('query'); }
         // get documents
-        return this.get('store').query('document', query);
+        return this.get('store').query('document', query)
+            .then(documents => ({
+                documents,
+                metadata: documents.meta,
+                method: { result: { aggregates: documents.meta.aggregates } }
+            }));
     },
 
     actions: {
@@ -89,6 +94,7 @@ export default Route.extend({
          */
         sortByField(params) {
             this.set('sortTarget', params);
+            console.log(params);
             // update model
             this._updateModel();
         },
@@ -159,14 +165,16 @@ export default Route.extend({
 
         changeQuery(params) {
             // check what are the parameters
-            const query = params.text ? params : null;
+            const query = { };
+            if (params.text) { query.text = params.text; }
+            if (params.number.length) { query.number = params.number; }
+            
             //set the query parameters
             this.set('query', query);
             // we don't know how many results there will be
             // set to first page and remove sorting
             this.set('page', 1);
             this.set('sortTarget', null);
-            
             // update model
             this._updateModel();
         }
@@ -175,8 +183,6 @@ export default Route.extend({
     
     // helper functions
     _updateModel() {
-        // empty table and add a loading row
-        this.set('controller.model.loading', true);
         // request for data and update the model
         this.model().then(model => this.set('controller.model', model));
     }

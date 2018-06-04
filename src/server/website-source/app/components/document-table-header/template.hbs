@@ -1,6 +1,0 @@
-<th class="checkbox-header" style="width:1%;"></th>
-{{#each fields as |field index|}}
-  <th class="{{field.name}}" style={{columnWidth}} {{action 'sortBy' index}}>
-    {{field.name}} <i class="pull-right fa fa-sort{{if field.sortType (concat "-" field.sortType)}}" aria-hidden="true"></i>
-  </th>
-{{/each}}

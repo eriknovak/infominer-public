@@ -36,6 +36,7 @@ export default Component.extend({
 
     willDestroyElement() {
         this._super(...arguments);
+        clearTimeout(this.get('resizeTimer'));
         $(window).off('resize');
     },
 

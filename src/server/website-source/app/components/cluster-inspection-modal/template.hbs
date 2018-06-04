@@ -1,0 +1,72 @@
+{{! Create document subset }}
+<div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+    {{! modal header }}
+    <div class="modal-header">
+      {{! modal title }}
+      <div class="modal-header-title">
+        <h4 class="modal-title">Cluster Information</h4>
+        <p class="modal-subtitle">{{type}}</p>
+      </div>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body new-subset">
+      <div class="container-fluid">
+
+        {{! cluster label }}
+        <div class="row">
+          <div class="col">
+            <h5>Cluster Name</h5>
+            <p>{{cluster.label}}</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <h5>Cluster Documents</h5>
+            {{ 
+              document-table
+              documents=documents
+              metadata=metadata
+              changeLimit=(action 'changeLimit')
+              changePage=(action 'changePage')
+              sortByField=(action 'sortByField')
+            }}
+          </div>
+        </div>
+
+        {{!-- {{! cluster aggregates }}
+        <h5>Cluster Aggregates</h5>
+        <div class="row">
+          {{#each cluster.aggregates as |aggregate index|}}
+            {{#if aggregate.distribution}}
+              <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
+                {{ component
+                    (concat "aggregate-" aggregate.type)
+                    field=aggregate.field
+                    distribution=aggregate.distribution
+                }}
+              </div>
+            {{/if}}
+          {{/each}}
+        </div> --}}
+
+        {{! additional content }}
+        <div class="row">
+          <div class="col-lg-12">
+            {{yield}}
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+    </div>
+
+  </div>{{! .modal-content }}
+</div>{{! .modal-dialog }}

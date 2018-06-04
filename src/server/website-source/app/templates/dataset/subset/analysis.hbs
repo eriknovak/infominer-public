@@ -1,10 +1,16 @@
 {{#each model.subset.usedBy as |method|}}
   {{#if method.analysisAppropriate}}
-    {{ analysis-method method=method subset=model.subset dataset=model.dataset createSubset=(route-action "createSubset") }}
+    {{ analysis-method 
+      method=method 
+      subset=model.subset 
+      dataset=model.dataset 
+      subsetCreationParams=model.subsetCreationParams
+      clusterValues=model.clusterValues
+    }}
   {{/if}}
 {{/each}}
 
-<!-- analysis selection button -->
+{{! analysis selection button }}
 <div class="row">
   <div class="col-lg-12">
     <a class="method-selection" data-toggle="modal"
@@ -12,14 +18,32 @@
       <div class="content">
         <i class="fa fa-plus fa-3x"></i>
         <p>Select method analysis</p>
-      </div><!-- .content -->
+      </div>{{! .content }}
     </a>
-  </div><!-- .col-lg-12 -->
-</div><!-- .row -->
+  </div>{{! .col-lg-12 }}
+</div>{{! .row }}
 
-{{ method-selection
+{{! method selection modal }}
+{{ 
+  method-selection
   id="select-analysis-modal"
   action=(route-action 'startAnalysis')
+  dataset=model.dataset
+}}
+
+{{! subset creation modal }}
+{{ 
+  create-subset-modal
+  id="subset-create-modal"
+  parameters=model.subsetCreationParams
+  createSubset=(route-action "createSubset") 
+}}
+
+{{! cluster inspection modal }}
+{{ 
+  cluster-inspection-modal
+  id="cluster-inspect-modal"
+  cluster=model.clusterValues
   dataset=model.dataset
 }}
 

@@ -1,8 +1,0 @@
-{{#if parameters.features.length}}
-    {{#each parameters.features as |features index| }}
-        {{method-selection-fields features=features index=index}}
-    {{/each}}
-{{else}}
-    <div class="field-feature warning">No fields of type <b>number</b> found</div>
-{{/if}}
-{{yield}}

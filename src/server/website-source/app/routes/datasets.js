@@ -14,7 +14,16 @@ export default DatasetsRoute.extend({
 
     model() {
         return this.get('store').findAll('dataset', { reload: true })
-            .then(datasets => datasets.sortBy('created'));
+            .then(datasets => datasets.sortBy('created'))
+            .then(datasets => {
+                // add date to dataset
+                for (let dataset of datasets) {
+                    let created = dataset.get('created');
+                    let date = `${created.getDate()}/${created.getMonth() + 1}/${created.getFullYear()}`;
+                    dataset.set('date', date);
+                }
+                return datasets;
+            });
     }
 
 });

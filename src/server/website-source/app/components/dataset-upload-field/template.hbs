@@ -1,10 +1,12 @@
 <td class="field name">
-  <input type="text" id="{{nameId}}" class="form-control {{if invalid 'invalid-value'}}" 
+  <input type="text" id="{{nameId}}" class="form-control {{if invalid 'invalid'}}" 
     oninput={{action "changeFieldName"}} value={{name}} disabled={{disabled}}>
   
-  <div class="field-name-warning {{if invalid 'show'}}">
+  <div class="field-warning">
     {{#if nameNotExists}}Field name is missing{{/if}}
-    {{#if multipleNames}}Field name already in use{{#if invalidCharacters}}.{{/if}}{{/if}}
+    {{#if multipleNames}}Field name already in use
+      {{#if invalidCharacters}}.{{/if}}
+    {{/if}}
     {{#if invalidCharacters}}Remove invalid characters: {{invalidCharacters}}{{/if}} 
   </div>
 
