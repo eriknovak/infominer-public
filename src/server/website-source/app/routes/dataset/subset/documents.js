@@ -49,7 +49,8 @@ export default Route.extend({
         return this.get('store').query('document', query)
             .then(documents => ({
                 documents,
-                metadata: documents.meta
+                metadata: documents.meta,
+                method: { result: { aggregates: documents.meta.aggregates } }
             }));
     },
 

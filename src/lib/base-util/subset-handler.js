@@ -1,5 +1,6 @@
 // the formatter function for subset, method and documents
 const formatter = require('./formatter');
+const methodHandler = require('./method-handler');
 
 // schema validator
 const validator = require('../validator')({
@@ -205,6 +206,19 @@ module.exports = {
                 return field;
             });
 
+        // document aggregates
+        let aggregates = [];
+        for (let field of fields) {
+            // get aggregate distribution
+            let distribution = methodHandler._aggregateByField(subsetDocuments, field);
+            aggregates.push({ 
+                field: field.name, 
+                type: field.aggregate, 
+                distribution 
+            });
+
+        }
+
         // prepare objects
         let documents = {
             documents: null,
@@ -215,7 +229,8 @@ module.exports = {
                     limit,
                     documentCount: subsetDocuments.length,
                 },
-                query: queryParams && queryParams.text ? queryParams : null
+                query: queryParams && queryParams.text ? queryParams : null,
+                aggregates
             }
         };
         
