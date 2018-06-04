@@ -40,9 +40,9 @@ module.exports = {
                 // update cluster information
                 let clusters = method.result.clusters;
                 clusters[clusterId].label = subset.label;
-                clusters[clusterId].subset = { 
-                    created: true, 
-                    id: subsetId 
+                clusters[clusterId].subset = {
+                    created: true,
+                    id: subsetId
                 };
                 method.result = { clusters };
             }
@@ -54,10 +54,10 @@ module.exports = {
             if (document) { base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
         }
         // return id of created subset
-        return { 
-            subsets: { 
-                id: subsetId 
-            } 
+        return {
+            subsets: {
+                id: subsetId
+            }
         };
     },
 
@@ -184,9 +184,9 @@ module.exports = {
         if (queryParams && queryParams.number) {
             for (let field of queryParams.number) {
                 // add field and value to the query
-                qmQuery[field.field] = { 
-                    $gt: parseFloat(field.values[0]), 
-                    $lt: parseFloat(field.values[1]) 
+                qmQuery[field.field] = {
+                    $gt: parseFloat(field.values[0]),
+                    $lt: parseFloat(field.values[1])
                 };
             }
         }
@@ -208,15 +208,16 @@ module.exports = {
 
         // document aggregates
         let aggregates = [];
-        for (let field of fields) {
-            // get aggregate distribution
-            let distribution = methodHandler._aggregateByField(subsetDocuments, field);
-            aggregates.push({ 
-                field: field.name, 
-                type: field.aggregate, 
-                distribution 
-            });
-
+        if (queryParams.calculateAggregates && queryParams.calculateAggregates === 'true') {
+            for (let field of fields) {
+                // get aggregate distribution
+                let distribution = methodHandler._aggregateByField(subsetDocuments, field);
+                aggregates.push({
+                    field: field.name,
+                    type: field.aggregate,
+                    distribution
+                });
+            }
         }
 
         // prepare objects
@@ -233,7 +234,7 @@ module.exports = {
                 aggregates
             }
         };
-        
+
         // truncate the documents and format documents
         subsetDocuments.trunc(limit, offset);
         documents.documents = subsetDocuments.map(rec => formatter.document(rec));

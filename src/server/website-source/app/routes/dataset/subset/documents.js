@@ -7,13 +7,16 @@ export default Route.extend({
     defaultPage: 1,
     defaultLimit: 10,
     defaultSortTarget: null,
-    defaultQuery: null,
+    defaultQuery: { calculateAggregates: true },
 
     // current parameters
     page: 1,
     limit: 10,
     sortTarget: null,
-    query: null,
+    query: { calculateAggregates: true },
+
+    // aggregates
+    aggregates: null,
 
     beforeModel(transition) {
         // modify namespace for subset model
@@ -47,11 +50,18 @@ export default Route.extend({
         if (this.get('query')) { query.query = this.get('query'); }
         // get documents
         return this.get('store').query('document', query)
-            .then(documents => ({
-                documents,
-                metadata: documents.meta,
-                method: { result: { aggregates: documents.meta.aggregates } }
-            }));
+            .then(documents => {
+                if (documents.meta.aggregates.length) {
+                    console.log(documents.meta.aggregates);
+                    this.set('aggregates', documents.meta.aggregates);
+                    console.log('updated')
+                }
+                return {
+                    documents,
+                    metadata: documents.meta,
+                    method: { result: { aggregates: this.get('aggregates') } }
+                };
+            });
     },
 
     actions: {
@@ -64,12 +74,13 @@ export default Route.extend({
             // update the limit and transition to route
             this.set('limit', limit);
             // check if the pagination changes
-            const pagination = this.get('controller.model.meta.pagination');
+            const pagination = this.get('controller.model.metadata.pagination');
             // calculage the new maxpage value
             let maxPage = pagination.documentCount / limit;
             if (maxPage % 1 !== 0) { maxPage = Math.floor(maxPage) + 1; }
             // change page value if not in bound
             if (pagination.page > maxPage) { this.set('page', maxPage); }
+            this.set('query.calculateAggregates', false);
             // update model
             this._updateModel();
 
@@ -82,6 +93,7 @@ export default Route.extend({
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
+            this.set('query.calculateAggregates', false);
             // update model
             this._updateModel();
         },
@@ -94,7 +106,7 @@ export default Route.extend({
          */
         sortByField(params) {
             this.set('sortTarget', params);
-            console.log(params);
+            this.set('query.calculateAggregates', false);
             // update model
             this._updateModel();
         },
@@ -168,7 +180,7 @@ export default Route.extend({
             const query = { };
             if (params.text) { query.text = params.text; }
             if (params.number.length) { query.number = params.number; }
-            
+            query.calculateAggregates = true;
             //set the query parameters
             this.set('query', query);
             // we don't know how many results there will be
@@ -180,7 +192,7 @@ export default Route.extend({
         }
 
     },
-    
+
     // helper functions
     _updateModel() {
         // request for data and update the model

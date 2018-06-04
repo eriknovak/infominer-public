@@ -1,4 +1,4 @@
-{{ 
+{{
   document-table
   documents=model.documents
   metadata=model.metadata
@@ -12,10 +12,15 @@
 <div class="row mt-5">
   <div class="col">
     <h5>Query Aggregates</h5>
-    {{
-      analysis-method-aggregate-subset
-      method=model.method
-    }}
+    {{#if model.documents.length}}
+      {{
+        analysis-method-aggregate-subset
+        method=model.method
+      }}
+    {{else}}
+      <p>No query aggregates for query results</p>
+    {{/if}}
   </div>
 </div>
+
 {{outlet}}

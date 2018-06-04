@@ -1,9 +1,11 @@
 import Component from '@ember/component';
+import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
     classNames: ['query-options'],
+    columnWidth: service('column-size'),
 
     init() {
         this._super(...arguments);
@@ -14,10 +16,17 @@ export default Component.extend({
                 return { name: field.name, included };
             })
         );
-        this.set('numberFields', this.get('fields').filterBy('type', 'float').map(field => {
+
+        // set number fields
+        let numberFields = this.get('fields').filterBy('type', 'float').map(field => {
             field.value = [field.metadata.min, field.metadata.max];
             return field;
-        }));
+        });
+
+        this.get('columnWidth.setColumnsWidth')(numberFields, 2, 'md');
+        this.get('columnWidth.setColumnsWidth')(numberFields, 1, 'sm');
+
+        this.set('numberFields', numberFields);
 
         const keywords = query && query.text ? query.text.keywords : null;
         this.set('keywords', keywords);
@@ -42,14 +51,14 @@ export default Component.extend({
     }),
 
     actions: {
-        changeQuery() { this.changeQuery(); }   
+        changeQuery() { this.changeQuery(); }
     },
 
     changeQuery() {
         // get keywords and selected fields
         const keywords = $(`#${this.get('elementId')} input[data-purpose="keywords"]`).val();
         const textFields = this.get('textFields').filterBy('included', true).map(field => field.name);
-        
+
         const number = this.get('numberFields')
             .map(field => ({ field: field.name, values: field.value }));
         let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;

@@ -29,20 +29,25 @@
 {{#if numberFields}}
   <div class="form-group row">
     <div class="offset-sm-2 col-sm-10">
-      {{#each numberFields as |field index|}}
-        <div class="query-ranges">
-          <label>{{field.name}}</label>
-          {{ range-slider 
-            value=field.value
-            min=field.metadata.min
-            max=field.metadata.max
-            tooltipPosition='bottom'
-            tooltipSplit=true
-            focus=false
-            mood='info'
-          }}
-        </div>
-      {{/each}}
+      <div class="row">
+        {{#each numberFields as |field index|}}
+          <div class="{{concat field.columnmd ' ' field.columnsm}}">
+            <div class="query-ranges">
+              <label>{{field.name}}</label>
+              {{
+                range-slider
+                value=field.value
+                min=field.metadata.min
+                max=field.metadata.max
+                tooltipPosition='bottom'
+                tooltipSplit=true
+                focus=false
+                mood='info'
+              }}
+            </div>
+          </div>
+        {{/each}}
+      </div>
     </div>
   </div>
 {{/if}}
