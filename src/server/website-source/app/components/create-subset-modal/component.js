@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
@@ -29,6 +30,10 @@ export default Component.extend({
         this.set('description', '');
     },
 
+    invalid: computed('name', function () {
+        return !this.get('name');
+    }),
+
     ///////////////////////////////////////////////////////
     // Actions
     ///////////////////////////////////////////////////////
@@ -52,6 +57,11 @@ export default Component.extend({
          * Save the subset.
          */
         saveSubset() {
+
+            if (this.get('invalid')) {
+                return;
+            }
+
             // prepare subset info object
             const subset = {
                 label: this.get('name'),

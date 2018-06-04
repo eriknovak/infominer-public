@@ -309,3 +309,10 @@ input, select, textarea {
 .fa.edit { cursor: pointer; }
 .confirm-editing { color: green; }
 .cancel-editing { color: darken($primary-color, 15%); }
+
+input.invalid,
+input:focus.invalid { border: 1px solid red; }
+.field-warning {
+    color: red;
+    height: 10px;
+}
