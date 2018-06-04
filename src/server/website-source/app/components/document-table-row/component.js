@@ -27,9 +27,7 @@ export default Component.extend({
         this._super(...arguments);
 
         // get document valueObject and fields
-        const document = this.get('document');
         const fields = this.get('fields');
-
         // get query parameters
         const query = this.get('query');
 
@@ -37,7 +35,7 @@ export default Component.extend({
         let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
-            let value = document.get(`values.${field.name}`);
+            let value = this.get(`document.values.${field.name}`);
             if (field.type == 'string') { value = this._trimContent(value, this.get('nChar')); }
             // find the selected query value, find and highligh the text
             if (query && query.text && query.text.fields.includes(field.name)) {
@@ -47,12 +45,12 @@ export default Component.extend({
             documentValues.push({ value: value, field: field.name });
         }
         // save values
-        this.set('index', document.get('id'));
-        this.set('selected', document.get('selected'));
+        this.set('index', this.get('document.id'));
+        this.set('selected', this.get('document.selected'));
         this.set('documentValues', documentValues);
 
         // set link with expanded info
-        this.set('dataTarget', `#document-${document.id}`);
+        this.set('dataTarget', `#document-${this.get('document.id')}`);
     },
 
     ///////////////////////////////////////////////////////

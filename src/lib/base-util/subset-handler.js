@@ -201,19 +201,15 @@ module.exports = {
                     sortType = query.sort.sortType;
                 }
                 // return field metadata
-                return { 
-                    name: field.name, 
-                    type: field.type, 
-                    sortType,
-                    aggregate: field.aggregate
-                };
+                field.sortType = sortType;
+                return field;
             });
 
         // prepare objects
         let documents = {
             documents: null,
             meta: {
-                fields,
+                fields: metaFields,
                 pagination: {
                     page,
                     limit,

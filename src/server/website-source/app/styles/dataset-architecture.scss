@@ -43,7 +43,7 @@
 .method { @include link-style(green); }
 .subset { @include link-style($tertiary-color); }
 
-.subset-information{
+.subset-information {
     border-bottom: 1px solid #cccccc;
 
     .subset-navigation .btn {

@@ -46,7 +46,11 @@ export default Route.extend({
         if (this.get('sortTarget')) { query.sort = this.get('sortTarget'); }
         if (this.get('query')) { query.query = this.get('query'); }
         // get documents
-        return this.get('store').query('document', query);
+        return this.get('store').query('document', query)
+            .then(documents => ({
+                documents,
+                metadata: documents.meta
+            }));
     },
 
     actions: {
@@ -89,6 +93,7 @@ export default Route.extend({
          */
         sortByField(params) {
             this.set('sortTarget', params);
+            console.log(params);
             // update model
             this._updateModel();
         },
@@ -177,8 +182,6 @@ export default Route.extend({
     
     // helper functions
     _updateModel() {
-        // empty table and add a loading row
-        this.set('controller.model.loading', true);
         // request for data and update the model
         this.model().then(model => this.set('controller.model', model));
     }

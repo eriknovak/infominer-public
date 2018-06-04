@@ -48,16 +48,18 @@ export default Component.extend({
         saveLabel() { this._saveLabel(); },
 
         updateSubsetCreationParams() {
-            this.set('parameters', {
+            this.set('subsetCreationParams', {
                 label: this.get('cluster.label'),
                 type: 'Clustering',
                 methodId: this.get('method.id'),
                 clusterId: this.get('index'),
                 documentCount: this.get('cluster.documentCount')
             });
-            this.get('parameters');
-        }
+        },
 
+        showClusterValues() {
+            this.set('clusterValues', this.get('cluster'));
+        }
     },
 
     _setCluster() {

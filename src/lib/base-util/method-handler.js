@@ -150,7 +150,6 @@ module.exports = {
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
-                console.log(field);
                 let distribution = this._aggregateByField(elements, field);
                 method.result.aggregates.push({ 
                     field: field.name, 
@@ -282,7 +281,10 @@ module.exports = {
             // get elements in the cluster
             const documentIds = new qm.la.IntVector(query.result.clusters[i].docIds);
             const clusterDocuments = base.store('Dataset').newRecordSet(documentIds);
-
+            // get document sample
+            query.result.clusters[i].documentSample = clusterDocuments.sample(100)
+                .map(document => formatter.document(document));
+                
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
@@ -290,7 +292,7 @@ module.exports = {
                 query.result.clusters[i].aggregates.push({ 
                     field: field.name, 
                     type: field.aggregate, 
-                    distribution 
+                    distribution
                 });
             }
 

@@ -24,18 +24,16 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
 
-        const model = this.get('model');
         // set documents, fields and pagination values
-        this.set('documents', model);
-        this.set('fields', model.get('meta.fields'));
-        this.set('query', model.get('meta.query'));
+        this.set('fields', this.get('metadata.fields'));
+        this.set('query', this.get('metadata.query'));
         // table content rows
         this.set('loading-row-width', 1 + this.get('fields.length'));
 
         /*************************************
          * pagination navigation parameters
          ************************************/
-        const pagination = model.get('meta.pagination');
+        const pagination = this.get('metadata.pagination');
 
         // set page, limit and count
         const page = pagination.page;

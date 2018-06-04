@@ -80,6 +80,7 @@ module.exports = {
         return {
             clusters: result.clusters.map(cluster => ({
                 documentCount: cluster.docIds.length,
+                documentSample: cluster.documentSample,
                 aggregates: cluster.aggregates,
                 subset: cluster.subset,
                 label: cluster.label

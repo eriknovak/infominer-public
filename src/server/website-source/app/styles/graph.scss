@@ -88,7 +88,11 @@ $height: 250px;
     &.field-title     { width: 144px; height: 13px; margin-top: 3px; }
     &.document-number { width: 120px; height: 13px; }
     .cluster-header & { width: 104px; height: 19px; }
-    &.subset-button   { width: 114px; height: 31px; }
+    &.subset-button   { 
+        width: 114px; 
+        height: 31px; 
+        &.spacing { margin-right: 10px; }
+    }
 
 
 }
