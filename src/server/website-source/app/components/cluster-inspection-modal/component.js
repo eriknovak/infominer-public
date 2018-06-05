@@ -42,11 +42,9 @@ export default Component.extend({
             this.set('limit', limit);
         },
         changePage(page) {
-            console.log(page);
             this.set('page', page);
         },
         sortByField() {
-
         }
 
     }
