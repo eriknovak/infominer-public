@@ -66,9 +66,7 @@ export default Component.extend({
             const subset = {
                 label: this.get('name'),
                 description: this.get('description'),
-                methodId: this.get('parameters.methodId'),
-                clusterId: this.get('parameters.clusterId'),
-                documentCount: this.get('parameters.documentCount')
+                parameters: this.get('parameters')
             };
 
             // make it loading

@@ -36,13 +36,17 @@ module.exports = {
          let subset = base.store('Subsets')[method.appliedOn];
          if (subset) {
  
-             switch(qmMethod.type) {
-             case 'clustering.kmeans':
-                this._kmeansClustering(base, qmMethod, subset, fields);
-                 break;
-             case 'visualization':
-                 this._visualizationSetup(base, qmMethod, subset, fields);
-             }
+            switch(qmMethod.type) {
+            case 'clustering.kmeans':
+                 this._kmeansClustering(base, qmMethod, subset, fields);
+                break;
+            case 'visualization':
+                this._visualizationSetup(base, qmMethod, subset, fields);
+                break;
+            case 'filter.manual':
+                this._filterByQuery(base, qmMethod, subset, fields);
+                break;
+            }
  
              if (qmMethod instanceof Error) {
                  // something went wrong return an error
@@ -325,6 +329,52 @@ module.exports = {
      */
     _visualizationSetup(base, query, subset, fields) {
         query.result = 'visualization';
+    },
+
+    _filterByQuery(base, query, subset, fields) {
+        // prepare qminer query
+        let qmQuery = {
+            $join: {
+                $name: 'hasElements',
+                $query: {
+                    $from: 'Subsets',
+                    $id: subset.$id
+                }
+            }
+        };
+
+        // add additional queries - keywords
+        let queryParams = query.parameters.query;
+        if (queryParams && queryParams.text) {
+            qmQuery.$or = [ ];
+            for (let field of queryParams.text.fields) {
+                // add field and value to the query
+                let fieldQuery = { };
+                fieldQuery[field] = queryParams.text.keywords;
+                qmQuery.$or.push(fieldQuery);
+            }
+        }
+        // add additional queries - ranges
+        if (queryParams && queryParams.number) {
+            for (let field of queryParams.number) {
+                // add field and value to the query
+                qmQuery[field.field] = {
+                    $gt: parseFloat(field.values[0]),
+                    $lt: parseFloat(field.values[1])
+                };
+            }
+        }
+        // get the subset documents
+        let subsetDocuments = base.search(qmQuery);
+
+        query.result = { docIds: [] };
+        // populate the cluster results
+        for (let id = 0; id < subsetDocuments.length; id++) {
+            const docId = subsetDocuments[id].$id;
+            // store the document id in the correct cluster
+            query.result.docIds.push(docId);
+        }
+
     }
 
 };

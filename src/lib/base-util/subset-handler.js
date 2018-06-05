@@ -29,6 +29,9 @@ module.exports = {
         if (method) {
             // add join to method
             base.store('Subsets')[subsetId].$addJoin('resultedIn', method);
+            if (method.type === 'filter.manual') {
+                subset.documents = method.result.docIds;
+            }
         }
 
         if(subset.meta) {
@@ -208,7 +211,7 @@ module.exports = {
 
         // document aggregates
         let aggregates = [];
-        if (queryParams.calculateAggregates && queryParams.calculateAggregates === 'true') {
+        if (queryParams.calcAggr && queryParams.calcAggr === 'true') {
             for (let field of fields) {
                 // get aggregate distribution
                 let distribution = methodHandler._aggregateByField(subsetDocuments, field);

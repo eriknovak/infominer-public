@@ -6,7 +6,6 @@
   changeLimit=(route-action 'changeLimit')
   changePage=(route-action 'changePage')
   sortByField=(route-action 'sortByField')
-  createSubset=(route-action 'createSubset')
 }}
 
 <div class="row mt-5">
@@ -22,5 +21,12 @@
     {{/if}}
   </div>
 </div>
+
+{{
+  create-subset-modal
+  id="subset-create-modal"
+  parameters=model.parameters
+  createSubset=(route-action 'saveResults')
+}}
 
 {{outlet}}

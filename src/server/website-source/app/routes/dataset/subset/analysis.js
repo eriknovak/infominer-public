@@ -38,15 +38,15 @@ export default Route.extend({
         createSubset(params) {
             let self = this;
             // update method internal state
-            this.get('store').findRecord('method', params.methodId).then(method => {
+            this.get('store').findRecord('method', params.parameters.methodId).then(method => {
                 // create new subset
                 const subset = self.get('store').createRecord('subset', {
                     id: self.get('store').peekAll('subset').get('length'),
                     label: params.label,
                     description: params.description,
                     resultedIn: method,
-                    clusterId: params.clusterId,
-                    documentCount: params.documentCount
+                    clusterId: params.parameters.clusterId,
+                    documentCount: params.parameters.documentCount
                 });
 
                 // save the cluster

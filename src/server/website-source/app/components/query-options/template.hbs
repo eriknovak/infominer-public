@@ -1,9 +1,14 @@
 {{#if textFields}}
   <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Keywords</label>
-    <div class="col-sm-10">
+    <div class="offset-lg-6 col-lg-6">
       <div class="input-group">
-        <input class="form-control keywords-input" type="text" autocomplete="on" data-purpose="keywords" value="{{keywords}}">
+        <input type="text" 
+          class="form-control keywords-input" 
+          autocomplete="on" 
+          data-purpose="keywords" 
+          placeholder="Insert search phrase"
+          value="{{keywords}}"
+        >
         <div class="input-group-append">
           <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Selected Fields
@@ -28,7 +33,7 @@
 
 {{#if numberFields}}
   <div class="form-group row">
-    <div class="offset-sm-2 col-sm-10">
+    <div class="offset-lg-6 col-lg-6">
       <div class="row">
         {{#each numberFields as |field index|}}
           <div class="{{concat field.columnmd ' ' field.columnsm}}">
@@ -52,9 +57,23 @@
   </div>
 {{/if}}
 
-<button class="btn btn-primary pull-right" {{action "changeQuery"}}>
-    Start Query
+
+
+<button 
+  class="btn btn-primary pull-right" 
+  {{action "changeQuery"}}
+>
+  Start Query
 </button>
 
+{{#if queryChanged}}
+  <button 
+    class="btn btn-default pull-right" 
+    data-toggle="modal"
+    data-target="#subset-create-modal"
+  >
+    Save Results
+  </button>
+{{/if}}
 
 {{yield}}

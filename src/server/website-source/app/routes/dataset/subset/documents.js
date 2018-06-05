@@ -7,16 +7,23 @@ export default Route.extend({
     defaultPage: 1,
     defaultLimit: 10,
     defaultSortTarget: null,
-    defaultQuery: { calculateAggregates: true },
+    defaultQuery: null,
 
     // current parameters
     page: 1,
     limit: 10,
     sortTarget: null,
-    query: { calculateAggregates: true },
+    query: null,
 
     // aggregates
     aggregates: null,
+
+    init() {
+        this._super(...arguments);
+        this.set('defaultQuery', { calcAggr: true });
+        this.set('query', this.get('defaultQuery'));
+        
+    },
 
     beforeModel(transition) {
         // modify namespace for subset model
@@ -52,14 +59,16 @@ export default Route.extend({
         return this.get('store').query('document', query)
             .then(documents => {
                 if (documents.meta.aggregates.length) {
-                    console.log(documents.meta.aggregates);
                     this.set('aggregates', documents.meta.aggregates);
-                    console.log('updated')
                 }
                 return {
                     documents,
                     metadata: documents.meta,
-                    method: { result: { aggregates: this.get('aggregates') } }
+                    method: { result: { aggregates: this.get('aggregates') } },
+                    parameters: { 
+                        label: this.get('query.text.keywords'),
+                        query: this.get('query') 
+                    }
                 };
             });
     },
@@ -80,7 +89,7 @@ export default Route.extend({
             if (maxPage % 1 !== 0) { maxPage = Math.floor(maxPage) + 1; }
             // change page value if not in bound
             if (pagination.page > maxPage) { this.set('page', maxPage); }
-            this.set('query.calculateAggregates', false);
+            this.set('query.calcAggr', false);
             // update model
             this._updateModel();
 
@@ -93,7 +102,7 @@ export default Route.extend({
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
-            this.set('query.calculateAggregates', false);
+            this.set('query.calcAggr', false);
             // update model
             this._updateModel();
         },
@@ -106,7 +115,7 @@ export default Route.extend({
          */
         sortByField(params) {
             this.set('sortTarget', params);
-            this.set('query.calculateAggregates', false);
+            this.set('query.calcAggr', false);
             // update model
             this._updateModel();
         },
@@ -116,63 +125,44 @@ export default Route.extend({
          * @param {Object} params - The subset information.
          * @param {String} param.label - The subset label.
          * @param {String} param.description - The subset description.
+         * @param {Object} param.parameters - The parameters for creating the subset.
+         * @param {Object} param.parameters.query - The query parameters.
          */
-        createSubset(params) {
+        saveResults(params) {
             let self = this;
-            // get local documents
-            const selectedDocs = self.get('store').peekAll('document').filterBy('selected', true);
 
-            // get warning container
-            let warningContent = $('#create-subset-documents-modal div.warning');
-            // empty warning container
-            warningContent.empty();
+            // get parent subset - to save method
+            let parentSubset = self.modelFor('dataset.subset');
 
-            if (params.label.length === 0) {
-                // TODO: notify the user the subset label is missing
-                warningContent.append('<p class="warning-content">No subset name found</p>');
-            }
+            // create a new method
+            const method = self.get('store').createRecord('method', {
+                id: self.get('store').peekAll('method').get('length'),
+                methodType: 'filter.manual',
+                parameters: { query: params.parameters.query },
+                appliedOn: parentSubset
+            });
 
-            if (selectedDocs.get('length') === 0) {
-                // TODO: notify user there were no documents selected
-                warningContent.append('<p class="warning-content">No documents were selected</p>');
-            }
+            // create new subset
+            const subset = self.get('store').createRecord('subset', {
+                id: self.get('store').peekAll('subset').get('length'),
+                label: params.label,
+                description: params.description,
+                resultedIn: method
+            });
 
-            // if there are selected documents and label given
-            if (params.label.length > 0 && selectedDocs.get('length') > 0) {
-                // get parent subset - to save method
-                let parentSubset = self.modelFor('dataset.subset');
-
-                // create a new method
-                const method = self.get('store').createRecord('method', {
-                    id: self.get('store').peekAll('method').get('length'),
-                    methodType: 'filter.manual',
-                    parameters: { docIds: selectedDocs.map(doc => parseInt(doc.id)) },
-                    appliedOn: parentSubset
-                });
-
-                // create new subset
-                const subset = self.get('store').createRecord('subset', {
-                    id: self.get('store').peekAll('subset').get('length'),
-                    label: params.label,
-                    description: params.description,
-                    documents: selectedDocs,
-                    documentCount: selectedDocs.get('length'),
-                    resultedIn: method
-                });
-
-                $('#create-subset-documents-modal').modal('toggle');
-                // save method
-                method.save().then(function () {
-                    // save subset
-                    subset.save().then(function () {
-                            // hide modal and transition to new route
-                            self.transitionTo('dataset.subset', self.modelFor('dataset'), subset.id);
-                        }).catch(error => {
-                            console.log(error.message);
-                        });
+            // save method
+            method.save().then(function () {
+                // save subset
+                subset.save().then(function () {
+                        // hide modal and transition to new route
+                        $('#subset-create-modal').modal('toggle');
+                        $(`#subset-create-modal .modal-footer .btn-primary`).html('Save Subset');
+                        self.transitionTo('dataset.subset', self.modelFor('dataset'), subset.id);
+                    }).catch(error => {
+                        console.log(error.message);
                     });
+                });
 
-            }
         },
 
         changeQuery(params) {
@@ -180,7 +170,7 @@ export default Route.extend({
             const query = { };
             if (params.text) { query.text = params.text; }
             if (params.number.length) { query.number = params.number; }
-            query.calculateAggregates = true;
+            query.calcAggr = true;
             //set the query parameters
             this.set('query', query);
             // we don't know how many results there will be

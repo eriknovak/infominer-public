@@ -14,7 +14,7 @@ export default Component.extend({
 
         // get document valueObject and fields
         const fields = this.get('fields');
-        let numberOfColumns = 1 + fields.length;
+        let numberOfColumns = /*1 +*/ fields.length;
         this.set('numberOfColumns', numberOfColumns);
 
         // get query parameters

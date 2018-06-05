@@ -7,9 +7,13 @@ export default Component.extend({
     classNames: ['query-options'],
     columnWidth: service('column-size'),
 
+    queryChanged: false,
+
     init() {
         this._super(...arguments);
         const query = this.get('query');
+
+        // set text fields
         this.set('textFields', this.get('fields').filterBy('type', 'string')
             .map(field => {
                 const included = query && query.text ? query.text.fields.includes(field.name) : true;
@@ -22,10 +26,9 @@ export default Component.extend({
             field.value = [field.metadata.min, field.metadata.max];
             return field;
         });
-
+        // add spacing classes to number fields
         this.get('columnWidth.setColumnsWidth')(numberFields, 2, 'md');
         this.get('columnWidth.setColumnsWidth')(numberFields, 1, 'sm');
-
         this.set('numberFields', numberFields);
 
         const keywords = query && query.text ? query.text.keywords : null;
@@ -58,12 +61,14 @@ export default Component.extend({
         // get keywords and selected fields
         const keywords = $(`#${this.get('elementId')} input[data-purpose="keywords"]`).val();
         const textFields = this.get('textFields').filterBy('included', true).map(field => field.name);
-
+        // get number field values
         const number = this.get('numberFields')
             .map(field => ({ field: field.name, values: field.value }));
+        // get text field keywords
         let text = keywords.length && textFields.length ? { keywords, fields: textFields } : null;
+        // set query parameters and run it
         this.set('query', { text, number });
-
+        this.set('queryChanged', true);
         this.get('action')(this.get('query'));
     }
 });
