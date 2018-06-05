@@ -26,7 +26,7 @@ const HistogramComponent = GraphComponent.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'margin', { top: 10, right: 15, bottom: 20, left: 35 });
+        set(this, 'margin', { top: 10, right: 10, bottom: 20, left: 10 });
     },
 
     didReceiveAttrs() {
@@ -59,8 +59,7 @@ const HistogramComponent = GraphComponent.extend({
                 min: min + i*step,
                 max: min + (i+1)*step,
                 frequency: hist.frequency,
-                percent: (hist.precent / 100).toFixed(2),
-                percentSum: (hist.percentSum / 100).toFixed(2)
+                percent: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0
             });
         }
         // prepare histogram data
@@ -103,13 +102,14 @@ const HistogramComponent = GraphComponent.extend({
         // set horizontal scale - values between min and max
         let xScale = scaleLinear()
             .domain([data.min, data.max])
-            .rangeRound([0, width]);
+            .rangeRound([0, width])
+            .nice();
 
         // set vertical scale - percent attribute
         let yScale = scaleLinear()
             .domain([0, 1])
-            .range([height, 0]);
-
+            .range([height, 0])
+            .nice();
 
         /**************************************************
          * Background shading
@@ -121,35 +121,16 @@ const HistogramComponent = GraphComponent.extend({
             .y(d => yScale(d.percent))
             .curve(curveStepAfter);
 
-        // add first and last points to the path
+            // add first and last points to the path
         let pathValues = data.values.slice();
         pathValues.push({ min: data.max, percent: 0 });
         pathValues = [{ min: data.min, percent: 0 }].concat(pathValues);
 
-        // create the outline of percentSum
+        // create the outline of percent
         content.append('path')
             .datum(pathValues)
             .attr('class', 'percentOutline')
             .attr('d', percentOutline);
-
-
-        /**************************************************
-         * Cumulative sum of the percentage attribute
-         **************************************************/
-
-        // // create the percentage sum histogram placeholder
-        // let percentSum = content.selectAll('.percentSum')
-        //     .data(data.values)
-        //   .enter().append('g')
-        //     .attr('class', 'percentSum')
-        //     .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d.percentSum)})`);
-
-        // // create histogram rectangle
-        // percentSum.append('rect')
-        //     .attr('x', 0)
-        //     .attr('width', xScale(data.values[0].max) - xScale(data.values[0].min))
-        //     .attr('height', (d) => height - yScale(d.percentSum));
-
 
         /**************************************************
          * Percentage attributes
@@ -161,12 +142,6 @@ const HistogramComponent = GraphComponent.extend({
           .enter().append('g')
             .attr('class', 'percent')
             .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d.percent)})`);
-
-        // create histogram rectangle
-        // percent.append('rect')
-        //     .attr('x', 0)
-        //     .attr('width', xScale(data.values[0].max) - xScale(data.values[0].min))
-        //     .attr('height', (d) => height - yScale(d.percent));
 
         // set frequency format
         function formatCount(value) {
@@ -194,14 +169,14 @@ const HistogramComponent = GraphComponent.extend({
          * Axis
          **************************************************/
 
-        // set vertical axis
-        content.append('g')
-            .call(axisLeft(yScale).ticks(5).tickFormat(format('.0%')));
+        // // set vertical axis
+        // content.append('g')
+        //     .call(axisLeft(yScale).ticks(5).tickFormat(format('.0%')));
 
         // set horizontal axis
         content.append('g')
             .attr('transform', `translate(0,${height})`)
-            .call(axisBottom(xScale).ticks(5).tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); }));
+            .call(axisBottom(xScale).ticks(width < 400 ? 5 : 10).tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); }));
     }
 
 });

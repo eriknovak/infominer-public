@@ -44,8 +44,7 @@ export default Component.extend({
         changePage(page) {
             this.set('page', page);
         },
-        sortByField() {
-        }
+        sortByField() { }
 
     }
 
