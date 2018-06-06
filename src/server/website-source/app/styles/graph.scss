@@ -6,7 +6,6 @@ $height: 250px;
     height: $height;
 
     &.wordcloud {
-        margin: -1px; // for border space
         border: 1px solid $primary-color;
         font-weight: 600;
         text.small  { fill: darken($primary-color, 35%); }
@@ -38,7 +37,7 @@ $height: 250px;
         .node {
             text { font: 10px $font-primary; }
 
-            foreignObject { 
+            foreignObject {
                 cursor: move;
                 body {
                     background-color: transparent;
@@ -71,7 +70,7 @@ $height: 250px;
 /**************************************
  * analysis results
  *************************************/
-.clustering .graph { height: calc(#{$height} - 100px); }
+.clustering .graph { height: calc(#{$height} - 50px); }
 
 /**************************************
  * placeholder style
@@ -88,11 +87,14 @@ $height: 250px;
     &.field-title     { width: 144px; height: 13px; margin-top: 3px; }
     &.document-number { width: 120px; height: 13px; }
     .cluster-header & { width: 104px; height: 19px; }
-    &.subset-button   { 
-        width: 114px; 
-        height: 31px; 
+    &.subset-button   {
+        width: 114px;
+        height: 31px;
         &.spacing { margin-right: 10px; }
     }
-
+    &.document-table {
+        height: $height;
+        margin-top: 10px;
+    }
 
 }

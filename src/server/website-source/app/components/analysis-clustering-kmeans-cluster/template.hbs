@@ -27,10 +27,10 @@
   {{/if}}
 
 </h4>
-<p>{{cluster.documentCount}} documents</p>
+<p class="cluster-metadata">{{cluster.documentCount}} documents</p>
 
 {{#bs-collapse collapsed=collapsed}}
-  <div class="row">
+  <div class="row cluster-aggregates">
     {{#each cluster.aggregates as |aggregate index|}}
       {{#if aggregate.distribution}}
         <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
@@ -43,7 +43,7 @@
       {{/if}}
     {{/each}}
   </div>
-  
+
   <div class="row">
     <div class="col mt-1">
       <h6>Sample Documents</h6>

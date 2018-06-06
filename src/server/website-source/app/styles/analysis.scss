@@ -81,6 +81,12 @@
 // analysis results
 .analysis {
     margin: 10px auto;
+
+    .analysis-component {
+        padding: 10px;
+        background-color: white;
+    }
+
     .parameter-label { font-weight: 600; }
     .analysis {
         margin-top: 30px;
@@ -89,8 +95,9 @@
             color: green;
             @include collapse-toggle(green, 20px);
         }
+
         .clusters .cluster-content {
-            margin: 30px auto;
+            margin: 15px auto;
             .cluster-header {
                 color: $secondary-color;
                 margin-bottom: 0px;
@@ -100,6 +107,14 @@
                     &.show { display: inline-block; }
 
                 }
+            }
+            .cluster-metadata {
+                margin-left: 25px;
+                margin-bottom: 0px;
+            }
+
+            .cluster-aggregates {
+                margin-top: 1em;
             }
         }
     }

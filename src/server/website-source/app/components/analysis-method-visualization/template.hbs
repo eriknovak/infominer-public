@@ -7,7 +7,9 @@
 </h3>
 
 {{#bs-collapse collapsed=collapsed}}
-  {{ graph-radial-tree subset=subset usedBy=subset.usedBy }}
+  <div class="analysis-component">
+    {{ graph-radial-tree subset=subset usedBy=subset.usedBy }}
+  </div>
 {{/bs-collapse}}
 
 {{yield}}

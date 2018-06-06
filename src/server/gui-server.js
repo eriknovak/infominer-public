@@ -32,22 +32,32 @@ let processHandler = new ProcessHandler({
 
 // on manual process exit
 process.on('SIGINT', () => {
-    processHandler.closeAllProcesses(() => {
+    if (process.platform === 'win32') {
+        processHandler.closeAllProcesses(() => {
+            pg.close(() => {
+                // close postgresql connection
+                logger.info('close postgresql connection and stop server');
+                process.exit(0);
+            });
+        });
+    } else {
         pg.close(() => {
             // close postgresql connection
             logger.info('close postgresql connection and stop server');
             process.exit(0);
         });
-    });
+    }
 });
 
 // express app creation
 let app = express();
 
-app.use(cors());                // allow accessing from other external addresses
-app.use(cookieParser());        // to support cookie parsing
-app.use(bodyParser.json());     // to support JSON-encoded bodies
+
+app.use(cors()); // allow accessing from other external addresses
+app.use(cookieParser()); // to support cookie parsing
+app.use(bodyParser.json({limit: '50mb'})); // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
+    limit: '50mb',
     extended: true
 }));
 

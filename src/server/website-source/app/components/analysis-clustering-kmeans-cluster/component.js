@@ -4,7 +4,7 @@ import { computed, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
-    classNames: ['cluster-content'],
+    classNames: ['analysis-component', 'cluster-content'],
     columnWidth: service('column-size'),
     store:       service('store'),
 
@@ -89,7 +89,7 @@ export default Component.extend({
             console.log(fieldParams);
             console.log(this.get('dataset.fields'));
             console.log(this.get('cluster.documentSample'));
-            
+
          }
     },
 

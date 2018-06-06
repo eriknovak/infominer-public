@@ -238,6 +238,7 @@ class ProcessHandler {
             try {
                 self.sendAndWait(childId, { cmd: 'shutdown' }, (error) => {
                     if (error) { console.log('Disconnected with error'); }
+                    console.log(`child with key ${childId} shutdown`);
                     xcallback();
                 });
             } catch (err) {

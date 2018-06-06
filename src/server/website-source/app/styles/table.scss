@@ -13,21 +13,20 @@
             background: $quaternary-color;
         }
     }
-    
+
 
     .query-ranges {
         margin: 10px 0;
-        label { 
-            text-transform: capitalize; 
+        label {
+            text-transform: capitalize;
             font-weight: 400;
         }
     }
 
     .table-options {
-        padding-top: 10px;
         padding-bottom: 10px;
-        span select { 
-            width: 60px; 
+        span select {
+            width: 60px;
             background-color: white;
         }
     }
@@ -72,12 +71,12 @@
                 vertical-align: top !important;
             }
             .document-attributes {
-                & > .container { 
+                & > .container {
                     padding: 10px 6px;
                     margin: 0px;
-                    .field-value { 
+                    .field-value {
                         text-transform: capitalize;
-                        padding-right: 20px !important;     
+                        padding-right: 20px !important;
                     }
                 }
             }
