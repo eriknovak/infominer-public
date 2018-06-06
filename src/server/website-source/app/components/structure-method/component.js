@@ -29,6 +29,7 @@ export default Component.extend({
                     clusterObj.subset = this.get('store').peekRecord('subset', cluster.subset.id);
                 } else {
                     clusterObj.label = cluster.label;
+                    clusterObj.documentCount = cluster.documentCount;
                 }
                 // add cluster info to ontology
                 ontology.push(clusterObj);

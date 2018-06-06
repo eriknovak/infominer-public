@@ -200,22 +200,29 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // get first row in the document - the fields
                 const fields = datasetFIn.readLine().trim().split(delimiter);
                 // set field types container
-                let fieldTypes = fields.map(() => 'float');
+                let fieldTypes = fields.map(() => null);
                 // set limit - read first limit rows to determine field types
                 let limit = 100, count = 1;
 
                 // set field types based on initial rows
                 while(!datasetFIn.eof || count < limit) {
-                    // escape loop if all fields are strings
-                    if (fieldTypes.every(type => type === 'string')) { break; }
                     // document values to determine type of field
                     let document = datasetFIn.readLine().trim();
                     if (document.length === 0) { count++; continue; }
                     let docValues = document.split(delimiter);
+                    
                     for (let j = 0; j < docValues.length; j++) {
                         let value = docValues[j];
-                        // check if value is a float
-                        if (value.match(/[^0-9,\.]+/gi)) { fieldTypes[j] = 'string'; }
+                        // check if value has a pathway
+                        if (fieldTypes[j] !== 'string' &&
+                            fieldTypes[j] !== 'string_v' && 
+                            !value.match(/[^0-9,\.]+/gi)) { 
+                                fieldTypes[j] = 'float'; 
+                        } else if (fieldTypes[j] !== 'string' && 
+                            value.match(/\S*[\\\/][\w]+|[\w]+/gi).length === 1 &&
+                            value.match(/\S*[\\\/][\w]+|[\w]+/gi)[0] === value) { 
+                                fieldTypes[j] = 'string_v'; 
+                        } else { fieldTypes[j] = 'string'; }
                     }
                     // we read a document - increment the count
                     count++;

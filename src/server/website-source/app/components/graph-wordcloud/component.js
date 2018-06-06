@@ -35,6 +35,7 @@ const WordCloudComponent = GraphComponent.extend({
     },
 
     willDestroyElement() {
+        this._super(...arguments);
         // clears timeout when creating the graph
         clearTimeout(this.get('creationTimeout'));
     },
@@ -88,7 +89,7 @@ const WordCloudComponent = GraphComponent.extend({
         let self = this;
         this._setLoadingState();
         once(function () { 
-            let creationTimeout = setTimeout(function () { self.drawGraph(); }, 1000); 
+            let creationTimeout = setTimeout(function () { self.drawGraph(); }, 100); 
             self.set('creationTimeout', creationTimeout);
         });
     }),

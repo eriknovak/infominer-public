@@ -25,6 +25,9 @@ export default Component.extend({
         this._super(...arguments);
 
         // set documents, fields and pagination values
+        this.get('metadata.fields').forEach(field => { 
+            set(field, 'sortable', field.type !== 'string_v');
+        });
         this.set('fields', this.get('metadata.fields'));
         this.set('query', this.get('metadata.query'));
         // table content rows

@@ -21,8 +21,9 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         this.set('fieldTypes', [
-            { type: 'string', selected: false },
-            { type: 'float', selected: false }
+            { name: 'text', type: 'string', selected: false },
+            { name: 'number', type: 'float', selected: false },
+            { name: 'categories', type: 'string_v', selected: false }
         ]);
         // get field type and possible field types
         let type = this.get('type');
@@ -96,6 +97,7 @@ export default Component.extend({
         const numberOfSameName = this.get('fieldList').filterBy('included', true)
             .map(field => field.name === this.get('name') ? 1 : 0)
             .reduce((total, number) => total + number, 0);
+            
         this.set('multipleNames', numberOfSameName !== 1);
 
         // check if there are invalid characters in field

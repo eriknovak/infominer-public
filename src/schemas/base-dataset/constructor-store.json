@@ -10,7 +10,7 @@
                 "description": "The qminer field parameters",
                 "properties": {
                     "name": { "type": "string" },
-                    "type": { "constant": ["string", "float"] },
+                    "type": { "constant": ["string", "float", "string_v"] },
                     "null": { "constant": true }
                 },
                 "minItems": 1,

@@ -2,24 +2,12 @@
   {{#link-to 'dataset.subset' dataset cluster.subset.id class="btn btn-secondary pull-right" }}
     Go to Subset
   {{/link-to}}
-  <button class="btn btn-default pull-right" data-toggle="modal"
-    data-target="#cluster-inspect-modal"
-    onclick={{action 'showClusterValues'}}
-  >
-    Inspect Cluster
-  </button>
 {{else if cluster.documentCount}}
   <button class="btn btn-primary pull-right" data-toggle="modal"
     data-target="#subset-create-modal"
     onclick={{action 'updateSubsetCreationParams'}}
   >
     Create Subset
-  </button>
-  <button class="btn btn-default pull-right" data-toggle="modal"
-    data-target="#cluster-inspect-modal"
-    onclick={{action 'showClusterValues'}}
-  >
-    Inspect Cluster
   </button>
 {{/if}}
 
@@ -54,5 +42,19 @@
         </div>
       {{/if}}
     {{/each}}
+  </div>
+  
+  <div class="row">
+    <div class="col mt-1">
+      <h6>Sample Documents</h6>
+      {{
+        document-table
+        documents=documents
+        metadata=metadata
+        changeLimit=(action 'changeLimit')
+        changePage=(action 'changePage')
+        sortByField=(action 'sortByField')
+      }}
+    </div>
   </div>
 {{/bs-collapse}}

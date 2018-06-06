@@ -121,7 +121,7 @@ const HistogramComponent = GraphComponent.extend({
             .y(d => yScale(d.percent))
             .curve(curveStepAfter);
 
-            // add first and last points to the path
+        // add first and last points to the path
         let pathValues = data.values.slice();
         pathValues.push({ min: data.max, percent: 0 });
         pathValues = [{ min: data.min, percent: 0 }].concat(pathValues);

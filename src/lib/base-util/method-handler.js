@@ -154,12 +154,14 @@ module.exports = {
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
-                let distribution = this._aggregateByField(elements, field);
-                method.result.aggregates.push({ 
-                    field: field.name, 
-                    type: field.aggregate, 
-                    distribution 
-                });
+                if (field.aggregate) {
+                    let distribution = this._aggregateByField(elements, field);
+                    method.result.aggregates.push({ 
+                        field: field.name, 
+                        type: field.aggregate, 
+                        distribution 
+                    });
+                }
             }
             // save the method
             return this.create(base, method, fields);
@@ -181,12 +183,25 @@ module.exports = {
         // TODO: check if field exists
         const fieldName = field.name;
         const aggregate = field.aggregate;
-        // calculate the aggregates for the record set
-        let distribution = elements.aggr({ 
-            name: `${aggregate}_${fieldName}`, 
-            field: fieldName, 
-            type: aggregate 
-        });
+
+        let distribution;
+        if (aggregate === 'hierarchy') {
+            // calculate the hierarchical structure of the field
+            distribution = [];
+            for (let id = 0; id < elements.length; id++) {
+                const fieldVals = elements[id][fieldName].toArray();
+                this._addChild(distribution, fieldVals[0], fieldVals.slice(1));
+            }
+        } else {
+            // aggregate params
+            let aggregateParams = {
+                name: `${aggregate}_${fieldName}`, 
+                field: fieldName, 
+                type: aggregate 
+            };
+            // calculate the aggregates for the record set
+            distribution = elements.aggr(aggregateParams);
+        }
         return distribution;
     },
 
@@ -292,12 +307,14 @@ module.exports = {
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
-                let distribution = this._aggregateByField(clusterDocuments, field);
-                query.result.clusters[i].aggregates.push({ 
-                    field: field.name, 
-                    type: field.aggregate, 
-                    distribution
-                });
+                if (field.aggregate) {
+                    let distribution = this._aggregateByField(clusterDocuments, field);
+                    query.result.clusters[i].aggregates.push({ 
+                        field: field.name, 
+                        type: field.aggregate, 
+                        distribution
+                    });
+                }
             }
 
             // set cluster label out of the first keyword cloud
@@ -331,6 +348,14 @@ module.exports = {
         query.result = 'visualization';
     },
 
+    /**
+     * Set the filter method result.
+     * @param {Object} base - The QMiner base object.
+     * @param {Object} query - Method parameters.
+     * @param {Object} subset - The subset object.
+     * @param {Object[]} fields - The fields in the database (not used in method).
+     * @private
+     */
     _filterByQuery(base, query, subset, fields) {
         // prepare qminer query
         let qmQuery = {
@@ -374,7 +399,47 @@ module.exports = {
             // store the document id in the correct cluster
             query.result.docIds.push(docId);
         }
+    },
 
+    /**
+     * Add the current value of the hierarchy to the children array.
+     * @param {Object[]} children - The array of children.
+     * @param {String} value - The current observed value in the hierarchy.
+     * @param {String[]} other - Children of the value.
+     * @private
+     */
+    _addChild(children, value, other) {
+        if (other.length) {
+            // check if there is already a child included with this value
+            let object;
+            for (let child of children) {
+                if (child.name === value) { 
+                    if (!child.children) { child.children = []; }
+                    object = child;
+                    break;
+                }
+            }
+            if (!object) {
+                let len = children.push({ name: value, children: [] });
+                object = children[len - 1];
+            }
+            this._addChild(object.children, other[0], other.slice(1));
+
+        } else {
+            // value is the last in the array - add it and it's size to the 
+            // the children object
+            let included = false;
+            for (let child of children) {
+                if (child.name === value) { 
+                    child.size += 1;
+                    included = true;
+                    break;
+                }
+            }
+            if (!included) {
+                children.push({ name: value, size: 1 });
+            }
+        }
     }
 
 };

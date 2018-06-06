@@ -7,7 +7,7 @@ export default Route.extend({
     defaultPage: 1,
     defaultLimit: 10,
     defaultSortTarget: null,
-    defaultQuery: null,
+    defaultQuery: true,
 
     // current parameters
     page: 1,
@@ -21,8 +21,6 @@ export default Route.extend({
     init() {
         this._super(...arguments);
         this.set('defaultQuery', { calcAggr: true });
-        this.set('query', this.get('defaultQuery'));
-        
     },
 
     beforeModel(transition) {

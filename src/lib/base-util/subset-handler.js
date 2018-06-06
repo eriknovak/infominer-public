@@ -214,12 +214,14 @@ module.exports = {
         if (queryParams.calcAggr && queryParams.calcAggr === 'true') {
             for (let field of fields) {
                 // get aggregate distribution
-                let distribution = methodHandler._aggregateByField(subsetDocuments, field);
-                aggregates.push({
-                    field: field.name,
-                    type: field.aggregate,
-                    distribution
-                });
+                if (field.aggregate) {
+                    let distribution = methodHandler._aggregateByField(subsetDocuments, field);
+                    aggregates.push({
+                        field: field.name,
+                        type: field.aggregate,
+                        distribution
+                    });
+                }
             }
         }
 

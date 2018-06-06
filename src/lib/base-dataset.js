@@ -223,17 +223,21 @@ class BaseDataset {
                 return parseInt(value);
             case 'float':
                 return parseFloat(value);
+            case 'string_v':
+                return value.split(/[\\\/]/g);
             default:
                 throw new Error('FieldError: type is not "string", "int" or "float"');
         }
     }
 
     _getDatasetFields() {
+        console.log("fields");
         let fields = this.base.store('Dataset').fields;
         // prepare full dataset 
         let dataset = this.base.store('Dataset').allRecords;
         // set aggregate types for each field
         fields.forEach(field => {
+
             if (field.type === 'float') {
                 // aggregate field of type float with histogram
                 field.aggregate = 'histogram';
@@ -254,9 +258,12 @@ class BaseDataset {
                     field: field.name, 
                     type: 'count' 
                 });
-
                 field.aggregate = aggregate && aggregate.values.length < Math.min(15, dataset.length) ? 
                     'count' : 'keywords';
+
+            } else if (field.type === 'string_v') {
+                // categories should be aggregated as hierarchy
+                field.aggregate = 'hierarchy';
             }
         });
         // return the fields with aggregates

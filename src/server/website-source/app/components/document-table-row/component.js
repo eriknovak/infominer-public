@@ -37,6 +37,7 @@ export default Component.extend({
         for (let field of fields) {
             let value = this.get(`document.values.${field.name}`);
             if (field.type == 'string') { value = this._trimContent(value, this.get('nChar')); }
+            if (field.type == 'string_v') { value = value.join(' 🡒 '); }
             // find the selected query value, find and highligh the text
             if (query && query.text && query.text.fields.includes(field.name)) {
                 const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');

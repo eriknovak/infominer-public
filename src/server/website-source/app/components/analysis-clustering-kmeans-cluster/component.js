@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { set } from '@ember/object';
+import { computed, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
@@ -17,6 +17,8 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         this._setCluster();
+        this.set('page', 1);
+        this.set('limit', 5);
     },
 
     didInsertElement() {
@@ -42,6 +44,26 @@ export default Component.extend({
     },
 
 
+    documents: computed('cluster.documentSample', 'limit', 'page', function () {
+        let limit = this.get('limit');
+        let page = this.get('page');
+        return this.get('cluster.documentSample') ?
+            this.get('cluster.documentSample').slice(limit*(page - 1), limit*page) :
+            null;
+    }),
+
+    metadata: computed('cluster.documentSample', 'limit', 'page', function () {
+        return {
+            fields: this.get('dataset.fields'),
+            query: null,
+            pagination: {
+                page: this.get('page'),
+                limit: this.get('limit'),
+                documentCount: this.get('cluster.documentSample.length')
+            }
+        };
+    }),
+
     actions: {
         toggleInformation() { this.toggleProperty('collapsed'); },
         editLabel() { this.toggleProperty('editing-label'); },
@@ -57,9 +79,18 @@ export default Component.extend({
             });
         },
 
-        showClusterValues() {
-            this.set('clusterValues', this.get('cluster'));
-        }
+        changeLimit(limit) {
+            this.set('limit', limit);
+        },
+        changePage(page) {
+            this.set('page', page);
+        },
+        sortByField(fieldParams) {
+            console.log(fieldParams);
+            console.log(this.get('dataset.fields'));
+            console.log(this.get('cluster.documentSample'));
+            
+         }
     },
 
     _setCluster() {

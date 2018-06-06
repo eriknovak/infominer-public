@@ -16,7 +16,7 @@
   <select id="{{typeId}}" class="form-control" onchange={{action "changeFieldType"}} disabled={{disabled}}>
     {{#each fieldTypes as |typeOption|}}
       <option value='{{typeOption.type}}' selected={{if typeOption.selected 'selected'}}>
-        {{typeOption.type}}
+        {{typeOption.name}}
       </option>
     {{/each}}
   </select>

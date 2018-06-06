@@ -18,6 +18,7 @@
   {{#link-to 'dataset.subset' subset }}
     {{ subset.label }}
   {{/link-to}}
+  <small class="ml-1">n={{subset.documentCount}}</small>
 {{else}}
   <!-- set placeholder -->
   <span class="subset-structure-placeholder">{{ subset.label }}</span>
