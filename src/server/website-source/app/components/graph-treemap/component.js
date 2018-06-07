@@ -1,7 +1,7 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
-import { scheduleOnce } from '@ember/runloop';
 import { observer, set } from '@ember/object';
+import { once } from '@ember/runloop';
 
 // d3 visualizations
 import { select } from 'd3-selection';
@@ -33,7 +33,7 @@ const HierarchyComponent = GraphComponent.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         // prepare the data
-        this._preparehierarchy(this.get('hierarchy'));
+        this._prepareHierarchy(this.get('hierarchy'));
     },
 
     ///////////////////////////////////////////////////////
@@ -45,16 +45,20 @@ const HierarchyComponent = GraphComponent.extend({
      * @param {Object} hierarchy - The histogram data used to create the
      * histogram visualization.
      */
-    _preparehierarchy(hierarchy) {
+    _prepareHierarchy(hierarchy) {
         let data = { name: 'root', children: hierarchy };
         // set the data
         this.set('data', data);
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        let self = this;
-        scheduleOnce('afterRender', function () { self.drawGraph(); });
+        once(this, '_redrawGraph');
     }),
+
+    _redrawGraph() {
+        let self = this;
+        self.drawGraph();
+    },
 
     drawGraph() {
         // get the container size

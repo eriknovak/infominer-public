@@ -6,7 +6,7 @@ export default Route.extend({
     model() {
         let subset = this.modelFor('dataset.subset');
         let dataset = this.modelFor('dataset');
-        return { subset, dataset, subsetCreationParams: { }, clusterValues: { } };
+        return { subset, dataset, subsetCreationParams: { } };
     },
 
     actions: {

@@ -86,13 +86,15 @@ const WordCloudComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        let self = this;
-        this._setLoadingState();
-        once(function () { 
-            let creationTimeout = setTimeout(function () { self.drawGraph(); }, 300); 
-            self.set('creationTimeout', creationTimeout);
-        });
+        once(this, '_redrawGraph');
     }),
+
+    _redrawGraph() {
+        let self = this;
+        self._setLoadingState();
+        let creationTimeout = setTimeout(function () { self.drawGraph(); }, 300); 
+        self.set('creationTimeout', creationTimeout);
+    },
 
     /**
      * Prepares the cloud canvas.

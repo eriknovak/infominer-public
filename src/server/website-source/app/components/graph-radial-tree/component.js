@@ -2,7 +2,7 @@
 import GraphComponent from '../graph-component/component';
 import { inject as service } from '@ember/service';
 import { observer, computed, set } from '@ember/object';
-import { scheduleOnce } from '@ember/runloop';
+import { once } from '@ember/runloop';
 
 // d3 visualizations
 import { select } from 'd3-selection';
@@ -26,7 +26,6 @@ const RadialTreeComponent = GraphComponent.extend({
     init() {
         this._super(...arguments);
         set(this, 'margin', { top: 50, right: 50, bottom: 50, left: 50 });
-        this.get('hierarchy');
     },
 
     ///////////////////////////////////////////////////////
@@ -157,9 +156,13 @@ const RadialTreeComponent = GraphComponent.extend({
     }),
 
     hierarchyUpdated: observer('hierarchy', 'width', 'height', function () {
-        let self = this;
-        scheduleOnce('afterRender', function () { self.drawGraph(); });
+        once(this, '_redrawGraph');
     }),
+
+    _redrawGraph() {
+        let self = this;
+        self.drawGraph();
+    },
 
     drawGraph() {
         let self = this;

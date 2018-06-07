@@ -8,22 +8,26 @@ export default Component.extend({
     columnWidth: service('column-size'),
     store:       service('store'),
 
+    ///////////////////////////////////////////////////////
+    // Component Life Cycle
+    ///////////////////////////////////////////////////////
+
     init() {
         this._super(...arguments);
         set(this, 'collapsed', false);
         set(this, 'editing-label', false);
+        set(this, 'page', 1);
+        set(this, 'limit', 5);
     },
 
     didReceiveAttrs() {
         this._super(...arguments);
         this._setCluster();
-        this.set('page', 1);
-        this.set('limit', 5);
     },
 
     didInsertElement() {
-        this._super(...arguments);
         let self = this;
+        self._super(...arguments);
         const elementId = self.get('elementId');
         // on hover show edit button
         $(`#${elementId} .cluster-header`).hover(
@@ -33,8 +37,8 @@ export default Component.extend({
     },
 
     didRender() {
-        this._super(...arguments);
         let self = this;
+        self._super(...arguments);
         if (self.get('editing-label')) {
             // save cluster label change on enter
             $(`#${self.get('elementId')} input.editing`).on('keyup', function (e) {
@@ -43,8 +47,7 @@ export default Component.extend({
         }
     },
 
-
-    documents: computed('cluster.documentSample', 'limit', 'page', function () {
+    documents: computed('limit', 'page', function () {
         let limit = this.get('limit');
         let page = this.get('page');
         return this.get('cluster.documentSample') ?
@@ -52,7 +55,7 @@ export default Component.extend({
             null;
     }),
 
-    metadata: computed('cluster.documentSample', 'limit', 'page', function () {
+    metadata: computed('limit', 'page', function () {
         return {
             fields: this.get('dataset.fields'),
             query: null,
@@ -95,17 +98,13 @@ export default Component.extend({
 
     _setCluster() {
         let cluster = this.get('cluster');
-        // prepare the layout of the components
-        let aggregates = cluster.aggregates;
         // set column width for medium and large view size
-        this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
-        this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');
+        this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 3, 'lg');
+        this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 2, 'sm');
         // get subset names
         if (cluster.subsetId) {
             set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
         }
-        // set clusters values
-        this.set('cluster', cluster);
     },
 
     _saveLabel() {

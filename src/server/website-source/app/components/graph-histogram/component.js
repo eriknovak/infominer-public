@@ -1,6 +1,6 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
-import { scheduleOnce } from '@ember/runloop';
+import { once } from '@ember/runloop';
 import { observer, set } from '@ember/object';
 
 // d3 visualizations
@@ -69,9 +69,13 @@ const HistogramComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        let self = this;
-        scheduleOnce('afterRender', function () { self.drawGraph(); });
+        once(this, '_redrawGraph');
     }),
+
+    _redrawGraph() {
+        let self = this;
+        self.drawGraph();
+    },
 
     drawGraph() {
         // get the container size
@@ -88,7 +92,6 @@ const HistogramComponent = GraphComponent.extend({
 
         // get the svg element - contains the visualization components
         let container = select(this.element);
-
         // remove previous g components
         container.selectAll('g').remove();
 
@@ -169,14 +172,13 @@ const HistogramComponent = GraphComponent.extend({
          * Axis
          **************************************************/
 
-        // // set vertical axis
-        // content.append('g')
-        //     .call(axisLeft(yScale).ticks(5).tickFormat(format('.0%')));
-
         // set horizontal axis
         content.append('g')
             .attr('transform', `translate(0,${height})`)
-            .call(axisBottom(xScale).ticks(width < 400 ? 5 : 10).tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); }));
+            .call(axisBottom(xScale)
+                .ticks(width < 400 ? 5 : 10)
+                .tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); })
+            );
     }
 
 });

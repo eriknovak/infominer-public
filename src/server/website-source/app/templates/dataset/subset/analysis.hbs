@@ -1,11 +1,11 @@
 {{#each model.subset.usedBy as |method|}}
   {{#if method.analysisAppropriate}}
-    {{ analysis-method
+    {{ 
+      analysis-method
       method=method
       subset=model.subset
       dataset=model.dataset
       subsetCreationParams=model.subsetCreationParams
-      clusterValues=model.clusterValues
     }}
   {{/if}}
 {{/each}}
@@ -27,8 +27,8 @@
 {{
   method-selection
   id="select-analysis-modal"
-  action=(route-action 'startAnalysis')
   dataset=model.dataset
+  action=(route-action 'startAnalysis')
 }}
 
 {{! subset creation modal }}
@@ -37,14 +37,6 @@
   id="subset-create-modal"
   parameters=model.subsetCreationParams
   createSubset=(route-action "createSubset")
-}}
-
-{{! cluster inspection modal }}
-{{
-  cluster-inspection-modal
-  id="cluster-inspect-modal"
-  cluster=model.clusterValues
-  dataset=model.dataset
 }}
 
 {{outlet}}

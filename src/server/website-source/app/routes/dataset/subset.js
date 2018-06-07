@@ -11,7 +11,7 @@ export default Route.extend({
             $('#go-to-top').css('display', display);
         });
         // get the subset info
-        return this.get('store').findRecord('subset', params.subset_id);
+        return this.get('store').peekRecord('subset', params.subset_id);
     },
 
     actions: {

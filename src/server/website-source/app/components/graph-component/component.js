@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { scheduleOnce } from '@ember/runloop';
+import { once } from '@ember/runloop';
 
 import $ from 'jquery';
 
@@ -29,7 +29,7 @@ export default Component.extend({
         $(window).on('resize', function () {
             clearTimeout(self.get('resizeTimer'));
             self.set('resizeTimer', setTimeout(function () {
-                scheduleOnce('afterRender', function () { self._handleResize(); });
+                once(self, '_handleResize');
             }, 500));
         });
     },
@@ -48,8 +48,10 @@ export default Component.extend({
      * Resizes the width and height.
      */
     _handleResize() {
-        this.set('width', $(this.element).width());
-        this.set('height', $(this.element).height());
+        this.setProperties({
+            width: $(this.element).width(),
+            height: $(this.element).height()
+        });
     },
 
     /**
