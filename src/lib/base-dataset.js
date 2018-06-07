@@ -231,7 +231,6 @@ class BaseDataset {
     }
 
     _getDatasetFields() {
-        console.log("fields");
         let fields = this.base.store('Dataset').fields;
         // prepare full dataset 
         let dataset = this.base.store('Dataset').allRecords;
