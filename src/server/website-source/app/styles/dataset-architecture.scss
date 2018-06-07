@@ -24,7 +24,7 @@
 }
 
 @mixin link-style ($color) {
-    font-weight: 600;
+    font-weight: 500;
     color: $color;
     a {
         padding: 0 5px;
@@ -46,7 +46,7 @@
 .subset-information {
 
     .subset-navigation {
-    border-bottom: 1px solid #cccccc;
+        border-bottom: 1px solid #cccccc;
         & .btn {
             background-color: $primary-color;
             color: $font-color-dark;
@@ -70,7 +70,7 @@
 }
 
 .subset-information-container {
-    background-color: #fbfbfb;
+    background-color: #f6f6f6;
 }
 
 @media (max-width: 767px) {

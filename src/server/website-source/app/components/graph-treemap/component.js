@@ -127,7 +127,7 @@ const HierarchyComponent = GraphComponent.extend({
             .data(d => `${d.data.id}.${d.data.size}`.split('.').slice(1))
           .enter().append('tspan')
             .attr('x', 4)
-            .attr('y', (d, i) => 13 + i * 10)
+            .attr('y', (d, i) => 14 + i * 14)
             .text(d => d);
       
         cell.append('title')

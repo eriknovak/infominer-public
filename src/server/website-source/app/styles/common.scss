@@ -6,7 +6,7 @@ html {
 // common styles for all views
 html, body {
     font-family: $font-primary;
-    font-weight: 200;
+    font-weight: 300;
     font-size: 13px;
     color: $font-color-dark;
 }
@@ -23,6 +23,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     text-transform: uppercase;
     margin-bottom: 6px;
+    font-family: $font-secondary;
 }
 
 a {
@@ -284,13 +285,13 @@ p.message {
 
 .medium-size { font-size: 16px; }
 
-.highlight-text-only { font-weight: 600; }
+.highlight-text-only { font-weight: 500; }
 
 .bottom-space { margin-bottom: 10px; }
 
 .highlight {
     background-color: darken($primary-color, 2%);
-    font-weight: 600;
+    font-weight: 500;
     padding: 0px 2px;
 }
 

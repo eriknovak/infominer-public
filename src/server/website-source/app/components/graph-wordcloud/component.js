@@ -89,7 +89,7 @@ const WordCloudComponent = GraphComponent.extend({
         let self = this;
         this._setLoadingState();
         once(function () { 
-            let creationTimeout = setTimeout(function () { self.drawGraph(); }, 100); 
+            let creationTimeout = setTimeout(function () { self.drawGraph(); }, 300); 
             self.set('creationTimeout', creationTimeout);
         });
     }),
@@ -111,7 +111,7 @@ const WordCloudComponent = GraphComponent.extend({
             .words(data)
             .rotate(0)
             .random(() => 0.5)
-            .font('Open Sans')
+            .font('Roboto')
             .fontSize(d => d.size)
             .on('end', this._createWordCloud.bind(this))
             .start();

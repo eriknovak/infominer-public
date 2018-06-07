@@ -7,7 +7,7 @@ $height: 250px;
 
     &.wordcloud {
         border: 1px solid $primary-color;
-        font-weight: 600;
+        font-weight: 500;
         text.small  { fill: darken($primary-color, 35%); }
         text.medium { fill: $tertiary-color; }
         text.large  { fill: $font-color-dark; }
@@ -42,8 +42,8 @@ $height: 250px;
                 body {
                     background-color: transparent;
                     .description {
-                        font: 10px $font-primary;
-                        .title { font-weight: bold; }
+                        font: 11px $font-primary;
+                        .title { font-weight: 600; }
                     }
                 }
             }

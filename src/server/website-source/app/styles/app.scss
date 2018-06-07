@@ -6,7 +6,9 @@ $quaternary-color: #6699FF;
 // fonts colors
 $light-font-color: #e7e7e7;
 $font-color-dark: #2C3539;
-$font-primary: 'Open Sans';
+$font-primary: 'Roboto', sans-serif;
+$font-secondary: 'Open Sans', sans-serif;
+
 
 // mixins
 @mixin label {

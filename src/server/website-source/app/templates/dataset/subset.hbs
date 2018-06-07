@@ -12,11 +12,15 @@
           <div class="col-lg-3">
             <p class="subset-basic-information">
               <span class="dataset-documents-number">{{ model.documentCount }} documents</span><br/>
+              Derived from: <span class="subset">{{if model.resultedIn model.resultedIn.appliedOn.label 'none' }}</span><br/>
               Created using:
               <span class="method">
-                {{if model.resultedIn model.resultedIn.label 'none' }}
+                {{#if model.resultedIn }}
+                  {{model.resultedIn.label}}
+                {{else}}
+                  none
+                {{/if}}
               </span><br/>
-              Derived from: <span class="subset">{{if model.resultedIn model.resultedIn.appliedOn.label 'none' }}</span><br/>
             </p>
           </div>
           {{#if model.description }}
