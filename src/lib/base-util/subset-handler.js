@@ -26,7 +26,7 @@ module.exports = {
             description: subset.description
         });
         let method = base.store('Methods')[subset.resultedIn];
-        if (method) {
+        if (method && !method.deleted) {
             // add join to method
             base.store('Subsets')[subsetId].$addJoin('resultedIn', method);
             if (method.type === 'filter.manual') {
@@ -71,33 +71,45 @@ module.exports = {
      * @returns {Object} An array of subset representation objects.
      */
     get(base, id) {
-        let subsets = { subsets: null };
 
+        function getSubsetRelatedMethods(subset, fieldName) {
+            let methods = subset[fieldName];
+            if (methods && methods.length && methods[0].deleted !== undefined) {
+                methods.filterByField('deleted', false);
+            }
+            return method.map(method => formatter.method(method));
+        }
+
+        let subsets = base.store('Subsets');
+        let response = { subsets: null };
         if (!isNaN(parseFloat(id))) {
             // get one subset and format it
-            let subset = base.store('Subsets')[id];
-            if (!subset) { return null; }
-            subsets.subsets = formatter.subset(subset);
+            let subset = subsets[id];
+            if (!subset || subset.deleted) { return null; }
+            response.subsets = formatter.subset(subset);
 
-            subsets.methods = [ ];
+            response.methods = [ ];
             if (subset.resultedIn) {
                 // set the resulted in method
                 let resultedInMethod = [formatter.method(subset.resultedIn)];
-                subsets.methods = subsets.methods.concat(resultedInMethod);
+                response.methods = response.methods.concat(resultedInMethod);
             }
             if (subset.usedBy.length) {
                 // get methods that used the subset
-                let usedByMethods = subset.usedBy.map(method => formatter.method(method));
-                subsets.methods = subsets.methods.concat(usedByMethods);
+                let usedByMethods = getSubsetRelatedMethods(subset, 'usedBy');
+                response.methods = response.methods.concat(usedByMethods);
             }
             // remove the 'methods' property if none were given
-            if (!subsets.methods.length) { delete subsets.methods; }
+            if (!response.methods.length) { delete response.methods; }
         } else {
-            subsets.subsets = base.store('Subsets').allRecords
-                .map(rec => formatter.subset(rec));
+            let allSubsets = subsets.allRecords;
+            if (allSubsets && allSubsets.length && allSubsets[0].deleted !== undefined) {
+                allSubsets.filterByField('deleted', false);
+            }
+            response.subsets = allSubsets.map(rec => formatter.subset(rec));
         }
         // return the subsets
-        return subsets;
+        return response;
     },
 
     /**
@@ -120,6 +132,30 @@ module.exports = {
         // return the subset information
         return { subsets: formatter.subset(subset) };
     },
+
+    /**
+     * Set the deleted flag for the subset and all its joins.
+     * @param {Object} base - The QMiner base object.
+     * @param {Number} id - The id of the subset.
+     */
+    delete(base, id) {
+        let subsets = base.store('Subsets');
+        if (!isNaN(parseFloat(id))) {
+            let subset = subsets[id];
+            // if no subset or already deleted just skip
+            if (!subset || subset.deleted) { return null; }
+            // set the deleted flag to true
+            if (subset.deleted !== undefined && subset.deleted === false) {
+                subset.deleted = true;
+                // iterate through it's joins
+                for (let i = 0; i < subset.usedBy.length; i++) {
+                    let method = subset.usedBy[i];
+                    methodHandler.delete(base, method.$id);
+                }
+            }
+        }
+    }
+
 
     /**
      * Gets documents that are part of the subset.

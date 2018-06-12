@@ -3,7 +3,7 @@
     "type": "array",
     "items": {
         "anyOf": [{
-            "description": "The text feature space",
+            "description": "The text feature extractor",
             "type": "object",
             "properties": {
                 "source": { "constant": "Dataset" },
@@ -14,6 +14,7 @@
             },
             "required": ["source", "type", "field"]
         }, {
+            "description": "The numeric feature extractor",
             "type": "object",
             "properties": {
                 "source": { "constant": "Dataset" },
@@ -22,6 +23,15 @@
                 "normalize": { "constant": ["none", "scale", "var"] }
             },
             "required": ["source", "type", "field"]
+        }, {
+            "description": "The constant feature extractor",
+            "type": "object",
+            "properties": {
+                "source": { "constant": "Dataset" },
+                "type": { "constant": "constant" },
+                "const": { "type": "number" }
+            },
+            "required": ["source", "type", "const"]
         }]
 
     }

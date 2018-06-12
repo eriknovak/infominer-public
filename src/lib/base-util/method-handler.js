@@ -3,6 +3,7 @@ const qm = require('qminer');
 
 // the formatter function for subset, method and documents
 const formatter = require('./formatter');
+const subsetHandler = require('./subset-handler');
 
 // schema validator
 const validator = require('../validator')({
@@ -23,22 +24,21 @@ module.exports = {
      * @param {Object[]} fields - The fields in the database.
      */
     create(base, method, fields) {
-         // TODO: log activity
+        // TODO: log activity
 
-         // prepare method object
-         let qmMethod = {
-             type:       method.type,
-             parameters: method.parameters,
-             result:     method.result
-         };
- 
-         // get subset on which the method was used
-         let subset = base.store('Subsets')[method.appliedOn];
-         if (subset) {
- 
+        // prepare method object
+        let qmMethod = {
+            type:       method.type,
+            parameters: method.parameters,
+            result:     method.result
+        };
+
+        // get subset on which the method was used
+        let subset = base.store('Subsets')[method.appliedOn];
+        if (subset) {
             switch(qmMethod.type) {
             case 'clustering.kmeans':
-                 this._kmeansClustering(base, qmMethod, subset, fields);
+                    this._kmeansClustering(base, qmMethod, subset, fields);
                 break;
             case 'visualization':
                 this._visualizationSetup(base, qmMethod, subset, fields);
@@ -47,19 +47,19 @@ module.exports = {
                 this._filterByQuery(base, qmMethod, subset, fields);
                 break;
             }
- 
-             if (qmMethod instanceof Error) {
-                 // something went wrong return an error
-                 throw { errors: { message: 'createMethod: cannot initialize method - invalid method parameters' } };
-             } else {
+
+            if (qmMethod instanceof Error) {
+                // something went wrong return an error
+                throw { errors: { message: 'createMethod: cannot initialize method - invalid method parameters' } };
+            } else {
                 // store the method into the database
                 let methodId = base.store('Methods').push(qmMethod);
                 base.store('Methods')[methodId].$addJoin('appliedOn', subset);
                 return { methods: formatter.method(base.store('Methods')[methodId]) };
-             }
-         } else {
-             return { errors: { message: `createMethod: No subset with id=${method.appliedOn}` } };
-         }
+            }
+        } else {
+            return { errors: { message: `createMethod: No subset with id=${method.appliedOn}` } };
+        }
     },
 
     /**
@@ -69,39 +69,50 @@ module.exports = {
      * @returns {Object} The method object.
      */
     get(base, id) {
-         // TODO: log activity
 
-         let methods = base.store('Methods');
-         let response = { methods: null, meta: null };
-         // if id is a number
-         if (!isNaN(parseFloat(id))) {
-             // validate id
-             if (id < 0 || methods.length <= id) {
-                 // handle id missmatch
-                 return { errors: { message: 'The method id does not match with any existing methods' } };
-             }
-             // get the method from database
-             let method = methods[id];
-             response.methods = formatter.method(method);
+        function getMethodRelatedSubsets(method, fieldName) {
+            let subsets = method[fieldName];
+            if (subsets && subsets.length && subsets[0].deleted !== undefined) {
+                subsets.filterByField('deleted', false);
+            }
+            return subsets.map(subset => formatter.subset(subset));
+        }
 
-             // subset information
-             response.subsets = [ ]; 
-             if (!method.appliedOn.empty) {
-                 // set the resulted in method
-                 let appliedOnSubsets = method.appliedOn.map(subset => formatter.subset(subset));
-                 response.subsets = response.subsets.concat(appliedOnSubsets);
-             }
-             if (!method.produced.empty) {
-                 // get methods that used the subset
-                 let producedSubsets = method.produced.map(subset => formatter.subset(subset));
-                 response.subsets = response.subsets.concat(producedSubsets);
-             }
-             // remove the 'methods' property if none were given
-             if (!response.subsets.length) { delete response.subsets; }
- 
+        // TODO: log activity
+        let methods = base.store('Methods');
+        let response = { methods: null, meta: null };
+        // if id is a number
+        if (!isNaN(parseFloat(id))) {
+            // validate id
+            if (id < 0 || methods.length <= id) {
+                // handle id missmatch
+                return { errors: { message: 'The method id does not match with any existing methods' } };
+            }
+            // get the method from database
+            let method = methods[id];
+            response.methods = formatter.method(method);
+
+            // subset information
+            response.subsets = [ ]; 
+            if (!method.appliedOn.empty) {
+                // set the resulted in method
+                let appliedOnSubsets = getMethodRelatedSubsets(method, 'appliedOn');
+                response.subsets = response.subsets.concat(appliedOnSubsets);
+            }
+            if (!method.produced.empty) {
+                // get methods that used the subset
+                let producedSubsets = getMethodRelatedSubsets(method, 'produced');
+                response.subsets = response.subsets.concat(producedSubsets);
+            }
+            // remove the 'methods' property if none were given
+            if (!response.subsets.length) { delete response.subsets; }
+
          } else {
-            response.methods = methods.allRecords
-                 .map(rec => formatter.method(rec));
+            let allMethods = methods.allRecords;
+            if (allMethods && allMethods.length && allMethods[0].deleted !== undefined) {
+                allMethods.filterByField('deleted', false);
+            }
+            response.methods = allMethods.map(rec => formatter.method(rec));
          }
          // return the methods
          return response;
@@ -128,6 +139,29 @@ module.exports = {
             method.result = result;
         }
         return { methods: formatter.method(method) };
+    },
+
+    /**
+     * Set the deleted flag for the method and all its joins.
+     * @param {Object} base - The QMiner base object.
+     * @param {String | Number} id - The id of the method.
+     */
+    delete(base, id) {
+        let methods = base.store('Methods');
+        if (!isNaN(parseFloat(id))) {
+            let method = methods[id];
+            // if no subset or already deleted just skip
+            if (!method || method.deleted) { return null; }
+            // set the deleted flag to true
+            if (method.deleted !== undefined && method.deleted === false) {
+                method.deleted = true;
+                // iterate through it's joins
+                for (let i = 0; i < method.produced.length; i++) {
+                    let subset = method.produced[i];
+                    subsetHandler.delete(base, subset.$id);
+                }
+            }
+        }
     },
 
     /**
@@ -226,6 +260,9 @@ module.exports = {
                     field: query.parameters.fields,
                     ngrams: 2, 
                     hashDimension: 200000
+                },{
+                    type: 'constant',
+                    const: 0.0001
                 }]; break;
             case 'number':
                 query.parameters.method.distanceType = 'Euclid';
@@ -266,6 +303,14 @@ module.exports = {
 
         // get matrix representation of the documents
         const matrix = featureSpace.extractSparseMatrix(documents);
+
+        let norms = matrix.colNorms();
+        for (let i = 0; i < documents.length; i++) {
+            if (norms.at(i) === 0) {
+                console.log(norms.at(i));
+                console.log(documents[i]);
+            }
+        }
 
         // create kmeans model and feed it the sparse document matrix
         let kMeans = new qm.analytics.KMeans(query.parameters.method); 

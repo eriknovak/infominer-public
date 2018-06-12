@@ -205,12 +205,28 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 let limit = 100, count = 1;
 
                 // set field types based on initial rows
-                while(!datasetFIn.eof || count < limit) {
+                while(!datasetFIn.eof) {
                     // document values to determine type of field
                     let document = datasetFIn.readLine().trim();
                     if (document.length === 0) { count++; continue; }
                     let docValues = document.split(delimiter);
-                    
+
+                    if (docValues.length !== fields.length) {
+                        // delimiter is not recognized - send warning to user
+                        return pg.delete({ owner, filename: filename }, 'infominer_temporary_files', (yerror) => {
+                            fileManager.removeFile(file.path);
+                            // log multer error
+                            logger.warn('warn [file.format]: number of values not matching with number of fields',
+                                logger.formatRequest(req, { error: 'number of values not matching with number of fields', values: docValues.length, fields: fields.length })
+                            );
+                            // send error object to user
+                            return res.send({ errors: {
+                                filename: file.originalname,
+                                msg: `number of values not matching with number of fields in row ${count+1}` }
+                            });
+                        });
+                    }
+
                     for (let j = 0; j < docValues.length; j++) {
                         let value = docValues[j];
                         // check if value has a pathway
@@ -234,7 +250,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 for (let i = 0; i < fields.length; i++) {
                     fieldList.push({ name: fields[i].trim(), type: fieldTypes[i], included: true });
                 }
-
                 // log request success
                 logger.info('user request to upload dataset file successful',
                     logger.formatRequest(req)
