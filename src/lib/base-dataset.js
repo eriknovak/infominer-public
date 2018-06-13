@@ -409,6 +409,14 @@ class BaseDataset {
     }
 
     /**
+     * Sets the deleted flag of the subset and its joins to treu.
+     * @param {String | Number} id - The id of the subset.
+     */
+    deleteSubset(id) {
+        return subsetHandler.delete(this.base, id);
+    }
+
+    /**
      * Gets documents that are part of the subset.
      * @param {Number} id - Subset id.
      * @param {Object} [query] - Query for retrieving documents.
@@ -425,7 +433,7 @@ class BaseDataset {
     }
 
 
-
+    
     /**********************************
      * Method-related Functions
      *********************************/
@@ -462,6 +470,14 @@ class BaseDataset {
     editMethod(method) {
         return methodHandler.set(this.base, method);
     }
+    
+    /**
+     * Sets the deleted flag of the method and its joins to true.
+     * @param {Number | String} id - The id of the method.
+     */
+    deleteMethod(id) {
+        return methodHandler.delete(this.base, id);
+    }    
 
     /**
      * Calculates the aggregates on the subset.

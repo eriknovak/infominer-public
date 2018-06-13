@@ -77,7 +77,7 @@ module.exports = {
             if (methods && methods.length && methods[0].deleted !== undefined) {
                 methods.filterByField('deleted', false);
             }
-            return method.map(method => formatter.method(method));
+            return methods.map(method => formatter.method(method));
         }
 
         let subsets = base.store('Subsets');
@@ -143,19 +143,40 @@ module.exports = {
         if (!isNaN(parseFloat(id))) {
             let subset = subsets[id];
             // if no subset or already deleted just skip
-            if (!subset || subset.deleted) { return null; }
+            if (!subset || subset.deleted) { return { }; }
             // set the deleted flag to true
             if (subset.deleted !== undefined && subset.deleted === false) {
-                subset.deleted = true;
                 // iterate through it's joins
                 for (let i = 0; i < subset.usedBy.length; i++) {
                     let method = subset.usedBy[i];
                     methodHandler.delete(base, method.$id);
                 }
+                // change parent method parameter
+                if (subset.resultedIn) {
+                    let parentMethod = subset.resultedIn;
+                    if (parentMethod.type === 'clustering.kmeans') {
+                        let clusters = parentMethod.result.clusters;
+                        for (let clusterId = 0; clusterId < clusters.length; clusterId++) {
+                            let cluster = clusters[clusterId];
+                            if (cluster.subset.id === id) {
+                                clusters[clusterId].subset = { 
+                                    created: false, 
+                                    id: null
+                                };
+                                break;
+                            }
+                        }
+                        parentMethod.result = { clusters };
+                    }
+                    subset.resultedIn.$delJoin('produced', subsets[id]);
+                }
+
+                console.log('deleted', subsets[id].deleted);
+                subsets[id].deleted = true;
             }
         }
-    }
-
+        return { };
+    },
 
     /**
      * Gets documents that are part of the subset.

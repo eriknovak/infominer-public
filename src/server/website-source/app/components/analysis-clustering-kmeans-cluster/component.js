@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { computed, set } from '@ember/object';
+import { computed, get, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
@@ -47,7 +47,7 @@ export default Component.extend({
         }
     },
 
-    documents: computed('limit', 'page', function () {
+    documents: computed('cluster.documentSample', 'limit', 'page', function () {
         let limit = this.get('limit');
         let page = this.get('page');
         return this.get('cluster.documentSample') ?
@@ -55,7 +55,7 @@ export default Component.extend({
             null;
     }),
 
-    metadata: computed('limit', 'page', function () {
+    metadata: computed('cluster.documentSample', 'limit', 'page', function () {
         return {
             fields: this.get('dataset.fields'),
             query: null,
@@ -88,11 +88,20 @@ export default Component.extend({
         changePage(page) {
             this.set('page', page);
         },
-        sortByField(fieldParams) {
-            console.log(fieldParams);
-            console.log(this.get('dataset.fields'));
-            console.log(this.get('cluster.documentSample'));
 
+        sortByField(fieldParams) {
+            this.get('dataset.fields').forEach(function (field) {
+                set(field, 'sortType', null);
+                if (get(field, 'name') === fieldParams.field) {
+                    set(field, 'sortType', fieldParams.sortType);
+                }
+            });
+            
+            let documents = this.get('cluster.documentSample').sortBy(`values.${fieldParams.field}`);
+            if (fieldParams.sortType === 'desc') {
+                documents.reverse();
+            }
+            this.set('cluster.documentSample', documents);
          }
     },
 
@@ -102,8 +111,8 @@ export default Component.extend({
         this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 3, 'lg');
         this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 2, 'sm');
         // get subset names
-        if (cluster.subsetId) {
-            set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subsetId).get('label'));
+        if (cluster.subset.id) {
+            set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
         }
     },
 
@@ -112,8 +121,8 @@ export default Component.extend({
         const label = $(`#${elementId} input.editing`).val();
         let method = this.get('method');
         let cluster = this.get('cluster');
-        if (cluster.subsetId) {
-            let subset = this.get('store').peekRecord('subset', cluster.subsetId);
+        if (cluster.subset.id) {
+            let subset = this.get('store').peekRecord('subset', cluster.subset.id);
             subset.set('label', label); subset.save();
         }
         this.set('cluster.label', label);

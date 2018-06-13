@@ -111,6 +111,7 @@ module.exports = {
             let allMethods = methods.allRecords;
             if (allMethods && allMethods.length && allMethods[0].deleted !== undefined) {
                 allMethods.filterByField('deleted', false);
+                console.log(allMethods);
             }
             response.methods = allMethods.map(rec => formatter.method(rec));
          }
@@ -151,17 +152,18 @@ module.exports = {
         if (!isNaN(parseFloat(id))) {
             let method = methods[id];
             // if no subset or already deleted just skip
-            if (!method || method.deleted) { return null; }
+            if (!method || method.deleted) { return { }; }
             // set the deleted flag to true
             if (method.deleted !== undefined && method.deleted === false) {
-                method.deleted = true;
-                // iterate through it's joins
-                for (let i = 0; i < method.produced.length; i++) {
+                 // iterate through it's joins
+                 for (let i = 0; i < method.produced.length; i++) {
                     let subset = method.produced[i];
                     subsetHandler.delete(base, subset.$id);
                 }
+                methods[id].deleted = true;
             }
         }
+        return  { };
     },
 
     /**

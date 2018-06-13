@@ -13,9 +13,7 @@ $font-secondary: 'Open Sans', sans-serif;
 // mixins
 @mixin label {
     margin: 0;
-    font-size: 14px;
     font-weight: 300;
-    text-transform: uppercase;
 }
 
 @mixin collapse-toggle($color, $size) {

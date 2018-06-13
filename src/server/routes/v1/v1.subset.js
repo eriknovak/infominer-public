@@ -210,6 +210,54 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         });
     }); // PUT /api/datasets/:dataset_id/subsets/:subset_id
 
+    app.delete('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
+        // log user requests
+        logger.info('user requested to delete subset',
+            logger.formatRequest(req)
+        );
+
+        let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to delete subset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        let subsetId = parseInt(req.params.subset_id);
+        if (!validator.validateInteger(subsetId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request to delete subset failed',
+                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
+            );
+            // send error object to user
+            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+        }
+        // the user making the request
+        let owner = req.user ? req.user.id : 'development';
+
+        // send the request to the process
+        let body = { cmd: 'delete_subset', content: { subsetId } };
+        sendToProcess(datasetId, owner, body, function (error, results) {
+            if (error) {
+                // log error on updating subset
+                logger.error('error [node_process]: user request to delete subset failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                // send error object to user
+                return res.send({ errors: { msg: error.message } });
+            }
+            // log request success
+            logger.info('user request to delete subset successful',
+                logger.formatRequest(req)
+            );
+            // send the data
+            return res.send(results);
+        });
+    });
+
     /**
      * GET subset documents
      */

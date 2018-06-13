@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { observer, get, set } from '@ember/object';
+import { observer, set } from '@ember/object';
 import { once } from '@ember/runloop';
 
 export default Component.extend({

@@ -14,18 +14,20 @@ const validator = require('../../lib/validator')({
     // the schemas used to validate the input
     createDataset: require('../../schemas/child-messages/dataset-create'),
     openDataset:   require('../../schemas/child-messages/dataset-open'),
-    editDataset:   require('../../schemas/child-messages/dataset-edit'),
     getDataset:    require('../../schemas/child-messages/dataset-get'),
+    editDataset:   require('../../schemas/child-messages/dataset-edit'),
     shutdown:      require('../../schemas/child-messages/shutdown'),
     // subset message schemas
     createSubset:  require('../../schemas/child-messages/subset-create'),
     getSubset:     require('../../schemas/child-messages/subset-get'),
     editSubset:    require('../../schemas/child-messages/subset-edit'),
+    deleteSubset:    require('../../schemas/child-messages/subset-delete'),
     getSubsetDocuments: require('../../schemas/child-messages/subset-get-documents'),
     // method message schemas
     createMethod:  require('../../schemas/child-messages/method-create'),
     getMethod:     require('../../schemas/child-messages/method-get'),
-    editMethod:    require('../../schemas/child-messages/method-edit')
+    editMethod:    require('../../schemas/child-messages/method-edit'),
+    deleteMethod:    require('../../schemas/child-messages/method-delete')
 });
 
 // database placeholder
@@ -100,6 +102,9 @@ function handle(msg) {
     case 'edit_subset':
         editSubset(msg);
         break;
+    case 'delete_subset':
+        deleteSubset(msg);
+        break;
     case 'get_subset_documents':
         getSubsetDocuments(msg);
         break;
@@ -111,6 +116,9 @@ function handle(msg) {
         break;
     case 'edit_method':
         editMethod(msg);
+        break;
+    case 'delete_method':
+        deleteMethod(msg);
         break;
     default:
         break;
@@ -148,36 +156,6 @@ function messageValidation(msg, schema, callback) {
  */
 
 /**
- * Opens the database.
- * @param {Object} msg - Message to open database.
- * @param {Number} msg.reqId - The request id - used for for getting the callback
- * what to do with the results.
- * @param {Object} msg.body - The body of the message.
- * @param {String} msg.body.cmd - What command needs to be executed.
- * @param {Object} msg.body.content - The content for the body.
- * @param {Object} msg.body.content.params - The initialization parameters.
- * @param {String} msg.body.content.params.dbPath - Where the database is stored.
- * @param {String} msg.body.content.params.mode - In what mode the database should be opened.
- */
-function openDatabase(msg) {
-    // validate message information
-    messageValidation(msg, validator.schemas.openDataset, function (msg) {
-        // message is in correct format
-        let { reqId, body } = msg;
-        try {
-            // get the constructor parameters
-            let { params } = body.content;
-            database = new BaseDataset(params); // create the database
-            process.send({ reqId, content: { datasetId: database.getId() } });
-        } catch (err) {
-            console.log('openDatabase Error', err.message);
-            // notify parent process about the error
-            process.send({ reqId, error: err.message });
-        }
-    });
-}
-
-/**
  * Creates the database.
  * @param {Object} msg - Message to open database.
  * @param {Number} msg.reqId - The request id - used for for getting the callback
@@ -208,6 +186,36 @@ function createDatabase(msg) {
             process.send({ reqId, content: database.getId() });
         } catch (err) {
             console.log('createDatabase Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
+}
+
+/**
+ * Opens the database.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {String} msg.body.cmd - What command needs to be executed.
+ * @param {Object} msg.body.content - The content for the body.
+ * @param {Object} msg.body.content.params - The initialization parameters.
+ * @param {String} msg.body.content.params.dbPath - Where the database is stored.
+ * @param {String} msg.body.content.params.mode - In what mode the database should be opened.
+ */
+function openDatabase(msg) {
+    // validate message information
+    messageValidation(msg, validator.schemas.openDataset, function (msg) {
+        // message is in correct format
+        let { reqId, body } = msg;
+        try {
+            // get the constructor parameters
+            let { params } = body.content;
+            database = new BaseDataset(params); // create the database
+            process.send({ reqId, content: { datasetId: database.getId() } });
+        } catch (err) {
+            console.log('openDatabase Error', err.message);
             // notify parent process about the error
             process.send({ reqId, error: err.message });
         }
@@ -295,6 +303,38 @@ function editDataset(msg) {
 /////////////////////////////
 // subset retrieving
 
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.subset - The subset object.
+ * @param {Object} msg.body.content.subset.label - The subset label.
+ * @param {Object} [msg.body.content.subset.description] - The subset description.
+ * @param {Object} msg.body.content.subset.resultedIn - Which method created the subset.
+ * @param {Number[]} msg.body.content.subset.documents - Array of document ids the subset contains.
+ */
+function createSubset(msg) {
+    // validate message information
+    messageValidation(msg, validator.schemas.createSubset, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let { subset } = body.content;
+            let results = database.createSubset(subset);
+            database.aggregateSubset(results.subsets.id);
+            results = database.getSubset(results.subsets.id);
+            process.send({ reqId, results });
+        } catch (err) {
+            console.log('createSubset Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
+}
+
 /**
  * Gets the database info.
  * @param {Object} msg - Message to open database.
@@ -348,30 +388,24 @@ function editSubset(msg) {
 }
 
 /**
- * Gets the database info.
- * @param {Object} msg - Message to open database.
+ * Delete the subset.
+ * @param {Object} msg - Message to delete subset.
  * @param {Number} msg.reqId - The request id - used for for getting the callback
  * what to do with the results.
  * @param {Object} msg.body - The body of the message.
- * @param {Object} msg.body.content - The content of the message.
- * @param {Object} msg.body.content.subset - The subset object.
- * @param {Object} msg.body.content.subset.label - The subset label.
- * @param {Object} [msg.body.content.subset.description] - The subset description.
- * @param {Object} msg.body.content.subset.resultedIn - Which method created the subset.
- * @param {Number[]} msg.body.content.subset.documents - Array of document ids the subset contains.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.subsetId] - The id of the subset.
  */
-function createSubset(msg) {
+function deleteSubset(msg) {
     // validate message information
-    messageValidation(msg, validator.schemas.createSubset, function (msg) {
+    messageValidation(msg, validator.schemas.deleteSubset, function (msg) {
         let { reqId, body } = msg;
         try {
-            let { subset } = body.content;
-            let results = database.createSubset(subset);
-            database.aggregateSubset(results.subsets.id);
-            results = database.getSubset(results.subsets.id);
+            let subsetId = body.content.subsetId;
+            let results = database.deleteSubset(subsetId);
             process.send({ reqId, results });
         } catch (err) {
-            console.log('createSubset Error', err.message);
+            console.log('deleteSubset Error', err.message);
             // notify parent process about the error
             process.send({ reqId, error: err.message });
         }
@@ -415,33 +449,8 @@ function getSubsetDocuments(msg) {
 // method retrieving
 
 /**
- * Gets the database info.
- * @param {Object} msg - Message to open database.
- * @param {Number} msg.reqId - The request id - used for for getting the callback
- * what to do with the results.
- * @param {Object} msg.body - The body of the message.
- * @param {Object} [msg.body.content] - The content of the message.
- * @param {Object} [msg.body.content.methodId] - The id of the subset.
- */
-function getMethod(msg) {
-    // validate message information
-    messageValidation(msg, validator.schemas.getMethod, function (msg) {
-        let { reqId, body } = msg;
-        try {
-            let methodId = body.content ? body.content.methodId : null;
-            let results = database.getMethod(methodId);
-            process.send({ reqId, results });
-        } catch (err) {
-            console.log('getMethod Error', err.message);
-            // notify parent process about the error
-            process.send({ reqId, error: err.message });
-        }
-    });
-}
-
-/**
- * Gets the database info.
- * @param {Object} msg - Message to open database.
+ * Creates a new method.
+ * @param {Object} msg - Message to create method.
  * @param {Number} msg.reqId - The request id - used for for getting the callback
  * what to do with the results.
  * @param {Object} msg.body - The body of the message.
@@ -474,6 +483,31 @@ function createMethod(msg) {
  * @param {Number} msg.reqId - The request id - used for for getting the callback
  * what to do with the results.
  * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.methodId] - The id of the method.
+ */
+function getMethod(msg) {
+    // validate message information
+    messageValidation(msg, validator.schemas.getMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let methodId = body.content ? body.content.methodId : null;
+            let results = database.getMethod(methodId);
+            process.send({ reqId, results });
+        } catch (err) {
+            console.log('getMethod Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
+}
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
  * @param {Object} msg.body.content - The content of the message.
  * @param {Object} msg.body.content.method - The subset object.
  * @param {String} msg.body.content.method.methodType - The type of the method.
@@ -490,6 +524,31 @@ function editMethod(msg) {
             process.send({ reqId, results });
         } catch (err) {
             console.log('editMethod Error', err.message);
+            // notify parent process about the error
+            process.send({ reqId, error: err.message });
+        }
+    });
+}
+
+/**
+ * Delete the method.
+ * @param {Object} msg - Message to delete method.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.methodId] - The id of the method.
+ */
+function deleteMethod(msg) {
+    // validate message information
+    messageValidation(msg, validator.schemas.deleteMethod, function (msg) {
+        let { reqId, body } = msg;
+        try {
+            let methodId = body.content.methodId;
+            let results = database.deleteMethod(methodId);
+            process.send({ reqId, results });
+        } catch (err) {
+            console.log('deleteMethod Error', err.message);
             // notify parent process about the error
             process.send({ reqId, error: err.message });
         }

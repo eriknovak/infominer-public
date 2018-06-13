@@ -54,8 +54,8 @@
 
 
 <!-- Edit subset modal -->
-<div class="modal fade" id="edit-subset-modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
+<div class="modal" id="edit-subset-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <!-- modal header -->
       <div class="modal-header">
@@ -71,7 +71,7 @@
           <!-- subset label -->
           <div class="row new-subset-information">
             <div class="col-lg-6">
-              <label>Subset Label</label>
+              <label>Subset label</label>
               <input type="text" class="form-control"
                 value={{model.label}}
                 placeholder="Add subset label">
@@ -104,13 +104,51 @@
       </div><!-- .modal-body -->
 
       <div class="modal-footer">
+        {{#if model.id }}
+        <button type="button" class="btn btn-default mr-auto" data-toggle="modal"
+          data-target="#delete-subset-modal">Delete</button>
+        {{/if}}
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" {{action 'submitSubsetInfo'}}>Edit subset</button>
+        <button type="button" class="btn btn-primary" {{action 'editSubset'}}>Save</button>
       </div>
 
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- Edit subset modal -->
+<div class="modal" id="delete-subset-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <!-- modal header -->
+      <div class="modal-header">
+        <h4 class="modal-title m-auto"> Deleting subset</h4>
+        <!-- modal title -->
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+
+          <!-- subset label -->
+          <div class="row new-subset-information">
+            <div class="col">
+              <p>Are you sure you want to delete subset? You will not be able to revert this action.</p>
+            </div>
+          </div>
+
+        </div><!-- .container-fluid -->
+
+      </div><!-- .modal-body -->
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" {{action 'deleteSubset'}}>Yes, delete subset</button>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 
 
 <button id="go-to-top" class="btn btn-light" {{action 'backToTop'}}>Back to Top</button>

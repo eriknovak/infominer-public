@@ -7,7 +7,7 @@ export default Component.extend({
     classNameBindings: ['parent'],
 
     _parentState: observer('subset.usedBy.@each.produced', function () {
-        this.get('usedBy').then(methods => {
+        this.get('subset.usedBy').then(methods => {
             let producedSubsets = methods.filter((item) => {
                 return item.hasMany('produced').ids().length > 0;
             });
@@ -39,6 +39,7 @@ export default Component.extend({
         let self = this;
         self._super(...arguments);
         const methods = self.get('usedBy');
+        console.log(self.get('usedBy'));
         // subset contains methods that produced new subset
         for (let i = 0; i < methods.get('length'); i++) {
             let method = methods.objectAt(i);

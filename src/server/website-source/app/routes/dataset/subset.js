@@ -15,10 +15,11 @@ export default Route.extend({
     },
 
     actions: {
+
         /**
          * Submits the changes to the subset information.
          */
-        submitSubsetInfo() {
+        editSubset() {
             // get subset label and description
             let label = $('#edit-subset-modal input').val();
             let description = $('#edit-subset-modal textarea').val();
@@ -43,6 +44,7 @@ export default Route.extend({
                 subset.save();
             }
         },
+
         /**
          * Removes the warning message within the subset creation model
          */
@@ -53,6 +55,20 @@ export default Route.extend({
             warningContent.empty();
         },
 
+        deleteSubset() {
+            // hide modals
+            $('#delete-subset-modal').modal('toggle');
+            $('#edit-subset-modal').modal('toggle');
+
+            let subset = this.modelFor(this.routeName);
+            if (parseInt(subset.get('id')) !== 0) {
+                // this subset is the root subset - cannot delete it
+                this._destroySubset(subset);
+                let datasetId = parseInt(this.modelFor('dataset').get('id'));
+                this.transitionTo('dataset.subset.analysis', datasetId, 0);
+            }
+        },
+
         /**
          * Moves the window to the top of the page, smoothly.
          */
@@ -60,6 +76,29 @@ export default Route.extend({
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-    }
+    },
 
+    _destroySubset(subset) {
+        // iterate throught methods that use the subset
+        if (subset.get('usedBy.length')) {
+            for (let i = 0; i < subset.get('usedBy.length'); i++) {
+                let method = subset.get('usedBy').objectAt(i);
+                this._destroyMethod(method);
+            }
+        }
+        // destroy the record
+        subset.destroyRecord();
+    },
+
+    _destroyMethod(method) {
+        // iterate throught methods that use the subset
+        if (method.get('produced.length')) {
+            for (let i = 0; i < method.get('produced.length'); i++) {
+                let subset = method.get('produced').objectAt(i);
+                this._destroySubset(subset);
+            }
+        }
+        // destroy the record
+        method.destroyRecord();
+    }
 });

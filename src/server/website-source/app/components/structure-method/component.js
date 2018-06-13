@@ -38,6 +38,7 @@ export default Component.extend({
             // method is a filtering method - again get all results
             for (let i = 0; i < method.get('produced.length'); i++) {
                 let subset = method.get('produced').objectAt(i);
+                console.log(subset);
                 ontology.push({ created: true, subset });
             }
         }

@@ -209,6 +209,11 @@ p.modal-subtitle { margin-bottom: 0px; }
         @include button-type($primary-color);
     }
 
+    &.btn-default {
+        color: $font-color-dark;
+        @include button-type(lightgray);
+    }
+
     &.pull-right { margin-left: 10px; }
 }
 

@@ -45,9 +45,9 @@ export default DatasetUploadRoute.extend({
                     this.get('notify').info({
                         html: `<div class="notification">
                                 <span class="fa fa-exclamation-circle"></span>
-                                Uploaded file <span class="label">
+                                Error when uploading file <span class="label">
                                     ${model.errors.filename}
-                                </span> is not in correct format!
+                                </span>: ${model.errors.msg}!
                             </div>`
                     });
                     return this.removeDataset();

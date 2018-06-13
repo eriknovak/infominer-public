@@ -6,7 +6,7 @@ import { observer, set } from '@ember/object';
 // d3 visualizations
 import { select } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
-import { axisBottom, axisLeft } from 'd3-axis';
+import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
 import { line, curveStepAfter } from 'd3-shape';
 

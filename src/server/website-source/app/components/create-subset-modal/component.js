@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['modal', 'fade'],
+    classNames: ['modal'],
     attributeBindings: ['tabindex', 'role'],
     tagName: 'div',
     tabindex: -1,
