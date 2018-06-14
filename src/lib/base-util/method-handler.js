@@ -3,7 +3,6 @@ const qm = require('qminer');
 
 // the formatter function for subset, method and documents
 const formatter = require('./formatter');
-const subsetHandler = require('./subset-handler');
 
 // schema validator
 const validator = require('../validator')({
@@ -93,7 +92,7 @@ module.exports = {
             response.methods = formatter.method(method);
 
             // subset information
-            response.subsets = [ ]; 
+            response.subsets = [ ];
             if (!method.appliedOn.empty) {
                 // set the resulted in method
                 let appliedOnSubsets = getMethodRelatedSubsets(method, 'appliedOn');
@@ -111,7 +110,6 @@ module.exports = {
             let allMethods = methods.allRecords;
             if (allMethods && allMethods.length && allMethods[0].deleted !== undefined) {
                 allMethods.filterByField('deleted', false);
-                console.log(allMethods);
             }
             response.methods = allMethods.map(rec => formatter.method(rec));
          }
@@ -158,7 +156,7 @@ module.exports = {
                  // iterate through it's joins
                  for (let i = 0; i < method.produced.length; i++) {
                     let subset = method.produced[i];
-                    subsetHandler.delete(base, subset.$id);
+                    require('./subset-handler').delete(base, subset.$id);
                 }
                 methods[id].deleted = true;
             }
@@ -192,10 +190,10 @@ module.exports = {
                 // get aggregate distribution
                 if (field.aggregate) {
                     let distribution = this._aggregateByField(elements, field);
-                    method.result.aggregates.push({ 
-                        field: field.name, 
-                        type: field.aggregate, 
-                        distribution 
+                    method.result.aggregates.push({
+                        field: field.name,
+                        type: field.aggregate,
+                        distribution
                     });
                 }
             }
@@ -231,9 +229,9 @@ module.exports = {
         } else {
             // aggregate params
             let aggregateParams = {
-                name: `${aggregate}_${fieldName}`, 
-                field: fieldName, 
-                type: aggregate 
+                name: `${aggregate}_${fieldName}`,
+                field: fieldName,
+                type: aggregate
             };
             // calculate the aggregates for the record set
             distribution = elements.aggr(aggregateParams);
@@ -258,9 +256,9 @@ module.exports = {
                 // set kmeans and features space parameters
                 query.parameters.method.distanceType = 'Cos';
                 features = [{
-                    type: 'text', 
+                    type: 'text',
                     field: query.parameters.fields,
-                    ngrams: 2, 
+                    ngrams: 2,
                     hashDimension: 200000
                 },{
                     type: 'constant',
@@ -269,7 +267,7 @@ module.exports = {
             case 'number':
                 query.parameters.method.distanceType = 'Euclid';
                 features = query.parameters.fields.map(fieldName => ({
-                    type: 'numeric', 
+                    type: 'numeric',
                     field: fieldName
                 })); break;
         }
@@ -305,32 +303,23 @@ module.exports = {
 
         // get matrix representation of the documents
         const matrix = featureSpace.extractSparseMatrix(documents);
-
-        let norms = matrix.colNorms();
-        for (let i = 0; i < documents.length; i++) {
-            if (norms.at(i) === 0) {
-                console.log(norms.at(i));
-                console.log(documents[i]);
-            }
-        }
-
         // create kmeans model and feed it the sparse document matrix
-        let kMeans = new qm.analytics.KMeans(query.parameters.method); 
+        let kMeans = new qm.analytics.KMeans(query.parameters.method);
         kMeans.fit(matrix);
-        
+
         // get the document-cluster affiliation
         const idxv = kMeans.getModel().idxv;
 
         // prepare clusters array in the results
         query.result = {
             clusters: Array.apply(null, Array(query.parameters.method.k))
-                .map(() => ({ 
-                    docIds: [ ], 
-                    aggregates: [ ], 
-                    subset: { 
-                        created: false, 
-                        id: null 
-                    } 
+                .map(() => ({
+                    docIds: [ ],
+                    aggregates: [ ],
+                    subset: {
+                        created: false,
+                        id: null
+                    }
                 }))
         };
 
@@ -350,15 +339,15 @@ module.exports = {
             // get document sample
             query.result.clusters[i].documentSample = clusterDocuments.sample(100)
                 .map(document => formatter.document(document));
-                
+
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
                 if (field.aggregate) {
                     let distribution = this._aggregateByField(clusterDocuments, field);
-                    query.result.clusters[i].aggregates.push({ 
-                        field: field.name, 
-                        type: field.aggregate, 
+                    query.result.clusters[i].aggregates.push({
+                        field: field.name,
+                        type: field.aggregate,
                         distribution
                     });
                 }
@@ -377,7 +366,7 @@ module.exports = {
             // if label was not assigned - set a lame label
             // TODO: intelligent label setting
             if (!label) { label = `Cluster #${i+1}`; }
-            
+
             // set the cluster label
             query.result.clusters[i].label = label;
         }
@@ -460,7 +449,7 @@ module.exports = {
             // check if there is already a child included with this value
             let object;
             for (let child of children) {
-                if (child.name === value) { 
+                if (child.name === value) {
                     if (!child.children) { child.children = []; }
                     object = child;
                     break;
@@ -473,11 +462,11 @@ module.exports = {
             this._addChild(object.children, other[0], other.slice(1));
 
         } else {
-            // value is the last in the array - add it and it's size to the 
+            // value is the last in the array - add it and it's size to the
             // the children object
             let included = false;
             for (let child of children) {
-                if (child.name === value) { 
+                if (child.name === value) {
                     child.size += 1;
                     included = true;
                     break;

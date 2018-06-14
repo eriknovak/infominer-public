@@ -1,7 +1,10 @@
 import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
 export default Route.extend({
+
+    unloadExtra: service('unload-extra'),
 
     model(params) {
         // set a on scroll listener
@@ -56,17 +59,23 @@ export default Route.extend({
         },
 
         deleteSubset() {
-            // hide modals
-            $('#delete-subset-modal').modal('toggle');
-            $('#edit-subset-modal').modal('toggle');
-
-            let subset = this.modelFor(this.routeName);
-            if (parseInt(subset.get('id')) !== 0) {
-                // this subset is the root subset - cannot delete it
-                this._destroySubset(subset);
-                let datasetId = parseInt(this.modelFor('dataset').get('id'));
-                this.transitionTo('dataset.subset.analysis', datasetId, 0);
-            }
+            let self = this;
+            let subset = self.modelFor(self.routeName);
+            // this subset is the root subset - cannot delete it
+            self.modelFor('dataset').get('hasSubsets').removeObject(subset);
+            subset.destroyRecord().then(() => {
+                // reload dataset model
+                self.modelFor('dataset').reload().then((response) => {
+                    self.get('unloadExtra.unload')(response, self.get('store'), 'method');
+                    self.get('unloadExtra.unload')(response, self.get('store'), 'subset');
+                    self.modelFor('dataset').reload().then(() => {
+                        $('#delete-subset-modal').modal('toggle');
+                        $('#edit-subset-modal').modal('toggle');
+                        let datasetId = parseInt(self.modelFor('dataset').get('id'));
+                        self.transitionTo('dataset.subset', datasetId, 0);
+                    })
+                });
+            });
         },
 
         /**
@@ -75,30 +84,6 @@ export default Route.extend({
         backToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-    },
-
-    _destroySubset(subset) {
-        // iterate throught methods that use the subset
-        if (subset.get('usedBy.length')) {
-            for (let i = 0; i < subset.get('usedBy.length'); i++) {
-                let method = subset.get('usedBy').objectAt(i);
-                this._destroyMethod(method);
-            }
-        }
-        // destroy the record
-        subset.destroyRecord();
-    },
-
-    _destroyMethod(method) {
-        // iterate throught methods that use the subset
-        if (method.get('produced.length')) {
-            for (let i = 0; i < method.get('produced.length'); i++) {
-                let subset = method.get('produced').objectAt(i);
-                this._destroySubset(subset);
-            }
-        }
-        // destroy the record
-        method.destroyRecord();
     }
+
 });

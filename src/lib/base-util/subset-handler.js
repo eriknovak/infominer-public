@@ -159,19 +159,18 @@ module.exports = {
                         for (let clusterId = 0; clusterId < clusters.length; clusterId++) {
                             let cluster = clusters[clusterId];
                             if (cluster.subset.id === id) {
-                                clusters[clusterId].subset = { 
-                                    created: false, 
-                                    id: null
-                                };
+                                clusters.splice(clusterId, 1);
                                 break;
                             }
                         }
                         parentMethod.result = { clusters };
+                        if (!clusters.length) { parentMethod.deleted = true; }
+                    } else if (parentMethod.type === 'filter.manual') {
+                        parentMethod.deleted = true;
                     }
-                    subset.resultedIn.$delJoin('produced', subsets[id]);
+                    parentMethod.$delJoin('produced', subsets[id]);
                 }
 
-                console.log('deleted', subsets[id].deleted);
                 subsets[id].deleted = true;
             }
         }

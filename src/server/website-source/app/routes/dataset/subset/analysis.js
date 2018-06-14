@@ -22,12 +22,14 @@ export default Route.extend({
             let parentSubset = self.modelFor('dataset.subset');
             // create a new method
             const method = self.get('store').createRecord('method', {
-                id: self.get('store').peekAll('method').get('length'),
+                id: self.modelFor('dataset').get('numberOfMethods'),
                 methodType: params.methodType,
                 parameters: params.parameters,
                 appliedOn: parentSubset
             });
-            // save the model
+            self.modelFor('dataset').get('hasMethods').pushObject(method);
+            // needed to correctly increment subset and method indices
+            self.modelFor('dataset').incrementProperty('numberOfMethods');
             method.save();
         },
 
@@ -38,23 +40,26 @@ export default Route.extend({
         createSubset(params) {
             let self = this;
             // update method internal state
-            this.get('store').findRecord('method', params.parameters.methodId).then(method => {
+            self.get('store').findRecord('method', params.parameters.methodId).then(method => {
                 // create new subset
                 const subset = self.get('store').createRecord('subset', {
-                    id: self.get('store').peekAll('subset').get('length'),
+                    id: self.modelFor('dataset').get('numberOfSubsets'),
                     label: params.label,
                     description: params.description,
                     resultedIn: method,
                     clusterId: params.parameters.clusterId,
                     documentCount: params.parameters.documentCount
                 });
+                // needed to correctly increment subset and method indices
+                self.modelFor('dataset').get('hasSubsets').pushObject(subset);
+                self.modelFor('dataset').incrementProperty('numberOfSubsets');
+                self.modelFor('dataset').incrementProperty('numberOfMethods');
 
-                // save the cluster
                 subset.save().then(() => {
                     // toggle the modal - giving the user control
                     $('#subset-create-modal').modal('toggle');
                     $(`#subset-create-modal .modal-footer .btn-primary`).html('Save Subset');
-                    this.transitionTo('dataset.subset', subset);
+                    self.transitionTo('dataset.subset', subset);
                 });
             });
         }

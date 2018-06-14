@@ -29,7 +29,6 @@ export default DatasetRoute.extend({
             subsetAdapter.set('namespace', namespace);
             methodAdapter.set('namespace', namespace);
         }
-        // get data
         return this.get('store').findRecord('dataset', params.dataset_id);
     },
 

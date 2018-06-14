@@ -37,9 +37,9 @@ class BaseDataset {
      * Constructing the dataset base.
      * @param {Object} params - The construction parameters.
      * @param {String} params.dbPath - Path to data folder.
-     * @param {String} params.mode - The mode in which the base is opened. 
+     * @param {String} params.mode - The mode in which the base is opened.
      * Possible: 'open' and 'createClean'.
-     * @param {field-instance[]} [fields] - The fields of the dataset. Must have 
+     * @param {field-instance[]} [fields] - The fields of the dataset. Must have
      * when `params.mode='createClean'`.
      * @constructor
      */
@@ -56,10 +56,10 @@ class BaseDataset {
         } else {
             // constructor parameters mismatch - something went wrong
             console.error('Constructor parameters are not in specified schema');
-            return { 
-                errors: { 
-                    messages: 'Constructor parameters are not in specified schema' 
-                } 
+            return {
+                errors: {
+                    messages: 'Constructor parameters are not in specified schema'
+                }
             };
 
         }
@@ -92,10 +92,10 @@ class BaseDataset {
             } else {
                 // schema parameters mismatch - something went wrong
                 console.error('Schema parameters are not in specified form');
-                return { 
-                    errors: { 
-                        messages: '_loadBase: Schema parameters are not in specified form' 
-                    } 
+                return {
+                    errors: {
+                        messages: '_loadBase: Schema parameters are not in specified form'
+                    }
                 };
             }
         } else if (self.params.mode === 'open') {
@@ -105,10 +105,10 @@ class BaseDataset {
         } else {
             // TODO: handle non-supported mode
             console.error('Constructor parameters are not in specified schema');
-            return { 
-                errors: { 
-                    messages: '_loadBase: self.params.mode must be "createClean" or "open"' 
-                } 
+            return {
+                errors: {
+                    messages: '_loadBase: self.params.mode must be "createClean" or "open"'
+                }
             };
         }
     }
@@ -125,10 +125,10 @@ class BaseDataset {
         const includedFields = fields.filter(field => field.included);
 
         // prepare the dataset fields
-        const datasetFields = includedFields.map(field => ({ 
-            name: field.name, 
-            type: field.type, 
-            null: true 
+        const datasetFields = includedFields.map(field => ({
+            name: field.name,
+            type: field.type,
+            null: true
         }));
 
         // replace the schema fields
@@ -139,14 +139,14 @@ class BaseDataset {
         for (let field of includedFields) {
             // string fields are used for keys
             if (field.type === 'string') {
-                keys.push({ 
-                    field: field.name, 
-                    type: 'text_position' 
+                keys.push({
+                    field: field.name,
+                    type: 'text_position'
                 });
             } else if (field.type === 'float') {
-                keys.push({ 
-                    field: field.name, 
-                    type: 'linear' 
+                keys.push({
+                    field: field.name,
+                    type: 'linear'
                 });
             }
         }
@@ -217,7 +217,7 @@ class BaseDataset {
      */
     _parseFieldValue(value, type) {
         switch (type) {
-            case 'string': 
+            case 'string':
                 return value;
             case 'int':
                 return parseInt(value);
@@ -232,7 +232,7 @@ class BaseDataset {
 
     _getDatasetFields() {
         let fields = this.base.store('Dataset').fields;
-        // prepare full dataset 
+        // prepare full dataset
         let dataset = this.base.store('Dataset').allRecords;
         // set aggregate types for each field
         fields.forEach(field => {
@@ -241,10 +241,10 @@ class BaseDataset {
                 // aggregate field of type float with histogram
                 field.aggregate = 'histogram';
                 // get the min and max value found within the field
-                let aggregate = dataset.aggr({ 
-                    name: `sample_${field.name}`, 
-                    field: field.name, 
-                    type: field.aggregate 
+                let aggregate = dataset.aggr({
+                    name: `sample_${field.name}`,
+                    field: field.name,
+                    type: field.aggregate
                 });
                 // store the aggregate values
                 const { min, max } = aggregate;
@@ -252,12 +252,12 @@ class BaseDataset {
 
             } else if (field.type === 'string') {
                 // there is for that field
-                let aggregate = dataset.aggr({ 
-                    name: `sample_${field.name}`, 
-                    field: field.name, 
-                    type: 'count' 
+                let aggregate = dataset.aggr({
+                    name: `sample_${field.name}`,
+                    field: field.name,
+                    type: 'count'
                 });
-                field.aggregate = aggregate && aggregate.values.length < Math.min(15, dataset.length) ? 
+                field.aggregate = aggregate && aggregate.values.length < Math.min(15, dataset.length) ?
                     'count' : 'keywords';
 
             } else if (field.type === 'string_v') {
@@ -328,10 +328,10 @@ class BaseDataset {
         // validate input parameter schema
         if (!validator.validateSchema(dataset, validator.schemas.editDatasetSchema)) {
             // input parameter is not in correct format - return Error
-            return { 
-                error: { 
-                    message: 'Edit parameters are in incorrect format' 
-                } 
+            return {
+                error: {
+                    message: 'Edit parameters are in incorrect format'
+                }
             };
         }
 
@@ -357,8 +357,10 @@ class BaseDataset {
         let self = this;
         //  get subset info
         let { subsets } = self.getSubset();
+        let { methods } = self.getMethod();
         // subset ids used in the dataset info
-        let subsetIds = subsets.map(set => set.id);
+        let subsetIds = subsets.map(rec => rec.id);
+        let methodIds = methods.map(rec => rec.id);
 
         return {
             id: self.params.datasetId,
@@ -366,13 +368,16 @@ class BaseDataset {
             description: self.params.description,
             created: self.params.created,
             numberOfDocuments: self.base.store('Dataset').length,
+            numberOfSubsets: self.base.store('Subsets').length,
+            numberOfMethods: self.base.store('Methods').length,
             hasSubsets: subsetIds,
+            hasMethods: methodIds,
             fields: self.fields
         };
     }
 
-    
-    
+
+
     /**********************************
      * Subset-related Functions
      *********************************/
@@ -433,7 +438,7 @@ class BaseDataset {
     }
 
 
-    
+
     /**********************************
      * Method-related Functions
      *********************************/
@@ -470,14 +475,14 @@ class BaseDataset {
     editMethod(method) {
         return methodHandler.set(this.base, method);
     }
-    
+
     /**
      * Sets the deleted flag of the method and its joins to true.
      * @param {Number | String} id - The id of the method.
      */
     deleteMethod(id) {
         return methodHandler.delete(this.base, id);
-    }    
+    }
 
     /**
      * Calculates the aggregates on the subset.

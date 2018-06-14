@@ -1,3 +1,13 @@
+function undeletedRecords(record, field) {
+    let recordSet = record[field];
+    if (recordSet[0].deleted === undefined) {
+        // get all record ids
+        return recordSet.map(rec => rec.$id);
+    }
+    recordSet.filterByField('deleted', false);
+    return recordSet.length ? recordSet.map(rec => rec.$id) : null;
+}
+
 module.exports = {
 
     /**
@@ -12,7 +22,7 @@ module.exports = {
             label: record.label,
             description: record.description,
             resultedIn: record.resultedIn ? record.resultedIn.$id : null,
-            usedBy: !record.usedBy.empty ? record.usedBy.map(method => method.$id) : null,
+            usedBy: !record.usedBy.empty ? undeletedRecords(record, 'usedBy') : null,
             documentCount: !record.hasElements.empty ? record.hasElements.length : null
         };
     },
@@ -27,7 +37,7 @@ module.exports = {
         return {
             id: record.$id,
             type: 'documents',
-            subsets: !record.inSubsets.empty ? record.inSubsets.map(subset => subset.$id) : null,
+            subsets: !record.inSubsets.empty ? undeletedRecords(record, 'inSubsets') : null,
             values: record.toJSON(false, false, false)
         };
     },
@@ -45,8 +55,8 @@ module.exports = {
             methodType: record.type,
             parameters: record.parameters,
             result: this._methodResults(record.type, record.result),
-            produced: !record.produced.empty ? record.produced.map(subset => subset.$id) : null,
-            appliedOn: !record.appliedOn.empty ? record.appliedOn.map(subset => subset.$id) : null
+            produced: !record.produced.empty ? undeletedRecords(record, 'produced') : null,
+            appliedOn: !record.appliedOn.empty ? undeletedRecords(record, 'appliedOn') : null
         };
     },
 

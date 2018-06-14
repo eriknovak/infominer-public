@@ -28,7 +28,12 @@
   {{#each ontology as |method| }}
 
     <!-- subsets are joined to this method -->
-    {{ structure-method method=method }}
+    {{
+      structure-method
+      method=method
+      numberOfSubsets=numberOfSubsets
+      numberOfMethods=numberOfMethods
+    }}
 
   {{/each}}
 {{/bs-collapse}}

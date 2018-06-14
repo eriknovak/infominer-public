@@ -15,7 +15,7 @@ export default DS.RESTSerializer.extend({
         if (json.documents) { json.documents = json.documents.map(id => parseInt(id)); }
 
         // set metadata
-        let clusterId = parseInt(record.record.clusterId);
+        let clusterId = record.record.clusterId;
         json.meta = { clusterId };
 
         // return fixed results
