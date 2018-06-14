@@ -92,7 +92,7 @@ const RadialTreeComponent = GraphComponent.extend({
         let parentId = `subset-${method.get('appliedOn').get('id')}`;
 
         // if (!singleMethod) {
-            hierarchy.push({ label: method.get('methodType'), type: 'method', id, parentId });
+            hierarchy.push({ label: method.get('label'), type: 'method', id, parentId });
         // }
         // check the type of the method
         if (method.get('methodType').includes('clustering')) {
@@ -256,11 +256,13 @@ const RadialTreeComponent = GraphComponent.extend({
         htmlDOMs.append('div')
             .attr('class', 'description')
             .html(d => {
-                return d.data.type === 'subset' && !(d.parent && d.children) ? `
+                return d.data.type === 'subset' ? `
                     <span class="title">${d.data.label}</span><br>
                     <span class="attribute-label">documents</span> =
                     <span class="attribute-value">${d.data.numberOfDocuments}</span>
-                ` : '';
+                ` : `
+                    <span class="title">${d.data.label}</span>
+                `;
             });
 
 
