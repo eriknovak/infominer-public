@@ -46,6 +46,19 @@ export default Component.extend({
         }
     },
 
+    didInsertElement() {
+        let self = this;
+        self._super(...arguments);
+        // on hover show edit button
+        if (self.get('subset.isRoot')) {
+            $(`#structure-subset-${self.get('subset.id')}`).hover(
+                function () { $(`#delete-subset-${self.get('subset.id')}`).addClass('show'); },
+                function () { $(`#delete-subset-${self.get('subset.id')}`).removeClass('show'); }
+            );
+        }
+    },
+
+
     ///////////////////////////////////////////////////////
     // Actions
     ///////////////////////////////////////////////////////

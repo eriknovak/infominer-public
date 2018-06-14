@@ -310,19 +310,32 @@ p.message {
 
 .form-control {
     &.editing {
-        padding: 2px 0.75rem;
-        width: fit-content;
         display: inline-block;
-        line-height: 1 !important;
+        line-height: 1;
+        font-size: 14px;
+        border: 0px;
+        border-bottom: 1px solid #e0e0e0;
+        &.title {
+            width: 30%;
+            font-weight: 500;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            line-height: 0 !important;
+            padding: 0px;
+            color: $secondary-color;
+        }
+        &.invalid,
+        &:focus.invalid { border-color: red; }
     }
 }
 
-.fa.edit { cursor: pointer; }
-.confirm-editing { color: green; }
-.cancel-editing { color: darken($primary-color, 15%); }
+.fa.edit { 
+    cursor: pointer; 
+    font-size: 16px; 
+    &.confirm-editing { color: green; }
+    &.cancel-editing { color: darken($primary-color, 15%); }
+}
 
-input.invalid,
-input:focus.invalid { border: 1px solid red; }
 .field-warning {
     color: red;
     height: 10px;

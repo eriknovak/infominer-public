@@ -1,24 +1,20 @@
-<div class="container-fluid dataset-upload">
+<div class="container dataset-upload">
   <div class="row">
-    <div class="col-sm-12 offset-lg-1 col-lg-10">
-
-      <div class="container-fluid">
-        <!-- Title -->
-        <div class="row">
-          <div class="col-lg-3">
-            <h3 class="description-header">Upload Dataset</h3>
-            <p>
-              Upload the dataset, input the field names and select which fields
-              should be used for the ontology creation and analysis
-            </p>
-          </div>
-        </div><!-- .col-lg-12 -->
-      </div><!-- .row -->
+    <div class="col">
+      <div class="row">
+        <div class="col-md-6">
+          <h3 class="description-header">Upload Dataset</h3>
+          <p>
+            Upload the dataset, input the field names and select which fields
+            should be used for the ontology creation and analysis
+          </p>
+        </div>
+      </div>
 
       {{#if model}}
         <!-- Title -->
         <div class="row">
-          <div class="col-lg-10">
+          <div class="col">
             <!-- Field options selection -->
             {{ dataset-upload
                 file=model.file
@@ -32,44 +28,40 @@
       {{else}}
 
         <!-- File Upload section -->
-        <div class="container-fluid">
-          <div class="row">
-
-            <!-- Dropzone -->
-            <div class="col-lg-12">
-              {{#file-dropzone name="dataset" as |dropzone queue|}}
-                <p class="dropzone">
-                  {{#if dropzone.active}}
-                    {{#if dropzone.valid}}
-                      Drop to upload
-                    {{else}}
-                      Invalid
-                    {{/if}}
-                  {{else if queue.files.length}}
-                    Uploading File...
-                    {{#bs-progress as |p|}}
-                      {{p.bar value=queue.progress minValue=0 maxValue=100 showLabel=true}}
-                    {{/bs-progress}}
+        <div class="row">
+          <!-- Dropzone -->
+          <div class="col">
+            {{#file-dropzone name="dataset" as |dropzone queue|}}
+              <p class="dropzone">
+                {{#if dropzone.active}}
+                  {{#if dropzone.valid}}
+                    Drop to upload
                   {{else}}
-                      {{#if dropzone.supported}}
-                        Drag and drop dataset onto this area to upload them or
-                      {{/if}}
-                      {{#file-upload name="dataset"
-                                    accept=["text/plain", "text/csv"]
-                                    multiple=false
-                                    onfileadd=(route-action "uploadDataset")}}
-                        <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
-                      {{/file-upload}}
-                      <br>
-                      <small>Supported delimiters are comma (<b>,</b>), semicolon (<b>;</b>),
-                      tab (<b>\t</b>), pipe (<b>|</b>), tilde (<b>~</b>).</small>
+                    Invalid
                   {{/if}}
-                </p>
-              {{/file-dropzone}}
-            </div><!-- .col-lg-12 -->
-
-          </div><!-- .row -->
-        </div><!-- .container-fluid -->
+                {{else if queue.files.length}}
+                  Uploading File...
+                  {{#bs-progress as |p|}}
+                    {{p.bar value=queue.progress minValue=0 maxValue=100 showLabel=true}}
+                  {{/bs-progress}}
+                {{else}}
+                    {{#if dropzone.supported}}
+                      Drag and drop dataset onto this area to upload them or
+                    {{/if}}
+                    {{#file-upload name="dataset"
+                                  accept=["text/plain", "text/csv"]
+                                  multiple=false
+                                  onfileadd=(route-action "uploadDataset")}}
+                      <a id="upload-dataset" tabindex=0>Add a Dataset.</a>
+                    {{/file-upload}}
+                    <br>
+                    <small>Supported delimiters are comma (<b>,</b>), semicolon (<b>;</b>),
+                    tab (<b>\t</b>), pipe (<b>|</b>), tilde (<b>~</b>).</small>
+                {{/if}}
+              </p>
+            {{/file-dropzone}}
+          </div><!-- .col-lg-12 -->
+        </div><!-- .row -->
 
       {{/if}}
 

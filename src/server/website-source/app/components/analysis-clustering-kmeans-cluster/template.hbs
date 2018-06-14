@@ -1,13 +1,13 @@
 {{#if cluster.subset.created}}
   {{#link-to 'dataset.subset' dataset cluster.subset.id class="btn btn-secondary pull-right" }}
-    Go to Subset
+    Inspect
   {{/link-to}}
 {{else if cluster.documentCount}}
   <button class="btn btn-primary pull-right" data-toggle="modal"
     data-target="#subset-create-modal"
     onclick={{action 'updateSubsetCreationParams'}}
   >
-    Create Subset
+    Edit
   </button>
 {{/if}}
 
@@ -18,7 +18,7 @@
     <i class="fa fa-chevron-down"></i>
   </button>
   {{#if editing-label}}
-    <input class="form-control editing" type="text" value="{{cluster.label}}">
+    <input class="form-control editing title" type="text" value="{{cluster.label}}">
     <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
     <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
   {{else}}

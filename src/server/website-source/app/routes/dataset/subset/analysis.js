@@ -58,7 +58,7 @@ export default Route.extend({
                 subset.save().then(() => {
                     // toggle the modal - giving the user control
                     $('#subset-create-modal').modal('toggle');
-                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save Subset');
+                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
                     self.transitionTo('dataset.subset', subset);
                 });
             });

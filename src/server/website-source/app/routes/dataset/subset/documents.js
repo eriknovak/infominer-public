@@ -158,7 +158,7 @@ export default Route.extend({
                 subset.save().then(function () {
                     // hide modal and transition to new route
                     $('#subset-create-modal').modal('toggle');
-                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save Subset');
+                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
                     self.transitionTo('dataset.subset', self.modelFor('dataset'), subset.id);
                 }).catch(error => {
                     console.log(error.message);

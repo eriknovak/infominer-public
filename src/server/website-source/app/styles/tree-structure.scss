@@ -75,5 +75,11 @@
             .label { color: black }
         }
 
+        .delete { 
+            display: none;
+            &.show { display: inline-block; }
+
+        }
+
     }
 }

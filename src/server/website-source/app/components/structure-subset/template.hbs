@@ -1,3 +1,4 @@
+<div id="structure-subset-{{subset.id}}">
 {{#if ontology.length }}
   <!-- button for toggling collapse -->
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
@@ -19,10 +20,14 @@
     {{ subset.label }}
   {{/link-to}}
   <small class="ml-1">({{subset.documentCount}} docs)</small>
+  {{!-- <small class="ml-1 delete" id="delete-subset-{{subset.id}}">
+    <i class="fa fa-times" aria-hidden="true"></i>
+  </small> --}}
 {{else}}
   <!-- set placeholder -->
   <span class="subset-structure-placeholder">{{ subset.label }}</span>
 {{/if}}
+</div>
 
 {{#bs-collapse collapsed=collapsed class="tree-branch"}}
   {{#each ontology as |method| }}

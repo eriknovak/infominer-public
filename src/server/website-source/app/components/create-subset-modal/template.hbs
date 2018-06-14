@@ -16,10 +16,10 @@
       <div class="container-fluid">
 
         {{! subset label }}
-        <div class="row new-subset-information">
-          <div class="col-lg-6">
-            <label>Subset Name</label>
-            <input type="text" class="form-control {{if invalid "invalid"}}"
+        <div class="form-group row new-subset-information">
+          <label class="col-md-3 col-form-label">Subset label</label>
+          <div class="col-md-9">
+            <input type="text" class="form-control editing {{if invalid "invalid"}}"
               oninput={{action 'changeSubsetName'}} value={{name}}
               placeholder="Add subset name">
              <div class="field-warning text-right">
@@ -29,15 +29,13 @@
         </div>
 
         {{! subset description }}
-        <div class="row new-subset-information">
-          <div class="col-lg-12">
-            <div class="form-group">
-              <label>Description</label>
-              <textarea class="form-control" rows="5"
-                  oninput={{action 'changeSubsetDescription'}}
-                placeholder="Add subset description (optional)"
-                value={{description}}></textarea>
-            </div>
+        <div class="form-group row new-subset-information">
+          <label class="col-sm-3 col-form-label">Description</label>
+          <div class="col-sm-9">
+            <textarea class="form-control editing" rows="5"
+              oninput={{action 'changeSubsetDescription'}}
+              placeholder="Add subset description (optional)"
+              value={{description}}></textarea>
           </div>
         </div>
 
@@ -59,8 +57,8 @@
     </div>
 
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-      <button {{action 'saveSubset'}} type="button" class="btn btn-primary">Save Subset</button>
+      <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+      <button {{action 'saveSubset'}} type="button" class="btn btn-primary">Save</button>
     </div>
 
   </div>{{! .modal-content }}
