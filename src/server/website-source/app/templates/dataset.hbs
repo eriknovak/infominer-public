@@ -1,4 +1,6 @@
-{{ dataset-header dataset=model
+{{ 
+  dataset-header 
+  dataset=model
   deleteDataset=(route-action "deleteDataset")
 }}
 
@@ -34,4 +36,8 @@
   </div><!-- .row -->
 </div><!-- .container-fluid -->
 
-
+{{
+  subset-delete-modal
+  id="subset-delete-modal"
+  deleteSubset=(route-action "deleteSubset")
+}}

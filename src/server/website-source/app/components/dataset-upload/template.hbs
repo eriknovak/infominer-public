@@ -1,13 +1,13 @@
 <div class="row">
-  <div class="col-lg-12">
+  <div class="col">
 
     <div class="dataset-label">
       <div class="row form-group">
         <label class="col-md-2 col-form-label" for="dataset-label">Dataset Name</label>
-        <div class="col-md-4">
+        <div class="col-md-10">
           {{
             input 
-            class="form-control editing" 
+            class="form-control editing emphasize" 
             value=dataset.label 
             placeholder="Add dataset name"
           }}
@@ -18,7 +18,7 @@
     <div class="dataset-description">
       <div class="row form-group">
         <label class="col-md-2 col-form-label" for="dataset-description">Description</label>
-        <div class="col-md-4">
+        <div class="col-md-10">
           {{
             textarea 
             class="form-control editing" 
@@ -30,17 +30,17 @@
       </div>
     </div>{{! .dataset-description }}
 
-  </div>{{! .col-lg-12 }}
+  </div>{{! .col}}
 </div>{{! .row }}
 
 <div class="row">
-  <div class="col-lg-12 document-table">
+  <div class="col document-table">
 
     <table class="table">
       <thead>
         <tr>
-          <th style="width:60%">field name</th>
-          <th style="width:30%" class="center">type</th>
+          <th style="width:50%">field name</th>
+          <th style="width:40%" class="center">type</th>
           <th style="width:10%" class="center">included</th>
         </tr>
       </thead>
@@ -59,15 +59,15 @@
       </tbody>
     </table>
 
-  </div>{{! .col-lg-12 }}
+  </div>{{! .col }}
 </div>{{! .row }}
 
 <div class="row">
-  <div class="col-lg-12">
+  <div class="col">
     <button {{action submitDataset}} class="btn btn-primary pull-right">Save Dataset</button>
     <button {{action resetList}} class="btn btn-light pull-right">Cancel</button>
     <div id="submittion-error" class="pull-right">Invalid field names</div>
-  </div>{{! .col-lg-12 }}
+  </div>{{! .col }}
 </div>{{! .row }}
 
 {{yield}}

@@ -311,12 +311,13 @@ p.message {
 .form-control {
     &.editing {
         display: inline-block;
+        padding: 0.375rem;
         line-height: 1;
         font-size: 14px;
         border: 0px;
         border-bottom: 1px solid #e0e0e0;
         &.title {
-            width: 30%;
+            width: 50%;
             font-weight: 500;
             font-size: 1.5rem;
             text-transform: uppercase;
@@ -324,6 +325,7 @@ p.message {
             padding: 0px;
             color: $secondary-color;
         }
+        &.emphasize { color: $secondary-color; }
         &.invalid,
         &:focus.invalid { border-color: red; }
     }

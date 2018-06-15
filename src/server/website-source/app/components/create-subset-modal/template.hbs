@@ -19,7 +19,7 @@
         <div class="form-group row new-subset-information">
           <label class="col-md-3 col-form-label">Subset label</label>
           <div class="col-md-9">
-            <input type="text" class="form-control editing {{if invalid "invalid"}}"
+            <input type="text" class="form-control editing emphasize {{if invalid "invalid"}}"
               oninput={{action 'changeSubsetName'}} value={{name}}
               placeholder="Add subset name">
              <div class="field-warning text-right">

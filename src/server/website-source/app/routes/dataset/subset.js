@@ -1,10 +1,7 @@
 import Route from '@ember/routing/route';
-import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
 export default Route.extend({
-
-    unloadExtra: service('unload-extra'),
 
     model(params) {
         // set a on scroll listener
@@ -56,30 +53,6 @@ export default Route.extend({
             let warningContent = $('#edit-subset-modal div.warning');
             // empty warning container
             warningContent.empty();
-        },
-
-        deleteSubset() {
-            let self = this;
-            let subset = self.modelFor(self.routeName);
-            $('#delete-subset-modal .modal-footer .btn-danger').html(
-                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
-            );
-            // this subset is the root subset - cannot delete it
-            self.modelFor('dataset').get('hasSubsets').removeObject(subset);
-            subset.destroyRecord().then(() => {
-                // reload dataset model
-                self.modelFor('dataset').reload().then((response) => {
-                    self.get('unloadExtra.unload')(response, self.get('store'), 'method');
-                    self.get('unloadExtra.unload')(response, self.get('store'), 'subset');
-                    self.modelFor('dataset').reload().then(() => {
-                        $('#edit-subset-modal').modal('toggle');
-                        $('#delete-subset-modal').modal('toggle');
-                        $('#delete-subset-modal .modal-footer .btn-danger').html('Yes, delete subset');
-                        let datasetId = parseInt(self.modelFor('dataset').get('id'));
-                        self.transitionTo('dataset.subset', datasetId, 0);
-                    })
-                });
-            });
         },
 
         /**

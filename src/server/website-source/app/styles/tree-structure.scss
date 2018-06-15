@@ -77,8 +77,16 @@
 
         .delete { 
             display: none;
+            width: 15px;
+            height: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 50%;
+            -webkit-transition: all .2s linear;
+            -moz-transition: all .2s linear;
+            transition: all .2s linear;
             &.show { display: inline-block; }
-
+            &:hover { background-color: $primary-color; }
         }
 
     }
