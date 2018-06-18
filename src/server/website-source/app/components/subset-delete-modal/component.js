@@ -1,7 +1,11 @@
 import Component from '@ember/component';
+import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
 export default Component.extend({
+
+    store: service('store'),
+
     // component attributes
     classNames: ['modal'],
     attributeBindings: ['tabindex', 'role', 'backdrop:data-backdrop'],
@@ -26,6 +30,8 @@ export default Component.extend({
             const trigger = $(event.relatedTarget);
             const subsetId = trigger.data('subsetid');
             self.set('subsetId', subsetId);
+            const subset = self.get('store').peekRecord('subset', subsetId);
+            self.set('subsetLabel', subset.get('label'));
         });
     },
 
