@@ -43,6 +43,7 @@ const RadialTreeComponent = GraphComponent.extend({
 
         // filter oout appropriate methods
         let methods = subset.get('usedBy').filter(method => {
+            if (!method.get('methodType')) { return false; }
             return method.get('methodType').includes('clustering') ||
                    method.get('methodType').includes('filter');
         });
@@ -57,7 +58,7 @@ const RadialTreeComponent = GraphComponent.extend({
 
         // get parent id
         let parentId = /* parentSiblingsCount !== 1 ? */
-            `method-${subset.get('resultedIn').get('id')}` /* : */
+            `method-${subset.get('resultedIn').get('id')}`; /* : */
             // `subset-${subset.get('resultedIn').get('appliedOn').get('id')}`;
         // push the subset information to the hierarchy tree
         let id = `subset-${subset.get('id')}`;
@@ -260,9 +261,7 @@ const RadialTreeComponent = GraphComponent.extend({
                     <span class="title">${d.data.label}</span><br>
                     <span class="attribute-label">documents</span> =
                     <span class="attribute-value">${d.data.numberOfDocuments}</span>
-                ` : `
-                    <span class="title">${d.data.label}</span>
-                `;
+                ` : '';
             });
 
 

@@ -13,7 +13,7 @@ export default Component.extend({
     store: service('store'),
 
     // parameters
-    ontology: computed('method.result', function () {
+    ontology: computed('method.result', 'numberOfSubsets', 'numberOfMethods', function () {
         // ontology placeholder
         let ontology = [];
 
@@ -59,6 +59,15 @@ export default Component.extend({
             let selectedFields = method.get('parameters.fields').join(', ');
             this.set('selectedFields', selectedFields);
         }
+    },
+
+    didInsertElement() {
+        let self = this;
+        self._super(...arguments);
+        $(`#structure-method-${self.get('method.id')}`).hover(
+            function () { $(`#delete-method-${self.get('method.id')}`).addClass('show'); },
+            function () { $(`#delete-method-${self.get('method.id')}`).removeClass('show'); }
+        );
     },
 
     ///////////////////////////////////////////////////////

@@ -68,8 +68,8 @@
             padding: 1px;
         }
 
-        .method > button > .fa { color: green; }
-        .subset > button > .fa { color: $tertiary-color; }
+        .method > div > button > .fa { color: green; }
+        .subset > div > button > .fa { color: $tertiary-color; }
         .unsaved {
             padding: 0px 5px;
             .label { color: black }

@@ -20,7 +20,7 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
-        this.set('subsetId', null);
+        this.set('methodId', null);
     },
 
     didInsertElement() {
@@ -28,12 +28,11 @@ export default Component.extend({
         self._super(...arguments);
         $(`#${self.get('elementId')}`).on('show.bs.modal', function (event) {
             const trigger = $(event.relatedTarget);
-            const subsetId = trigger.data('subsetid');
-            self.set('subsetId', subsetId);
-            const subset = self.get('store').peekRecord('subset', subsetId);
-            self.set('subsetLabel', subset.get('label'));
-            self.set('derivedFrom', subset.get('resultedIn.appliedOn.label'));
-            self.set('createdUsing', subset.get('resultedIn.label'));
+            const methodId = trigger.data('methodid');
+            self.set('methodId', methodId);
+            const method = self.get('store').peekRecord('method', methodId);
+            self.set('label', method.get('label'));
+            self.set('appliedOn', method.get('appliedOn.label'));
             $(`#${self.get('elementId')} .modal-footer .btn-danger`)
                 .html('Yes, delete method');
         });
@@ -46,10 +45,10 @@ export default Component.extend({
     actions: {
         
         delete() {
-            const subsetId = this.get('subsetId');
-            if (subsetId) {
-                this.set('subsetId', null);
-                return this.get('deleteSubset')(subsetId);
+            const methodId = this.get('methodId');
+            if (methodId) {
+                this.set('methodId', null);
+                return this.get('deleteMethod')(methodId);
             }
         }
     }

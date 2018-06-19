@@ -49,30 +49,55 @@ export default DatasetRoute.extend({
             });
         },
 
+        /**
+         * Deletes the subset with the given id.
+         * @param {Number | String} subsetId - The subset id.
+         */
         deleteSubset(subsetId) {
             let self = this;
-            $('#delete-subset-modal .modal-footer .btn-danger').html(
+            $('#subset-delete-modal .modal-footer .btn-danger').html(
                 '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
             );
             let subset = this.get('store').peekRecord('subset', subsetId);
-            // this subset is the root subset - cannot delete it
             self.modelFor('dataset').get('hasSubsets').removeObject(subset);
             subset.destroyRecord().then(() => {
                 // reload dataset model
                 self.modelFor('dataset').reload().then((response) => {
                     self.get('unloadExtra.unload')(response, self.get('store'), 'method');
                     self.get('unloadExtra.unload')(response, self.get('store'), 'subset');
-                    self.modelFor('dataset').reload().then(() => {
-                        // if subset deleted through edit subset modal
-                        if ($('#edit-subset-modal').hasClass('show')) {
-                            $('#edit-subset-modal').modal('toggle');
-                        } 
-                        // hide the subset-delete-modal
-                        $('#subset-delete-modal').modal('toggle');
-                        $('#subset-delete-modal .modal-footer .btn-danger').html('Yes, delete subset');
-                        let datasetId = parseInt(self.modelFor('dataset').get('id'));
-                        self.transitionTo('dataset.subset', datasetId, 0);
-                    });
+                    // if subset deleted through edit subset modal
+                    if ($('#edit-subset-modal').hasClass('show')) {
+                        $('#edit-subset-modal').modal('toggle');
+                    } 
+                    // hide the subset-delete-modal
+                    $('#subset-delete-modal').modal('toggle');
+                    let datasetId = parseInt(self.modelFor('dataset').get('id'));
+                    self.transitionTo('dataset.subset', datasetId, 0);
+                });
+            });
+        },
+
+        /**
+         * Deletes the method with the given id.
+         * @param {Number | String} methodId - The method id.
+         */
+        deleteMethod(methodId) {
+            let self = this;
+            $('#method-delete-modal .modal-footer .btn-danger').html(
+                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
+            );
+            let method = this.get('store').peekRecord('method', methodId);
+            self.modelFor('dataset').get('hasMethods').removeObject(method);
+            method.set('appliedOn', null);
+            method.destroyRecord().then(() => {
+                // reload dataset model
+                self.modelFor('dataset').reload().then((response) => {
+                    self.get('unloadExtra.unload')(response, self.get('store'), 'method');
+                    self.get('unloadExtra.unload')(response, self.get('store'), 'subset');
+                    // hide the method-delete-modal
+                    $('#method-delete-modal').modal('toggle');
+                    let datasetId = parseInt(self.modelFor('dataset').get('id'));
+                    self.transitionTo('dataset.subset', datasetId, 0);
                 });
             });
         }

@@ -1,20 +1,28 @@
-{{#if ontology.length }}
-  <!-- button for toggling collapse -->
-  <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
-    aria-expanded="false" onclick={{action 'toggleBranch'}}>
-    <i class="fa fa-chevron-down"></i>
-  </button>
-{{else}}
-  <!-- placeholder for the toggle -->
-  <span class="navigation-button-placeholder">
-    <i class="fa fa-circle-o-notch fa-spin"></i>
-  </span>
-{{/if}}
-<!-- method type/label -->
-{{ method.label }}
-{{#if selectedFields}}
-  <small>k={{method.parameters.method.k}} ({{ selectedFields }})</small>
-{{/if}}
+<div id="structure-method-{{method.id}}">
+  {{#if ontology.length }}
+    <!-- button for toggling collapse -->
+    <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
+      aria-expanded="false" onclick={{action 'toggleBranch'}}>
+      <i class="fa fa-chevron-down"></i>
+    </button>
+  {{else}}
+    <!-- placeholder for the toggle -->
+    <span class="navigation-button-placeholder">
+      <i class="fa fa-circle-o-notch fa-spin"></i>
+    </span>
+  {{/if}}
+  <!-- method type/label -->
+  {{ method.label }}
+  {{#if selectedFields}}
+    <small>k={{method.parameters.method.k}} ({{ selectedFields }})</small>
+  {{/if}}
+  <small class="ml-1 delete" id="delete-method-{{method.id}}" 
+    data-toggle="modal"
+    data-target="#method-delete-modal"
+    data-methodid="{{method.id}}">
+    <i class="fa fa-times" aria-hidden="true"></i>
+  </small>
+</div>
 
 {{#bs-collapse collapsed=collapsed class="tree-branch"}}
   {{#each ontology as |onto| }}
