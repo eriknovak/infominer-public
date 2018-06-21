@@ -35,26 +35,25 @@ module.exports = {
         // get subset on which the method was used
         let subset = base.store('Subsets')[method.appliedOn];
         if (subset) {
+            let methodId;
             switch(qmMethod.type) {
             case 'clustering.kmeans':
-                    this._kmeansClustering(base, qmMethod, subset, fields);
+                methodId = this._kmeansClustering(base, qmMethod, subset, fields);
                 break;
             case 'visualization':
-                this._visualizationSetup(base, qmMethod, subset, fields);
+                methodId = this._visualizationSetup(base, qmMethod, subset, fields);
                 break;
             case 'filter.manual':
-                this._filterByQuery(base, qmMethod, subset, fields);
+                methodId = this._filterByQuery(base, qmMethod, subset, fields);
                 break;
             }
 
-            if (qmMethod instanceof Error) {
+            if (methodId instanceof Error) {
                 // something went wrong return an error
                 throw { errors: { message: 'createMethod: cannot initialize method - invalid method parameters' } };
             } else {
                 // store the method into the database
-                let methodId = base.store('Methods').push(qmMethod);
-                base.store('Methods')[methodId].$addJoin('appliedOn', subset);
-                return { methods: formatter.method(base.store('Methods')[methodId]) };
+                return this.get(base, methodId);
             }
         } else {
             return { errors: { message: `createMethod: No subset with id=${method.appliedOn}` } };
@@ -167,7 +166,7 @@ module.exports = {
     /**
      * Aggregate subset with given id.
      * @param {Object} base - The QMiner base object.
-     * @param {Object} id - The method data used to update.
+     * @param {Object} id - The subset id used to update.
      * @param {Object[]} fields - The fields in the database.
      * @returns {Object} The subset aggregates method.
      */
@@ -182,8 +181,7 @@ module.exports = {
             let method = {
                 type: 'aggregate.subset',
                 parameters: { id },
-                result: { aggregates: [ ] },
-                appliedOn: id
+                result: { aggregates: [ ] }
             };
             // iterate through the fields
             for (let field of fields) {
@@ -197,8 +195,11 @@ module.exports = {
                     });
                 }
             }
-            // save the method
-            return this.create(base, method, fields);
+            // join the created method with the applied subset
+            let methodId = base.store('Methods').push(method);
+            base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
+            // store the method into the database
+            return this.get(base, methodId);
 
         } else {
             return { errors: { message: `aggregateSubset: No subset with id=${id}` } };
@@ -280,8 +281,7 @@ module.exports = {
         if (!validator.validateSchema(features, validator.schemas.featureSchema)) {
             // features object is not in correct schema - set query
             // to Error and exit this function
-            query = new Error('Features are not in correct schema');
-            return;
+            return new Error('Features are not in correct schema');
         }
 
         /////////////////////////////////////////
@@ -290,8 +290,7 @@ module.exports = {
         if (!validator.validateSchema(query.parameters.method, validator.schemas.methodKMeansParams)) {
             // method parameters are not in correct schema - set query
             // to Error and exist this function
-            query = new Error('KMeans parameters are not in correct schema');
-            return;
+            return new Error('KMeans parameters are not in correct schema');
         }
 
         // create the feature space using the validated features object
@@ -370,6 +369,29 @@ module.exports = {
             // set the cluster label
             query.result.clusters[i].label = label;
         }
+
+        // join the created method with the applied subset
+        let methodId = base.store('Methods').push(query);
+        base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
+
+        // create subsets using the cluster information
+        for (let clusterId = 0; clusterId < query.result.clusters.length; clusterId++) {
+            const cluster = query.result.clusters[clusterId];
+            let subset = {
+                label: cluster.label,
+                description: null,
+                resultedIn: methodId,
+                meta: { clusterId }
+            };
+            // create subset and get its id
+            let { subsets: { id } } = require('./subset-handler').create(base, subset);
+            // aggregate the given subset
+            this.aggregateSubset(base, id, fields);
+            // join the produced subset with the method
+            base.store('Methods')[methodId].$addJoin('produced', id);
+        }
+
+        return methodId;
     },
 
     /**
@@ -382,6 +404,10 @@ module.exports = {
      */
     _visualizationSetup(base, query, subset, fields) {
         query.result = 'visualization';
+        // create subset for the given cluster
+        let methodId = base.store('Methods').push(query);
+        base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
+        return methodId;
     },
 
     /**
@@ -435,6 +461,11 @@ module.exports = {
             // store the document id in the correct cluster
             query.result.docIds.push(docId);
         }
+
+        // create subset for the given cluster
+        let methodId = base.store('Methods').push(query);
+        base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
+        return methodId;
     },
 
     /**

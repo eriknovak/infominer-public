@@ -30,7 +30,12 @@ export default Route.extend({
             self.modelFor('dataset').get('hasMethods').pushObject(method);
             // needed to correctly increment subset and method indices
             self.modelFor('dataset').incrementProperty('numberOfMethods');
-            method.save();
+            method.save().then(() => {
+                self.modelFor('dataset').reload().then((response) => { 
+                    self.modelFor('dataset').set('numberOfSubsets', response.data.numberOfSubsets);
+                    self.modelFor('dataset').set('numberOfMethods', response.data.numberOfMethods);
+                });
+            });
         },
 
         /**
