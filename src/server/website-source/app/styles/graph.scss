@@ -13,6 +13,13 @@ $height: 250px;
         text.large  { fill: $font-color-dark; }
     }
 
+    &.timeline {
+        font-weight: 500;
+        text.small  { fill: darken($primary-color, 35%); }
+        text.medium { fill: $tertiary-color; }
+        text.large  { fill: $font-color-dark; }
+    }
+
     &.histogram {
         .percent {
             rect { fill: $tertiary-color; }

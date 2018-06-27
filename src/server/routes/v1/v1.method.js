@@ -27,7 +27,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -42,14 +42,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request for all methods successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
 
     }); // GET /api/datasets/:dataset_id/methods
@@ -71,7 +71,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // check if method_id is an integer
@@ -82,7 +82,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter method_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter method_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter method_id is not an integer' } });
         }
 
         // get the user
@@ -97,14 +97,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request for method successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
 
     }); // GET /api/datasets/:dataset_id/methods/:method_id
@@ -122,7 +122,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         let methodId = parseInt(req.params.method_id);
@@ -132,7 +132,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter method_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter method_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter method_id is not an integer' } });
         }
 
         // get the user making the request
@@ -147,13 +147,13 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             logger.info('user request to delete method successful',
                 logger.formatRequest(req)
             );
             // send the response
-            return res.send(results);
+            return res.json(results);
         });
     }); // DELETE /api/datasets/:dataset_id/methods/:method_id
  
@@ -174,7 +174,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -196,14 +196,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request to create new method successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
 
     }); // POST /api/datasets/:dataset_id/methods
@@ -225,7 +225,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // check if subset_id is an integer
@@ -236,7 +236,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter method_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter method_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter method_id is not an integer' } });
         }
 
         // get the user
@@ -257,14 +257,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request to create new method successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
 
     }); // PUT /api/datasets/:dataset_id/methods

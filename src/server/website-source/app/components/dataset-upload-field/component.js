@@ -17,27 +17,31 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
-
+    
     init() {
         this._super(...arguments);
         this.set('fieldTypes', [
-            { name: 'text', type: 'string', selected: false },
             { name: 'number', type: 'float', selected: false },
-            { name: 'categories', type: 'string_v', selected: false }
+            { name: 'categories', type: 'string_v', selected: false },
+            { name: 'date-time', type: 'datetime', selected: false }
         ]);
+
         // get field type and possible field types
         let type = this.get('type');
 
         // find and set field type to the start of the array
-        for (let i = 0; i < this.get('fieldTypes').length; i++) {
+        let validFieldTypes = [];
+        for (let i = 0; i < this.get('fieldTypes.length'); i++) {
             let obj = this.get('fieldTypes').objectAt(i);
             if (get(obj, 'type') === type) { 
-                set(obj, 'selected', true); 
+                set(obj, 'selected', true);
                 // modify fieldTypes to reflect the possible type options
-                this.set('fieldTypes', this.get('fieldTypes').slice(0, i+1));
+                validFieldTypes.push(obj);
                 break; 
             }
         }
+        validFieldTypes.push({ name: 'text', type: 'string', selected: !validFieldTypes.length });
+        this.set('fieldTypes', validFieldTypes);
     },
 
     didReceiveAttrs() {

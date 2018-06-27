@@ -112,7 +112,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // create JSON API data
             let datasets = results.map(rec => {
@@ -129,7 +129,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send({ datasets });
+            return res.json({ datasets });
         }); // pg.select({ owner }, 'infominer_datasets')
 
     }); // GET /api/datasets
@@ -148,7 +148,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
 
             // log user request
@@ -171,7 +171,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: 'unknown delimiter' })
                 );
                 // send error object to user
-                return res.send({ errors: {
+                return res.json({ errors: {
                     filename: file.originalname,
                     msg: 'unknown delimiter, check if the delimiter is one of the following options ",", ";", "\t", "|", "~"' }
                 });
@@ -185,7 +185,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         logger.formatRequest(req, { error: xerror.message })
                     );
                     // send error object to user
-                    return res.send({ errors: { msg: xerror.message } });
+                    return res.status(500).json({ errors: { msg: xerror.message } });
                 }
 
                 // get dataset information
@@ -205,7 +205,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 let limit = 100, count = 1;
 
                 // set field types based on initial rows
-                while(!datasetFIn.eof) {
+                while(!datasetFIn.eof && limit > count) {
                     // document values to determine type of field
                     let document = datasetFIn.readLine().trim();
                     if (document.length === 0) { count++; continue; }
@@ -220,23 +220,29 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                                 logger.formatRequest(req, { error: 'number of values not matching with number of fields', values: docValues.length, fields: fields.length })
                             );
                             // send error object to user
-                            return res.send({ errors: {
+                            return res.json({ errors: {
                                 filename: file.originalname,
                                 msg: `number of values not matching with number of fields in row ${count+1}` }
                             });
                         });
                     }
 
+                    let validTypes = ['float', 'datetime', 'string_v', 'string'];
+
                     for (let j = 0; j < docValues.length; j++) {
                         let value = docValues[j];
                         // check if value has a pathway
-                        if (fieldTypes[j] !== 'string' &&
-                            fieldTypes[j] !== 'string_v' && 
+                        if (!validTypes.slice(1).includes(fieldTypes[j]) && 
                             !value.match(/[^0-9,\.]+/gi)) { 
+                                // the value is a number
                                 fieldTypes[j] = 'float'; 
-                        } else if (fieldTypes[j] !== 'string' && 
+                        } else if (!validTypes.slice(2).includes(fieldTypes[j]) &&
+                            Date.parse(value)) {
+                            fieldTypes[j] = 'datetime';
+                        } else if (!validTypes.slice(3).includes(fieldTypes[j]) && 
                             value.match(/\S*[\\\/][\w]+|[\w]+/gi).length === 1 &&
                             value.match(/\S*[\\\/][\w]+|[\w]+/gi)[0] === value) { 
+                                // the value is a 
                                 fieldTypes[j] = 'string_v'; 
                         } else { fieldTypes[j] = 'string'; }
                     }
@@ -255,7 +261,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req)
                 );
                 // return values to the user - for dataset creation
-                return res.send({
+                return res.json({
                     dataset: {
                         label,
                         filename
@@ -283,7 +289,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
 
             // check if results are not null
@@ -293,7 +299,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: 'no such file found' })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: 'no such file found' } });
+                return res.json({ errors: { msg: 'no such file found' } });
             }
 
             let filepath = results[0].filepath;
@@ -304,7 +310,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         logger.formatRequest(req, { error: xerror.message })
                     );
                     // send error object to user
-                    return res.send({ errors: { msg: xerror.message } });
+                    return res.status(500).json({ errors: { msg: xerror.message } });
                 }
                 // remove the temporary file
                 fileManager.removeFile(filepath);
@@ -338,7 +344,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
 
             // number of datasets is the name of the new dataset folder
@@ -357,7 +363,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         logger.formatRequest(req, { error: xerror.message })
                     );
                     // send error object to user
-                    return res.send({ errors: { msg: xerror.message } });
+                    return res.status(500).json({ errors: { msg: xerror.message } });
                 }
                 if (results.length !== 1) {
                     // log finding multiple results in postgres
@@ -365,7 +371,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         logger.formatRequest(req, { error: `multiple or no records found (${results.length}), unable to determine which is required` })
                     );
                     // send error object to user
-                    return res.send({ errors: { msg: 'found multiple or no temporary dataset files with name=' + dataset.filename } });
+                    return res.json({ errors: { msg: 'found multiple or no temporary dataset files with name=' + dataset.filename } });
                 }
                 // save temporary dataset file information
                 let tempDataset = results[0];
@@ -378,7 +384,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                             logger.formatRequest(req, { error: xerror.message })
                         );
                         // send error object to user
-                        return res.send({ errors: { msg: yerror.message } });
+                        return res.status(500).json({ errors: { msg: yerror.message } });
                     }
 
                     // initiate child process
@@ -387,7 +393,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     processHandler.createChild(datasetId);
 
                     // redirect the user to dataset
-                    res.send({ datasetId });
+                    res.json({ datasetId });
 
                     // body of the message
                     let body = {
@@ -477,7 +483,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -492,14 +498,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request for dataset successful',
                 logger.formatRequest(req)
             );
             // send results
-            return res.send(results);
+            return res.json(results);
         }); // sendToProcess
 
     }); // GET /api/datasets/:dataset_id
@@ -521,7 +527,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -542,7 +548,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
 
             // make update on the process
@@ -554,14 +560,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         logger.formatRequest(req, { error: xerror.message })
                     );
                     // send error object to user
-                    return res.send({ errors: { msg: error.message } });
+                    return res.status(500).json({ errors: { msg: error.message } });
                 }
                 // log request success
                 logger.info('user request to modify dataset successful',
                     logger.formatRequest(req)
                 );
                 // send results
-                return res.send(results);
+                return res.json(results);
             }); // sendToProcess
         }); // pg.update({ label, description }, 'infominer_datasets')
 
@@ -584,7 +590,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -603,7 +609,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     );
                 }
                 // return the process
-                res.send({});
+                res.json({});
 
                 // shutdown process
                 let body = { cmd: 'shutdown' };
@@ -657,7 +663,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         );
                     }
                     // send results
-                    res.send({});
+                    res.json({});
 
                     try {
                         // delete dataset folder
@@ -695,7 +701,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // TODO: get username of creator and handle empty user
@@ -708,7 +714,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
 
             if (results.length !== 1) {
@@ -717,7 +723,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: 'multiple dataset with same id found' })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: 'found multiple datasets with same id' } });
+                return res.json({ errors: { msg: 'found multiple datasets with same id' } });
             }
 
             // there are only one record with that id
@@ -733,7 +739,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(datasets);
+            return res.json(datasets);
 
         }); // pg.select({ owner }, 'infominer_datasets')
     }); // GET /api/datasets/:dataset_id/check

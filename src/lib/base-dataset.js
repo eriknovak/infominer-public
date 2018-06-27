@@ -58,7 +58,7 @@ class BaseDataset {
             console.error('Constructor parameters are not in specified schema');
             return {
                 errors: {
-                    messages: 'Constructor parameters are not in specified schema'
+                    msg: 'Constructor parameters are not in specified schema'
                 }
             };
 
@@ -94,7 +94,7 @@ class BaseDataset {
                 console.error('Schema parameters are not in specified form');
                 return {
                     errors: {
-                        messages: '_loadBase: Schema parameters are not in specified form'
+                        msg: '_loadBase: Schema parameters are not in specified form'
                     }
                 };
             }
@@ -107,7 +107,7 @@ class BaseDataset {
             console.error('Constructor parameters are not in specified schema');
             return {
                 errors: {
-                    messages: '_loadBase: self.params.mode must be "createClean" or "open"'
+                    msg: '_loadBase: self.params.mode must be "createClean" or "open"'
                 }
             };
         }
@@ -143,10 +143,15 @@ class BaseDataset {
                     field: field.name,
                     type: 'text_position'
                 });
-            } else if (field.type === 'float') {
+            } else if (field.type === 'float' || field.type === 'datetime') {
                 keys.push({
                     field: field.name,
                     type: 'linear'
+                });
+            } else if (field.type === 'string_v') {
+                keys.push({
+                    field: field.name,
+                    type: 'value'
                 });
             }
         }
@@ -219,14 +224,14 @@ class BaseDataset {
         switch (type) {
             case 'string':
                 return value;
-            case 'int':
-                return parseInt(value);
             case 'float':
                 return parseFloat(value);
             case 'string_v':
                 return value.split(/[\\\/]/g);
+            case 'datetime':
+                return new Date(value).toISOString();
             default:
-                throw new Error('FieldError: type is not "string", "int" or "float"');
+                throw new Error('FieldError: type is not "string", "float", "string_v" or "datetime"');
         }
     }
 
@@ -263,6 +268,8 @@ class BaseDataset {
             } else if (field.type === 'string_v') {
                 // categories should be aggregated as hierarchy
                 field.aggregate = 'hierarchy';
+            } else if (field.type === 'datetime') {
+                field.aggregate = 'timeline';
             }
         });
         // return the fields with aggregates
@@ -330,7 +337,7 @@ class BaseDataset {
             // input parameter is not in correct format - return Error
             return {
                 error: {
-                    message: 'Edit parameters are in incorrect format'
+                    msg: 'Edit parameters are in incorrect format'
                 }
             };
         }

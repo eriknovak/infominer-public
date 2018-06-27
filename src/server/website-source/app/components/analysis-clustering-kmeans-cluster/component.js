@@ -108,6 +108,8 @@ export default Component.extend({
     _setCluster() {
         let cluster = this.get('cluster');
         // set column width for medium and large view size
+        // TODO: remove filter
+        this.set('cluster.aggregates', cluster.aggregates.filter(aggregate => aggregate.type !== 'timeline'));
         this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 3, 'lg');
         this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 2, 'sm');
         // get subset names

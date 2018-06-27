@@ -27,7 +27,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -42,14 +42,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request for all subsets successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets
 
@@ -70,7 +70,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // get the user
@@ -87,14 +87,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request to create new subset successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
     }); // POST /api/datasets/:dataset_id/subsets
 
@@ -115,7 +115,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // check if subset_id is an integer
@@ -126,7 +126,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
         }
 
         // get the user
@@ -140,14 +140,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request for subset successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id
 
@@ -168,7 +168,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // check if subset_id is an integer
@@ -179,7 +179,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
         }
 
         // get the user
@@ -199,14 +199,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request to update subset successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
     }); // PUT /api/datasets/:dataset_id/subsets/:subset_id
 
@@ -223,7 +223,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         let subsetId = parseInt(req.params.subset_id);
@@ -233,7 +233,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
         }
         // the user making the request
         let owner = req.user ? req.user.id : 'development';
@@ -247,14 +247,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request to delete subset successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
     });
 
@@ -275,7 +275,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
         // check if subset_id is an integer
@@ -286,7 +286,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
             );
             // send error object to user
-            return res.send({ errors: { msg: 'Parameter subset_id is not an integer' } });
+            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
         }
 
         // query values
@@ -310,14 +310,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 logger.error('error [node_process]: user request for documents in subset failed',
                     logger.formatRequest(req, { error: error.message })
                 );
-                return res.send({ errors: { msg: error.message } });
+                return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
             logger.info('user request for documents in subset successful',
                 logger.formatRequest(req)
             );
             // send the data
-            return res.send(results);
+            return res.json(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id/documents
 };

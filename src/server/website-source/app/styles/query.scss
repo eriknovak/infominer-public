@@ -27,5 +27,17 @@
         padding: 1px;
         background: $secondary-color;
         color: white;
-      }
+    }
+
+    .ui-slider {
+        .slider { height: 10px; }
+        .slider-track {
+            height: 5px;
+            .slider-handle {
+                height: 15px;
+                width: 15px;
+            }
+        }
+    }
+
 }

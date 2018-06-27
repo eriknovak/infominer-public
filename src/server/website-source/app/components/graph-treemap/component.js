@@ -90,6 +90,8 @@ const HierarchyComponent = GraphComponent.extend({
         const fader = (color) => { return interpolateRgb(color, '#fff')(0.2); };
         const color = scaleOrdinal(d3ScaleChromatic.schemeCategory10.map(fader));
 
+
+
         /**************************************************
          * Background shading
          **************************************************/
@@ -135,7 +137,7 @@ const HierarchyComponent = GraphComponent.extend({
             .text(d => d);
       
         cell.append('title')
-            .text(d => `category: ${d.data.id.split('.').slice(1).join(' 🡒 ')}\ncount: ${format('.0f')(d.data.size)}`);
+            .text(d => `category: ${d.data.id.split('.').slice(1).join('/')}\ncount: ${format('.0f')(d.data.size)}`);
     }
 
 });

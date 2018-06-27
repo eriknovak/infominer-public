@@ -15,7 +15,8 @@ export default Component.extend({
         let result = this.get('method.result');
 
         // prepare the layout of the components
-        let aggregates = result.aggregates;
+        // TODO: remove filter
+        let aggregates = result.aggregates.filter(aggregate => aggregate.type !== 'timeline');
         // set column width for medium and large view size
         this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
         this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');

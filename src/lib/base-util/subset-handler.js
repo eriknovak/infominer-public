@@ -195,7 +195,7 @@ module.exports = {
 
         if (id < 0 || base.store('Subsets').length <= id) {
             // TODO: log error
-            return { errors: { message: 'The subset id does not match with any existing subsets' } };
+            return { errors: { msg: 'The subset id does not match with any existing subsets' } };
         }
 
         // prepare the query parameters

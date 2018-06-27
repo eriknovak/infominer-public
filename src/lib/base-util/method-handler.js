@@ -50,13 +50,13 @@ module.exports = {
 
             if (methodId instanceof Error) {
                 // something went wrong return an error
-                throw { errors: { message: 'createMethod: cannot initialize method - invalid method parameters' } };
+                return { errors: { msg: 'createMethod: cannot initialize method - invalid method parameters' } };
             } else {
                 // store the method into the database
                 return this.get(base, methodId);
             }
         } else {
-            return { errors: { message: `createMethod: No subset with id=${method.appliedOn}` } };
+            return { errors: { msg: `createMethod: No subset with id=${method.appliedOn}` } };
         }
     },
 
@@ -84,7 +84,7 @@ module.exports = {
             // validate id
             if (id < 0 || methods.length <= id) {
                 // handle id missmatch
-                return { errors: { message: 'The method id does not match with any existing methods' } };
+                return { errors: { msg: 'The method id does not match with any existing methods' } };
             }
             // get the method from database
             let method = methods[id];
@@ -202,7 +202,7 @@ module.exports = {
             return this.get(base, methodId);
 
         } else {
-            return { errors: { message: `aggregateSubset: No subset with id=${id}` } };
+            return { errors: { msg: `aggregateSubset: No subset with id=${id}` } };
         }
     },
 

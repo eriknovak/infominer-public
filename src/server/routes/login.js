@@ -82,7 +82,7 @@ module.exports = function (app, passport, ignoreSecurity) {
             // check if user is authenticated - continue with serving data
             if (req.isAuthenticated()) { return next(); }
             // otherwise send authentication error
-            return res.send({ errors: { msg: 'User not authenticated' } });
+            return res.status(500).json({ errors: { msg: 'User not authenticated' } });
         });
     }
 

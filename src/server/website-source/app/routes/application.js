@@ -49,7 +49,13 @@ export default ApplicationRoute.extend({
 
                 }
             });
+    },
+
+    actions: {
+        error(error) {
+            return error.status === '403' ?
+                this.replaceWith('login') :
+                true;
+        }
     }
-
-
 });

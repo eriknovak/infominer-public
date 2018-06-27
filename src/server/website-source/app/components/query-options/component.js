@@ -12,10 +12,10 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         const query = this.get('query');
-
         // set text fields
-        this.set('textFields', this.get('fields').filterBy('type', 'string')
-            .map(field => {
+        this.set('textFields', this.get('fields').filter(field => 
+            field.type === 'string' || field.type === 'string_v'
+            ).map(field => {
                 const included = query && query.text ? query.text.fields.includes(field.name) : true;
                 return { name: field.name, included };
             })
@@ -24,6 +24,7 @@ export default Component.extend({
         // set number fields
         let numberFields = this.get('fields').filterBy('type', 'float').map(field => {
             field.value = [field.metadata.min, field.metadata.max];
+            field.step = field.metadata.min % 1 || field.metadata.max % 1 ? 0.001 : 1;
             return field;
         });
         // add spacing classes to number fields
