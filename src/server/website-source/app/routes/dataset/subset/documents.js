@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+import { get } from '@ember/object';
 import $ from 'jquery';
 
 export default Route.extend({
@@ -21,6 +22,8 @@ export default Route.extend({
     init() {
         this._super(...arguments);
         this.set('defaultQuery', { calcAggr: true });
+
+
     },
 
     beforeModel(transition) {
@@ -53,12 +56,19 @@ export default Route.extend({
         if (this.get('limit')) { query.limit = this.get('limit'); }
         if (this.get('sortTarget')) { query.sort = this.get('sortTarget'); }
         if (this.get('query')) { query.query = this.get('query'); }
+
+        const fields = this.modelFor('dataset').get('fields');
+
         // get documents
         return this.get('store').query('document', query)
             .then(documents => {
                 if (documents.meta.aggregates.length) {
                     this.set('aggregates', documents.meta.aggregates);
                 }
+                documents.meta.fields.forEach(field => {
+                    field.show = get(fields.find(item => item.id === field.id), 'show');
+                });
+
                 return {
                     documents,
                     metadata: documents.meta,

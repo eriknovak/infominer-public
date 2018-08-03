@@ -133,7 +133,8 @@ const HistogramComponent = GraphComponent.extend({
         content.append('path')
             .datum(pathValues)
             .attr('class', 'percentOutline')
-            .attr('d', percentOutline);
+            .attr('d', percentOutline)
+            .style('fill', '#3366CC');
 
         /**************************************************
          * Percentage attributes
@@ -165,7 +166,9 @@ const HistogramComponent = GraphComponent.extend({
                 let squareHight = height - yScale(d.percent);
                 return squareHight > 20 ? 'white' : '#2C3539';
             })
-            .text(d => { return d.frequency ? formatCount(d.frequency) : ''; });
+            .text(d => { return d.frequency ? formatCount(d.frequency) : ''; })
+            .style('font-family', 'Open Sans')
+            .style('font-size', '9px');
 
 
         /**************************************************

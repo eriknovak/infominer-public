@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 
 export default Component.extend({
     // component attributes
@@ -25,7 +26,15 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
+        // save values
+        this.set('index', this.get('document.id'));
+        this.set('selected', this.get('document.selected'));
 
+        // set link with expanded info
+        this.set('dataTarget', `#document-${this.get('document.id')}`);
+    },
+
+    documentValues: computed('fields.@each.show', 'query', function () {
         // get document valueObject and fields
         const fields = this.get('fields');
         // get query parameters
@@ -35,13 +44,14 @@ export default Component.extend({
         let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
+            if (!field.show) { continue; }
             let value = this.get(`document.values.${field.name}`);
-            if (field.type == 'string') { 
-                value = this._trimContent(value, this.get('nChar')); 
-            } else if (field.type == 'string_v') { 
-                value = value.join(' 🡒 '); 
-            } else if (field.type == 'datetime') { 
-                value = (new Date(value)).toUTCString(); 
+            if (field.type == 'string') {
+                value = this._trimContent(value, this.get('nChar'));
+            } else if (field.type == 'string_v') {
+                value = value.join(' 🡒 ');
+            } else if (field.type == 'datetime') {
+                value = (new Date(value)).toUTCString();
             }
             // find the selected query value, find and highligh the text
             if (query && query.text && query.text.fields.includes(field.name)) {
@@ -50,14 +60,8 @@ export default Component.extend({
             }
             documentValues.push({ value: value, field: field.name });
         }
-        // save values
-        this.set('index', this.get('document.id'));
-        this.set('selected', this.get('document.selected'));
-        this.set('documentValues', documentValues);
-
-        // set link with expanded info
-        this.set('dataTarget', `#document-${this.get('document.id')}`);
-    },
+        return documentValues;
+    }),
 
     ///////////////////////////////////////////////////////
     // Actions

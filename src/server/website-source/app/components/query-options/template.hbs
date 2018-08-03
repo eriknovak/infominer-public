@@ -2,16 +2,16 @@
   <div class="form-group row">
     <div class="offset-lg-6 col-lg-6">
       <div class="input-group">
-        <input type="text" 
-          class="form-control keywords-input" 
-          autocomplete="on" 
-          data-purpose="keywords" 
+        <input type="text"
+          class="form-control keywords-input"
+          autocomplete="on"
+          data-purpose="keywords"
           placeholder="Insert search phrase"
           value="{{keywords}}"
         >
         <div class="input-group-append">
           <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Selected Fields
+            Query By Fields
             <span class="number-circle">{{numberOfSelectedFields}}</span>
           </button>
           <div class="dropdown-menu dropdown-menu-right">
@@ -60,16 +60,16 @@
 
 
 
-<button 
-  class="btn btn-primary pull-right" 
+<button
+  class="btn btn-primary pull-right"
   {{action "changeQuery"}}
 >
   Start Query
 </button>
 
 {{#if queryChanged}}
-  <button 
-    class="btn btn-light pull-right" 
+  <button
+    class="btn btn-light pull-right"
     data-toggle="modal"
     data-target="#subset-create-modal"
   >

@@ -1,8 +1,12 @@
 import Component from '@ember/component';
+import { inject as service } from '@ember/service';
 import { computed, set } from '@ember/object';
 import { htmlSafe } from '@ember/string';
 
 export default Component.extend({
+
+    store: service('store'),
+
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -25,13 +29,12 @@ export default Component.extend({
         this._super(...arguments);
 
         // set documents, fields and pagination values
-        this.get('metadata.fields').forEach(field => { 
+        this.get('metadata.fields').forEach(field => {
             set(field, 'sortable', field.type !== 'string_v');
         });
-        this.set('fields', this.get('metadata.fields'));
         this.set('query', this.get('metadata.query'));
         // table content rows
-        this.set('loading-row-width', 1 + this.get('fields.length'));
+        this.set('loading-row-width', 1 + this.get('metadata.fields').filter(field => field.show).length);
 
         /*************************************
          * pagination navigation parameters
@@ -51,7 +54,7 @@ export default Component.extend({
         this.set('firstPage', 1);
         this.set('prevPage', page-1);
         this.set('nextPage', page+1);
-        
+
         // set last page
         let lastPage = count/limit;
         if (lastPage % 1 !== 0) { lastPage = Math.floor(lastPage) + 1; }
@@ -91,8 +94,25 @@ export default Component.extend({
         this.set('possibleLimits', possibleLimits);
     },
 
-    columnWidth: computed('fields.length', function () {
-        return htmlSafe(`width:${100 / this.get('fields.length')}%`);
+    didInsertElement() {
+        let self = this;
+        self._super(...arguments);
+        $(`#${self.get('elementId')} .dropdown-menu`).click(function(e) {
+            e.stopPropagation();
+        });
+    },
+
+    columnWidth: computed('metadata.fields.@each.show', function () {
+        return htmlSafe(`width:${100 / this.get('metadata.fields').filter(field => field.show).length}%`);
+    }),
+
+    numberOfFieldsShown: computed('metadata.fields.@each.show', function () {
+        let fields = this.get('store').peekAll('dataset').objectAt(0).get('fields');
+        this.get('metadata.fields').forEach(field => {
+            set(fields.find(f => f.id === field.id), 'show', field.show);
+        });
+
+        return this.get('metadata.fields').filter(field => field.show).length;
     }),
 
     ///////////////////////////////////////////////////////
@@ -107,11 +127,11 @@ export default Component.extend({
          */
         sortBy(index) {
             // get selected field
-            let selectedField = this.get('fields').objectAt(index);
+            let selectedField = this.get('metadata.fields').objectAt(index);
             // sort parameters
             let field = selectedField.name;
             // switch the sort type of the selected field
-            let sortType = selectedField.sortType === 'desc' ? 
+            let sortType = selectedField.sortType === 'desc' ?
                 this.get('sortOptions')[1] :
                 this.get('sortOptions')[0];
 

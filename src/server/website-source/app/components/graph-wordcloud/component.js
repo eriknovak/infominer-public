@@ -92,7 +92,7 @@ const WordCloudComponent = GraphComponent.extend({
     _redrawGraph() {
         let self = this;
         self._setLoadingState();
-        let creationTimeout = setTimeout(function () { self.drawGraph(); }, 300); 
+        let creationTimeout = setTimeout(function () { self.drawGraph(); }, 300);
         self.set('creationTimeout', creationTimeout);
     },
 
@@ -165,7 +165,18 @@ const WordCloudComponent = GraphComponent.extend({
             .attr('text-anchor', 'middle')
             .attr('transform', d => `translate(${d.x},${d.y})`)
             .text(d => d.text)
-            .style('font-size', d => `${d.size}px`);
+            .style('font-weight', 500)
+            .style('font-family', 'Roboto')
+            .style('font-size', d => `${d.size}px`)
+            .style('fill', d => {
+                if (d.colorClass === 'small') {
+                    return 'gray';
+                } else if (d.colorClass === 'medium') {
+                    return '#3366CC';
+                } else {
+                    return '#2C3539';
+                }
+            });
 
     }
 

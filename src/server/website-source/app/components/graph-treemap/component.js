@@ -103,30 +103,30 @@ const HierarchyComponent = GraphComponent.extend({
             .paddingInner(1);
 
         let root = hierarchy(data)
-            .eachBefore(d => { 
-                d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name; 
+            .eachBefore(d => {
+                d.data.id = (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
             })
             .sum(d => Math.sqrt(d.size))
             .sort((a, b) => b.height - a.height || b.value - a.value);
-      
+
         treemapFunction(root);
-      
+
         let cell = content.selectAll('g')
           .data(root.leaves())
           .enter().append('g')
             .attr('transform', d => `translate(${d.x0},${d.y0})`);
-      
+
         cell.append('rect')
             .attr('id', d => `${this.get('elementId')}-${d.data.id}`)
             .attr('width', d => d.x1 - d.x0)
             .attr('height', d => d.y1 - d.y0)
             .attr('fill', d => color(d.data.id.split('.')[1]));
-      
+
         cell.append('clipPath')
             .attr('id', d => `clip-${this.get('elementId')}-${d.data.id}`)
           .append('use')
             .attr('xlink:href', d => `#${this.get('elementId')}-${d.data.id}`);
-      
+
         cell.append('text')
             .attr('clip-path', d => `url(#clip-${this.get('elementId')}-${d.data.id}`)
           .selectAll('tspan')
@@ -134,8 +134,9 @@ const HierarchyComponent = GraphComponent.extend({
           .enter().append('tspan')
             .attr('x', 4)
             .attr('y', (d, i) => 14 + i * 14)
-            .text(d => d);
-      
+            .text(d => d)
+            .style('font-family', 'Open Sans');
+
         cell.append('title')
             .text(d => `category: ${d.data.id.split('.').slice(1).join('/')}\ncount: ${format('.0f')(d.data.size)}`);
     }

@@ -56,7 +56,8 @@
             & > td {
                 border-top: 0px !important;
                 vertical-align: middle;
-                word-break: break-word;
+                overflow-wrap: break-word;
+
                 .checkbox label { margin-bottom: 0; }
             }
             .clickable { cursor: pointer; }
@@ -110,6 +111,26 @@
         margin-bottom: 50px;
         .pull-center { text-align: center; }
         .document-display-info { margin: 6px 0; }
+    }
+
+    .table-responsive-xl {
+        margin-bottom: 10px;
+    }
+
+    .table-responsive-xl::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    .table-responsive-xl::-webkit-scrollbar-track {
+        background: $primary-color;
+    }
+
+    .table-responsive-xl::-webkit-scrollbar-thumb {
+        background: $tertiary-color;
+    }
+
+    .table-responsive-xl::-webkit-scrollbar-thumb:hover {
+        background: darken($tertiary-color, 5%);
     }
 }
 

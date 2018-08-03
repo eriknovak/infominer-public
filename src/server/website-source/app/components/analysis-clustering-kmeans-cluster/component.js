@@ -96,7 +96,7 @@ export default Component.extend({
                     set(field, 'sortType', fieldParams.sortType);
                 }
             });
-            
+
             let documents = this.get('cluster.documentSample').sortBy(`values.${fieldParams.field}`);
             if (fieldParams.sortType === 'desc') {
                 documents.reverse();

@@ -3,54 +3,77 @@
     <div class="row">
       <div class="col-lg-12 table-options">
         {{#if changeQuery}}
-          {{ query-options fields=fields query=query action=changeQuery }}
+          {{ query-options fields=metadata.fields query=query action=changeQuery }}
         {{/if}}
-        {{! document limit selection }}
+
         <span>
-          Show:
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Show fields
+            <span class="number-circle">{{numberOfFieldsShown}}</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-left">
+            {{#each metadata.fields as |field index|}}
+              <div class="dropdown-item">
+                {{
+                  checkbox-select
+                  checkboxId=(concat "field-selection-checkbox-" index)
+                  checked=field.show
+                }}
+                <label class="query-field-selection">{{field.name}}</label>
+              </div>
+            {{/each}}
+          </div>
+        </span>
+
+        <span>
+          Show
           <select id="table-show-limit" onchange={{action 'changeLimit'}}>
             {{#each possibleLimits as |limit|}}
               <option selected={{if limit.selected "selected"}}>{{ limit.value }}</option>
             {{/each}}
           </select>
+          documents
         </span>
 
       </div>
     </div>
 
-    <table class="table table-hover">
-      {{! table header }}
-      <thead>
-        <tr>
-          {{!-- <th class="checkbox-header" style="width:1%;"></th> --}}
-          {{#each fields as |field index|}}
-            <th class="{{field.name}}" style={{columnWidth}} onclick={{if field.sortable (action 'sortBy' index)}}>
-              {{field.name}} 
-              {{#if field.sortable }}
-                <i class="pull-right fa fa-sort{{if field.sortType (concat "-" field.sortType)}}" aria-hidden="true"></i>
-              {{/if}}
-            </th>
-          {{/each}}
-        </tr>
-      </thead>
-      {{! table body }}
-      <tbody>
-        {{#if documents.length}}
-          {{! if documents are available show them }}
-          {{#each documents as |document| }}
-            {{ document-table-row             document=document fields=fields query=query }}
-            {{ document-table-row-information document=document fields=fields query=query }}
-          {{/each}}
-        {{else}}
+    <div class="table-responsive-xl">
+      <table class="table table-hover">
+        {{! table header }}
+        <thead>
           <tr>
-            <td colspan="{{loading-row-width}}">
-              <p>No documents found for given query parameters</p>
-            </td>
+            {{!-- <th class="checkbox-header" style="width:1%;"></th> --}}
+            {{#each metadata.fields as |field index|}}
+              {{#if field.show}}
+                <th class="{{field.name}}" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>
+                  {{field.name}}
+                  {{#if field.sortable }}
+                    <i class="pull-right fa fa-sort{{if field.sortType (concat "-" field.sortType)}}" aria-hidden="true"></i>
+                  {{/if}}
+                </th>
+              {{/if}}
+            {{/each}}
           </tr>
-        {{/if}}
-      </tbody>
-    </table>
-
+        </thead>
+        {{! table body }}
+        <tbody>
+          {{#if documents.length}}
+            {{! if documents are available show them }}
+            {{#each documents as |document| }}
+              {{ document-table-row             document=document fields=metadata.fields query=query }}
+              {{ document-table-row-information document=document fields=metadata.fields query=query }}
+            {{/each}}
+          {{else}}
+            <tr>
+              <td colspan="{{loading-row-width}}">
+                <p>No documents found for given query parameters</p>
+              </td>
+            </tr>
+          {{/if}}
+        </tbody>
+      </table>
+    </div>
     {{! indeces of displayed documents and navigation bar }}
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-3">
@@ -101,7 +124,6 @@
     </div>{{! .col-xs-12.col-sm-12.col-md-6 }}
 
   </div>{{! .row }}
-    {{!-- {{ document-table-create-subset createSubset=createSubset }} --}}
 </div>
 
 {{yield}}
