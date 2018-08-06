@@ -130,6 +130,7 @@ p.modal-subtitle { margin-bottom: 0px; }
     height: 20px;
     position: relative;
     margin: auto;
+    font-size: 13px;
 
     input[type=checkbox] {
         display: none;
@@ -148,7 +149,7 @@ p.modal-subtitle { margin-bottom: 0px; }
         border-radius: 3px;
         margin: 0px;
         display: inline;
-        padding-right: 18px;
+        padding-right: 15px;
 
         &:hover::after { opacity: 0.5; }
 
@@ -159,8 +160,8 @@ p.modal-subtitle { margin-bottom: 0px; }
             width: 10px;
             height: 6px;
             background: transparent;
-            top: 5px;
-            left: 5px;
+            top: 4px;
+            left: 4px;
             border: 3px solid #333;
             border-top: none;
             border-right: none;
@@ -331,9 +332,9 @@ p.message {
     }
 }
 
-.fa.edit { 
-    cursor: pointer; 
-    font-size: 16px; 
+.fa.edit {
+    cursor: pointer;
+    font-size: 16px;
     &.confirm-editing { color: green; }
     &.cancel-editing { color: darken($primary-color, 15%); }
 }

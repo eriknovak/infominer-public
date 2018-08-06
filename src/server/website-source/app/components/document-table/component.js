@@ -4,9 +4,7 @@ import { computed, set } from '@ember/object';
 import { htmlSafe } from '@ember/string';
 
 export default Component.extend({
-
-    store: service('store'),
-
+    fieldSelection: service('field-selection'),
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -107,9 +105,8 @@ export default Component.extend({
     }),
 
     numberOfFieldsShown: computed('metadata.fields.@each.show', function () {
-        let fields = this.get('store').peekAll('dataset').objectAt(0).get('fields');
         this.get('metadata.fields').forEach(field => {
-            set(fields.find(f => f.id === field.id), 'show', field.show);
+            this.get('fieldSelection').showFieldInTable(field.id, field.show);
         });
 
         return this.get('metadata.fields').filter(field => field.show).length;

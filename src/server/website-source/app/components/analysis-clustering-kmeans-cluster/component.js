@@ -5,6 +5,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     classNames: ['analysis-component', 'cluster-content'],
+    fieldSelection: service('field-selection'),
     columnWidth: service('column-size'),
     store:       service('store'),
 
@@ -22,7 +23,10 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        this._setCluster();
+        let cluster = this.get('cluster');
+        if (cluster.subset.id) {
+            set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
+        }
     },
 
     didInsertElement() {
@@ -46,6 +50,19 @@ export default Component.extend({
             });
         }
     },
+
+    aggregates: computed('fieldSelection.fieldSettings.@each.showInVisual', function () {
+        // set column width for medium and large view size
+        // TODO: remove filter
+        let aggregates = this.get('cluster.aggregates').filter(aggregate =>
+            aggregate.type !== 'timeline' && this.get('fieldSelection').isShownInVisual(aggregate.field)
+        );
+        this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
+        this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');
+        // get subset names
+
+        return aggregates;
+    }),
 
     documents: computed('cluster.documentSample', 'limit', 'page', function () {
         let limit = this.get('limit');

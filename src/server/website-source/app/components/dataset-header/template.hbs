@@ -1,7 +1,7 @@
 <div class="container-fluid dataset-header">
   <div class="row">
     <div class="col-sm-12 offset-lg-1 col-lg-11">
-      <div class="row">
+      <div class="row dataset-information">
         <div class="col-sm-5 col-md-4 col-lg-3">
           {{! Dataset title and information }}
           <h2 class="description-header">{{dataset.label}}</h2>
@@ -16,21 +16,50 @@
           <span class="dataset-created">Created: {{dataset.date}}</span>
         </div>{{! .col-sm-5.col-md-4.col-lg-3 }}
 
-        {{#if dataset.description}}
           <div class="col-sm-7 col-md-8 col-lg-9">
             {{! Dataset description }}
             <div class="row">
               <div class="col-lg-10">
-                <h4 class="description-header">Description</h4>
-                <p class="dataset-description">{{dataset.description}}</p>
+                {{#if dataset.description}}
+                  <h4 class="description-header">Description</h4>
+                  <p class="dataset-description">{{dataset.description}}</p>
+                {{/if}}
               </div>{{! .col-lg-10 }}
             </div>{{! .row }}
           </div>{{! .col-sm-7.col-md-8.col-lg-9 }}
-        {{/if}}
 
       </div>{{! .row }}
     </div>{{! .col-sm-12.offset-lg-1.col-lg-11 }}
   </div>{{! .row }}
+
+  <div class="row visualization-field-selection">
+    <div class="col-sm-12 offset-lg-1 col-lg-11">
+      <div class="offset-sm-5 col-sm-7 offset-md-4 col-md-8 offset-lg-3 col-lg-9">
+        <div class="row">
+          <div class="col-lg-10 pl-2">
+
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
+              id="visualization-field-selection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Field visualization selection
+            </button>
+            <div class="dropdown-menu dropdown-menu-left">
+              {{#each fieldSelection.fieldSettings as |field index|}}
+                <div class="dropdown-item">
+                  {{
+                    checkbox-select
+                    checkboxId=(concat 'field-visual-' index)
+                    checked=field.showInVisual
+                  }}
+                  <label class="query-field-selection">{{field.name}}</label>
+                </div>
+              {{/each}}
+            </div>
+
+          </div>{{! .col-lg-10 }}
+        </div>{{! .row }}
+      </div>{{! .col-sm-7.col-md-8.col-lg-9 }}
+    </div>
+  </div>
 </div>{{! .container-fluid }}
 
 {{! Delete dataset warning }}
@@ -45,7 +74,7 @@
       {{! modal body }}
       <div class="modal-body">
         <p>
-          Are you sure you want to delete dataset <b class="uppercase">{{dataset.label}}</b>? 
+          Are you sure you want to delete dataset <b class="uppercase">{{dataset.label}}</b>?
           You will not be able to revert this action.
         </p>
       </div>

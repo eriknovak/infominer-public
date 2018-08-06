@@ -13,7 +13,7 @@ export default Component.extend({
         this._super(...arguments);
         const query = this.get('query');
         // set text fields
-        this.set('textFields', this.get('fields').filter(field => 
+        this.set('textFields', this.get('fields').filter(field =>
             field.type === 'string' || field.type === 'string_v'
             ).map(field => {
                 const included = query && query.text ? query.text.fields.includes(field.name) : true;

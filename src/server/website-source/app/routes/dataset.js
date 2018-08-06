@@ -13,7 +13,7 @@ const DatasetRoute = ENV.environment === 'development' ?
     Route.extend(AuthenticatedRouteMixin);
 
 export default DatasetRoute.extend({
-
+    fieldSelection: service('field-selection'),
     unloadExtra: service('unload-extra'),
 
     model(params) {
@@ -32,7 +32,13 @@ export default DatasetRoute.extend({
             subsetAdapter.set('namespace', namespace);
             methodAdapter.set('namespace', namespace);
         }
-        return this.get('store').findRecord('dataset', params.dataset_id);
+        return this.get('store').findRecord('dataset', params.dataset_id)
+            .then(dataset => {
+                // required to initialize service for that dataset
+                this.get('fieldSelection').init();
+                // return the dataset
+                return dataset;
+            });
     },
 
     actions: {
@@ -68,7 +74,7 @@ export default DatasetRoute.extend({
                     // if subset deleted through edit subset modal
                     if ($('#edit-subset-modal').hasClass('show')) {
                         $('#edit-subset-modal').modal('toggle');
-                    } 
+                    }
                     // hide the subset-delete-modal
                     $('#subset-delete-modal').modal('toggle');
                     let datasetId = parseInt(self.modelFor('dataset').get('id'));

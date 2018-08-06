@@ -1,7 +1,10 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
+import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
 export default Component.extend({
+    fieldSelection: service('field-selection'),
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -18,6 +21,14 @@ export default Component.extend({
         this._super(...arguments);
         // modify date to appropriate format
         this._prepareDate();
+    },
+
+    didInsertElement() {
+        let self = this;
+        self._super(...arguments);
+        $(`#${self.get('elementId')} .dropdown-menu`).click(function(e) {
+            e.stopPropagation();
+        });
     },
 
     ///////////////////////////////////////////////////////

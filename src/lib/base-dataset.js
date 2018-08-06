@@ -241,6 +241,8 @@ class BaseDataset {
         let dataset = this.base.store('Dataset').allRecords;
         // set aggregate types for each field
         fields.forEach(field => {
+            // TODO: add editable configuration
+            // for showing fields in tables
             field.show = field.id < 4;
             if (field.type === 'float') {
                 // aggregate field of type float with histogram

@@ -28,15 +28,21 @@ export default Component.extend({
         // set window resize listener
         $(window).on('resize', function () {
             clearTimeout(self.get('resizeTimer'));
-            self.set('resizeTimer', setTimeout(function () {
+            self.set('windowResize', setTimeout(function () {
                 once(self, '_handleResize');
             }, 500));
         });
+        self.set('resizeCheck', setInterval(function () {
+            if ($(self.element).width() >= 0 && $(self.element).width() !== self.get('width')) {
+                once(self, '_handleResize');
+            }
+        }, 100));
     },
 
     willDestroyElement() {
         this._super(...arguments);
-        clearTimeout(this.get('resizeTimer'));
+        clearTimeout(this.get('windowResize'));
+        clearInterval(this.get('resizeCheck'));
         $(window).off('resize');
     },
 

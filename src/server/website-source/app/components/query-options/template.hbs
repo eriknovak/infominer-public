@@ -1,6 +1,6 @@
 {{#if textFields}}
   <div class="form-group row">
-    <div class="offset-lg-6 col-lg-6">
+    <div class="col-lg-12">
       <div class="input-group">
         <input type="text"
           class="form-control keywords-input"
@@ -10,22 +10,26 @@
           value="{{keywords}}"
         >
         <div class="input-group-append">
-          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Query By Fields
-            <span class="number-circle">{{numberOfSelectedFields}}</span>
-          </button>
-          <div class="dropdown-menu dropdown-menu-right">
-            {{#each textFields as |field index|}}
-              <div class="dropdown-item">
-                {{ checkbox-select
-                  checkboxId=(concat "query-checkbox-" index)
-                  checked=field.included
-                }}
-                <label class="query-field-selection">{{field.name}}</label>
-              </div>
-            {{/each}}
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+              id="query-by-fields" aria-haspopup="true" aria-expanded="false">
+              Query by fields
+              <span class="number-circle">{{numberOfSelectedFields}}</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="query-by-fields">
+              {{#each textFields as |field index|}}
+                <div class="dropdown-item">
+                  {{ checkbox-select
+                    checkboxId=(concat "query-by-fields-checkbox-" index)
+                    checked=field.included
+                  }}
+                  <label class="query-field-selection">{{field.name}}</label>
+                </div>
+              {{/each}}
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -33,7 +37,7 @@
 
 {{#if numberFields}}
   <div class="form-group row">
-    <div class="offset-lg-6 col-lg-6">
+    <div class="col-lg-12">
       <div class="row">
         {{#each numberFields as |field index|}}
           <div class="{{concat field.columnmd ' ' field.columnsm}}">
@@ -60,21 +64,23 @@
 
 
 
-<button
-  class="btn btn-primary pull-right"
-  {{action "changeQuery"}}
->
-  Start Query
-</button>
-
 {{#if queryChanged}}
   <button
-    class="btn btn-light pull-right"
+    class="btn btn-primary pull-right"
     data-toggle="modal"
     data-target="#subset-create-modal"
   >
-    Save Results
+    Save results
   </button>
 {{/if}}
+
+<button
+  class="btn btn-secondary pull-right"
+  {{action "changeQuery"}}
+>
+  Start query
+</button>
+
+
 
 {{yield}}

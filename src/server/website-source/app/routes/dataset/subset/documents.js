@@ -1,8 +1,10 @@
 import Route from '@ember/routing/route';
-import { get } from '@ember/object';
+import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
 export default Route.extend({
+
+    fieldSelection: service('field-selection'),
 
     // default parameters
     defaultPage: 1,
@@ -22,8 +24,6 @@ export default Route.extend({
     init() {
         this._super(...arguments);
         this.set('defaultQuery', { calcAggr: true });
-
-
     },
 
     beforeModel(transition) {
@@ -57,7 +57,8 @@ export default Route.extend({
         if (this.get('sortTarget')) { query.sort = this.get('sortTarget'); }
         if (this.get('query')) { query.query = this.get('query'); }
 
-        const fields = this.modelFor('dataset').get('fields');
+        // service for field selection
+        const fieldSelection = this.get('fieldSelection');
 
         // get documents
         return this.get('store').query('document', query)
@@ -66,7 +67,7 @@ export default Route.extend({
                     this.set('aggregates', documents.meta.aggregates);
                 }
                 documents.meta.fields.forEach(field => {
-                    field.show = get(fields.find(item => item.id === field.id), 'show');
+                    field.show = fieldSelection.isShownInTable(field.id);
                 });
 
                 return {

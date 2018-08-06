@@ -25,6 +25,10 @@
 
     .table-options {
         padding-bottom: 10px;
+        .table-options-show {
+            margin-top: 5px;
+            display: inline-block;
+        }
         span select {
             width: 60px;
             background-color: white;

@@ -6,26 +6,7 @@
           {{ query-options fields=metadata.fields query=query action=changeQuery }}
         {{/if}}
 
-        <span>
-          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Show fields
-            <span class="number-circle">{{numberOfFieldsShown}}</span>
-          </button>
-          <div class="dropdown-menu dropdown-menu-left">
-            {{#each metadata.fields as |field index|}}
-              <div class="dropdown-item">
-                {{
-                  checkbox-select
-                  checkboxId=(concat "field-selection-checkbox-" index)
-                  checked=field.show
-                }}
-                <label class="query-field-selection">{{field.name}}</label>
-              </div>
-            {{/each}}
-          </div>
-        </span>
-
-        <span>
+        <span class="table-options-show">
           Show
           <select id="table-show-limit" onchange={{action 'changeLimit'}}>
             {{#each possibleLimits as |limit|}}
@@ -34,6 +15,28 @@
           </select>
           documents
         </span>
+
+        <span class="dropdown pull-right">
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+            id="document-table-{{elementId}}" aria-haspopup="true" aria-expanded="false">
+            Show columns
+            <span class="number-circle">{{numberOfFieldsShown}}</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-table-{{elementId}}">
+            {{#each metadata.fields as |field index|}}
+              <div class="dropdown-item">
+                {{
+                  checkbox-select
+                  checkboxId=(concat "table-" elementId "-field-selection-checkbox-" index)
+                  checked=field.show
+                }}
+                <label class="query-field-selection">{{field.name}}</label>
+              </div>
+            {{/each}}
+          </div>
+        </span>
+
+
 
       </div>
     </div>
