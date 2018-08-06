@@ -36,6 +36,10 @@ $height: 250px;
             line { stroke: $font-color-dark; }
             text { font-family: $font-primary; }
         }
+
+        .svg-button-container {
+            display: inline-flex;
+        }
     }
 
     &.radial-tree {

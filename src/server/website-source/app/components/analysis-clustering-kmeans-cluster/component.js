@@ -60,7 +60,6 @@ export default Component.extend({
         this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
         this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');
         // get subset names
-
         return aggregates;
     }),
 

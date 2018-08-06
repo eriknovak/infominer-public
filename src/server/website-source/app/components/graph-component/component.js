@@ -32,6 +32,7 @@ export default Component.extend({
                 once(self, '_handleResize');
             }, 500));
         });
+
         self.set('resizeCheck', setInterval(function () {
             if ($(self.element).width() >= 0 && $(self.element).width() !== self.get('width')) {
                 once(self, '_handleResize');
@@ -45,6 +46,7 @@ export default Component.extend({
         clearInterval(this.get('resizeCheck'));
         $(window).off('resize');
     },
+
 
     ///////////////////////////////////////////////////////
     // Helper functions

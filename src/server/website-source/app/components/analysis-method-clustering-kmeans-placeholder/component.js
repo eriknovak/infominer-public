@@ -8,6 +8,7 @@ export default Component.extend({
 
     // services
     columnWidth: service('column-size'),
+    fieldSelection: service('field-selection'),
 
     init() {
         this._super(...arguments);
@@ -24,7 +25,7 @@ export default Component.extend({
         let method = this.get('method');
         // get number of clusters
         let clusterNumber = method.get('parameters.method.k');
-        let fieldInfo = this.get('dataset.fields')
+        let fieldInfo = this.get('fieldSelection.fieldSettings').filter(field => field.showInVisual)
             .map(field => ({ field: field.field, type: field.type }));
 
         // prepare placeholders

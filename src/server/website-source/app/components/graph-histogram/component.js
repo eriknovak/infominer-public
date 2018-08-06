@@ -5,7 +5,7 @@ import { observer, set } from '@ember/object';
 
 // d3 visualizations
 import { select } from 'd3-selection';
-import { scaleLinear } from 'd3-scale';
+import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
 import { line, curveStepAfter } from 'd3-shape';
@@ -19,6 +19,7 @@ const HistogramComponent = GraphComponent.extend({
      * Object containing the histogram information.
      */
     data: null,
+    type: null,
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -26,13 +27,24 @@ const HistogramComponent = GraphComponent.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'margin', { top: 10, right: 10, bottom: 20, left: 10 });
+        set(this, 'margin', { top: 35, right: 10, bottom: 20, left: 10 });
+        set(this, 'type', 'linear');
     },
 
     didReceiveAttrs() {
         this._super(...arguments);
         // prepare the data
         this._prepareHistogram(this.get('histogram'));
+    },
+
+
+    actions: {
+        changeType(type) {
+            if (this.get('type') !== type) {
+                this.set('type', type);
+            }
+        }
+
     },
 
     ///////////////////////////////////////////////////////
@@ -59,7 +71,9 @@ const HistogramComponent = GraphComponent.extend({
                 min: min + i*step,
                 max: min + (i+1)*step,
                 frequency: hist.frequency,
-                percent: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0
+                linear: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0,
+                sqrt: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0,
+                log: hist.frequency + 1
             });
         }
         // prepare histogram data
@@ -69,6 +83,11 @@ const HistogramComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
+        this.set('buttonPosition', this.get('width') - 110);
+        once(this, '_redrawGraph');
+    }),
+
+    typeObserver: observer('type', function () {
         once(this, '_redrawGraph');
     }),
 
@@ -108,11 +127,28 @@ const HistogramComponent = GraphComponent.extend({
             .rangeRound([0, width])
             .nice();
 
+        // scale type
+        let type = this.get('type');
         // set vertical scale - percent attribute
-        let yScale = scaleLinear()
-            .domain([0, 1])
-            .range([height, 0])
-            .nice();
+        let yScale = null;
+
+        if (type === 'linear') {
+            yScale = scaleLinear()
+                .domain([0, 1])
+                .range([height, 0])
+                .nice();
+        } else if (type === 'sqrt') {
+            yScale = scaleSqrt()
+                .domain([0, 1])
+                .range([height, 0])
+                .nice();
+        } else if (type === 'log') {
+            yScale = scaleLog()
+                .domain([1, data.max])
+                .range([height, 0])
+                .base(2)
+                .nice();
+        }
 
         /**************************************************
          * Background shading
@@ -121,13 +157,13 @@ const HistogramComponent = GraphComponent.extend({
         // initialize percent sum outline
         let percentOutline = line()
             .x(d => xScale(d.min))
-            .y(d => yScale(d.percent))
+            .y(d => yScale(d[type]))
             .curve(curveStepAfter);
 
         // add first and last points to the path
         let pathValues = data.values.slice();
-        pathValues.push({ min: data.max, percent: 0 });
-        pathValues = [{ min: data.min, percent: 0 }].concat(pathValues);
+        pathValues.push({ min: data.max, linear: 0, sqrt: 0, log: 1 });
+        pathValues = [{ min: data.min, linear: 0, sqrt: 0, log: 1 }].concat(pathValues);
 
         // create the outline of percent
         content.append('path')
@@ -145,7 +181,7 @@ const HistogramComponent = GraphComponent.extend({
             .data(data.values)
           .enter().append('g')
             .attr('class', 'percent')
-            .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d.percent)})`);
+            .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d[type])})`);
 
         // set frequency format
         function formatCount(value) {
@@ -157,13 +193,13 @@ const HistogramComponent = GraphComponent.extend({
             .attr('class', 'frequency')
             .attr('dy', '.75em')
             .attr('y', (d) => {
-                let squareHight = height - yScale(d.percent);
+                let squareHight = height - yScale(d[type]);
                 return squareHight > 20 ? 6 : -12;
             })
             .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
             .attr('text-anchor', 'middle')
             .attr('fill', d => {
-                let squareHight = height - yScale(d.percent);
+                let squareHight = height - yScale(d[type]);
                 return squareHight > 20 ? 'white' : '#2C3539';
             })
             .text(d => { return d.frequency ? formatCount(d.frequency) : ''; })
