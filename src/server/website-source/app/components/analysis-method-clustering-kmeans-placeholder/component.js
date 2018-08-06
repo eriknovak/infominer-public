@@ -25,7 +25,7 @@ export default Component.extend({
         let method = this.get('method');
         // get number of clusters
         let clusterNumber = method.get('parameters.method.k');
-        let fieldInfo = this.get('fieldSelection.fieldSettings').filter(field => field.showInVisual)
+        let fieldInfo = this.get('fieldSelection.fields').filter(field => field.showInVisual)
             .map(field => ({ field: field.field, type: field.type }));
 
         // prepare placeholders

@@ -28,7 +28,7 @@
                 {{
                   checkbox-select
                   checkboxId=(concat "table-" elementId "-field-selection-checkbox-" index)
-                  checked=field.show
+                  checked=field.showInTable
                 }}
                 <label class="query-field-selection">{{field.name}}</label>
               </div>
@@ -48,7 +48,7 @@
           <tr>
             {{!-- <th class="checkbox-header" style="width:1%;"></th> --}}
             {{#each metadata.fields as |field index|}}
-              {{#if field.show}}
+              {{#if field.showInTable}}
                 <th class="{{field.name}}" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>
                   {{field.name}}
                   {{#if field.sortable }}

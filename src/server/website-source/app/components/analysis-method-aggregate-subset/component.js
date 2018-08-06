@@ -12,7 +12,7 @@ export default Component.extend({
     // Component Life Cycle
     ///////////////////////////////////////////////////////
 
-    aggregates: computed('fieldSelection.fieldSettings.@each.showInVisual', function () {
+    aggregates: computed('fieldSelection.fields.@each.showInVisual', function () {
         let result = this.get('method.result');
 
         // prepare the layout of the components

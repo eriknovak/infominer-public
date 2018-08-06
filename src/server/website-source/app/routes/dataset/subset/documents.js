@@ -58,7 +58,7 @@ export default Route.extend({
         if (this.get('query')) { query.query = this.get('query'); }
 
         // service for field selection
-        const fieldSelection = this.get('fieldSelection');
+        let fieldSelection = this.get('fieldSelection');
 
         // get documents
         return this.get('store').query('document', query)
@@ -67,7 +67,7 @@ export default Route.extend({
                     this.set('aggregates', documents.meta.aggregates);
                 }
                 documents.meta.fields.forEach(field => {
-                    field.show = fieldSelection.isShownInTable(field.id);
+                    field.showInTable = fieldSelection.isShownInTable(field.id);
                 });
 
                 return {

@@ -51,7 +51,7 @@ export default Component.extend({
         }
     },
 
-    aggregates: computed('fieldSelection.fieldSettings.@each.showInVisual', function () {
+    aggregates: computed('fieldSelection.fields.@each.showInVisual', function () {
         // set column width for medium and large view size
         // TODO: remove filter
         let aggregates = this.get('cluster.aggregates').filter(aggregate =>
@@ -73,7 +73,7 @@ export default Component.extend({
 
     metadata: computed('cluster.documentSample', 'limit', 'page', function () {
         return {
-            fields: this.get('dataset.fields'),
+            fields: this.get('fieldSelection.fields'),
             query: null,
             pagination: {
                 page: this.get('page'),
@@ -119,19 +119,6 @@ export default Component.extend({
             }
             this.set('cluster.documentSample', documents);
          }
-    },
-
-    _setCluster() {
-        let cluster = this.get('cluster');
-        // set column width for medium and large view size
-        // TODO: remove filter
-        this.set('cluster.aggregates', cluster.aggregates.filter(aggregate => aggregate.type !== 'timeline'));
-        this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 3, 'lg');
-        this.get('columnWidth.setColumnsWidth')(cluster.aggregates, 2, 'sm');
-        // get subset names
-        if (cluster.subset.id) {
-            set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
-        }
     },
 
     _saveLabel() {

@@ -32,7 +32,7 @@ export default Component.extend({
         });
         this.set('query', this.get('metadata.query'));
         // table content rows
-        this.set('loading-row-width', 1 + this.get('metadata.fields').filter(field => field.show).length);
+        this.set('loading-row-width', 1 + this.get('metadata.fields').filter(field => field.showInTable).length);
 
         /*************************************
          * pagination navigation parameters
@@ -100,16 +100,16 @@ export default Component.extend({
         });
     },
 
-    columnWidth: computed('metadata.fields.@each.show', function () {
-        return htmlSafe(`width:${100 / this.get('metadata.fields').filter(field => field.show).length}%`);
+    columnWidth: computed('metadata.fields.@each.showInTable', function () {
+        return htmlSafe(`width:${100 / this.get('metadata.fields')
+            .filter(field => field.showInTable).length}%`);
     }),
 
-    numberOfFieldsShown: computed('metadata.fields.@each.show', function () {
+    numberOfFieldsShown: computed('metadata.fields.@each.showInTable', function () {
         this.get('metadata.fields').forEach(field => {
-            this.get('fieldSelection').showFieldInTable(field.id, field.show);
+            this.get('fieldSelection').showFieldInTable(field.id, field.showInTable);
         });
-
-        return this.get('metadata.fields').filter(field => field.show).length;
+        return this.get('metadata.fields').filter(field => field.showInTable).length;
     }),
 
     ///////////////////////////////////////////////////////

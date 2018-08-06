@@ -5,10 +5,11 @@ import { inject as service } from '@ember/service';
 export default Service.extend({
     store: service('store'),
 
-    fieldSettings: null,
+    fields: null,
 
     init() {
         this._super(...arguments);
+        console.log('init');
         let fields = this.get('store').peekAll('dataset')
             .objectAt(0).get('fields');
 
@@ -17,30 +18,31 @@ export default Service.extend({
             set(field, 'showInVisual', field.show);
         });
 
-        this.set('fieldSettings', fields);
+        this.set('fields', fields);
     },
 
     isShownInTable(fieldId) {
-        for (let field of this.get('fieldSettings')) {
+        for (let field of this.get('fields')) {
             if (field.id === fieldId) { return field.showInTable; }
         }
         return false;
     },
 
     showFieldInTable(fieldId, isShown) {
-        for (let field of this.get('fieldSettings')) {
-            if (field.id === fieldId) { set(field, 'showInTable', isShown); break; }
+        for (let field of this.get('fields')) {
+            if (field.id === fieldId) {
+                set(field, 'showInTable', isShown); break; }
         }
     },
 
     isShownInVisual(fieldName) {
-        for (let field of this.get('fieldSettings')) {
+        for (let field of this.get('fields')) {
             if (field.name === fieldName) { return field.showInVisual; }
         }
     },
 
     showFieldVisual(fieldId, isShown) {
-        for (let field of this.get('fieldSettings')) {
+        for (let field of this.get('fields')) {
             if (field.id === fieldId) { set(field, 'showInVisual', isShown); break; }
         }
     }

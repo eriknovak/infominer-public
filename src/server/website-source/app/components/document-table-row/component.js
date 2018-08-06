@@ -34,7 +34,7 @@ export default Component.extend({
         this.set('dataTarget', `#document-${this.get('document.id')}`);
     },
 
-    documentValues: computed('fields.@each.show', 'query', function () {
+    documentValues: computed('fields.@each.showInTable', 'query', function () {
         // get document valueObject and fields
         const fields = this.get('fields');
         // get query parameters
@@ -44,7 +44,7 @@ export default Component.extend({
         let documentValues = [ ];
         // get values in the fields order
         for (let field of fields) {
-            if (!field.show) { continue; }
+            if (!field.showInTable) { continue; }
             let value = this.get(`document.values.${field.name}`);
             if (field.type == 'string') {
                 value = this._trimContent(value, this.get('nChar'));
