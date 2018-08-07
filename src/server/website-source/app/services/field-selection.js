@@ -9,7 +9,6 @@ export default Service.extend({
 
     init() {
         this._super(...arguments);
-        console.log('init');
         let fields = this.get('store').peekAll('dataset')
             .objectAt(0).get('fields');
 

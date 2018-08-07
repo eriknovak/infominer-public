@@ -72,7 +72,6 @@ const HistogramComponent = GraphComponent.extend({
                 max: min + (i+1)*step,
                 frequency: hist.frequency,
                 linear: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0,
-                sqrt: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0,
                 log: hist.frequency + 1
             });
         }
@@ -83,7 +82,7 @@ const HistogramComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        this.set('buttonPosition', this.get('width') - 110);
+        this.set('buttonPosition', this.get('width') - 85);
         once(this, '_redrawGraph');
     }),
 
@@ -137,19 +136,14 @@ const HistogramComponent = GraphComponent.extend({
                 .domain([0, 1])
                 .range([height, 0])
                 .nice();
-        } else if (type === 'sqrt') {
-            yScale = scaleSqrt()
-                .domain([0, 1])
-                .range([height, 0])
-                .nice();
         } else if (type === 'log') {
+            const max =  data.values.map(el => el.log)
+                .reduce((acc, curr) => Math.max(acc, curr), 1);
             yScale = scaleLog()
-                .domain([1, data.max])
+                .domain([1, max])
                 .range([height, 0])
-                .base(2)
                 .nice();
         }
-
         /**************************************************
          * Background shading
          **************************************************/
@@ -162,8 +156,8 @@ const HistogramComponent = GraphComponent.extend({
 
         // add first and last points to the path
         let pathValues = data.values.slice();
-        pathValues.push({ min: data.max, linear: 0, sqrt: 0, log: 1 });
-        pathValues = [{ min: data.min, linear: 0, sqrt: 0, log: 1 }].concat(pathValues);
+        pathValues.push({ min: data.max, linear: 0, log: 1 }); // last point
+        pathValues.push({ min: data.min, linear: 0, log: 1 }); // first point
 
         // create the outline of percent
         content.append('path')
