@@ -5,7 +5,9 @@ import { observer, set } from '@ember/object';
 
 // d3 visualizations
 import { select } from 'd3-selection';
-import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale';
+import { scaleLinear, scaleLog } from 'd3-scale';
+import { transition } from 'd3-transition';
+
 import { axisBottom } from 'd3-axis';
 import { format } from 'd3-format';
 import { line, curveStepAfter } from 'd3-shape';
@@ -44,7 +46,6 @@ const HistogramComponent = GraphComponent.extend({
                 this.set('type', type);
             }
         }
-
     },
 
     ///////////////////////////////////////////////////////
@@ -87,7 +88,7 @@ const HistogramComponent = GraphComponent.extend({
     }),
 
     typeObserver: observer('type', function () {
-        once(this, '_redrawGraph');
+        once(this, '_changeGraph');
     }),
 
     _redrawGraph() {
@@ -212,6 +213,101 @@ const HistogramComponent = GraphComponent.extend({
                 .ticks(width < 400 ? 5 : 10)
                 .tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); })
             );
+    },
+
+
+    /**
+     * make the transitions from one type of graph to another.
+     */
+    _changeGraph() {
+        // get the container size
+        let totalWidth = this.get('width');
+        let totalHeight = this.get('height');
+        let margin = this.get('margin');
+
+        // set content dimensions
+        let width = totalWidth - margin.left - margin.right;
+        let height = totalHeight - margin.top - margin.bottom;
+
+        // get histogram data
+        let data = this.get('data');
+
+        // get the svg element - contains the visualization components
+        let container = select(this.element);
+
+        // set horizontal scale - values between min and max
+        let xScale = scaleLinear()
+            .domain([data.min, data.max])
+            .rangeRound([0, width])
+            .nice();
+
+        // scale type
+        let type = this.get('type');
+
+        // set vertical scale - percent attribute
+        let yScale = null;
+
+        if (type === 'linear') {
+            yScale = scaleLinear()
+                .domain([0, 1])
+                .range([height, 0])
+                .nice();
+        } else if (type === 'log') {
+            const max =  data.values.map(el => el.log)
+                .reduce((acc, curr) => Math.max(acc, curr), 1);
+            yScale = scaleLog()
+                .domain([1, max])
+                .range([height, 0])
+                .nice();
+        }
+        /**************************************************
+         * Background shading
+         **************************************************/
+
+        // initialize percent sum outline
+        let percentOutline = line()
+            .x(d => xScale(d.min))
+            .y(d => yScale(d[type]))
+            .curve(curveStepAfter);
+
+        // add first and last points to the path
+        let pathValues = data.values.slice();
+        pathValues.push({ min: data.max, linear: 0, log: 1 }); // last point
+        pathValues.push({ min: data.min, linear: 0, log: 1 }); // first point
+
+        // create and move the outline
+        let path = percentOutline(pathValues);
+        container.selectAll('.percentOutline')
+            .transition()
+            .duration(500)
+            .attr('d', path);
+
+        /**************************************************
+         * Percentage attributes
+         **************************************************/
+
+        // move the percentage container
+        let percent = container.selectAll('.percent')
+            .data(data.values)
+            .transition()
+            .duration(500)
+            .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d[type])})`);
+
+
+        // move frequency info to each rectangle
+        percent.selectAll('.frequency')
+            .transition()
+            .duration(500)
+            .attr('y', (d) => {
+                let squareHight = height - yScale(d[type]);
+                return squareHight > 20 ? 6 : -12;
+            })
+            .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
+            .attr('fill', d => {
+                let squareHight = height - yScale(d[type]);
+                return squareHight > 20 ? 'white' : '#2C3539';
+            });
+
     }
 
 });

@@ -138,3 +138,16 @@
     }
 }
 
+.cluster-content {
+    .btn-sm {
+        .number-circle {
+            display: inline-block;
+            border-radius: 50%;
+            width: 17px;
+            height: 17px;
+            padding: 1px;
+            background: $secondary-color;
+            color: white;
+        }
+    }
+}

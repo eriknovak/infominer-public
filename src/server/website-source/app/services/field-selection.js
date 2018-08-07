@@ -46,6 +46,4 @@ export default Service.extend({
         }
     }
 
-
-
 });

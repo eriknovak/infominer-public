@@ -17,7 +17,7 @@
         </span>
 
         <span class="dropdown pull-right">
-          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+          <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle" type="button" data-toggle="dropdown"
             id="document-table-{{elementId}}" aria-haspopup="true" aria-expanded="false">
             Show columns
             <span class="number-circle">{{numberOfFieldsShown}}</span>
@@ -35,8 +35,6 @@
             {{/each}}
           </div>
         </span>
-
-
 
       </div>
     </div>
