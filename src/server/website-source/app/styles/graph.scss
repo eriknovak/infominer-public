@@ -14,10 +14,15 @@ $height: 250px;
     }
 
     &.timeline {
-        font-weight: 500;
-        text.small  { fill: darken($primary-color, 35%); }
-        text.medium { fill: $tertiary-color; }
-        text.large  { fill: $font-color-dark; }
+        .svg-button-container {
+            display: inline-flex;
+        }
+
+        .domain { stroke: $font-color-dark; }
+        .tick {
+            line { stroke: $font-color-dark; }
+            text { font-family: $font-primary; }
+        }
     }
 
     &.histogram {

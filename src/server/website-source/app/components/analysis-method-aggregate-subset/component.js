@@ -18,7 +18,7 @@ export default Component.extend({
         // prepare the layout of the components
         // TODO: remove filter
         let aggregates = result.aggregates.filter(aggregate =>
-            aggregate.type !== 'timeline' && this.get('fieldSelection').isShownInVisual(aggregate.field)
+            this.get('fieldSelection').isShownInVisual(aggregate.field)
         );
 
         // set column width for medium and large view size

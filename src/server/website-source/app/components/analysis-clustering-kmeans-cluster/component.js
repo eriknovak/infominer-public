@@ -55,7 +55,7 @@ export default Component.extend({
         // set column width for medium and large view size
         // TODO: remove filter
         let aggregates = this.get('cluster.aggregates').filter(aggregate =>
-            aggregate.type !== 'timeline' && this.get('fieldSelection').isShownInVisual(aggregate.field)
+            this.get('fieldSelection').isShownInVisual(aggregate.field)
         );
         this.get('columnWidth.setColumnsWidth')(aggregates, 3, 'lg');
         this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');

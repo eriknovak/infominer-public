@@ -29,7 +29,7 @@ const HistogramComponent = GraphComponent.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'margin', { top: 35, right: 10, bottom: 20, left: 10 });
+        set(this, 'margin', { top: 35, right: 15, bottom: 20, left: 15 });
         set(this, 'type', 'linear');
     },
 
@@ -38,7 +38,6 @@ const HistogramComponent = GraphComponent.extend({
         // prepare the data
         this._prepareHistogram(this.get('histogram'));
     },
-
 
     actions: {
         changeType(type) {
@@ -83,7 +82,7 @@ const HistogramComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        this.set('buttonPosition', this.get('width') - 85);
+        this.set('buttonPosition', this.get('width') - 75);
         once(this, '_redrawGraph');
     }),
 
@@ -106,9 +105,6 @@ const HistogramComponent = GraphComponent.extend({
         let width = totalWidth - margin.left - margin.right;
         let height = totalHeight - margin.top - margin.bottom;
 
-        // get histogram data
-        let data = this.get('data');
-
         // get the svg element - contains the visualization components
         let container = select(this.element);
         // remove previous g components
@@ -121,14 +117,16 @@ const HistogramComponent = GraphComponent.extend({
           .append('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
+        // get histogram data
+        let data = this.get('data');
+        let type = this.get('type');
+
         // set horizontal scale - values between min and max
         let xScale = scaleLinear()
             .domain([data.min, data.max])
             .rangeRound([0, width])
             .nice();
 
-        // scale type
-        let type = this.get('type');
         // set vertical scale - percent attribute
         let yScale = null;
 
@@ -145,6 +143,7 @@ const HistogramComponent = GraphComponent.extend({
                 .range([height, 0])
                 .nice();
         }
+
         /**************************************************
          * Background shading
          **************************************************/

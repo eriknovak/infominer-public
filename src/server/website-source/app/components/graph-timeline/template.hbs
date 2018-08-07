@@ -1,0 +1,10 @@
+<foreignObject x={{buttonPosition}}>
+    <div class="svg-button-container">
+      <button class="btn btn-{{if (eq aggregate 'days') 'secondary' 'light'}} btn-sm"
+        {{action 'changeAggregate' 'days'}}>days</button>
+      <button class="btn btn-{{if (eq aggregate 'months') 'secondary' 'light'}} btn-sm"
+        {{action 'changeAggregate' 'months'}}>months</button>
+      <button class="btn btn-{{if (eq aggregate 'years') 'secondary' 'light'}} btn-sm"
+        {{action 'changeAggregate' 'years'}}>years</button>
+    </div>
+</foreignObject>
