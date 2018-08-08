@@ -74,32 +74,14 @@ const TimelineComponent = GraphComponent.extend({
             month = { date: null, value: 0 };
 
         for (let date of timeline.date) {
-            let yearMonthDay = date.interval.split('-');
             let d = new Date(date.interval);
 
             data.days.push({ date: timeFormat('%Y-%m-%d')(d), value: date.frequency });
 
+            let yearMonthDay = date.interval.split('-');
             // update years data
             if (year.date !== yearMonthDay[0]) {
                 if (year.date) {
-                    // check years in between
-                    let prevYear = data.years[data.years.length - 1];
-                    if (prevYear) {
-                        let difference = parseInt(year.date) - parseInt(prevYear.date);
-                        if (difference > 2) {
-                            data.years.push({
-                                date: (parseInt(prevYear.date)+1).toString(),
-                                value: 0
-                            });
-                        }
-                        if (difference > 1) {
-                            data.years.push({
-                                date: (parseInt(year.date)-1).toString(),
-                                value: 0
-                            });
-                        }
-                    }
-
                     // add current year to the list
                     let yClone = Object.assign({}, year);
                     data.years.push(yClone);
@@ -176,7 +158,8 @@ const TimelineComponent = GraphComponent.extend({
         // set horizontal scale
         let xScale = scaleTime()
             .domain(extent(data[aggregate], d => new Date(d.date)))
-            .rangeRound([0, width - margin.left]);
+            .range([0, width - margin.left])
+            .nice();
 
         let ticks = [];
         if (aggregate === 'days') {
@@ -287,7 +270,8 @@ const TimelineComponent = GraphComponent.extend({
         // set horizontal scale
         let xScale = scaleTime()
             .domain(extent(data[aggregate], d => new Date(d.date)))
-            .rangeRound([0, width - margin.left]);
+            .rangeRound([0, width - margin.left])
+            .nice();
 
         let ticks = [];
         if (aggregate === 'days') {
@@ -340,7 +324,7 @@ const TimelineComponent = GraphComponent.extend({
             .attrTween('d', function () {
                 var previous = select(this).attr('d');
                 return interpolatePath.interpolatePath(previous, path);
-              });
+            });
 
         // let points = chart.selectAll('.point')
         //     .data(data[aggregate]);

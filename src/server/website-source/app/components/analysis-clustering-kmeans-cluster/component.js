@@ -51,7 +51,7 @@ export default Component.extend({
         }
     },
 
-    aggregates: computed('fieldSelection.fields.@each.showInVisual', function () {
+    aggregates: computed('fieldSelection.fields.@each.showInVisual', 'cluster.aggregates', function () {
         // set column width for medium and large view size
         // TODO: remove filter
         let aggregates = this.get('cluster.aggregates').filter(aggregate =>
