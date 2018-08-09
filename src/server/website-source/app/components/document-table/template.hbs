@@ -39,15 +39,15 @@
       </div>
     </div>
 
-    <div class="table-responsive-xl">
-      <table class="table table-hover">
+    <div class="table-responsive">
+      <table class="table table-hover fixed">
         {{! table header }}
         <thead>
           <tr>
-            {{!-- <th class="checkbox-header" style="width:1%;"></th> --}}
+            {{! <th class="checkbox-header" style="width:1%;"></th> }}
             {{#each metadata.fields as |field index|}}
               {{#if field.showInTable}}
-                <th class="{{field.name}}" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>
+                <th class="{{field.name}}" scope="col" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>
                   {{field.name}}
                   {{#if field.sortable }}
                     <i class="pull-right fa fa-sort{{if field.sortType (concat "-" field.sortType)}}" aria-hidden="true"></i>
@@ -78,7 +78,7 @@
     {{! indeces of displayed documents and navigation bar }}
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-3">
-        <!-- which documents are shown -->
+        {{! which documents are shown }}
         <div class="document-display-info">
           <p>Displaying {{startDisplay}}-{{endDisplay}} of {{count}}</p>
         </div>

@@ -14,9 +14,6 @@ $height: 250px;
     }
 
     &.timeline {
-        .svg-button-container {
-            display: inline-flex;
-        }
 
         .domain { stroke: $font-color-dark; }
         .tick {
@@ -40,10 +37,6 @@ $height: 250px;
         .tick {
             line { stroke: $font-color-dark; }
             text { font-family: $font-primary; }
-        }
-
-        .svg-button-container {
-            display: inline-flex;
         }
     }
 

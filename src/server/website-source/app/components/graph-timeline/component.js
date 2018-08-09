@@ -64,9 +64,9 @@ const TimelineComponent = GraphComponent.extend({
     _prepareTimeline(timeline) {
 
         let data = {
-            days:   [],
-            months: [],
-            years:  []
+            days:   { values: [] },
+            months: { values: [] },
+            years:  { values: [] }
         };
 
         // year and month data container
@@ -76,7 +76,7 @@ const TimelineComponent = GraphComponent.extend({
         for (let date of timeline.date) {
             let d = new Date(date.interval);
 
-            data.days.push({ date: timeFormat('%Y-%m-%d')(d), value: date.frequency });
+            data.days.values.push({ date: timeFormat('%Y-%m-%d')(d), value: date.frequency });
 
             let yearMonthDay = date.interval.split('-');
             // update years data
@@ -84,7 +84,7 @@ const TimelineComponent = GraphComponent.extend({
                 if (year.date) {
                     // add current year to the list
                     let yClone = Object.assign({}, year);
-                    data.years.push(yClone);
+                    data.years.values.push(yClone);
                 }
                 year.date = timeFormat('%Y')(d);
                 year.value = date.frequency;
@@ -98,7 +98,7 @@ const TimelineComponent = GraphComponent.extend({
             if (month.date !== yearMonth) {
                 if (month.date) {
                     let mClone = Object.assign({}, month);
-                    data.months.push(mClone);
+                    data.months.values.push(mClone);
                 }
                 month.date = timeFormat("%Y-%m")(d);
                 month.value = date.frequency;
@@ -109,9 +109,35 @@ const TimelineComponent = GraphComponent.extend({
         }
 
         // add last year and month element
-        data.years.push(year);
-        data.months.push(month);
+        data.years.values.push(year);
+        data.months.values.push(month);
 
+        // interpolate through the values
+        for (let aggregate of Object.keys(data)) {
+            let ticks = scaleTime()
+                .domain(extent(data[aggregate].values, d => new Date(d.date)))
+                .nice().ticks(timeDay);
+
+            let interpolate = ticks.map(tick => {
+                let tickDate = new Date(tick);
+                let tickCompare = null;
+                if (aggregate === 'days') {
+                    tickCompare = timeFormat('%Y-%m-%d')(tickDate);
+                } else if (aggregate === 'months') {
+                    tickCompare = timeFormat('%Y-%m')(tickDate);
+                } else if (aggregate === 'years') {
+                    tickCompare = timeFormat('%Y')(tickDate);
+                }
+                return data[aggregate].values.find(el => {
+                    return tickCompare === el.date;
+                }) || { date: tick, value: 0 };
+            });
+            // store aggregates interpolated values
+            data[aggregate].interpolate = interpolate;
+            // store the maximum value
+            data[aggregate].max = data[aggregate].values.map(el => el.value)
+                .reduce((acc, curr) => Math.max(acc, curr), 0);
+        }
         this.set('data', data);
     },
 
@@ -157,25 +183,13 @@ const TimelineComponent = GraphComponent.extend({
 
         // set horizontal scale
         let xScale = scaleTime()
-            .domain(extent(data[aggregate], d => new Date(d.date)))
+            .domain(extent(data[aggregate].values, d => new Date(d.date)))
             .range([0, width - margin.left])
             .nice();
 
-        let ticks = [];
-        if (aggregate === 'days') {
-            ticks = xScale.ticks(timeDay);
-        } else if (aggregate === 'months') {
-            ticks = xScale.ticks(timeMonth);
-        } else if (aggregate === 'years') {
-            ticks = xScale.ticks(timeYear);
-        }
-
         // set vertical scale
-        const max = data[aggregate].map(el => el.value)
-            .reduce((acc, curr) => Math.max(acc, curr), 0);
-
         let yScale = scaleLinear()
-            .domain([0, max])
+            .domain([0, data[aggregate].max])
             .rangeRound([height, 0])
             .nice();
 
@@ -189,28 +203,13 @@ const TimelineComponent = GraphComponent.extend({
             .y(d => yScale(d.value))
             .curve(curveMonotoneX);
 
-        let interpolated = ticks.map(tick => {
-            let tickDate = new Date(tick);
-            let tickCompare = null;
-            if (aggregate === 'days') {
-                tickCompare = timeFormat('%Y-%m-%d')(tickDate);
-            } else if (aggregate === 'months') {
-                tickCompare = timeFormat('%Y-%m')(tickDate);
-            } else if (aggregate === 'years') {
-                tickCompare = timeFormat('%Y')(tickDate);
-            }
-            return data[aggregate].find(el => {
-                return tickCompare === el.date;
-            }) || { date: tick, value: 0 };
-        });
-
         let chart = content.append('g')
             .attr('class', 'chart')
             .attr('transform', `translate(${margin.left},0)`);
 
         // draw the timeline
         chart.append('path')
-            .datum(interpolated)
+            .datum(data[aggregate].interpolate)
             .attr('class', 'timeline')
             .attr('fill', 'none')
             .attr('stroke', 'steelblue')
@@ -269,25 +268,13 @@ const TimelineComponent = GraphComponent.extend({
 
         // set horizontal scale
         let xScale = scaleTime()
-            .domain(extent(data[aggregate], d => new Date(d.date)))
+            .domain(extent(data[aggregate].values, d => new Date(d.date)))
             .rangeRound([0, width - margin.left])
             .nice();
 
-        let ticks = [];
-        if (aggregate === 'days') {
-            ticks = xScale.ticks(timeDay);
-        } else if (aggregate === 'months') {
-            ticks = xScale.ticks(timeMonth);
-        } else if (aggregate === 'years') {
-            ticks = xScale.ticks(timeYear);
-        }
-
         // set vertical scale
-        const max = data[aggregate].map(el => el.value)
-            .reduce((acc, curr) => Math.max(acc, curr), 0);
-
         let yScale = scaleLinear()
-            .domain([0, max])
+            .domain([0, data[aggregate].max])
             .rangeRound([height, 0])
             .nice();
 
@@ -295,28 +282,13 @@ const TimelineComponent = GraphComponent.extend({
          * Timeline
          **************************************************/
 
-        let interpolated = ticks.map(tick => {
-            let tickDate = new Date(tick);
-            let tickCompare = null;
-            if (aggregate === 'days') {
-                tickCompare = timeFormat('%Y-%m-%d')(tickDate);
-            } else if (aggregate === 'months') {
-                tickCompare = timeFormat('%Y-%m')(tickDate);
-            } else if (aggregate === 'years') {
-                tickCompare = timeFormat('%Y')(tickDate);
-            }
-            return data[aggregate].find(el => {
-                return tickCompare === el.date;
-            }) || { date: tick, value: 0 };
-        });
-
         // intitialize timeline
         let timeline = line()
             .x(d => xScale(new Date(d.date)))
             .y(d => yScale(d.value))
             .curve(curveMonotoneX);
 
-        let path = timeline(interpolated);
+        let path = timeline(data[aggregate].interpolate);
 
         chart.selectAll('.timeline')
             .transition()

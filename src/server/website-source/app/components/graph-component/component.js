@@ -27,23 +27,21 @@ export default Component.extend({
         self._handleResize();
         // set window resize listener
         $(window).on('resize', function () {
-            clearTimeout(self.get('resizeTimer'));
+            clearTimeout(self.get('windowResize'));
+            clearInterval(self.get('resizeTimer'));
             self.set('windowResize', setTimeout(function () {
                 once(self, '_handleResize');
+                self.set('resizeTimer', setInterval(self._checkResize.bind(self), 100));
             }, 500));
         });
 
-        self.set('resizeCheck', setInterval(function () {
-            if ($(self.element).width() >= 0 && $(self.element).width() !== self.get('width')) {
-                once(self, '_handleResize');
-            }
-        }, 100));
+        self.set('resizeTimer', setInterval(self._checkResize.bind(self), 100));
     },
 
     willDestroyElement() {
         this._super(...arguments);
         clearTimeout(this.get('windowResize'));
-        clearInterval(this.get('resizeCheck'));
+        clearInterval(this.get('resizeTimer'));
         $(window).off('resize');
     },
 
@@ -51,6 +49,13 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
     // Helper functions
     ///////////////////////////////////////////////////////
+
+    _checkResize() {
+        let self = this;
+        if ($(self.element).width() >= 0 && $(self.element).width() !== self.get('width')) {
+            once(self, '_handleResize');
+        }
+    },
 
     /**
      * Resizes the width and height.

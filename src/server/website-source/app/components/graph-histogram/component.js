@@ -186,17 +186,11 @@ const HistogramComponent = GraphComponent.extend({
         percent.append('text')
             .attr('class', 'frequency')
             .attr('dy', '.75em')
-            .attr('y', (d) => {
-                let squareHight = height - yScale(d[type]);
-                return squareHight > 20 ? 6 : -12;
-            })
+            .attr('y', d => height - yScale(d[type]) > 20 ? 6 : -12)
             .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
             .attr('text-anchor', 'middle')
-            .attr('fill', d => {
-                let squareHight = height - yScale(d[type]);
-                return squareHight > 20 ? 'white' : '#2C3539';
-            })
-            .text(d => { return d.frequency ? formatCount(d.frequency) : ''; })
+            .attr('fill', d => height - yScale(d[type]) > 20 ? 'white' : '#2C3539')
+            .text(d => d.frequency ? formatCount(d.frequency) : '')
             .style('font-family', 'Open Sans')
             .style('font-size', '9px');
 
@@ -210,7 +204,7 @@ const HistogramComponent = GraphComponent.extend({
             .attr('transform', `translate(0,${height})`)
             .call(axisBottom(xScale)
                 .ticks(width < 400 ? 5 : 10)
-                .tickFormat(tick => { return tick <= 10 ? tick : format(".2s")(tick); })
+                .tickFormat(tick => tick <= 10 ? tick : format(".2s")(tick))
             );
     },
 
@@ -290,22 +284,16 @@ const HistogramComponent = GraphComponent.extend({
             .data(data.values)
             .transition()
             .duration(500)
-            .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d[type])})`);
+            .attr('transform', d => `translate(${xScale(d.min)},${yScale(d[type])})`);
 
 
         // move frequency info to each rectangle
         percent.selectAll('.frequency')
             .transition()
             .duration(500)
-            .attr('y', (d) => {
-                let squareHight = height - yScale(d[type]);
-                return squareHight > 20 ? 6 : -12;
-            })
+            .attr('y', d => height - yScale(d[type]) > 20 ? 6 : -12)
             .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
-            .attr('fill', d => {
-                let squareHight = height - yScale(d[type]);
-                return squareHight > 20 ? 'white' : '#2C3539';
-            });
+            .attr('fill', d => height - yScale(d[type]) > 20 ? 'white' : '#2C3539');
 
     }
 

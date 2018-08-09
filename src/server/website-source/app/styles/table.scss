@@ -36,6 +36,7 @@
     }
 
     .table {
+        margin-bottom: 0px;
         tbody > tr {
             &.selected {
                 background-color: $primary-color;
@@ -76,7 +77,7 @@
                 vertical-align: top !important;
             }
             .document-attributes {
-                & > .container {
+                & > .document-info-container {
                     padding: 10px 6px;
                     margin: 0px;
                     .field-value {
@@ -117,23 +118,24 @@
         .document-display-info { margin: 6px 0; }
     }
 
-    .table-responsive-xl {
+    .table-responsive {
         margin-bottom: 10px;
+        overflow: auto;
     }
 
-    .table-responsive-xl::-webkit-scrollbar {
+    .table-responsive::-webkit-scrollbar {
         height: 10px;
     }
 
-    .table-responsive-xl::-webkit-scrollbar-track {
+    .table-responsive::-webkit-scrollbar-track {
         background: $primary-color;
     }
 
-    .table-responsive-xl::-webkit-scrollbar-thumb {
+    .table-responsive::-webkit-scrollbar-thumb {
         background: $tertiary-color;
     }
 
-    .table-responsive-xl::-webkit-scrollbar-thumb:hover {
+    .table-responsive::-webkit-scrollbar-thumb:hover {
         background: darken($tertiary-color, 5%);
     }
 }
