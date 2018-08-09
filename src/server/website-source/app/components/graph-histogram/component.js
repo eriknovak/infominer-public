@@ -1,7 +1,7 @@
 // extend from graph component
 import GraphComponent from '../graph-component/component';
 import { once } from '@ember/runloop';
-import { observer, set } from '@ember/object';
+import { computed, observer, get, set } from '@ember/object';
 
 // d3 visualizations
 import { select } from 'd3-selection';
@@ -31,6 +31,7 @@ const HistogramComponent = GraphComponent.extend({
         this._super(...arguments);
         set(this, 'margin', { top: 35, right: 15, bottom: 20, left: 15 });
         set(this, 'type', 'linear');
+        get(this, 'valueType');
     },
 
     didReceiveAttrs() {
@@ -64,16 +65,29 @@ const HistogramComponent = GraphComponent.extend({
         // caluculate the step function
         let step = (max - min)/hValues.length;
         // calculate histogram values
-        let values = [ ];
+        let values = { wide: [ ], narrow: [] };
         for (let i = 0; i < hValues.length; i++) {
             let hist = hValues[i];
-            values.push({
+            values.wide.push({
                 min: min + i*step,
                 max: min + (i+1)*step,
                 frequency: hist.frequency,
                 linear: hist.frequency ? parseFloat((hist.precent / 100).toFixed(2)) + 0.015 : 0,
                 log: hist.frequency + 1
             });
+            // join two together
+            if (i % 2 === 0) {
+                let frequency = hValues[i].frequency + hValues[i+1].frequency;
+                let percent = hValues[i].precent + hValues[i+1].precent;
+
+                values.narrow.push({
+                    min: min + i*step,
+                    max: min + (i+2)*step,
+                    frequency: frequency,
+                    linear: frequency ? parseFloat((percent / 100).toFixed(2)) + 0.015 : 0,
+                    log: frequency + 1
+                });
+            }
         }
         // prepare histogram data
         let data = { min, max, values };
@@ -88,6 +102,10 @@ const HistogramComponent = GraphComponent.extend({
 
     typeObserver: observer('type', function () {
         once(this, '_changeGraph');
+    }),
+
+    valueType: computed('width', function () {
+        return this.get('width') <= 300 ? 'narrow' : 'wide';
     }),
 
     _redrawGraph() {
@@ -127,16 +145,18 @@ const HistogramComponent = GraphComponent.extend({
             .rangeRound([0, width])
             .nice();
 
+        // determine which aggregate of data to take
+        let valueType = this.get('valueType');
+
         // set vertical scale - percent attribute
         let yScale = null;
-
         if (type === 'linear') {
             yScale = scaleLinear()
                 .domain([0, 1])
                 .range([height, 0])
                 .nice();
         } else if (type === 'log') {
-            const max =  data.values.map(el => el.log)
+            const max =  data.values[valueType].map(el => el.log)
                 .reduce((acc, curr) => Math.max(acc, curr), 1);
             yScale = scaleLog()
                 .domain([1, max])
@@ -155,7 +175,7 @@ const HistogramComponent = GraphComponent.extend({
             .curve(curveStepAfter);
 
         // add first and last points to the path
-        let pathValues = data.values.slice();
+        let pathValues = data.values[valueType].slice();
         pathValues.push({ min: data.max, linear: 0, log: 1 }); // last point
         pathValues.push({ min: data.min, linear: 0, log: 1 }); // first point
 
@@ -172,7 +192,7 @@ const HistogramComponent = GraphComponent.extend({
 
         // create the percentage histogram placeholder
         let percent = content.selectAll('.percent')
-            .data(data.values)
+            .data(data.values[valueType])
           .enter().append('g')
             .attr('class', 'percent')
             .attr('transform', (d) => `translate(${xScale(d.min)},${yScale(d[type])})`);
@@ -187,7 +207,7 @@ const HistogramComponent = GraphComponent.extend({
             .attr('class', 'frequency')
             .attr('dy', '.75em')
             .attr('y', d => height - yScale(d[type]) > 20 ? 6 : -12)
-            .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
+            .attr('x', (xScale(data.values[valueType][0].max) - xScale(data.values[valueType][0].min)) / 2)
             .attr('text-anchor', 'middle')
             .attr('fill', d => height - yScale(d[type]) > 20 ? 'white' : '#2C3539')
             .text(d => d.frequency ? formatCount(d.frequency) : '')
@@ -236,6 +256,8 @@ const HistogramComponent = GraphComponent.extend({
 
         // scale type
         let type = this.get('type');
+        // determine which aggregate of data to take
+        let valueType = this.get('valueType');
 
         // set vertical scale - percent attribute
         let yScale = null;
@@ -246,7 +268,7 @@ const HistogramComponent = GraphComponent.extend({
                 .range([height, 0])
                 .nice();
         } else if (type === 'log') {
-            const max =  data.values.map(el => el.log)
+            const max =  data.values[valueType].map(el => el.log)
                 .reduce((acc, curr) => Math.max(acc, curr), 1);
             yScale = scaleLog()
                 .domain([1, max])
@@ -264,7 +286,7 @@ const HistogramComponent = GraphComponent.extend({
             .curve(curveStepAfter);
 
         // add first and last points to the path
-        let pathValues = data.values.slice();
+        let pathValues = data.values[valueType].slice();
         pathValues.push({ min: data.max, linear: 0, log: 1 }); // last point
         pathValues.push({ min: data.min, linear: 0, log: 1 }); // first point
 
@@ -281,7 +303,7 @@ const HistogramComponent = GraphComponent.extend({
 
         // move the percentage container
         let percent = container.selectAll('.percent')
-            .data(data.values)
+            .data(data.values[valueType])
             .transition()
             .duration(500)
             .attr('transform', d => `translate(${xScale(d.min)},${yScale(d[type])})`);
@@ -292,7 +314,7 @@ const HistogramComponent = GraphComponent.extend({
             .transition()
             .duration(500)
             .attr('y', d => height - yScale(d[type]) > 20 ? 6 : -12)
-            .attr('x', (xScale(data.values[0].max) - xScale(data.values[0].min)) / 2)
+            .attr('x', (xScale(data.values[valueType][0].max) - xScale(data.values[valueType][0].min)) / 2)
             .attr('fill', d => height - yScale(d[type]) > 20 ? 'white' : '#2C3539');
 
     }
