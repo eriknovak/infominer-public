@@ -46,7 +46,7 @@ export default Component.extend({
         for (let field of fields) {
             if (!field.showInTable) { continue; }
             let value = this.get(`document.values.${field.name}`);
-            if (field.type == 'string') {
+            if (field.type == 'string' && value) {
                 value = this._trimContent(value, this.get('nChar'));
             } else if (field.type == 'string_v') {
                 value = value.join(' 🡒 ');
