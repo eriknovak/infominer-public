@@ -15,30 +15,21 @@ class ActiveLearner {
         let self = this;
         // creates the active learner
         self.activeLearner = new qm.analytics.ActiveLearner();
-    
+
         // store documents
         self.documents = base.store('Subsets')[subsetId].hasElements;
 
         // configure features
         let features = [{
             // text feature extractor
-            type: 'text', 
+            type: 'text',
             field: base.store('Dataset').fields
                 .filter(field => field.type === 'string')
                 .map(field => field.name),
-            ngrams: 2, 
+            ngrams: 2,
             hashDimension: 20000,
             source: 'Dataset'
-        }].concat(
-            // number feature extractor
-            base.store('Dataset').fields
-                .filter(field => field.type === 'float')
-                .map(field => ({
-                    type: 'numeric',
-                    field: field.name,
-                    source: 'Dataset'
-                }))
-        );
+        }];
 
         // get feature matrix from record set
         self.featureSpace = new qm.FeatureSpace(base, features);
@@ -50,10 +41,11 @@ class ActiveLearner {
 
         // set the labels
         // TODO: validate if valid instance
-        let qLabels = labels ? 
-            new qm.la.IntVector(labels) : 
+        self.labels = labels ?
+            new qm.la.IntVector(labels) :
             new qm.la.IntVector(Array(self.documents.length).fill(0));
-        self.activeLearner.sety(qLabels);
+
+        self.activeLearner.sety(self.labels);
     }
 
     addLabel(element, label) {
@@ -65,7 +57,6 @@ class ActiveLearner {
         }
 
         // update label of that element
-        console.log(elementIdx);
         self.activeLearner.setLabel(elementIdx, label);
 
         return self._getNextDocument();

@@ -1,11 +1,10 @@
 {{#each model.subset.usedBy as |method|}}
   {{#if method.analysisAppropriate}}
-    {{ 
+    {{
       analysis-method
       method=method
       subset=model.subset
       dataset=model.dataset
-      subsetCreationParams=model.subsetCreationParams
     }}
   {{/if}}
 {{/each}}
@@ -28,15 +27,8 @@
   method-selection
   id="select-analysis-modal"
   dataset=model.dataset
-  action=(route-action 'startAnalysis')
-}}
-
-{{! subset creation modal }}
-{{
-  create-subset-modal
-  id="subset-create-modal"
-  parameters=model.subsetCreationParams
-  createSubset=(route-action "createSubset")
+  startAnalysis=(route-action 'startAnalysis')
+  startActiveLearning=(route-action 'startActiveLearning')
 }}
 
 {{outlet}}

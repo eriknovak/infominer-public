@@ -6,7 +6,7 @@ export default Route.extend({
     model() {
         let subset = this.modelFor('dataset.subset');
         let dataset = this.modelFor('dataset');
-        return { subset, dataset, subsetCreationParams: { } };
+        return { subset, dataset };
     },
 
     actions: {
@@ -31,10 +31,18 @@ export default Route.extend({
             // needed to correctly increment subset and method indices
             self.modelFor('dataset').incrementProperty('numberOfMethods');
             method.save().then(() => {
-                self.modelFor('dataset').reload().then((response) => { 
+                self.modelFor('dataset').reload().then((response) => {
                     self.modelFor('dataset').set('numberOfSubsets', response.data.numberOfSubsets);
                     self.modelFor('dataset').set('numberOfMethods', response.data.numberOfMethods);
                 });
+            });
+        },
+
+        startActiveLearning(params) {
+            // toggle the modal - giving the user control
+            $('.modal.analysis-modal').modal('toggle');
+            this.transitionTo('dataset.subset.active-learning', {
+                queryParams: params
             });
         },
 

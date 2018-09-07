@@ -37,6 +37,7 @@
     <div class="row">
       <div class="col-lg-10 subset-navigation">
         {{#link-to "dataset.subset.analysis" model class="btn"}}Analysis{{/link-to}}
+        {{#link-to "dataset.subset.active-learning" model class="btn"}}Active Learning{{/link-to}}
         {{#link-to "dataset.subset.documents" model class="btn"}}Documents{{/link-to}}
       </div>
     </div>
@@ -101,7 +102,7 @@
 
       <div class="modal-footer">
         {{#unless model.isRoot}}
-          <button type="button" class="btn btn-light mr-auto" 
+          <button type="button" class="btn btn-light mr-auto"
             data-toggle="modal"
             data-target="#subset-delete-modal"
             data-subsetid="{{model.id}}">Delete</button>

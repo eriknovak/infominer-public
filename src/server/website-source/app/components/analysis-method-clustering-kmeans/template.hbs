@@ -31,12 +31,11 @@
     {{#each method.result.clusters as |cluster index|}}
       <div class="row">
         <div class="col-lg-12">
-          {{ analysis-clustering-kmeans-cluster 
-            dataset=dataset 
-            method=method 
-            cluster=cluster 
-            index=index 
-            subsetCreationParams=subsetCreationParams
+          {{ analysis-clustering-kmeans-cluster
+            dataset=dataset
+            method=method
+            cluster=cluster
+            index=index
           }}
         </div><!-- .col-lg-12 -->
       </div><!-- .row -->

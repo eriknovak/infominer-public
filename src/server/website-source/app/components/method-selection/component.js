@@ -18,7 +18,7 @@ export default Component.extend({
         this._super(...arguments);
         set(this, 'availableMethods', [
             { method: 'clustering.kmeans', name: 'clustering' },
-            // { method: 'clustering.activelearning', name: 'active learning' },
+            { method: 'clustering.activelearning', name: 'active learning' },
             { method: 'visualization', name: 'visualization' },
         ]);
         set(this, 'selectedMethod', this.get('availableMethods').objectAt(0).method);
@@ -49,10 +49,12 @@ export default Component.extend({
                 parameters = this._prepareVisualizationParams();
             }
             // send the parameters to the route
-            if (methodType.includes('clustering') && parameters.fields.length || 
+            if (methodType.includes('clustering.kmeans') && parameters.fields.length ||
                 methodType.includes('visualization')) {
                 // parameters are set - make a method request
-                this.get('action')({ methodType, parameters });
+                this.get('startAnalysis')({ methodType, parameters });
+            } else if (methodType.includes('clustering.activelearning') && parameters.method.queryText) {
+                this.get('startActiveLearning')({ queryText: parameters.method.queryText });
             } else {
                 // there are no fields selected - warn the user
                 $('#analysis-warning').removeClass('d-none');
@@ -63,12 +65,17 @@ export default Component.extend({
     _prepareClusteringParams() {
         const parameters = this.get('parameters');
         // get feature parameters
-        let fields = get(parameters, 'features')
+        let response = { };
+        if (this.get('selectedMethod') !== 'clustering.activelearning') {
+            let fields = get(parameters, 'features')
                 .filterBy('included', true)
                 .map(param => get(param, 'field'));
+            response.fields = fields;
+        }
         // get method parameters
-        let method = get(parameters, 'method');
-        return { fields, method };
+        response.method = get(parameters, 'method');
+
+        return response;
     },
 
     _prepareVisualizationParams() {

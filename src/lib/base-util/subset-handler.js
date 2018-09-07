@@ -230,6 +230,8 @@ module.exports = {
 
         // add additional queries - keywords
         let queryParams = query.query;
+        console.log(query);
+        console.log(queryParams);
         if (queryParams && queryParams.text) {
             qmQuery.$or = [ ];
             for (let field of queryParams.text.fields) {

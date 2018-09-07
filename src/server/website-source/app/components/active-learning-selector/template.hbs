@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="col">
+    {{! Fill the container with documents }}
+    {{#if nextDocument}}
+      <div class="document-info-container mt-5">
+        <h6 class="subset text-center">Label Document</h6>
+        <div class="border p-2">
+          {{#each nextDocument.values as |value|}}
+            <div class="row">
+              <div class="col-md-2 user-input-label">{{value.field}}</div>
+              <div class="col-md-10">{{{value.value}}}</div>
+            </div>
+          {{/each}}
+        </div>
+      </div>{{! .container }}
+
+      <div class="text-center mt-1">
+        <i class="fa fa-check text-success document-label" aria-hidden="true" {{action 'saveLabel' 1}}></i>
+        <i class="fa fa-times text-danger document-label" aria-hidden="true" {{action 'saveLabel' -1}}></i>
+      </div>
+
+    {{else}}
+      <p>No more available documents to be labelled.</p>
+    {{/if}}
+  </div>
+
+</div>
+
+
+<div class="row">
+  <div class="col mt-5">
+    <h5>Labelled Documents</h5>
+    {{
+      document-table
+      documents=documentsTable
+      metadata=metadata
+      changeLimit=(action 'changeLimit')
+      changePage=(action 'changePage')
+      sortByField=(action 'sortByField')
+    }}
+  </div>
+</div>
+
+
+{{yield}}

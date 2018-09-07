@@ -2,6 +2,8 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { computed, set } from '@ember/object';
 import { htmlSafe } from '@ember/string';
+import $ from 'jquery';
+
 
 export default Component.extend({
     fieldSelection: service('field-selection'),

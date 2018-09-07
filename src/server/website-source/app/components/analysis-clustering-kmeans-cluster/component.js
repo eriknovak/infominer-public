@@ -88,16 +88,6 @@ export default Component.extend({
         editLabel() { this.toggleProperty('editing-label'); },
         saveLabel() { this._saveLabel(); },
 
-        updateSubsetCreationParams() {
-            this.set('subsetCreationParams', {
-                label: this.get('cluster.label'),
-                type: 'Clustering',
-                methodId: this.get('method.id'),
-                clusterId: this.get('index'),
-                documentCount: this.get('cluster.documentCount')
-            });
-        },
-
         changeLimit(limit) {
             this.set('limit', limit);
         },

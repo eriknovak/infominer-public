@@ -24,6 +24,8 @@ export default Route.extend({
     init() {
         this._super(...arguments);
         this.set('defaultQuery', { calcAggr: true });
+        this.set('query', this.get('defaultQuery'));
+
     },
 
     beforeModel(transition) {

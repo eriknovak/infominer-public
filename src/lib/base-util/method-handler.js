@@ -111,7 +111,7 @@ module.exports = {
                 allMethods.filterByField('deleted', false);
             }
             response.methods = allMethods.map(rec => formatter.method(rec));
-         }
+        }
          // return the methods
          return response;
     },

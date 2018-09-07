@@ -26,14 +26,16 @@ export default Component.extend({
         for (let field of fields) {
             let value = this.get(`document.values.${field.name}`);
             // find the selected query value, find and highligh the text
-            if (field.type == 'string_v') { 
-                value = value.join(' 🡒 '); 
-            } else if (field.type == 'datetime') { 
-                value = (new Date(value)).toUTCString(); 
-            }
-            if (query && query.text && query.text.fields.includes(field.name)) {
-                const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');
-                value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
+            if (value) {
+                if (field.type == 'string_v') {
+                    value = value.join(' 🡒 ');
+                } else if (field.type == 'datetime') {
+                    value = (new Date(value)).toUTCString();
+                }
+                if (query && query.text && query.text.fields.includes(field.name)) {
+                    const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');
+                    value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
+                }
             }
             documentValues.push({ value, field: field.name });
         }

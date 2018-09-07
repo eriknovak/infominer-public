@@ -1,15 +1,7 @@
-{{#if cluster.subset.created}}
-  {{#link-to 'dataset.subset' dataset cluster.subset.id class="btn btn-secondary pull-right" }}
-    Inspect
-  {{/link-to}}
-{{else if cluster.documentCount}}
-  <button class="btn btn-primary pull-right" data-toggle="modal"
-    data-target="#subset-create-modal"
-    onclick={{action 'updateSubsetCreationParams'}}
-  >
-    Edit
-  </button>
-{{/if}}
+{{#link-to 'dataset.subset' dataset cluster.subset.id class="btn btn-secondary pull-right" }}
+  Inspect
+{{/link-to}}
+
 
 <h4 class="cluster-header">
   {{! button for toggling collapse }}
@@ -18,11 +10,12 @@
     <i class="fa fa-chevron-down"></i>
   </button>
   {{#if editing-label}}
+    Cluster:
     <input class="form-control editing title" type="text" value="{{cluster.label}}">
     <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
     <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
   {{else}}
-    <span class="cluster-label">{{cluster.label}}</span>
+    <span class="cluster-label">Cluster: {{cluster.label}}</span>
     <i class="fa fa-pencil edit edit-cluster-label" aria-hidden="true" {{action 'editLabel'}}></i>
   {{/if}}
 

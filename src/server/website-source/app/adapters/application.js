@@ -5,7 +5,7 @@ export default DS.RESTAdapter.extend({
     host: ENV.APP.HOSTNAME,
     namespace: 'api',
 
-    handleResponse(status, headers, payload, requestData) {
+    handleResponse(status, headers, payload) {
         if (payload.errors) { payload.errors = DS.errorsHashToArray(payload.errors); }
         return this._super(...arguments);
     }

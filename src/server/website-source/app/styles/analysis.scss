@@ -125,3 +125,16 @@
         }
     }
 }
+
+.user-input-label {
+    text-transform: capitalize;
+    font-weight: 400;
+    color: $tertiary-color;
+}
+
+.document-label {
+    font-size: 26px;
+    cursor: pointer;
+    margin-left: 1px;
+    margin-right: 1px;
+}

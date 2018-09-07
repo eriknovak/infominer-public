@@ -1,0 +1,29 @@
+<h4 class="description-header">Active Learning</h4>
+
+<div class="analysis">
+  <div class="analysis-component">
+
+    <div class="row">
+      <div class="col-md-2 user-input-label">User Input</div>
+      <div class="col-md-10">
+        {{
+          textarea
+          class="form-control editing"
+          disabled=model.params.queryText
+          rows="5"
+          value=model.params.queryText
+          placeholder="Input text about content you wish to extract"
+        }}
+      </div>
+    </div>
+
+    {{
+      active-learning-selector
+      documents=model.documents
+      dataset=model.dataset
+    }}
+
+  </div>
+</div>
+
+{{outlet}}
