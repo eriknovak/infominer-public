@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
@@ -31,8 +31,8 @@ export default Component.extend({
         });
     },
 
-    numberOfVisualizationFields: computed('dataset.fields.@each.showInVisual', function () {
-        return this.get('dataset.fields').filter(field => field.showInVisual).length;
+    numberOfVisualizationFields: computed('fieldSelection.fields.@each.showInVisual', function () {
+        return this.get('fieldSelection.fields').filter(field => get(field, 'showInVisual')).length;
     }),
 
     ///////////////////////////////////////////////////////
