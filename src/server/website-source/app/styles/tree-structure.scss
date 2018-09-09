@@ -3,8 +3,26 @@
     .tree-structure {
 
         margin: 0;
-        padding: 0;
+        padding: 0 0 15px 0;
+        display: block;
+        overflow-x: auto;
         @include collapse-toggle($secondary-color, 19px);
+
+        &::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: $primary-color;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: $tertiary-color;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: darken($tertiary-color, 5%);
+        }
 
         a { padding: 1px 5px; }
 
@@ -67,6 +85,8 @@
 
         .method, .subset, .unsaved {
             font-family: $font-primary;
+            white-space: nowrap;
+            display: grid;
             padding: 1px;
         }
 
@@ -78,7 +98,8 @@
         }
 
         .delete {
-            display: none;
+            visibility: hidden;
+            display: inline-block;
             width: 15px;
             height: 15px;
             text-align: center;
@@ -87,7 +108,7 @@
             -webkit-transition: all .2s linear;
             -moz-transition: all .2s linear;
             transition: all .2s linear;
-            &.show { display: inline-block; }
+            &.show { visibility: visible; }
             &:hover { background-color: $primary-color; }
         }
 

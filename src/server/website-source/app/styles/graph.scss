@@ -93,12 +93,18 @@ $height: 250px;
 
 .placeholder {
     animation: pulse 2s infinite ease-in-out;
-    &.field-title     { width: 144px; height: 13px; margin-top: 3px; }
+    &.field-title {
+        width: 144px;
+        height: 19px;
+        margin-top: 3px;
+        margin: 10px 0px 4px;
+    }
     &.document-number { width: 120px; height: 13px; }
     .cluster-header & { width: 104px; height: 19px; }
     &.subset-button   {
         width: 114px;
         height: 31px;
+        border-radius: 50px;
         &.spacing { margin-right: 10px; }
     }
     &.document-table {

@@ -123,23 +123,18 @@
 
     .table-responsive {
         margin-bottom: 10px;
-        overflow: auto;
-    }
-
-    .table-responsive::-webkit-scrollbar {
-        height: 10px;
-    }
-
-    .table-responsive::-webkit-scrollbar-track {
-        background: $primary-color;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: $tertiary-color;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb:hover {
-        background: darken($tertiary-color, 5%);
+        &::-webkit-scrollbar {
+            height: 10px;
+        }
+        &::-webkit-scrollbar-track {
+            background: $primary-color;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: $tertiary-color;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+            background: darken($tertiary-color, 5%);
+        }
     }
 }
 
