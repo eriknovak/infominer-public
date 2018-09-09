@@ -6,6 +6,8 @@ import $ from 'jquery';
 
 
 export default Component.extend({
+    classNames: ['row', 'document-table'],
+
     fieldSelection: service('field-selection'),
 
     ///////////////////////////////////////////////////////
@@ -70,8 +72,8 @@ export default Component.extend({
         this.set('quickSelect', quickSelect);
 
         // set condition values
-        this.set('onFirstPage', page === 1);
-        this.set('onLastPage', page === lastPage);
+        this.set('onFirstPage', page === 1 || !count);
+        this.set('onLastPage', page === lastPage || !count);
 
         // how many documents are shown
         const startDisplay = count ? 1 + (page-1)*limit : 0;
@@ -103,8 +105,18 @@ export default Component.extend({
     },
 
     columnWidth: computed('metadata.fields.@each.showInTable', function () {
-        return htmlSafe(`width:${100 / this.get('metadata.fields')
-            .filter(field => field.showInTable).length}%`);
+        // get element total width
+        let totalWidth = $(`#${this.elementId} .table-responsive`).width();
+        // get number of fields shown
+        let shownFields = this.get('metadata.fields')
+            .filter(field => field.showInTable).length;
+        // get width factor
+        let width = totalWidth / shownFields;
+
+        // calculate header width
+        let headerWidth = width > 160 ? width : 160;
+
+        return htmlSafe(`min-width:${headerWidth-10}px;`);
     }),
 
     numberOfFieldsShown: computed('metadata.fields.@each.showInTable', function () {

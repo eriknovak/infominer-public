@@ -16,11 +16,11 @@
 
   {{#if subset.documentCount}}
     {{! link to the subset information }}
-    {{#link-to 'dataset.subset' subset }}
+    {{#link-to 'dataset.subset' subset class="rounded"}}
       {{ subset.label }}
     {{/link-to}}
     <small class="ml-1">({{subset.documentCount}} docs)</small>
-    <small class="ml-1 delete" id="delete-subset-{{subset.id}}" 
+    <small class="ml-1 delete" id="delete-subset-{{subset.id}}"
       data-toggle="modal"
       data-target="#subset-delete-modal"
       data-subsetid="{{subset.id}}">

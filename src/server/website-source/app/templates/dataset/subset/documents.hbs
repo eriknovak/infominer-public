@@ -1,4 +1,5 @@
 <div class="analysis">
+  <div class="analysis-component-header rounded-top">Query</div>
   <div class="analysis-component">
     {{
       document-table
@@ -16,16 +17,16 @@
 
 <div class="row">
   <div class="col analysis">
-    <div class="analysis-component">
-      {{#if model.documents.length}}
-        {{
-          analysis-method-aggregate-subset
-          method=model.method
-        }}
-      {{else}}
+    {{#if model.documents.length}}
+      {{
+        analysis-method-aggregate-subset
+        method=model.method
+      }}
+    {{else}}
+      <div class="analysis-component">
         <p class="message">No query aggregates for query results</p>
-      {{/if}}
-    </div>
+      </div>
+    {{/if}}
   </div>
 </div>
 

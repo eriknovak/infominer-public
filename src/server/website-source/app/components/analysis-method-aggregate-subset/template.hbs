@@ -1,11 +1,15 @@
-<div class="row">
-  {{#each aggregates as |aggregate|}}
-    <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
-      {{ component
-          (concat "aggregate-" aggregate.type)
-          field=aggregate.field
-          distribution=aggregate.distribution
-      }}
-    </div>
-  {{/each}}
+<div class="analysis-component-header rounded-top">Aggregates</div>
+
+<div class="analysis-component">
+  <div class="row">
+    {{#each aggregates as |aggregate|}}
+      <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
+        {{ component
+            (concat "aggregate-" aggregate.type)
+            field=aggregate.field
+            distribution=aggregate.distribution
+        }}
+      </div>
+    {{/each}}
+  </div>
 </div>

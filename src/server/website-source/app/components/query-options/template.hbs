@@ -2,31 +2,28 @@
   <div class="form-group row">
     <div class="col-lg-12">
       <div class="input-group">
-        <input type="text"
-          class="form-control keywords-input"
-          autocomplete="on"
-          data-purpose="keywords"
-          placeholder="Insert search phrase"
-          value="{{keywords}}"
-        >
+
+        <input type="text" class="form-control keywords-input" autocomplete="on"
+          data-purpose="keywords" placeholder="Insert search phrase" value="{{keywords}}">
+
         <div class="input-group-append">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-              id="query-by-fields" aria-haspopup="true" aria-expanded="false">
-              Query by fields
-              <span class="number-circle">{{numberOfSelectedFields}}</span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="query-by-fields">
-              {{#each textFields as |field index|}}
-                <div class="dropdown-item">
-                  {{ checkbox-select
-                    checkboxId=(concat "query-by-fields-checkbox-" index)
-                    checked=field.included
-                  }}
-                  <label class="query-field-selection">{{field.name}}</label>
-                </div>
-              {{/each}}
-            </div>
+
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+            id="query-by-fields" aria-haspopup="true" aria-expanded="false">
+            Query by fields
+            <span class="number-circle">{{numberOfSelectedFields}}</span>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="query-by-fields">
+            {{#each textFields as |field index|}}
+              <div class="dropdown-item">
+                {{ checkbox-select
+                  checkboxId=(concat "query-by-fields-checkbox-" index)
+                  checked=field.included
+                }}
+                <label class="query-field-selection">{{field.name}}</label>
+              </div>
+            {{/each}}
           </div>
         </div>
 
@@ -36,7 +33,7 @@
 {{/if}}
 
 {{#if numberFields}}
-  <div class="form-group row">
+  <div class="form-group row query-sliders">
     <div class="col-lg-12">
       <div class="row">
         {{#each numberFields as |field index|}}
@@ -65,19 +62,14 @@
 
 
 {{#if queryChanged}}
-  <button
-    class="btn btn-primary pull-right"
-    data-toggle="modal"
-    data-target="#subset-create-modal"
-  >
+  <button class="btn btn-primary btn-rounded pull-right" data-toggle="modal"
+    data-target="#subset-create-modal">
     Save results
   </button>
 {{/if}}
 
-<button
-  class="btn btn-secondary pull-right"
-  {{action "changeQuery"}}
->
+<button class="btn btn-secondary btn-rounded pull-right"
+  {{action "changeQuery"}}>
   Start query
 </button>
 

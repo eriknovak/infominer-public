@@ -4,7 +4,7 @@ import { computed, get, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
-    classNames: ['analysis-component', 'cluster-content'],
+    classNames: ['cluster-content'],
     fieldSelection: service('field-selection'),
     columnWidth: service('column-size'),
     store:       service('store'),

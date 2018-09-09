@@ -6,10 +6,10 @@
           {{! Dataset title and information }}
           <h2 class="description-header">{{dataset.label}}</h2>
 
-          <button class="btn btn-secondary pull-right" data-toggle="modal"
+          <button class="btn btn-secondary btn-rounded pull-right" data-toggle="modal"
             data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
 
-          <button class="btn btn-light pull-right" data-toggle="modal"
+          <button class="btn btn-light btn-rounded pull-right" data-toggle="modal"
             data-target="#delete-dataset-modal">Delete</button>
 
           <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
@@ -34,13 +34,14 @@
 
   <div class="row visualization-field-selection">
     <div class="col-sm-12 offset-lg-1 col-lg-11">
-      <div class="offset-sm-5 col-sm-7 offset-md-4 col-md-8 offset-lg-3 col-lg-9">
+      <div class="offset-sm-0 col-sm-12 offset-md-4 col-md-8 offset-lg-3 col-lg-9">
         <div class="row">
-          <div class="col-lg-10 pl-2">
+          <div class="col-lg-10 pl-0">
 
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
+            <button class="btn btn-secondary btn-sm btn-rounded dropdown-toggle" type="button"
               id="visualization-field-selection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Field visualization selection
+              <span class="number-circle">{{numberOfVisualizationFields}}</span>
             </button>
             <div class="dropdown-menu dropdown-menu-left">
               {{#each fieldSelection.fields as |field index|}}
@@ -80,8 +81,8 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick={{action deleteDataset}}>
+        <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger btn-rounded" onclick={{action deleteDataset}}>
           Yes, delete dataset
         </button>
       </div>
@@ -99,7 +100,8 @@
       <div class="modal-header">
         {{! modal title }}
         <h4 class="modal-title">Edit dataset</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="btn btn-light rounded-circle"
+          data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         {{! modal title }}
@@ -143,8 +145,8 @@
       </div>{{! .modal-body }}
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" {{action 'updateDataset'}}>Save</button>
+        <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-rounded" {{action 'updateDataset'}}>Save</button>
       </div>
 
     </div>{{! .modal-content }}

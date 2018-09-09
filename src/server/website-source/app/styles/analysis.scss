@@ -86,10 +86,22 @@
 .analysis {
     margin: 10px auto;
 
+    .analysis-component-header {
+        background-color: $tertiary-color;
+        padding: 1px 10px;
+        font-weight: 400;
+        color: white;
+    }
+
     .analysis-component {
         padding: 10px;
         background-color: white;
         @include analysis-border;
+        border-top: none;
+
+        .aggregate-title {
+            margin: 10px 0px 4px;
+        }
     }
 
     .parameter-label { font-weight: 500; }
@@ -103,7 +115,6 @@
 
         .clusters .cluster-content {
             margin: 15px auto;
-            @include analysis-border;
             .cluster-header {
                 color: $secondary-color;
                 margin-bottom: 0px;
@@ -114,6 +125,7 @@
 
                 }
             }
+
             .cluster-metadata {
                 margin-left: 25px;
                 margin-bottom: 0px;

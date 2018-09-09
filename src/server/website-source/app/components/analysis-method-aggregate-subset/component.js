@@ -3,7 +3,7 @@ import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 
 export default Component.extend({
-    classNames: ['analysis-component'],
+
     // services
     columnWidth: service('column-size'),
     fieldSelection: service('field-selection'),

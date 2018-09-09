@@ -80,11 +80,9 @@
                 & > .document-info-container {
                     padding: 10px 6px;
                     margin: 0px;
-                    .field-value {
-                        text-transform: capitalize;
-                        font-weight: 400;
-                        color: $tertiary-color;
-                    }
+                }
+                .document-attribute {
+                    margin-bottom: 6px;
                 }
             }
         }
@@ -97,18 +95,23 @@
             font-weight: 500;
             cursor: pointer;
             text-transform: capitalize;
-
+            position: relative;
             &.checkbox-header {
                 white-space: nowrap;
                 width: 1%;
             }
             // sorting icons
-            .fa {
+            .sorting {
                 padding: 3px 0;
                 font-size: 12px;
+                position: absolute;
+                right: 0;
             }
         }
 
+    }
+    .table-display-info {
+        margin-top: 4px;
     }
 
     .table-pagination {
@@ -140,16 +143,12 @@
     }
 }
 
-.cluster-content {
-    .btn-sm {
-        .number-circle {
-            display: inline-block;
-            border-radius: 50%;
-            width: 17px;
-            height: 17px;
-            padding: 1px;
-            background: $secondary-color;
-            color: white;
-        }
-    }
+.btn-sm .number-circle {
+    display: inline-block;
+    border-radius: 50%;
+    width: 17px;
+    height: 17px;
+    padding: 1px;
+    background: $secondary-color;
+    color: white;
 }
