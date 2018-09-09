@@ -13,6 +13,8 @@ export default DS.Model.extend({
     label: computed('methodType', function () {
         if (this.get('methodType').includes('kmeans')) {
             return 'clustering';
+        } else if (this.get('methodType').includes('filter.manual')) {
+            return 'query-filter';
         } else {
             return this.get('methodType');
         }
