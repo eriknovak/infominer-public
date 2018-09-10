@@ -87,7 +87,7 @@
       {{! navigation }}
       <div class="navigation-buttons text-center">
         {{! Go to first page }}
-        <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
+        <button class="btn btn-secondary rounded-left {{if onFirstPage 'disabled'}}"
           onclick={{if onFirstPage null (action 'getDocuments' firstPage)}}>
           <i class="fa fa-angle-double-left" aria-hidden="true"></i>
         </button>
@@ -113,7 +113,7 @@
         </button>
 
         {{! Go to last page }}
-        <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
+        <button class="btn btn-secondary rounded-right {{if onLastPage 'disabled'}}"
           onclick={{if onLastPage null (action 'getDocuments' lastPage)}}>
           <i class="fa fa-angle-double-right" aria-hidden="true"></i>
         </button>
