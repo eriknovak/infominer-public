@@ -89,6 +89,7 @@ module.exports = {
     _kMeansClustering(result) {
         return {
             clusters: result.clusters.map(cluster => ({
+                avgSimilarity: cluster.avgSimilarity,
                 documentCount: cluster.docIds.length,
                 documentSample: cluster.documentSample,
                 aggregates: cluster.aggregates,

@@ -109,7 +109,7 @@ const WordCloudComponent = GraphComponent.extend({
 
         // prepare wordcloud
         cloud().size([width, height])
-            .timeInterval(1000)
+            .timeInterval(10)
             .words(data)
             .rotate(0)
             .random(() => 0.5)

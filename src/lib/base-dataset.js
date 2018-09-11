@@ -175,6 +175,14 @@ class BaseDataset {
         if (!filePath) { throw new Error('FieldError: filePath must be defined'); }
         if (!fields) { throw new Error('FieldError: fields must be defined'); }
 
+
+        // create the root subset
+        let subset = {
+            label: 'root',
+            description: 'The root subset. Contains all records of dataset.',
+        };
+        let { subsets: { id: subsetId } } = self.createSubset(subset);
+
         // read file and skip first line
         let fileIn = qm.fs.openRead(filePath); fileIn.readLine();
 
@@ -184,7 +192,6 @@ class BaseDataset {
             let line = fileIn.readLine();
             // skip empty lines
             if (line.trim() === '') { continue; }
-
             let values = line.trim().split(delimiter);
             // prepare and push record to dataset
             let rec = { };
@@ -192,10 +199,11 @@ class BaseDataset {
             for (let i = 0; i < fields.length; i++) {
                 // if the field is included in the database
                 if (fields[i].included) {
-                    rec[fields[i].name] = self._parseFieldValue(values[i], fields[i].type);
+                    rec[fields[i].name] = values[i] ? self._parseFieldValue(values[i], fields[i].type) : null;
                 }
             }
-            self.base.store('Dataset').push(rec);
+            let recId = self.base.store('Dataset').push(rec);
+            self.base.store('Dataset')[recId].$addJoin('inSubsets', self.base.store('Subsets')[subsetId]);
         }
         // close the input stream - enable file manipulation
         fileIn.close();
@@ -203,15 +211,8 @@ class BaseDataset {
         // set dataset fields - and aggregates
         self.fields = self._getDatasetFields();
 
-        // create the root subset
-        let subset = {
-            label: 'root',
-            description: 'The root subset. Contains all records of dataset.',
-            documents: self.base.store('Dataset').allRecords.map(rec => rec.$id)
-        };
-
         // return subset object
-        return self.createSubset(subset);
+        return { subsets: { id: subsetId } };
     }
 
     /**
@@ -258,15 +259,7 @@ class BaseDataset {
                 field.metadata = { min, max };
 
             } else if (field.type === 'string') {
-                // there is for that field
-                let aggregate = dataset.aggr({
-                    name: `sample_${field.name}`,
-                    field: field.name,
-                    type: 'count'
-                });
-                field.aggregate = aggregate && aggregate.values.length < Math.min(15, dataset.length) ?
-                    'count' : 'keywords';
-
+                field.aggregate = 'keywords';
             } else if (field.type === 'string_v') {
                 // categories should be aggregated as hierarchy
                 field.aggregate = 'hierarchy';

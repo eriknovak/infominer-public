@@ -52,9 +52,11 @@ module.exports = {
         }
 
         // add joins to documents/elements
-        for (let documentId of subset.documents) {
-            let document = base.store('Dataset')[documentId];
-            if (document) { base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
+        if (subset.documents) {
+            for (let documentId of subset.documents) {
+                let document = base.store('Dataset')[documentId];
+                if (document) { base.store('Subsets')[subsetId].$addJoin('hasElements', document); }
+            }
         }
         // return id of created subset
         return {
@@ -230,8 +232,6 @@ module.exports = {
 
         // add additional queries - keywords
         let queryParams = query.query;
-        console.log(query);
-        console.log(queryParams);
         if (queryParams && queryParams.text) {
             qmQuery.$or = [ ];
             for (let field of queryParams.text.fields) {
@@ -269,7 +269,7 @@ module.exports = {
 
         // document aggregates
         let aggregates = [];
-        if (queryParams.calcAggr && queryParams.calcAggr === 'true') {
+        if (queryParams.calculateAggregates && queryParams.calculateAggregates === 'true') {
             for (let field of fields) {
                 // get aggregate distribution
                 if (field.aggregate) {

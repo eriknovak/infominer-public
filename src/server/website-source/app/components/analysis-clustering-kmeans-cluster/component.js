@@ -27,6 +27,9 @@ export default Component.extend({
         if (cluster.subset.id) {
             set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
         }
+        if (cluster.avgSimilarity) {
+            set(cluster, 'avgSimProcent', (cluster.avgSimilarity * 100).toFixed(2));
+        }
     },
 
     didInsertElement() {

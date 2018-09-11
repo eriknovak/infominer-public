@@ -224,8 +224,10 @@ module.exports = {
             // calculate the hierarchical structure of the field
             distribution = [];
             for (let id = 0; id < elements.length; id++) {
-                const fieldVals = elements[id][fieldName].toArray();
-                this._addChild(distribution, fieldVals[0], fieldVals.slice(1));
+                if (elements[id][fieldName]) {
+                    const fieldVals = elements[id][fieldName].toArray();
+                    this._addChild(distribution, fieldVals[0], fieldVals.slice(1));
+                }
             }
         } else {
             // aggregate params
@@ -260,7 +262,7 @@ module.exports = {
                     type: 'text',
                     field: query.parameters.fields,
                     ngrams: 2,
-                    hashDimension: 200000
+                    hashDimension: 20000
                 },{
                     type: 'constant',
                     const: 0.0001
@@ -302,6 +304,9 @@ module.exports = {
 
         // get matrix representation of the documents
         const matrix = featureSpace.extractSparseMatrix(documents);
+
+        // TODO: support dimensionality reduction
+
         // create kmeans model and feed it the sparse document matrix
         let kMeans = new qm.analytics.KMeans(query.parameters.method);
         kMeans.fit(matrix);
@@ -313,6 +318,7 @@ module.exports = {
         query.result = {
             clusters: Array.apply(null, Array(query.parameters.method.k))
                 .map(() => ({
+                    avgSimilarity: null,
                     docIds: [ ],
                     aggregates: [ ],
                     subset: {
@@ -322,12 +328,63 @@ module.exports = {
                 }))
         };
 
+        let clusterDocuments = { };
         // populate the cluster results
         for (let id = 0; id < idxv.length; id++) {
             const docId = documents[id].$id;
             const clusterId = idxv[id];
             // store the document id in the correct cluster
             query.result.clusters[clusterId].docIds.push(docId);
+
+            // save positions of documents of particular cluster
+            if (clusterDocuments[clusterId]) {
+                clusterDocuments[clusterId].push(id);
+            } else {
+                clusterDocuments[clusterId] = [id];
+            }
+        }
+        // calculate the average distance between cluster documents and centroid
+        for (let clusterId of Object.keys(clusterDocuments)) {
+            // get document submatrix
+            let positions = new qm.la.IntVector(clusterDocuments[clusterId]);
+            let submatrix = matrix.getColSubmatrix(positions); submatrix.normalizeCols();
+            // get centroid
+            let centroid = kMeans.centroids.getCol(parseInt(clusterId)); centroid.normalize();
+            // get distances between documents and centroid
+            query.result.clusters[clusterId].avgSimilarity = submatrix.multiplyT(centroid).sum() / submatrix.cols;
+        }
+
+        // // calculates the davies-bouldin index of the clustering
+        // let centroids = kMeans.centroids;
+        // centroids.normalizeCols();
+
+        // let DBIndex = 0;
+        // let centroidDistances = centroids.multiplyT(centroids);
+
+        // let clusters = query.result.clusters;
+        // for (let i = 0; i < clusters.length; i++) {
+        //     let possibleMax = [];
+        //     for (let j = 0; j < clusters.length; j++) {
+        //         if (i != j) {
+        //             let avgDistanceI = clusters[i].avgDistance;
+        //             let avgDistanceJ = clusters[j].avgDistance;
+        //             let centroidDist = centroidDistances.at(i, j);
+        //             possibleMax.push((avgDistanceI + avgDistanceJ) / centroidDist);
+        //         }
+        //     }
+        //     DBIndex += Math.max(...possibleMax);
+        // }
+        // // store the davies bouldin index
+        // query.result.DBIndex = DBIndex / clusters.length;
+
+        // console.log(query.result.DBIndex);
+        /**
+         * Formats the qminer record document.
+         * @param {qm.Record} document - The document to be formated.
+         * @returns {Object} The document in json format.
+         */
+        function formatDocuments(document) {
+            return formatter.document(document);
         }
 
         // for each cluster calculate the aggregates
@@ -337,7 +394,7 @@ module.exports = {
             const clusterDocuments = base.store('Dataset').newRecordSet(documentIds);
             // get document sample
             query.result.clusters[i].documentSample = clusterDocuments.sample(100)
-                .map(document => formatter.document(document));
+                .map(formatDocuments);
 
             // iterate through the fields
             for (let field of fields) {
@@ -373,7 +430,6 @@ module.exports = {
         // join the created method with the applied subset
         let methodId = base.store('Methods').push(query);
         base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
-
         // create subsets using the cluster information
         for (let clusterId = 0; clusterId < query.result.clusters.length; clusterId++) {
             const cluster = query.result.clusters[clusterId];

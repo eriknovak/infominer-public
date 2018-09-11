@@ -6,6 +6,12 @@
     Inspect
   {{/link-to}}
 
+  {{#if cluster.subset.id}}
+    <button type="button" class="btn btn-light btn-rounded pull-right" data-toggle="modal"
+      data-target="#subset-delete-modal" data-subsetid="{{cluster.subset.id}}">
+      Delete
+    </button>
+  {{/if}}
 
   <h4 class="cluster-header">
     {{! button for toggling collapse }}
@@ -24,7 +30,13 @@
     {{/if}}
 
   </h4>
-  <p class="cluster-metadata">{{cluster.documentCount}} documents</p>
+  <p class="cluster-metadata">
+    <b>Number of documents:</b> {{cluster.documentCount}}
+    {{#if cluster.avgSimProcent}}
+      <b class="ml-2">Average similarity:</b> {{cluster.avgSimProcent}}%
+    {{/if}}
+
+    </p>
 
   {{#bs-collapse collapsed=collapsed}}
     <div class="row cluster-aggregates">

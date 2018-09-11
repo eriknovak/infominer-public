@@ -23,7 +23,7 @@ export default Route.extend({
 
     init() {
         this._super(...arguments);
-        this.set('defaultQuery', { calcAggr: true });
+        this.set('defaultQuery', { calculateAggregates: true });
         this.set('query', this.get('defaultQuery'));
 
     },
@@ -100,7 +100,7 @@ export default Route.extend({
             if (maxPage % 1 !== 0) { maxPage = Math.floor(maxPage) + 1; }
             // change page value if not in bound
             if (pagination.page > maxPage) { this.set('page', maxPage); }
-            this.set('query.calcAggr', false);
+            this.set('query.calculateAggregates', false);
             // update model
             this._updateModel();
 
@@ -113,7 +113,7 @@ export default Route.extend({
         changePage(page) {
             // update the limit and transition to route
             this.set('page', page);
-            this.set('query.calcAggr', false);
+            this.set('query.calculateAggregates', false);
             // update model
             this._updateModel();
         },
@@ -126,7 +126,7 @@ export default Route.extend({
          */
         sortByField(params) {
             this.set('sortTarget', params);
-            this.set('query.calcAggr', false);
+            this.set('query.calculateAggregates', false);
             // update model
             this._updateModel();
         },
@@ -185,7 +185,7 @@ export default Route.extend({
             const query = { };
             if (params.text) { query.text = params.text; }
             if (params.number.length) { query.number = params.number; }
-            query.calcAggr = true;
+            query.calculateAggregates = true;
             //set the query parameters
             this.set('query', query);
             // we don't know how many results there will be

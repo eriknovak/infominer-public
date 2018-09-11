@@ -6,9 +6,9 @@
         <label class="col-md-2 col-form-label" for="dataset-label">Dataset Name</label>
         <div class="col-md-10">
           {{
-            input 
-            class="form-control editing emphasize" 
-            value=dataset.label 
+            input
+            class="form-control editing emphasize"
+            value=dataset.label
             placeholder="Add dataset name"
           }}
         </div>
@@ -20,9 +20,9 @@
         <label class="col-md-2 col-form-label" for="dataset-description">Description</label>
         <div class="col-md-10">
           {{
-            textarea 
-            class="form-control editing" 
-            rows="5" 
+            textarea
+            class="form-control editing"
+            rows="5"
             value=dataset.description
             placeholder="Add dataset description (optional)"
           }}
@@ -47,12 +47,12 @@
       <tbody>
         {{#each fieldList as |field index|}}
           {{
-            dataset-upload-field 
-            fieldList=fieldList 
-            name=field.name 
-            type=field.type 
-            included=field.included 
-            invalid=field.invalid 
+            dataset-upload-field
+            fieldList=fieldList
+            name=field.name
+            type=field.type
+            included=field.included
+            invalid=field.invalid
             index=index
           }}
         {{/each}}
@@ -64,8 +64,8 @@
 
 <div class="row">
   <div class="col">
-    <button {{action submitDataset}} class="btn btn-primary pull-right">Save Dataset</button>
-    <button {{action resetList}} class="btn btn-light pull-right">Cancel</button>
+    <button {{action submitDataset}} class="btn btn-primary btn-rounded pull-right">Save Dataset</button>
+    <button {{action resetList}} class="btn btn-light btn-rounded pull-right">Cancel</button>
     <div id="submittion-error" class="pull-right">Invalid field names</div>
   </div>{{! .col }}
 </div>{{! .row }}

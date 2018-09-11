@@ -125,8 +125,6 @@ export default Component.extend({
                     document: get(this.get('documentLabel').objectAt(0), 'document'),
                     label: 0
                 });
-                console.log(get(this.get('documentLabel').objectAt(0), 'document'));
-
                 // this.get('store').query('active-learning', { /* TODO */ }).then(response => {
                 //     this.get('documentLabel').pushObject({
                 //         document: response.document,
