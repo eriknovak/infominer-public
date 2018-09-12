@@ -36,7 +36,7 @@ export default DatasetUploadRoute.extend({
          */
         uploadDataset(file) {
             // set the options and upload
-            file.upload({
+            this.task = file.upload({
                 url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file`,
             }).then(response => {
                 let model = response.body;
@@ -50,7 +50,7 @@ export default DatasetUploadRoute.extend({
                                 </span>: ${model.errors.msg}!
                             </div>`
                     });
-                    return this.removeDataset();
+                    return this._removeDataset();
                 }
                 // set all fields to valid - modify values in child components
                 model.fieldList.forEach(field => { field.invalid = false; });
@@ -63,7 +63,7 @@ export default DatasetUploadRoute.extend({
          */
         resetModel() {
             // reset the model
-            this.removeDataset();
+            this._removeDataset();
         },
 
         /**
@@ -113,6 +113,12 @@ export default DatasetUploadRoute.extend({
                 }, 3000);
                 run(() => { this.transitionTo('datasets'); });
             });
+        },
+
+        willTransition(transition) {
+            // cancel task if still existant
+            if (this.task) { this.task.cancel(); }
+            return true;
         }
     },
 
@@ -121,9 +127,17 @@ export default DatasetUploadRoute.extend({
     /**
      * Resets file queue.
      */
-    removeDataset() {
-        // get dataset information
-        let { dataset } = this.get('controller.model');
+    _removeDataset() {
+        // delete dataset file on the server side
+        if (this.get('controller.model')) {
+            // get dataset information
+            let { dataset } = this.get('controller.model');
+            $.ajax({
+                url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file?filename=${dataset.filename}`,
+                type: 'DELETE'
+            });
+            this.set('controller.model', null);
+        }
         // get the dataset queue and set them all to null
         const uploader = this.get('uploader');
         let queue = uploader.find("dataset");
@@ -131,12 +145,7 @@ export default DatasetUploadRoute.extend({
             queue.get('files').forEach((file) => file.set('queue', null));
             queue.set('files', A());
         }
-        // delete dataset file on the server side
-        $.ajax({
-            url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file?filename=${dataset.filename}`,
-            type: 'DELETE'
-        });
-        this.set('controller.model', null);
+
     }
 
 });

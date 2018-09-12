@@ -1,7 +1,6 @@
 #database-container a:hover { background-color: $quaternary-color; }
 
 @mixin dataset-square {
-    margin-top: 20px;
     margin-bottom: 10px;
     padding: 10px;
     text-align: center;
@@ -48,14 +47,13 @@
 
     .dropzone {
         @include dataset-square;
-        padding: 5% 0;
-        margin: 20px 0;
+        padding: 50px 20px;
         border: 2px dashed $tertiary-color;
         label { margin-bottom: 0; }
         #upload-dataset { font-weight: 400; }
 
         .progress {
-            width: 70%;
+            width: 100%;
             height: 24px;
             border-radius: 0px;
             margin: auto;
@@ -70,25 +68,25 @@
 
         .document-table {
             .table td { vertical-align: top; }
-            .field.type select { 
-                margin: auto; 
+            .field.type select {
+                margin: auto;
                 cursor: pointer;
             }
             @media (min-width: 880px) {
                 .field.type select { width: 40%; }
             }
-            .table tr {  
+            .table tr {
                 &:hover { background-color: transparent !important; }
-                &.disabled { 
-                    select, input { 
-                        border-color: $primary-color; 
+                &.disabled {
+                    select, input {
+                        border-color: $primary-color;
                         color: $primary-color;
                         background-color: transparent;
                         cursor: not-allowed;
-                    }  
+                    }
                 }
             }
-            
+
             .checkbox label { margin-top: 5px !important; }
         }
     }

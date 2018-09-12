@@ -142,7 +142,8 @@ class ProcessHandler {
         // store callback
         self._callbackH.set(self._currReqId, {
             timestamp: Date.now(),
-            callback: callback
+            retriesLeft: 10,
+            callback
         });
         // prepare message
         let msg = {
@@ -176,8 +177,15 @@ class ProcessHandler {
         for (let key of self._callbackH.keys()) {
             let now = Date.now();
             // check if callback is `maxDuration` old
-            if (now - self._callbackH.get(key).timestamp > maxDuration) {
-                let callback = self._callbackH.get(key).callback;
+            let _callback = self._callbackH.get(key);
+            if (now - _callback.timestamp > maxDuration && _callback.retriesLeft) {
+                // still have some retries left
+                _callback.timestamp = Date.now();
+                _callback.retriesLeft--;
+                self._callbackH.set(key, _callback);
+            } else if (now - _callback.timestamp > maxDuration) {
+                // no retries left - request timeout
+                let callback = _callback.callback;
                 self._callbackH.delete(key);
                 callback(new Error('Request timed out!'));
             }

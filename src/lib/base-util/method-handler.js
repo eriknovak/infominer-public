@@ -316,6 +316,7 @@ module.exports = {
 
         // prepare clusters array in the results
         query.result = {
+            BDIndex: null,
             clusters: Array.apply(null, Array(query.parameters.method.k))
                 .map(() => ({
                     avgSimilarity: null,
@@ -343,41 +344,7 @@ module.exports = {
                 clusterDocuments[clusterId] = [id];
             }
         }
-        // calculate the average distance between cluster documents and centroid
-        for (let clusterId of Object.keys(clusterDocuments)) {
-            // get document submatrix
-            let positions = new qm.la.IntVector(clusterDocuments[clusterId]);
-            let submatrix = matrix.getColSubmatrix(positions); submatrix.normalizeCols();
-            // get centroid
-            let centroid = kMeans.centroids.getCol(parseInt(clusterId)); centroid.normalize();
-            // get distances between documents and centroid
-            query.result.clusters[clusterId].avgSimilarity = submatrix.multiplyT(centroid).sum() / submatrix.cols;
-        }
 
-        // // calculates the davies-bouldin index of the clustering
-        // let centroids = kMeans.centroids;
-        // centroids.normalizeCols();
-
-        // let DBIndex = 0;
-        // let centroidDistances = centroids.multiplyT(centroids);
-
-        // let clusters = query.result.clusters;
-        // for (let i = 0; i < clusters.length; i++) {
-        //     let possibleMax = [];
-        //     for (let j = 0; j < clusters.length; j++) {
-        //         if (i != j) {
-        //             let avgDistanceI = clusters[i].avgDistance;
-        //             let avgDistanceJ = clusters[j].avgDistance;
-        //             let centroidDist = centroidDistances.at(i, j);
-        //             possibleMax.push((avgDistanceI + avgDistanceJ) / centroidDist);
-        //         }
-        //     }
-        //     DBIndex += Math.max(...possibleMax);
-        // }
-        // // store the davies bouldin index
-        // query.result.DBIndex = DBIndex / clusters.length;
-
-        // console.log(query.result.DBIndex);
         /**
          * Formats the qminer record document.
          * @param {qm.Record} document - The document to be formated.
@@ -387,20 +354,56 @@ module.exports = {
             return formatter.document(document);
         }
 
+
+        // calculate the average distance between cluster documents and centroid
+        for (let clusterId of Object.keys(clusterDocuments)) {
+            // get document submatrix
+            let positions = new qm.la.IntVector(clusterDocuments[clusterId]);
+            let submatrix = matrix.getColSubmatrix(positions);
+            let centroid = kMeans.centroids.getCol(parseInt(clusterId));
+            if (query.parameters.method.distanceType === 'Cos') {
+                // normalize the columns for cosine similiary
+                submatrix.normalizeCols();
+                centroid.normalize();
+            }
+            // get distances between documents and centroid
+            let distances = submatrix.multiplyT(centroid);
+            if (query.parameters.method.distanceType === 'Cos') {
+                query.result.clusters[clusterId].avgSimilarity = distances.sum() / submatrix.cols;
+            }
+            // sort distances with their indeces
+            let sort = distances.sortPerm(false);
+            let idVec = qm.la.IntVector();
+            // set number of documents were interested in
+            let maxCount = 100;
+            if (maxCount > sort.perm.length) {
+                // the threshold is larger than the similarity vector
+                maxCount = sort.perm.length;
+            }
+
+            for (let i = 0; i < maxCount; i++) {
+                // get content id of (i+1)-th most similar content
+                let maxid = sort.perm[i];
+                // else remember the content and it's similarity
+                idVec.push(positions[maxid]);
+            }
+            // get elements in the cluster
+            const documents = base.store('Dataset').newRecordSet(idVec);
+            // get document sample
+            query.result.clusters[clusterId].documentSample = documents.map(formatDocuments);
+
+        }
+
         // for each cluster calculate the aggregates
         for (let i = 0; i < query.result.clusters.length; i++) {
             // get elements in the cluster
             const documentIds = new qm.la.IntVector(query.result.clusters[i].docIds);
-            const clusterDocuments = base.store('Dataset').newRecordSet(documentIds);
-            // get document sample
-            query.result.clusters[i].documentSample = clusterDocuments.sample(100)
-                .map(formatDocuments);
-
+            const documents = base.store('Dataset').newRecordSet(documentIds);
             // iterate through the fields
             for (let field of fields) {
                 // get aggregate distribution
                 if (field.aggregate) {
-                    let distribution = this._aggregateByField(clusterDocuments, field);
+                    let distribution = this._aggregateByField(documents, field);
                     query.result.clusters[i].aggregates.push({
                         field: field.name,
                         type: field.aggregate,
@@ -429,6 +432,9 @@ module.exports = {
 
         // join the created method with the applied subset
         let methodId = base.store('Methods').push(query);
+
+        console.log(base.store('Methods')[methodId].result);
+
         base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
         // create subsets using the cluster information
         for (let clusterId = 0; clusterId < query.result.clusters.length; clusterId++) {
