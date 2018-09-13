@@ -13,11 +13,5 @@ export default DS.Model.extend({
     hasSubsets: DS.hasMany('subset', { inverse: null }),
     hasMethods: DS.hasMany('method', { inverse: null }),
 
-    _subsetIds: mapBy('hasSubsets', 'id'),
-    _methodIds: mapBy('hasMethods', 'id'),
-
-    numberOfSubsets: max('_subsetIds'),
-    numberOfMethods: max('_methodIds'),
-
     fields: DS.attr()
 });

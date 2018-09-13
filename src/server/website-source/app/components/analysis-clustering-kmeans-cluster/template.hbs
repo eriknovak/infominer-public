@@ -21,11 +21,11 @@
     </button>
     {{#if editing-label}}
       Label:
-      <input class="form-control editing title" type="text" value="{{cluster.label}}">
+      <input class="form-control editing title" type="text" value="{{label}}">
       <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
       <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
     {{else}}
-      <span class="cluster-label">Label: {{cluster.label}}</span>
+      <span class="cluster-label">Label: {{label}}</span>
       <i class="fa fa-pencil edit edit-cluster-label" aria-hidden="true" {{action 'editLabel'}}></i>
     {{/if}}
 

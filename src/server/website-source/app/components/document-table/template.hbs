@@ -64,10 +64,18 @@
             {{ document-table-row             document=document fields=metadata.fields query=query }}
             {{ document-table-row-information document=document fields=metadata.fields query=query }}
           {{/each}}
-        {{else}}
+        {{else if (eq documents.length 0)}}
           <tr>
             <td colspan="{{loading-row-width}}">
               <p>No documents found for given query parameters</p>
+            </td>
+          </tr>
+        {{else}}
+          <tr>
+            <td colspan="{{loading-row-width}}">
+              <div class="loading">
+                <i class="page-loader fa fa-hourglass-o fa-spin fa-3x fa-fw"></i>
+              </div>
             </td>
           </tr>
         {{/if}}

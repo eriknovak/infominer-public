@@ -27,12 +27,15 @@ export default Component.extend({
         let self = this;
         self._super(...arguments);
         $(`#${self.get('elementId')}`).on('show.bs.modal', function (event) {
-            const trigger = $(event.relatedTarget);
-            const methodId = trigger.data('methodid');
+            const methodId = $(event.relatedTarget).data('methodid');
             self.set('methodId', methodId);
+
+            // get method information
             const method = self.get('store').peekRecord('method', methodId);
             self.set('label', method.get('label'));
             self.set('appliedOn', method.get('appliedOn.label'));
+
+            // prepare delete button text
             $(`#${self.get('elementId')} .modal-footer .btn-danger`)
                 .html('Yes, delete method');
         });
@@ -43,7 +46,7 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
-        
+
         delete() {
             const methodId = this.get('methodId');
             if (methodId) {

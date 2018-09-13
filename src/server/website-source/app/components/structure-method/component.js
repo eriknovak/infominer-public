@@ -14,7 +14,7 @@ export default Component.extend({
     store: service('store'),
 
     // parameters
-    ontology: computed('method.produced.length', 'numberOfSubsets', 'numberOfMethods', function () {
+    ontology: computed('method.produced.length', function () {
         // ontology placeholder
         let ontology = [];
 

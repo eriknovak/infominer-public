@@ -1,5 +1,6 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
+import { set } from '@ember/object';
 import $ from 'jquery';
 
 export default Route.extend({
@@ -205,6 +206,9 @@ export default Route.extend({
     // helper functions
     _updateModel() {
         // request for data and update the model
+        let model = this.get('controller.model');
+        set(model, 'documents', null);
+        this.set('controller.model', model);
         this.model().then(model => this.set('controller.model', model));
     }
 

@@ -7,7 +7,7 @@ export default Component.extend({
     classNames: ['subset', 'child'],
     classNameBindings: ['parent'],
 
-    _parentState: observer('subset.usedBy.@each.produced', 'numberOfSubsets', 'numberOfMethods', function () {
+    _parentState: observer('subset.usedBy.@each.produced', function () {
         this.get('usedBy').then(methods => {
             let producedSubsets = methods.filter((item) => {
                 return item.hasMany('produced').ids().length > 0;
@@ -17,7 +17,7 @@ export default Component.extend({
         });
     }),
 
-    ontology: computed('subset.usedBy', 'numberOfSubsets', 'numberOfMethods', function () {
+    ontology: computed('subset.usedBy.@each', function () {
         return this.get('usedBy').filter(method => {
             return method.get('methodType') &&
                 (method.get('methodType').includes('clustering') ||
