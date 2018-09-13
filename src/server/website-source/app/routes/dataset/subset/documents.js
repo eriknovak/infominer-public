@@ -147,28 +147,32 @@ export default Route.extend({
 
             // create a new method
             const method = self.get('store').createRecord('method', {
-                id: self.modelFor('dataset').get('numberOfMethods'),
+                id: self.modelFor('dataset').get('numberOfMethods') + 1,
                 methodType: 'filter.manual',
                 parameters: { query: params.parameters.query },
                 appliedOn: parentSubset
             });
             self.modelFor('dataset').get('hasMethods').pushObject(method);
-            self.modelFor('dataset').incrementProperty('numberOfMethods');
 
             // create new subset
             const subset = self.get('store').createRecord('subset', {
-                id: self.modelFor('dataset').get('numberOfSubsets'),
+                id: self.modelFor('dataset').get('numberOfSubsets') + 1,
                 label: params.label,
                 description: params.description,
                 resultedIn: method
             });
             self.modelFor('dataset').get('hasSubsets').pushObject(subset);
-            self.modelFor('dataset').incrementProperty('numberOfMethods');
-            self.modelFor('dataset').incrementProperty('numberOfSubsets');
 
             // save method
-            method.save().then(function () {
-                subset.save().then(function () {
+            method.save().then(() => {
+                subset.save().then(_subset => {
+                    // save methods created at subset creation
+                    _subset.get('usedBy').then(_methods => {
+                        _methods.forEach(_method => {
+                            self.modelFor('dataset').get('hasMethods').pushObject(_method);
+                        });
+                    });
+
                     // hide modal and transition to new route
                     $('#subset-create-modal').modal('toggle');
                     $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');

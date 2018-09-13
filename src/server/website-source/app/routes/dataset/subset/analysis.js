@@ -22,18 +22,23 @@ export default Route.extend({
             let parentSubset = self.modelFor('dataset.subset');
             // create a new method
             const method = self.get('store').createRecord('method', {
-                id: self.modelFor('dataset').get('numberOfMethods'),
+                id: self.modelFor('dataset').get('numberOfMethods') + 1,
                 methodType: params.methodType,
                 parameters: params.parameters,
                 appliedOn: parentSubset
             });
             self.modelFor('dataset').get('hasMethods').pushObject(method);
-            // needed to correctly increment subset and method indices
-            self.modelFor('dataset').incrementProperty('numberOfMethods');
-            method.save().then(() => {
-                self.modelFor('dataset').reload().then((response) => {
-                    self.modelFor('dataset').set('numberOfSubsets', response.data.numberOfSubsets);
-                    self.modelFor('dataset').set('numberOfMethods', response.data.numberOfMethods);
+            method.save().then(method => {
+                method.get('produced').then(_subsets => {
+                    _subsets.forEach(_subset => {
+                        self.modelFor('dataset').get('hasSubsets').pushObject(_subset);
+                        _subset.get('usedBy').then(_methods => {
+                            _methods.forEach(_method => {
+                                self.modelFor('dataset').get('hasMethods').pushObject(_method);
+                            });
+                        });
+                    });
+
                 });
             });
         },
@@ -56,7 +61,7 @@ export default Route.extend({
             self.get('store').findRecord('method', params.parameters.methodId).then(method => {
                 // create new subset
                 const subset = self.get('store').createRecord('subset', {
-                    id: self.modelFor('dataset').get('numberOfSubsets'),
+                    id: self.modelFor('dataset').get('numberOfSubsets') + 1,
                     label: params.label,
                     description: params.description,
                     resultedIn: method,
@@ -65,14 +70,18 @@ export default Route.extend({
                 });
                 // needed to correctly increment subset and method indices
                 self.modelFor('dataset').get('hasSubsets').pushObject(subset);
-                self.modelFor('dataset').incrementProperty('numberOfSubsets');
-                self.modelFor('dataset').incrementProperty('numberOfMethods');
 
-                subset.save().then(() => {
+                subset.save().then(subset => {
+                    subset.get('usedBy').then(methods => {
+                        methods.forEach(method => {
+                            self.modelFor('dataset').get('hasMethods').pushObject(method);
+                        });
+                    });
                     // toggle the modal - giving the user control
                     $('#subset-create-modal').modal('toggle');
                     $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
                     self.transitionTo('dataset.subset', subset);
+
                 });
             });
         }

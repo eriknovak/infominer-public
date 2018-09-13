@@ -7,8 +7,8 @@ export default Route.extend({
         // set a on scroll listener
         $(window).on('scroll', function () {
             // change display if the user scrolled down enough
-            let display = $(document).scrollTop() > 500  ? 'block' : 'none';
-            $('#go-to-top').css('display', display);
+            let visibility = $(document).scrollTop() > 500  ? 'visible' : 'hidden';
+            $('#go-to-top').css('visibility', visibility);
         });
         // get the subset info
         return this.get('store').peekRecord('subset', params.subset_id);

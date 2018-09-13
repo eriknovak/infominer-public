@@ -7,9 +7,11 @@ export default DS.Model.extend({
     result: DS.attr('object', { defaultValue: null }),
     produced: DS.hasMany('subset', { inverse: 'resultedIn' }),
     appliedOn: DS.belongsTo('subset', { inverse: 'usedBy' }),
+
     analysisAppropriate: computed('methodType', function () {
         return !this.get('methodType').includes('filter');
     }),
+
     label: computed('methodType', function () {
         if (this.get('methodType').includes('kmeans')) {
             return 'clustering';
