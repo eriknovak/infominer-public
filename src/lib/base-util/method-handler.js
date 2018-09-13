@@ -316,7 +316,6 @@ module.exports = {
 
         // prepare clusters array in the results
         query.result = {
-            BDIndex: null,
             clusters: Array.apply(null, Array(query.parameters.method.k))
                 .map(() => ({
                     avgSimilarity: null,
@@ -394,6 +393,7 @@ module.exports = {
 
         }
 
+        let subsetLabels = [ ];
         // for each cluster calculate the aggregates
         for (let i = 0; i < query.result.clusters.length; i++) {
             // get elements in the cluster
@@ -415,35 +415,42 @@ module.exports = {
             // set cluster label out of the first keyword cloud
             let label;
             for (let aggregate of query.result.clusters[i].aggregates) {
-                if (aggregate.type === 'keywords' && aggregate.distribution) {
-                    label = aggregate.distribution.keywords.slice(0, 3)
-                        .map(keyword => keyword.keyword).join(', ');
-                    break;
+                if (query.parameters.fields.includes(aggregate.field) && aggregate.distribution) {
+                    if (query.parameters.method.clusteringType === 'text') {
+                        // get the aggregates keyword distribution
+                        label = aggregate.distribution.keywords.slice(0, 3)
+                            .map(keyword => keyword.keyword).join(', ');
+                        break;
+                    } else if (query.parameters.method.clusteringType === 'number') {
+                        // get the histogram distribution
+                        let min = aggregate.distribution.min;
+                        let max = aggregate.distribution.max;
+                        if (Math.abs(min) < 1) { min = min.toFixed(2); }
+                        if (Math.abs(max) < 1) { max = max.toFixed(2); }
+                        label = `${min} <= count <= ${max}`;
+                        break;
+                    }
                 }
             }
 
             // if label was not assigned - set a lame label
-            // TODO: intelligent label setting
             if (!label) { label = `Cluster #${i+1}`; }
 
-            // set the cluster label
-            query.result.clusters[i].label = label;
+            // set the subset/cluster label
+            subsetLabels.push({ label, clusterId: i });
         }
 
         // join the created method with the applied subset
         let methodId = base.store('Methods').push(query);
-
-        console.log(base.store('Methods')[methodId].result);
-
         base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
+
         // create subsets using the cluster information
-        for (let clusterId = 0; clusterId < query.result.clusters.length; clusterId++) {
-            const cluster = query.result.clusters[clusterId];
+        for (let labelObj of subsetLabels) {
             let subset = {
-                label: cluster.label,
+                label: labelObj.label,
                 description: null,
                 resultedIn: methodId,
-                meta: { clusterId }
+                meta: { clusterId: labelObj.clusterId }
             };
             // create subset and get its id
             let { subsets: { id } } = require('./subset-handler').create(base, subset);

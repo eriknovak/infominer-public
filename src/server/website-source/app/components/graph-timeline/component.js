@@ -62,7 +62,7 @@ const TimelineComponent = GraphComponent.extend({
      * timeline visualization.
      */
     _prepareTimeline(timeline) {
-
+        // TODO: move this to backend
         let data = {
             days:   { values: [] },
             months: { values: [] },
