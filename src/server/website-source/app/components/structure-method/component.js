@@ -14,33 +14,16 @@ export default Component.extend({
     store: service('store'),
 
     // parameters
-    ontology: computed('method.result', 'numberOfSubsets', 'numberOfMethods', function () {
+    ontology: computed('method.produced.length', 'numberOfSubsets', 'numberOfMethods', function () {
         // ontology placeholder
         let ontology = [];
 
         const method = this.get('method');
-        if (method.get('methodType').includes('clustering')) {
-            // method does not have any results at the moment
-            if (!method.get('result')) { return ontology; }
-            // method is a clustering method - get all results
-            for (let cluster of method.get('result.clusters')) {
-                // create a subset
-                let clusterObj = { created: cluster.subset.created };
-                if (clusterObj.created) {
-                    clusterObj.subset = this.get('store').peekRecord('subset', cluster.subset.id);
-                } else {
-                    clusterObj.label = cluster.label;
-                    clusterObj.documentCount = cluster.documentCount;
-                }
-                // add cluster info to ontology
-                ontology.push(clusterObj);
-            }
-        } else if (method.get('methodType').includes('filter')) {
-            // method is a filtering method - again get all results
-            for (let i = 0; i < method.get('produced.length'); i++) {
-                let subset = method.get('produced').objectAt(i);
-                ontology.push({ created: true, subset });
-            }
+        if (!method.get('produced.length')) { return ontology; }
+        // method is a clustering method - get all results
+        for (let i = 0; i < method.get('produced.length'); i++) {
+            let subset = method.get('produced').objectAt(i);
+            ontology.push({ created: true, subset });
         }
 
         return ontology;
@@ -63,6 +46,15 @@ export default Component.extend({
     },
 
     didInsertElement() {
+        let self = this;
+        self._super(...arguments);
+        $(`#structure-method-${self.get('method.id')}`).hover(
+            function () { $(`#delete-method-${self.get('method.id')}`).addClass('show'); },
+            function () { $(`#delete-method-${self.get('method.id')}`).removeClass('show'); }
+        );
+    },
+
+    didUpdate() {
         let self = this;
         self._super(...arguments);
         $(`#structure-method-${self.get('method.id')}`).hover(

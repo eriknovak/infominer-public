@@ -9,7 +9,7 @@ export default DS.Model.extend({
     appliedOn: DS.belongsTo('subset', { inverse: 'usedBy' }),
 
     analysisAppropriate: computed('methodType', function () {
-        return !this.get('methodType').includes('filter');
+        return this.get('methodType') ? !this.get('methodType').includes('filter') : true;
     }),
 
     label: computed('methodType', function () {

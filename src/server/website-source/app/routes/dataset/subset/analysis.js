@@ -22,23 +22,27 @@ export default Route.extend({
             let parentSubset = self.modelFor('dataset.subset');
             // create a new method
             const method = self.get('store').createRecord('method', {
-                id: self.modelFor('dataset').get('numberOfMethods') + 1,
+                // id: self.modelFor('dataset').get('numberOfMethods') + 1,
                 methodType: params.methodType,
                 parameters: params.parameters,
                 appliedOn: parentSubset
             });
             self.modelFor('dataset').get('hasMethods').pushObject(method);
+            // save the method
             method.save().then(method => {
                 method.get('produced').then(_subsets => {
-                    _subsets.forEach(_subset => {
-                        self.modelFor('dataset').get('hasSubsets').pushObject(_subset);
-                        _subset.get('usedBy').then(_methods => {
-                            _methods.forEach(_method => {
-                                self.modelFor('dataset').get('hasMethods').pushObject(_method);
-                            });
+                    if (_subsets.get('length')) {
+                        _subsets.forEach(_subset => {
+                            self.modelFor('dataset').get('hasSubsets').pushObject(_subset);
+                            if (_subset.get('usedBy')) {
+                                _subset.get('usedBy').then(_methods => {
+                                    _methods.forEach(_method => {
+                                        self.modelFor('dataset').get('hasMethods').pushObject(_method);
+                                    });
+                                });
+                            }
                         });
-                    });
-
+                    }
                 });
             });
         },
@@ -61,7 +65,7 @@ export default Route.extend({
             self.get('store').findRecord('method', params.parameters.methodId).then(method => {
                 // create new subset
                 const subset = self.get('store').createRecord('subset', {
-                    id: self.modelFor('dataset').get('numberOfSubsets') + 1,
+                    // id: self.modelFor('dataset').get('numberOfSubsets') + 1,
                     label: params.label,
                     description: params.description,
                     resultedIn: method,

@@ -147,7 +147,7 @@ export default Route.extend({
 
             // create a new method
             const method = self.get('store').createRecord('method', {
-                id: self.modelFor('dataset').get('numberOfMethods') + 1,
+                // id: self.modelFor('dataset').get('numberOfMethods') + 1,
                 methodType: 'filter.manual',
                 parameters: { query: params.parameters.query },
                 appliedOn: parentSubset
@@ -156,7 +156,7 @@ export default Route.extend({
 
             // create new subset
             const subset = self.get('store').createRecord('subset', {
-                id: self.modelFor('dataset').get('numberOfSubsets') + 1,
+                // id: self.modelFor('dataset').get('numberOfSubsets') + 1,
                 label: params.label,
                 description: params.description,
                 resultedIn: method
