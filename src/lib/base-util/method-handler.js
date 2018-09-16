@@ -238,6 +238,9 @@ module.exports = {
             };
             // calculate the aggregates for the record set
             distribution = elements.aggr(aggregateParams);
+            if (aggregate === 'keywords' && !distribution.keywords.length) {
+                distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
+            }
         }
         return distribution;
     },
@@ -425,8 +428,8 @@ module.exports = {
                         // get the histogram distribution
                         let min = aggregate.distribution.min;
                         let max = aggregate.distribution.max;
-                        if (Math.abs(min) < 1) { min = min.toFixed(2); }
-                        if (Math.abs(max) < 1) { max = max.toFixed(2); }
+                        if (Math.abs(min) < 1 && min !== 0) { min = min.toFixed(2); }
+                        if (Math.abs(max) < 1 && max !== 0) { max = max.toFixed(2); }
                         label = `${min} <= count <= ${max}`;
                         break;
                     }

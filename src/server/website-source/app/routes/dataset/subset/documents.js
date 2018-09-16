@@ -206,9 +206,7 @@ export default Route.extend({
     // helper functions
     _updateModel() {
         // request for data and update the model
-        let model = this.get('controller.model');
-        set(model, 'documents', null);
-        this.set('controller.model', model);
+        set(this.get('controller.model'), 'documents', null);
         this.model().then(model => this.set('controller.model', model));
     }
 
