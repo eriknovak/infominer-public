@@ -75,7 +75,7 @@ const WordCloudComponent = GraphComponent.extend({
             return {
                 text: d.keyword.toUpperCase(),
                 size: minWeight === maxWeight ?
-                    maxFontSize : fontScale(d.weight),
+                    minFontSize : fontScale(d.weight),
                 colorClass: minWeight === maxWeight ?
                     colorClass[colorClass.length-1] :
                     textSizeClass(d.weight)

@@ -1,6 +1,12 @@
 // external libraries
 const qm = require('qminer');
 
+// prepare d3 libraries
+let d3 = { };
+d3 = Object.assign(d3, require('d3-time-format'));
+d3 = Object.assign(d3, require('d3-scale'));
+d3 = Object.assign(d3, require('d3-time'));
+
 // the formatter function for subset, method and documents
 const formatter = require('./formatter');
 
@@ -238,11 +244,93 @@ module.exports = {
             };
             // calculate the aggregates for the record set
             distribution = elements.aggr(aggregateParams);
-            if (aggregate === 'keywords' && !distribution.keywords.length) {
+            if (aggregate === 'keywords' && distribution && !distribution.keywords.length) {
                 distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
+            } else if (aggregate === 'timeline') {
+                distribution.count = this._aggregateTimeline(distribution);
             }
         }
         return distribution;
+    },
+
+    _aggregateTimeline(timeline) {
+        // TODO: move this to backend
+        let data = {
+            days:   { values: [] },
+            months: { values: [] },
+            years:  { values: [] }
+        };
+
+        // year and month data container
+        let year  = { date: null, value: 0 },
+            month = { date: null, value: 0 };
+
+        for (let date of timeline.date) {
+            let d = new Date(date.interval);
+
+            data.days.values.push({ date: d3.timeFormat('%Y-%m-%d')(d), value: date.frequency });
+
+            let yearMonthDay = date.interval.split('-');
+            // update years data
+            if (year.date !== yearMonthDay[0]) {
+                if (year.date) {
+                    // add current year to the list
+                    let yClone = Object.assign({}, year);
+                    data.years.values.push(yClone);
+                }
+                year.date = d3.timeFormat('%Y')(d);
+                year.value = date.frequency;
+            } else {
+                // update the year value
+                year.value += date.frequency;
+            }
+
+            // update months data
+            let yearMonth = yearMonthDay.slice(0, 2).join('-');
+            if (month.date !== yearMonth) {
+                if (month.date) {
+                    let mClone = Object.assign({}, month);
+                    data.months.values.push(mClone);
+                }
+                month.date = d3.timeFormat("%Y-%m")(d);
+                month.value = date.frequency;
+            } else {
+                // update the month value
+                month.value += date.frequency;
+            }
+        }
+
+        // add last year and month element
+        data.years.values.push(year);
+        data.months.values.push(month);
+
+        // interpolate through the values
+        for (let aggregate of Object.keys(data)) {
+            let ticks = d3.scaleTime()
+                .domain(data[aggregate].values.map(d => new Date(d.date)))
+                .nice().ticks(d3.timeDay);
+
+            let interpolate = ticks.map(tick => {
+                let tickDate = new Date(tick);
+                let tickCompare = null;
+                if (aggregate === 'days') {
+                    tickCompare = d3.timeFormat('%Y-%m-%d')(tickDate);
+                } else if (aggregate === 'months') {
+                    tickCompare = d3.timeFormat('%Y-%m')(tickDate);
+                } else if (aggregate === 'years') {
+                    tickCompare = d3.timeFormat('%Y')(tickDate);
+                }
+                return data[aggregate].values.find(el => {
+                    return tickCompare === el.date;
+                }) || { date: tick, value: 0 };
+            });
+            // store aggregates interpolated values
+            data[aggregate].interpolate = interpolate;
+            // store the maximum value
+            data[aggregate].max = data[aggregate].values.map(el => el.value)
+                .reduce((acc, curr) => Math.max(acc, curr), 0);
+        }
+        return data;
     },
 
     /**
