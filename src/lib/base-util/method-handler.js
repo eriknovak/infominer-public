@@ -373,21 +373,20 @@ module.exports = {
             if (query.parameters.method.distanceType === 'Cos') {
                 query.result.clusters[clusterId].avgSimilarity = distances.sum() / submatrix.cols;
             }
+
             // sort distances with their indeces
             let sort = distances.sortPerm(false);
             let idVec = qm.la.IntVector();
+
+            let MAX_COUNT = 100;
             // set number of documents were interested in
-            let maxCount = 100;
-            if (maxCount > sort.perm.length) {
-                // the threshold is larger than the similarity vector
-                maxCount = sort.perm.length;
-            }
+            let maxCount = MAX_COUNT > sort.perm.length ? sort.perm.length : MAX_COUNT;
 
             for (let i = 0; i < maxCount; i++) {
                 // get content id of (i+1)-th most similar content
                 let maxid = sort.perm[i];
                 // else remember the content and it's similarity
-                idVec.push(positions[maxid]);
+                idVec.push(subset.hasElements[positions[maxid]].$id);
             }
             // get elements in the cluster
             const documents = base.store('Dataset').newRecordSet(idVec);
