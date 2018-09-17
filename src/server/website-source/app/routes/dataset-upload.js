@@ -108,7 +108,35 @@ export default DatasetUploadRoute.extend({
                                 // set dataset loaded property
                                 let dataset = this.get('store').peekRecord('dataset', response.id);
                                 dataset.set('loaded', response.loaded);
+                            } else if (response.errors) {
+                                // clear the interval
+                                clearInterval(interval);
+                                let dataset = this.get('store').peekRecord('dataset', data.datasetId);
+
+                                this.get('notify').alert({
+                                    html: `<div class="notification">
+                                            Dataset <span class="label">
+                                                ${dataset.label}
+                                            </span> was unable to load!
+                                        </div>`
+                                });
+                                // destroy the dataset
+                                dataset.destroyRecord();
                             }
+                        }).catch(error => {
+                            // clear the interval
+                            clearInterval(interval);
+                            let dataset = this.get('store').peekRecord('dataset', data.datasetId);
+
+                            this.get('notify').alert({
+                                html: `<div class="notification">
+                                        Dataset <span class="label">
+                                            ${dataset.label}
+                                        </span> was unable to load!
+                                    </div>`
+                            });
+                            // destroy the dataset
+                            dataset.destroyRecord();
                         });
                 }, 3000);
                 run(() => { this.transitionTo('datasets'); });

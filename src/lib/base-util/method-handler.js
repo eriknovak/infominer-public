@@ -242,9 +242,13 @@ module.exports = {
                 field: fieldName,
                 type: aggregate
             };
+
             // calculate the aggregates for the record set
             distribution = elements.aggr(aggregateParams);
-            if (aggregate === 'keywords' && distribution && !distribution.keywords.length) {
+            if (aggregate === 'keywords' &&
+                distribution &&
+                distribution.keywords &&
+                !distribution.keywords.length) {
                 distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
             } else if (aggregate === 'timeline') {
                 distribution.count = this._aggregateTimeline(distribution);

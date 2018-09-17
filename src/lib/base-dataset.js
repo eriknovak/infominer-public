@@ -224,7 +224,7 @@ class BaseDataset {
     _parseFieldValue(value, type) {
         switch (type) {
             case 'string':
-                return value;
+                return value === '' ? null : value;
             case 'float':
                 return parseFloat(value);
             case 'string_v':

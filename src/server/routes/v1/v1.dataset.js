@@ -84,6 +84,7 @@ function detectDelimiter(filePath, delimiters = [',', ';', '\t', '|', '~']) {
     }, validDelimiters[0])[0];
 }
 
+
 /**
  * Adds api routes to .
  * @param {Object} app - Express app.
@@ -92,6 +93,16 @@ function detectDelimiter(filePath, delimiters = [',', ';', '\t', '|', '~']) {
  * @param {Object} sendToProcess - Function handling the process dynamic.
  */
 module.exports = function (app, pg, processHandler, sendToProcess, logger) {
+
+    // cleanup data tables
+    pg.delete({ loaded: false }, 'infominer_datasets', (xerror) => {
+        if (xerror) {
+            // log postgres error
+            logger.error('error [postgres.delete]: unable to delete unloaded datasets',
+                logger.formatRequest(req, { error: xerror.message })
+            );
+        }
+    });
 
     /**
      * GET all user defined datasets
@@ -231,19 +242,21 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
                     for (let j = 0; j < docValues.length; j++) {
                         let value = docValues[j];
+                        let categorySelection = value.match(/\S*[\\\/][\w]+|[\w]+/gi);
                         // check if value has a pathway
-                        if (!validTypes.slice(1).includes(fieldTypes[j]) && 
-                            !value.match(/[^0-9,\.]+/gi)) { 
+                        if (!validTypes.slice(1).includes(fieldTypes[j]) &&
+                            !value.match(/[^0-9,\.]+/gi)) {
                                 // the value is a number
-                                fieldTypes[j] = 'float'; 
+                                fieldTypes[j] = 'float';
                         } else if (!validTypes.slice(2).includes(fieldTypes[j]) &&
                             Date.parse(value)) {
                             fieldTypes[j] = 'datetime';
-                        } else if (!validTypes.slice(3).includes(fieldTypes[j]) && 
-                            value.match(/\S*[\\\/][\w]+|[\w]+/gi).length === 1 &&
-                            value.match(/\S*[\\\/][\w]+|[\w]+/gi)[0] === value) { 
-                                // the value is a 
-                                fieldTypes[j] = 'string_v'; 
+                        } else if (!validTypes.slice(3).includes(fieldTypes[j]) &&
+                            categorySelection &&
+                            categorySelection.length === 1 &&
+                            categorySelection[0] === value) {
+                                // the value is a
+                                fieldTypes[j] = 'string_v';
                         } else { fieldTypes[j] = 'string'; }
                     }
                     // we read a document - increment the count
@@ -293,7 +306,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             }
 
             // check if results are not null
-            if (!results.length) {  
+            if (!results.length) {
                 // log empty results file
                 logger.warn('error [postgres.results]: user request to delete temporary file failed',
                     logger.formatRequest(req, { error: 'no such file found' })
