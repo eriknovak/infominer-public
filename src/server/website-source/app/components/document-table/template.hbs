@@ -5,36 +5,54 @@
         {{ query-options fields=metadata.fields query=query action=changeQuery }}
       {{/if}}
 
-      <span class="table-options-show">
-        Show
-        <select class="rounded" id="table-show-limit" onchange={{action 'changeLimit'}}>
-          {{#each possibleLimits as |limit|}}
-            <option selected={{if limit.selected "selected"}}>{{ limit.value }}</option>
-          {{/each}}
-        </select>
-        documents
-      </span>
+      <div class="d-flex">
+        <span class="table-options-show mr-auto">
+          Show
+          <select class="rounded" id="table-show-limit" onchange={{action 'changeLimit'}}>
+            {{#each possibleLimits as |limit|}}
+              <option selected={{if limit.selected "selected"}}>{{ limit.value }}</option>
+            {{/each}}
+          </select>
+          documents
+        </span>
 
-      <span class="dropdown pull-right">
-        <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
-          id="document-table-{{elementId}}" aria-haspopup="true" aria-expanded="false">
-          Show columns
-          <span class="number-circle">{{numberOfFieldsShown}}</span>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-table-{{elementId}}">
-          {{#each metadata.fields as |field index|}}
-            <div class="dropdown-item">
-              {{
-                checkbox-select
-                checkboxId=(concat "table-" elementId "-field-selection-checkbox-" index)
-                checked=field.showInTable
-              }}
-              <label class="query-field-selection">{{field.name}}</label>
-            </div>
-          {{/each}}
-        </div>
-      </span>
+        <span class="dropdown ml-2">
+          <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
+            id="document-table-{{elementId}}-options" aria-haspopup="true" aria-expanded="false">
+            Document Options
+          </button>
 
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-table-{{elementId}}-options">
+
+            {{!-- move the documents to a sister subset --}}
+            <a class="dropdown-item" href="#">Move</a>
+
+            {{!-- TODO: remove the documents from the subset --}}
+            <a class="dropdown-item" href="#">Delete</a>
+          </div>
+        </span>
+
+        <span class="dropdown ml-2">
+          <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
+            id="document-table-{{elementId}}" aria-haspopup="true" aria-expanded="false">
+            Show columns
+            <span class="number-circle">{{numberOfFieldsShown}}</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-table-{{elementId}}">
+            {{#each metadata.fields as |field index|}}
+              <div class="dropdown-item">
+                {{
+                  checkbox-select
+                  checkboxId=(concat "table-" elementId "-field-selection-checkbox-" index)
+                  checked=field.showInTable
+                }}
+                <label class="query-field-selection">{{field.name}}</label>
+              </div>
+            {{/each}}
+          </div>
+        </span>
+
+      </div>
     </div>
   </div>
 
@@ -43,6 +61,7 @@
       {{! table header }}
       <thead>
         <tr>
+          <th class="header" scope="col"></th>
           {{! <th class="checkbox-header" style="width:1%;"></th> }}
           {{#each metadata.fields as |field index|}}
             {{#if field.showInTable}}
