@@ -258,7 +258,6 @@ module.exports = {
     },
 
     _aggregateTimeline(timeline) {
-        // TODO: move this to backend
         let data = {
             days:   { values: [] },
             months: { values: [] },
@@ -426,8 +425,8 @@ module.exports = {
         let clusterDocuments = { };
         // populate the cluster results
         for (let id = 0; id < idxv.length; id++) {
-            const docId = documents[id].$id;
             const clusterId = idxv[id];
+            const docId = documents[id].$id;
             // store the document id in the correct cluster
             query.result.clusters[clusterId].docIds.push(docId);
 
@@ -438,16 +437,6 @@ module.exports = {
                 clusterDocuments[clusterId] = [id];
             }
         }
-
-        /**
-         * Formats the qminer record document.
-         * @param {qm.Record} document - The document to be formated.
-         * @returns {Object} The document in json format.
-         */
-        function formatDocuments(document) {
-            return formatter.document(document);
-        }
-
 
         // calculate the average distance between cluster documents and centroid
         for (let clusterId of Object.keys(clusterDocuments)) {
@@ -483,7 +472,7 @@ module.exports = {
             // get elements in the cluster
             const documents = base.store('Dataset').newRecordSet(idVec);
             // get document sample
-            query.result.clusters[clusterId].documentSample = documents.map(formatDocuments);
+            query.result.clusters[clusterId].documentSample = documents.map(doc => formatter.document(doc));
 
         }
 
@@ -521,7 +510,7 @@ module.exports = {
                         let max = aggregate.distribution.max;
                         if (Math.abs(min) < 1 && min !== 0) { min = min.toFixed(2); }
                         if (Math.abs(max) < 1 && max !== 0) { max = max.toFixed(2); }
-                        label = `${min} <= count <= ${max}`;
+                        label = `${min} ≤ count ≤ ${max}`;
                         break;
                     }
                 }
