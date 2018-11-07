@@ -8,6 +8,7 @@ export default DS.Model.extend({
     resultedIn: DS.belongsTo('method', { inverse: 'produced' }),
     documents: DS.hasMany('document'),
     documentCount: DS.attr('number'),
+
     isRoot: computed('id', function () {
         return this.get('id') === '0';
     })

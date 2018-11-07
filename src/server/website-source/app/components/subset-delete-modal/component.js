@@ -35,7 +35,7 @@ export default Component.extend({
             self.set('derivedFrom', subset.get('resultedIn.appliedOn.label'));
             self.set('createdUsing', subset.get('resultedIn.label'));
             $(`#${self.get('elementId')} .modal-footer .btn-danger`)
-                .html('Yes, delete method');
+                .html('Yes, delete subset');
         });
     },
 
@@ -44,7 +44,7 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
 
     actions: {
-        
+
         delete() {
             const subsetId = this.get('subsetId');
             if (subsetId) {

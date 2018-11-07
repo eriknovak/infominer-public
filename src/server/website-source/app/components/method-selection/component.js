@@ -18,7 +18,7 @@ export default Component.extend({
         this._super(...arguments);
         set(this, 'availableMethods', [
             { method: 'clustering.kmeans', name: 'clustering' },
-            { method: 'clustering.activelearning', name: 'active learning' },
+            // { method: 'clustering.activelearning', name: 'active learning' },
             { method: 'visualization', name: 'visualization' },
         ]);
         set(this, 'selectedMethod', this.get('availableMethods').objectAt(0).method);

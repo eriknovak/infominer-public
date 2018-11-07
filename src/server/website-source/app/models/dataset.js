@@ -5,10 +5,11 @@ export default DS.Model.extend({
     description: DS.attr('string'),
     created: DS.attr('date'),
     loaded: DS.attr('boolean'),
+
     numberOfDocuments: DS.attr('number'),
-    numberOfSubsets: DS.attr('number'),
-    numberOfMethods: DS.attr('number'),
+
     hasSubsets: DS.hasMany('subset', { inverse: null }),
     hasMethods: DS.hasMany('method', { inverse: null }),
+
     fields: DS.attr()
 });

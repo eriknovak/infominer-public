@@ -1,6 +1,12 @@
 // external libraries
 const qm = require('qminer');
 
+// prepare d3 libraries
+let d3 = { };
+d3 = Object.assign(d3, require('d3-time-format'));
+d3 = Object.assign(d3, require('d3-scale'));
+d3 = Object.assign(d3, require('d3-time'));
+
 // the formatter function for subset, method and documents
 const formatter = require('./formatter');
 
@@ -236,10 +242,98 @@ module.exports = {
                 field: fieldName,
                 type: aggregate
             };
+
             // calculate the aggregates for the record set
             distribution = elements.aggr(aggregateParams);
+            if (aggregate === 'keywords' &&
+                distribution &&
+                distribution.keywords &&
+                !distribution.keywords.length) {
+                distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
+            } else if (aggregate === 'timeline') {
+                distribution.count = this._aggregateTimeline(distribution);
+            }
         }
         return distribution;
+    },
+
+    _aggregateTimeline(timeline) {
+        let data = {
+            days:   { values: [] },
+            months: { values: [] },
+            years:  { values: [] }
+        };
+
+        // year and month data container
+        let year  = { date: null, value: 0 },
+            month = { date: null, value: 0 };
+
+        for (let date of timeline.date) {
+            let d = new Date(date.interval);
+
+            data.days.values.push({ date: d3.timeFormat('%Y-%m-%d')(d), value: date.frequency });
+
+            let yearMonthDay = date.interval.split('-');
+            // update years data
+            if (year.date !== yearMonthDay[0]) {
+                if (year.date) {
+                    // add current year to the list
+                    let yClone = Object.assign({}, year);
+                    data.years.values.push(yClone);
+                }
+                year.date = d3.timeFormat('%Y')(d);
+                year.value = date.frequency;
+            } else {
+                // update the year value
+                year.value += date.frequency;
+            }
+
+            // update months data
+            let yearMonth = yearMonthDay.slice(0, 2).join('-');
+            if (month.date !== yearMonth) {
+                if (month.date) {
+                    let mClone = Object.assign({}, month);
+                    data.months.values.push(mClone);
+                }
+                month.date = d3.timeFormat("%Y-%m")(d);
+                month.value = date.frequency;
+            } else {
+                // update the month value
+                month.value += date.frequency;
+            }
+        }
+
+        // add last year and month element
+        data.years.values.push(year);
+        data.months.values.push(month);
+
+        // interpolate through the values
+        for (let aggregate of Object.keys(data)) {
+            let ticks = d3.scaleTime()
+                .domain(data[aggregate].values.map(d => new Date(d.date)))
+                .nice().ticks(d3.timeDay);
+
+            let interpolate = ticks.map(tick => {
+                let tickDate = new Date(tick);
+                let tickCompare = null;
+                if (aggregate === 'days') {
+                    tickCompare = d3.timeFormat('%Y-%m-%d')(tickDate);
+                } else if (aggregate === 'months') {
+                    tickCompare = d3.timeFormat('%Y-%m')(tickDate);
+                } else if (aggregate === 'years') {
+                    tickCompare = d3.timeFormat('%Y')(tickDate);
+                }
+                return data[aggregate].values.find(el => {
+                    return tickCompare === el.date;
+                }) || { date: tick, value: 0 };
+            });
+            // store aggregates interpolated values
+            data[aggregate].interpolate = interpolate;
+            // store the maximum value
+            data[aggregate].max = data[aggregate].values.map(el => el.value)
+                .reduce((acc, curr) => Math.max(acc, curr), 0);
+        }
+        return data;
     },
 
     /**
@@ -316,7 +410,6 @@ module.exports = {
 
         // prepare clusters array in the results
         query.result = {
-            BDIndex: null,
             clusters: Array.apply(null, Array(query.parameters.method.k))
                 .map(() => ({
                     avgSimilarity: null,
@@ -332,8 +425,8 @@ module.exports = {
         let clusterDocuments = { };
         // populate the cluster results
         for (let id = 0; id < idxv.length; id++) {
-            const docId = documents[id].$id;
             const clusterId = idxv[id];
+            const docId = documents[id].$id;
             // store the document id in the correct cluster
             query.result.clusters[clusterId].docIds.push(docId);
 
@@ -344,16 +437,6 @@ module.exports = {
                 clusterDocuments[clusterId] = [id];
             }
         }
-
-        /**
-         * Formats the qminer record document.
-         * @param {qm.Record} document - The document to be formated.
-         * @returns {Object} The document in json format.
-         */
-        function formatDocuments(document) {
-            return formatter.document(document);
-        }
-
 
         // calculate the average distance between cluster documents and centroid
         for (let clusterId of Object.keys(clusterDocuments)) {
@@ -371,29 +454,29 @@ module.exports = {
             if (query.parameters.method.distanceType === 'Cos') {
                 query.result.clusters[clusterId].avgSimilarity = distances.sum() / submatrix.cols;
             }
+
             // sort distances with their indeces
             let sort = distances.sortPerm(false);
             let idVec = qm.la.IntVector();
+
+            let MAX_COUNT = 100;
             // set number of documents were interested in
-            let maxCount = 100;
-            if (maxCount > sort.perm.length) {
-                // the threshold is larger than the similarity vector
-                maxCount = sort.perm.length;
-            }
+            let maxCount = MAX_COUNT > sort.perm.length ? sort.perm.length : MAX_COUNT;
 
             for (let i = 0; i < maxCount; i++) {
                 // get content id of (i+1)-th most similar content
                 let maxid = sort.perm[i];
                 // else remember the content and it's similarity
-                idVec.push(positions[maxid]);
+                idVec.push(subset.hasElements[positions[maxid]].$id);
             }
             // get elements in the cluster
             const documents = base.store('Dataset').newRecordSet(idVec);
             // get document sample
-            query.result.clusters[clusterId].documentSample = documents.map(formatDocuments);
+            query.result.clusters[clusterId].documentSample = documents.map(doc => formatter.document(doc));
 
         }
 
+        let subsetLabels = [ ];
         // for each cluster calculate the aggregates
         for (let i = 0; i < query.result.clusters.length; i++) {
             // get elements in the cluster
@@ -415,35 +498,42 @@ module.exports = {
             // set cluster label out of the first keyword cloud
             let label;
             for (let aggregate of query.result.clusters[i].aggregates) {
-                if (aggregate.type === 'keywords' && aggregate.distribution) {
-                    label = aggregate.distribution.keywords.slice(0, 3)
-                        .map(keyword => keyword.keyword).join(', ');
-                    break;
+                if (query.parameters.fields.includes(aggregate.field) && aggregate.distribution) {
+                    if (query.parameters.method.clusteringType === 'text') {
+                        // get the aggregates keyword distribution
+                        label = aggregate.distribution.keywords.slice(0, 3)
+                            .map(keyword => keyword.keyword).join(', ');
+                        break;
+                    } else if (query.parameters.method.clusteringType === 'number') {
+                        // get the histogram distribution
+                        let min = aggregate.distribution.min;
+                        let max = aggregate.distribution.max;
+                        if (Math.abs(min) < 1 && min !== 0) { min = min.toFixed(2); }
+                        if (Math.abs(max) < 1 && max !== 0) { max = max.toFixed(2); }
+                        label = `${min} ≤ count ≤ ${max}`;
+                        break;
+                    }
                 }
             }
 
             // if label was not assigned - set a lame label
-            // TODO: intelligent label setting
             if (!label) { label = `Cluster #${i+1}`; }
 
-            // set the cluster label
-            query.result.clusters[i].label = label;
+            // set the subset/cluster label
+            subsetLabels.push({ label, clusterId: i });
         }
 
         // join the created method with the applied subset
         let methodId = base.store('Methods').push(query);
-
-        console.log(base.store('Methods')[methodId].result);
-
         base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
+
         // create subsets using the cluster information
-        for (let clusterId = 0; clusterId < query.result.clusters.length; clusterId++) {
-            const cluster = query.result.clusters[clusterId];
+        for (let labelObj of subsetLabels) {
             let subset = {
-                label: cluster.label,
+                label: labelObj.label,
                 description: null,
                 resultedIn: methodId,
-                meta: { clusterId }
+                meta: { clusterId: labelObj.clusterId }
             };
             // create subset and get its id
             let { subsets: { id } } = require('./subset-handler').create(base, subset);

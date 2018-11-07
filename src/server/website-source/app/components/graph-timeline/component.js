@@ -11,9 +11,9 @@ import { transition } from 'd3-transition';
 
 import { axisBottom, axisLeft } from 'd3-axis';
 import { format } from 'd3-format';
-import { timeDay, timeMonth, timeYear } from 'd3-time';
+import { timeSecond, timeMinute, timeHour, timeDay, timeMonth, timeWeek, timeYear } from 'd3-time';
 import { timeFormat } from 'd3-time-format';
-import { line, curveMonotoneX } from 'd3-shape';
+import { line, curveLinear } from 'd3-shape';
 import { extent } from 'd3-array';
 
 
@@ -62,83 +62,7 @@ const TimelineComponent = GraphComponent.extend({
      * timeline visualization.
      */
     _prepareTimeline(timeline) {
-
-        let data = {
-            days:   { values: [] },
-            months: { values: [] },
-            years:  { values: [] }
-        };
-
-        // year and month data container
-        let year  = { date: null, value: 0 },
-            month = { date: null, value: 0 };
-
-        for (let date of timeline.date) {
-            let d = new Date(date.interval);
-
-            data.days.values.push({ date: timeFormat('%Y-%m-%d')(d), value: date.frequency });
-
-            let yearMonthDay = date.interval.split('-');
-            // update years data
-            if (year.date !== yearMonthDay[0]) {
-                if (year.date) {
-                    // add current year to the list
-                    let yClone = Object.assign({}, year);
-                    data.years.values.push(yClone);
-                }
-                year.date = timeFormat('%Y')(d);
-                year.value = date.frequency;
-            } else {
-                // update the year value
-                year.value += date.frequency;
-            }
-
-            // update months data
-            let yearMonth = yearMonthDay.slice(0, 2).join('-');
-            if (month.date !== yearMonth) {
-                if (month.date) {
-                    let mClone = Object.assign({}, month);
-                    data.months.values.push(mClone);
-                }
-                month.date = timeFormat("%Y-%m")(d);
-                month.value = date.frequency;
-            } else {
-                // update the month value
-                month.value += date.frequency;
-            }
-        }
-
-        // add last year and month element
-        data.years.values.push(year);
-        data.months.values.push(month);
-
-        // interpolate through the values
-        for (let aggregate of Object.keys(data)) {
-            let ticks = scaleTime()
-                .domain(extent(data[aggregate].values, d => new Date(d.date)))
-                .nice().ticks(timeDay);
-
-            let interpolate = ticks.map(tick => {
-                let tickDate = new Date(tick);
-                let tickCompare = null;
-                if (aggregate === 'days') {
-                    tickCompare = timeFormat('%Y-%m-%d')(tickDate);
-                } else if (aggregate === 'months') {
-                    tickCompare = timeFormat('%Y-%m')(tickDate);
-                } else if (aggregate === 'years') {
-                    tickCompare = timeFormat('%Y')(tickDate);
-                }
-                return data[aggregate].values.find(el => {
-                    return tickCompare === el.date;
-                }) || { date: tick, value: 0 };
-            });
-            // store aggregates interpolated values
-            data[aggregate].interpolate = interpolate;
-            // store the maximum value
-            data[aggregate].max = data[aggregate].values.map(el => el.value)
-                .reduce((acc, curr) => Math.max(acc, curr), 0);
-        }
-        this.set('data', data);
+        this.set('data', timeline.count);
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
@@ -201,7 +125,7 @@ const TimelineComponent = GraphComponent.extend({
         let timeline = line()
             .x(d => xScale(new Date(d.date)))
             .y(d => yScale(d.value))
-            .curve(curveMonotoneX);
+            .curve(curveLinear);
 
         let chart = content.append('g')
             .attr('class', 'chart')
@@ -231,12 +155,32 @@ const TimelineComponent = GraphComponent.extend({
          * Axis
          **************************************************/
 
+        const formatMillisecond = timeFormat(".%L"),
+            formatSecond = timeFormat(":%S"),
+            formatMinute = timeFormat("%I:%M"),
+            formatHour = timeFormat("%I %p"),
+            formatDay = timeFormat("%a %d"),
+            formatWeek = timeFormat("%b %d"),
+            formatMonth = timeFormat("%b"),
+            formatYear = timeFormat("%Y");
+
+        function multiFormat(date) {
+            return (timeSecond(date) < date ? formatMillisecond
+                : timeMinute(date) < date ? formatSecond
+                : timeHour(date) < date ? formatMinute
+                : timeDay(date) < date ? formatHour
+                : timeMonth(date) < date ? (timeWeek(date) < date ? formatDay : formatWeek)
+                : timeYear(date) < date ? formatMonth
+                : formatYear)(date);
+        }
+
         // set horizontal axis
         chart.append('g')
             .attr('transform', `translate(0,${height})`)
             .attr("class", "x axis")
             .call(axisBottom(xScale)
                 .ticks(width < 400 ? 5 : 10)
+                .tickFormat(multiFormat)
             );
 
         // set vertical axis
@@ -286,7 +230,7 @@ const TimelineComponent = GraphComponent.extend({
         let timeline = line()
             .x(d => xScale(new Date(d.date)))
             .y(d => yScale(d.value))
-            .curve(curveMonotoneX);
+            .curve(curveLinear);
 
         let path = timeline(data[aggregate].interpolate);
 

@@ -15,8 +15,8 @@ export default Component.extend({
 
     init() {
         this._super(...arguments);
-        set(this, 'collapsed', false);
         set(this, 'editing-label', false);
+        set(this, 'collapsed', false);
         set(this, 'page', 1);
         set(this, 'limit', 5);
     },
@@ -24,11 +24,9 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         let cluster = this.get('cluster');
-        if (cluster.subset.id) {
-            set(cluster, 'label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
-        }
+        this.set('label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
         if (cluster.avgSimilarity) {
-            set(cluster, 'avgSimProcent', (cluster.avgSimilarity * 100).toFixed(2));
+            set(cluster, 'avgSimProcent', (cluster.avgSimilarity * 100).toFixed(1));
         }
     },
 
@@ -99,7 +97,7 @@ export default Component.extend({
         },
 
         sortByField(fieldParams) {
-            this.get('dataset.fields').forEach(function (field) {
+            this.get('fieldSelection.fields').forEach(function (field) {
                 set(field, 'sortType', null);
                 if (get(field, 'name') === fieldParams.field) {
                     set(field, 'sortType', fieldParams.sortType);
@@ -117,15 +115,13 @@ export default Component.extend({
     _saveLabel() {
         const elementId = this.get('elementId');
         const label = $(`#${elementId} input.editing`).val();
-        let method = this.get('method');
-        let cluster = this.get('cluster');
-        if (cluster.subset.id) {
-            let subset = this.get('store').peekRecord('subset', cluster.subset.id);
-            subset.set('label', label); subset.save();
-        }
-        this.set('cluster.label', label);
-        // save method changes
-        method.save();
+
+        // save the label of the subset
+        let subset = this.get('store').peekRecord('subset', this.get('cluster').subset.id);
+        subset.set('label', label); subset.save();
+
+        // save the label of the cluster
+        this.set('label', subset.get('label'));
         this.toggleProperty('editing-label');
     }
 

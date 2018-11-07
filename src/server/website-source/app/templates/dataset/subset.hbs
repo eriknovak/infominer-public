@@ -37,7 +37,7 @@
     <div class="row">
       <div class="col-lg-10 subset-navigation">
         {{#link-to "dataset.subset.analysis" model class="btn"}}Analysis{{/link-to}}
-        {{#link-to "dataset.subset.active-learning" model class="btn"}}Active Learning{{/link-to}}
+        {{!-- {{#link-to "dataset.subset.active-learning" model class="btn"}}Active Learning{{/link-to}} --}}
         {{#link-to "dataset.subset.documents" model class="btn"}}Documents{{/link-to}}
       </div>
     </div>
@@ -117,7 +117,7 @@
 </div><!-- /.modal -->
 
 
-<button id="go-to-top" class="btn btn-light d-sm-none d-md-block"
+<button id="go-to-top" class="btn btn-light btn-rounded d-md-none d-lg-block"
   {{action 'backToTop'}}>
   Back to Top
 </button>

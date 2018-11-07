@@ -66,20 +66,31 @@ export default DatasetRoute.extend({
             );
             let subset = this.get('store').peekRecord('subset', subsetId);
             self.modelFor('dataset').get('hasSubsets').removeObject(subset);
+            // remove the subset from its creator method
+            let method = subset.get('resultedIn');
+            method.get('produced').removeObject(subset);
+
+            let _methodDeleted = false;
+            if (!method.get('produced.length')) {
+                // remove method from the applied on subset
+                method.set('appliedOn', null);
+                // remove link between dataset and method
+                self.modelFor('dataset').get('hasMethods').removeObject(method);
+                this.get('store').peekRecord('method', method.get('id')).destroyRecord();
+                _methodDeleted = true;
+            }
+
             subset.destroyRecord().then(() => {
-                // reload dataset model
-                self.modelFor('dataset').reload().then((response) => {
-                    self.get('unloadExtra.unload')(response, self.get('store'), 'method');
-                    self.get('unloadExtra.unload')(response, self.get('store'), 'subset');
-                    // if subset deleted through edit subset modal
-                    if ($('#edit-subset-modal').hasClass('show')) {
-                        $('#edit-subset-modal').modal('toggle');
-                    }
-                    // hide the subset-delete-modal
-                    $('#subset-delete-modal').modal('toggle');
-                    let datasetId = parseInt(self.modelFor('dataset').get('id'));
-                    self.transitionTo('dataset.subset', datasetId, 0);
-                });
+                if (!_methodDeleted) {
+                    this.get('store').peekRecord('method', method.get('id')).reload();
+                }
+                // if subset deleted through edit subset modal
+                if ($('#edit-subset-modal').hasClass('show')) {
+                    $('#edit-subset-modal').modal('toggle');
+                }
+                // hide the subset-delete-modal
+                $('#subset-delete-modal').modal('toggle');
+                self.transitionTo('dataset.subset', self.modelFor('dataset').get('id'), 0);
             });
         },
 
@@ -88,23 +99,17 @@ export default DatasetRoute.extend({
          * @param {Number | String} methodId - The method id.
          */
         deleteMethod(methodId) {
+
             let self = this;
             $('#method-delete-modal .modal-footer .btn-danger').html(
                 '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
             );
             let method = this.get('store').peekRecord('method', methodId);
-            self.modelFor('dataset').get('hasMethods').removeObject(method);
             method.set('appliedOn', null);
             method.destroyRecord().then(() => {
-                // reload dataset model
-                self.modelFor('dataset').reload().then((response) => {
-                    self.get('unloadExtra.unload')(response, self.get('store'), 'method');
-                    self.get('unloadExtra.unload')(response, self.get('store'), 'subset');
-                    // hide the method-delete-modal
-                    $('#method-delete-modal').modal('toggle');
-                    let datasetId = parseInt(self.modelFor('dataset').get('id'));
-                    self.transitionTo('dataset.subset', datasetId, 0);
-                });
+                // hide the method-delete-modal
+                $('#method-delete-modal').modal('toggle');
+                self.transitionTo('dataset.subset', self.modelFor('dataset').get('id'), 0);
             });
         }
 
