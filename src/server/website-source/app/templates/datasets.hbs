@@ -28,10 +28,10 @@
           {{#each model as |dataset|}}
             {{! Add new dataset }}
             <div class="col-sm-6 col-md-4 col-lg-3">
-              {{#if dataset.loaded}}
+              {{#if dataset.ready}}
                 {{! Button trigger modal }}
                 {{#link-to 'dataset.subset.analysis' dataset.id 0 }}
-                  <div class="dataset rounded {{unless dataset.loaded 'loading'}}">
+                  <div class="dataset rounded {{unless dataset.ready 'loading'}}">
                     <i class="fa fa-database" aria-hidden="true"></i>
                     <p class="dataset-label">{{ dataset.label }}</p>
                     <p class="dataset-created">Created: {{ dataset.date }}</p>

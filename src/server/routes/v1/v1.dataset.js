@@ -94,16 +94,6 @@ function detectDelimiter(filePath, delimiters = [',', ';', '\t', '|', '~']) {
  */
 module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
-    // cleanup data tables
-    pg.delete({ loaded: false }, 'infominer_datasets', (xerror) => {
-        if (xerror) {
-            // log postgres error
-            logger.error('error [postgres.delete]: unable to delete unloaded datasets',
-                logger.formatRequest(req, { error: xerror.message })
-            );
-        }
-    });
-
     /**
      * GET all user defined datasets
      */
@@ -132,7 +122,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     type: 'dataset',
                     label: rec.label,
                     created: rec.created,
-                    loaded: rec.loaded
+                    status: rec.status
                 };
             });
             // log request success
@@ -150,7 +140,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
      * POST file and creates a new dataset
      */
     const upload = multer({ storage }).single('file');
-    app.post('/api/datasets/temporary_file', (req, res) => {
+    app.post('/api/datasets', (req, res) => {
         // upload the dataset file
         upload(req, res, function (error) {
             if (error) {
@@ -188,8 +178,18 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 });
             }
 
+            let datasetInformation = {
+                owner,
+                status: 'in_queue',
+                parameters: {
+                    filepath: file.path,
+                    filename: file.filename,
+                    delimiter: delimiter
+                }
+            };
+
             // insert temporary file
-            pg.insert({ owner, filepath: file.path, filename: file.filename, delimiter: delimiter }, 'infominer_temporary_files', (xerror) => {
+            pg.insert(datasetInformation, 'infominer_datasets', (xerror, xresults) => {
                 if (xerror) {
                     // log postgres error
                     logger.error('error [postgres.insert]: user request to upload dataset failed',
@@ -200,6 +200,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 }
 
                 // get dataset information
+                let datasetId = xresults[0].id;
                 let label = file.originalname;
                 let filename = file.filename; // used only to access from postgres
 
@@ -224,7 +225,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
                     if (docValues.length !== fields.length) {
                         // delimiter is not recognized - send warning to user
-                        return pg.delete({ owner, filename: filename }, 'infominer_temporary_files', (yerror) => {
+                        return pg.delete({ owner, parameters: { filename } }, 'infominer_datasets', (yerror) => {
                             fileManager.removeFile(file.path);
                             // log multer error
                             logger.warn('warn [file.format]: number of values not matching with number of fields',
@@ -276,6 +277,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 // return values to the user - for dataset creation
                 return res.json({
                     dataset: {
+                        id: datasetId,
                         label,
                         filename
                     },
@@ -285,62 +287,25 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             }); // pg.insert()
         }); // upload()
 
-    }); // POST /api/datasets/temporary_file
+    });
 
-    app.delete('/api/datasets/temporary_file', (req, res) => {
-        // log user request
-        logger.info('user requested to delete temporary file',
-            logger.formatRequest(req)
-        );
-        let { filename } = req.query;
-        // get the temporary files and delete it
-        const owner = req.user ? req.user.id : 'development'; // temporary placeholder
-        pg.select({ owner, filename }, 'infominer_temporary_files', (error, results) => {
-            if (error) {
-                // log postgres error
-                logger.error('error [postgres.select]: user request to delete temporary file failed',
-                    logger.formatRequest(req, { error: error.message })
-                );
-                // send error object to user
-                return res.status(500).json({ errors: { msg: error.message } });
-            }
-
-            // check if results are not null
-            if (!results.length) {
-                // log empty results file
-                logger.warn('error [postgres.results]: user request to delete temporary file failed',
-                    logger.formatRequest(req, { error: 'no such file found' })
-                );
-                // send error object to user
-                return res.json({ errors: { msg: 'no such file found' } });
-            }
-
-            let filepath = results[0].filepath;
-            pg.delete({ owner, filename: filename }, 'infominer_temporary_files', (xerror) => {
-                if (xerror) {
-                    // log postgres error
-                    logger.error('error [postgres.delete]: user request to delete temporary file failed',
-                        logger.formatRequest(req, { error: xerror.message })
-                    );
-                    // send error object to user
-                    return res.status(500).json({ errors: { msg: xerror.message } });
-                }
-                // remove the temporary file
-                fileManager.removeFile(filepath);
-                logger.info('user request to delete temporary file successful',
-                    logger.formatRequest(req)
-                );
-            });
-        });
-    }); // DELETE /api/datasets/temporary_file
-
-    app.post('/api/datasets', (req, res) => {
+    app.post('/api/datasets/:dataset_id', (req, res) => {
         // log user request
         logger.info('user requested to submit data for new dataset',
             logger.formatRequest(req)
         );
 
         // get dataset information
+        // check if dataset_id is an integer
+        let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request for dataset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
         let { dataset, fields } = req.body;
 
         dataset = JSON.parse(dataset);
@@ -361,122 +326,105 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             }
 
             // number of datasets is the name of the new dataset folder
-            const dbFolder = results.length ? results[results.length-1].id : 0;
+            const dbFolder = Math.random().toString(36).substring(2, 15) +
+                             Math.random().toString(36).substring(2, 15) +
+                             Date.now();
 
             // set pg dataset values
-            const label = dataset.label;             // the user defined dataset label
-            const description = dataset.description; // the description of the dataset
-            const dbPath = path.join(static.dataPath, owner.toString(), dbFolder.toString()); // dataset directory
+            let datasetInformation = {
+                label: dataset.label, // the user defined dataset label
+                dbPath: path.join(static.dataPath, owner.toString(), dbFolder.toString()), // dataset directory
+                description: dataset.description, // the description of the dataset
+                status: 'processing'
+            };
 
-            // get temporary file
-            pg.select({ owner, filename: dataset.filename }, 'infominer_temporary_files', (xerror, results) => {
-                if (xerror) {
-                    // log postgres error
-                    logger.error('error [postgres.select]: user request to submit data for new dataset failed',
+            // update dataset value
+            pg.update(datasetInformation, { id: datasetId, owner }, 'infominer_datasets', (yerror, results) => {
+                if (yerror) {
+                    // log error when inserting dataset info
+                    logger.error('error [postgres.update]: user request to submit data for new dataset failed',
                         logger.formatRequest(req, { error: xerror.message })
                     );
                     // send error object to user
-                    return res.status(500).json({ errors: { msg: xerror.message } });
+                    return res.status(500).json({ errors: { msg: yerror.message } });
                 }
-                if (results.length !== 1) {
-                    // log finding multiple results in postgres
-                    logger.error('error [postgres.select]: user request to submit data for new dataset failed',
-                        logger.formatRequest(req, { error: `multiple or no records found (${results.length}), unable to determine which is required` })
-                    );
-                    // send error object to user
-                    return res.json({ errors: { msg: 'found multiple or no temporary dataset files with name=' + dataset.filename } });
-                }
-                // save temporary dataset file information
-                let tempDataset = results[0];
 
-                // insert dataset value
-                pg.insert({ owner, label, description, dbPath }, 'infominer_datasets', (yerror, results) => {
-                    if (yerror) {
+                // initiate child process
+                let datasetInfo = results[0];
+                let datasetId = parseInt(datasetInfo.id);
+                processHandler.createChild(datasetId);
+
+                // return dataset id for future status check
+                res.json({ datasetId });
+
+                // body of the message
+                let body = {
+                    cmd: 'create_dataset',
+                    content: {
+                        fields,
+                        filePath: datasetInfo.parameters.filepath,
+                        delimiter: datasetInfo.parameters.delimiter,
+                        params: {
+                            datasetId,
+                            label: datasetInfo.label,
+                            description: datasetInfo.description,
+                            created: datasetInfo.created,
+                            mode: 'createClean',
+                            dbPath: datasetInfo.dbpath
+                        }
+                    }
+                };
+                // create dataset
+                processHandler.sendAndWait(datasetId, body, function (zerror) {
+                    if (zerror) {
                         // log error when inserting dataset info
-                        logger.error('error [postgres.insert]: user request to submit data for new dataset failed',
-                            logger.formatRequest(req, { error: xerror.message })
+                        logger.error('error [node_process]: user request to submit data for new dataset failed',
+                            logger.formatRequest(req, { error: zerror.message })
                         );
-                        // send error object to user
-                        return res.status(500).json({ errors: { msg: yerror.message } });
+                        // delete dataset instance in postgres
+                        pg.delete({ id: datasetId, owner }, 'infominer_datasets');
+                    } else {
+                        // log user success
+                        logger.info('user created new dataset',
+                            logger.formatRequest(req, { datasetId: datasetId })
+                        );
+
+                        let updatedDataset = {
+                            status: 'finished',
+                            parameters: {
+                                filepath: null,
+                                filename: null,
+                                delimiter: datasetInfo.parameters.delimiter
+                            }
+                        };
+
+                        // update dataset - it has been loaded
+                        pg.update(updatedDataset, { id: datasetId }, 'infominer_datasets');
+                        // log request success
+                        logger.info('user request to create new dataset successful',
+                            logger.formatRequest(req)
+                        );
                     }
 
-                    // initiate child process
-                    let datasetInfo = results[0];
-                    let datasetId = parseInt(datasetInfo.id);
-                    processHandler.createChild(datasetId);
+                    try {
+                        // remove the temporary file
+                        fileManager.removeFile(datasetInfo.parameters.filepath);
+                        // log request success
+                        logger.info('user request to create new dataset - temporary file deletion successful',
+                            logger.formatRequest(req)
+                        );
+                    } catch (yyerror) {
+                        // log error on deleting temporary file
+                        logger.error('error [file_manager]: user request to submit data for new dataset - temporary file deletion failed',
+                            logger.formatRequest(req, { error: yyerror.message })
+                        );
+                    }
 
-                    // redirect the user to dataset
-                    res.json({ datasetId });
+                }); // processHandler.sendAndWait()
 
-                    // body of the message
-                    let body = {
-                        cmd: 'create_dataset',
-                        content: {
-                            fields,
-                            filePath: tempDataset.filepath,
-                            delimiter: tempDataset.delimiter,
-                            params: {
-                                datasetId,
-                                label,
-                                description,
-                                created: datasetInfo.created,
-                                mode: 'createClean',
-                                dbPath
-                            }
-                        }
-                    };
-                    // create dataset
-                    processHandler.sendAndWait(datasetId, body, function (zerror) {
-                        if (zerror) {
-                            // log error when inserting dataset info
-                            logger.error('error [node_process]: user request to submit data for new dataset failed',
-                                logger.formatRequest(req, { error: zerror.message })
-                            );
-                            // delete dataset instance in postgres
-                            pg.delete({ id: datasetId, owner }, 'infominer_datasets');
-                        } else {
-                            // log user success
-                            logger.info('user created new dataset',
-                                logger.formatRequest(req, { datasetId: datasetId })
-                            );
-                            // update dataset - it has been loaded
-                            pg.update({ loaded: true }, { id: datasetId }, 'infominer_datasets');
-                            // log request success
-                            logger.info('user request to create new dataset successful',
-                                logger.formatRequest(req)
-                            );
-                        }
-                        // delete the temporary file from postgres
-                        pg.delete({ id: tempDataset.id, owner }, 'infominer_temporary_files', function (xxerror) {
-                            if (xxerror) {
-                                // log error on deleting temporary file from postgres
-                                logger.error('error [postgres.delete]: user request to submit data for new dataset - temporary file deletion failed',
-                                    logger.formatRequest(req, { error: xxerror.message })
-                                );
-                            }
-
-                            try {
-                                // remove the temporary file
-                                fileManager.removeFile(tempDataset.filepath);
-                                // log request success
-                                logger.info('user request to create new dataset - temporary file deletion successful',
-                                    logger.formatRequest(req)
-                                );
-                            } catch (yyerror) {
-                                // log error on deleting temporary file
-                                logger.error('error [file_manager]: user request to submit data for new dataset - temporary file deletion failed',
-                                    logger.formatRequest(req, { error: yyerror.message })
-                                );
-                            }
-
-                        });
-                    }); // processHandler.sendAndWait()
-
-                }); // pg.insert({ owner, label, description, dbPath }, 'infominer_datasets')
-            }); // pg.select({ owner, filename }, 'tempDatasets')
-        }); // pg.select({ owner }, 'infominer_datasets')
-
-    }); // POST /api/datasets
+            }); // pg.update('infominer_datasets')
+        }); // pg.select('infominer_datasets')
+    }); // POST /api/datasets/:dataset_id
 
 
     /**
@@ -622,12 +570,12 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     );
                 }
                 // return the process
-                res.json({});
+                res.json({ });
 
                 // shutdown process
                 let body = { cmd: 'shutdown' };
                 // send the request to the process
-                processHandler.sendAndWait(datasetId, body, function (xerror, dbPath) {
+                processHandler.sendAndWait(datasetId, body, function (xerror, dbpath) {
                     if (xerror) {
                         // log error when inserting dataset info
                         logger.error('error [node_process]: user request to delete dataset failed',
@@ -636,7 +584,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                     }
                     // delete dataset folder
                     try {
-                        if (dbPath) { fileManager.removeFolder(dbPath); }
+                        if (dbpath) { fileManager.removeFolder(dbpath); }
                         // log request success
                         logger.info('user request to delete dataset successful',
                             logger.formatRequest(req)
@@ -676,11 +624,14 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                         );
                     }
                     // send results
-                    res.json({});
+                    res.json({ });
 
                     try {
                         // delete dataset folder
-                        if (dataset.dbPath) { fileManager.removeFolder(dataset.dbPath); }
+                        if (dataset.dbpath) { fileManager.removeFolder(dataset.dbpath); }
+                        if (dataset.parameters.filepath) {
+                            fileManager.removeFile(dataset.parameters.filepath);
+                        }
                         // log request success
                         logger.info('user request to delete dataset successful',
                             logger.formatRequest(req)
@@ -700,7 +651,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
     /**
      * GET dataset status - if its loaded
      */
-    app.get('/api/datasets/:dataset_id/check', (req, res) => {
+    app.get('/api/datasets/:dataset_id/status', (req, res) => {
         // log user request
         logger.info('user requested to checked availability of dataset',
             logger.formatRequest(req)
@@ -745,7 +696,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 id: rec.id,
                 label: rec.label,
                 created: rec.created,
-                loaded: rec.loaded
+                status: rec.status
             };
             // log request success
             logger.info('user request to check availability of dataset successful',
@@ -755,5 +706,5 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             return res.json(datasets);
 
         }); // pg.select({ owner }, 'infominer_datasets')
-    }); // GET /api/datasets/:dataset_id/check
+    }); // GET /api/datasets/:dataset_id/status
 };

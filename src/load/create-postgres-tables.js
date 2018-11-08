@@ -7,15 +7,16 @@ const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
 // prepare commands we want to execute
 let commands = [
     `CREATE TABLE IF NOT EXISTS infominer_datasets (id serial PRIMARY KEY, owner varchar NOT NULL,
-        dbPath varchar NOT NULL, label varchar NOT NULL, description varchar,
-        created timestamp with time zone DEFAULT NOW(), loaded boolean DEFAULT FALSE);`,
-    `CREATE TABLE IF NOT EXISTS infominer_temporary_files (id serial PRIMARY KEY,
-        owner varchar NOT NULL, filepath varchar NOT NULL, filename varchar NOT NULL,
-        uploaded timestamp with time zone DEFAULT NOW(), delimiter varchar NOT NULL);`,
+        dbPath varchar DEFAULT NULL, label varchar DEFAULT NULL, description varchar DEFAULT NULL,
+        created timestamp with time zone DEFAULT NOW(), status varchar DEFAULT 'in_queue',
+        parameters jsonb);`,
     'CREATE INDEX IF NOT EXISTS infominer_datasets_creator_idx ON infominer_datasets(owner);',
     'CREATE INDEX IF NOT EXISTS infominer_datasets_id_idx ON infominer_datasets(id);',
-    'CREATE INDEX IF NOT EXISTS infominer_temporary_files_creator_idx ON infominer_temporary_files(owner);',
-    'CREATE INDEX IF NOT EXISTS infominer_temporary_files_filename_idx ON infominer_temporary_files(filename);'
+
+    // alterations to the postgresql tables
+    'ALTER TABLE IF EXISTS infominer_datasets ADD COLUMN IF NOT EXISTS parameters jsonb;',
+    'ALTER TABLE IF EXISTS infominer_datasets ALTER COLUMN dbPath DROP NOT NULL;',
+    'ALTER TABLE IF EXISTS infominer_datasets ALTER COLUMN label DROP NOT NULL;'
 ];
 
 // execute them one by one
