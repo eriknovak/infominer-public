@@ -1,22 +1,23 @@
 // external libraries
 const qm = require('qminer');
 
-// prepare d3 libraries
-let d3 = { };
-d3 = Object.assign(d3, require('d3-time-format'));
-d3 = Object.assign(d3, require('d3-scale'));
-d3 = Object.assign(d3, require('d3-time'));
+const ClusteringKMeans = require('./models/clustering-kmeans');
 
-// the formatter function for subset, method and documents
-const formatter = require('./formatter');
+class ModelsManager {
 
-// schema validator
-const validator = require('../validator')({
-    featureSchema:      require('../../schemas/base-dataset/features-schema'),
-    methodKMeansParams: require('../../schemas/base-dataset/method-kmeans-params')
-});
+    constructor(formatter, validator) {
+        this._modelStatus = { };
+        this._formatter = formatter;
+        this._validator = validator;
+    }
 
-module.exports = {
+    setFormatter(formatter) {
+        this._formatter = formatter;
+    }
+
+    setValidator(validator) {
+        this._validator = validator;
+    }
 
     /**
      * Creates a method record in the database.
@@ -27,8 +28,10 @@ module.exports = {
      * @param {Object} method.result - The result of the method.
      * @param {Number} method.appliedOn - The id of the subset the method was applied on.
      * @param {Object[]} fields - The fields in the database.
+     * @param {Function} createSubsetCb - The function executed for creating subsets.
      */
-    create(base, method, fields) {
+    createModel(base, method, fields, createSubsetCb) {
+        let self = this;
         // TODO: log activity
 
         // prepare method object
@@ -44,13 +47,17 @@ module.exports = {
             let methodId;
             switch(qmMethod.type) {
             case 'clustering.kmeans':
-                methodId = this._kmeansClustering(base, qmMethod, subset, fields);
-                break;
+                let clusteringKMeans = new ClusteringKMeans(base, qmMethod, subset, fields, self._formatter);
+                const hash = this._createModelStatus(clusteringKMeans);
+                clusteringKMeans.run(self._clusteringKMeansCreateSubsets(base, hash, createSubsetCb));
+                return { hash, status: 'processing' };
+                // methodId = self._kmeansClustering(base, qmMethod, subset, fields, createSubsetCb);
+                // break;
             case 'visualization':
-                methodId = this._visualizationSetup(base, qmMethod, subset, fields);
+                methodId = self._visualizationSetup(base, qmMethod, subset, fields, createSubsetCb);
                 break;
             case 'filter.manual':
-                methodId = this._filterByQuery(base, qmMethod, subset, fields);
+                methodId = self._filterByQuery(base, qmMethod, subset, fields, createSubsetCb);
                 break;
             }
 
@@ -59,12 +66,12 @@ module.exports = {
                 return { errors: { msg: 'createMethod: cannot initialize method - invalid method parameters' } };
             } else {
                 // store the method into the database
-                return this.get(base, methodId);
+                return self.getModel(base, methodId);
             }
         } else {
             return { errors: { msg: `createMethod: No subset with id=${method.appliedOn}` } };
         }
-    },
+    }
 
     /**
      * Creates a method record in the database.
@@ -72,14 +79,14 @@ module.exports = {
      * @param {String | Number} id - The id of the method.
      * @returns {Object} The method object.
      */
-    get(base, id) {
-
+    getModel(base, id) {
+        let self = this;
         function getMethodRelatedSubsets(method, fieldName) {
             let subsets = method[fieldName];
             if (subsets && subsets.length && subsets[0].deleted !== undefined) {
                 subsets.filterByField('deleted', false);
             }
-            return subsets.map(subset => formatter.subset(subset));
+            return subsets.map(subset => self._formatter.subset(subset));
         }
 
         // TODO: log activity
@@ -94,7 +101,7 @@ module.exports = {
             }
             // get the method from database
             let method = methods[id];
-            response.methods = formatter.method(method);
+            response.methods = self._formatter.method(method);
 
             // subset information
             response.subsets = [ ];
@@ -116,11 +123,11 @@ module.exports = {
             if (allMethods && allMethods.length && allMethods[0].deleted !== undefined) {
                 allMethods.filterByField('deleted', false);
             }
-            response.methods = allMethods.map(rec => formatter.method(rec));
+            response.methods = allMethods.map(rec => self._formatter.method(rec));
         }
          // return the methods
          return response;
-    },
+    }
 
     /**
      * Edit a method record in the database.
@@ -128,7 +135,8 @@ module.exports = {
      * @param {Object} methodInfo - The method data used to update.
      * @returns {Object} The updated method object.
      */
-    set(base, methodInfo) {
+    updateModel(base, methodInfo) {
+        let self = this;
         // TODO: log activity
         // get method information and update state
         let method = base.store('Methods')[methodInfo.methodId];
@@ -142,15 +150,17 @@ module.exports = {
             }
             method.result = result;
         }
-        return { methods: formatter.method(method) };
-    },
+        return { methods: self._formatter.method(method) };
+    }
 
     /**
      * Set the deleted flag for the method and all its joins.
      * @param {Object} base - The QMiner base object.
      * @param {String | Number} id - The id of the method.
+     * @param {Function} deleteSubsetCb - The function called to delete the associated subset.
      */
-    delete(base, id) {
+    deleteModel(base, id, deleteSubsetCb) {
+        let self = this;
         let methods = base.store('Methods');
         if (!isNaN(parseFloat(id))) {
             let method = methods[id];
@@ -161,13 +171,13 @@ module.exports = {
                  // iterate through it's joins
                  for (let i = 0; i < method.produced.length; i++) {
                     let subset = method.produced[i];
-                    require('./subset-handler').delete(base, subset.$id);
+                    deleteSubsetCb(base, subset.$id, self.deleteModel.bind(self));
                 }
                 methods[id].deleted = true;
             }
         }
         return  { };
-    },
+    }
 
     /**
      * Aggregate subset with given id.
@@ -177,6 +187,7 @@ module.exports = {
      * @returns {Object} The subset aggregates method.
      */
     aggregateSubset(base, id, fields) {
+        let self = this;
         // TODO: log activity
         const subset = base.store('Subsets')[id];
         if (subset) {
@@ -193,7 +204,7 @@ module.exports = {
             for (let field of fields) {
                 // get aggregate distribution
                 if (field.aggregate) {
-                    let distribution = this._aggregateByField(elements, field);
+                    let distribution = self._aggregateByField(elements, field);
                     method.result.aggregates.push({
                         field: field.name,
                         type: field.aggregate,
@@ -205,12 +216,12 @@ module.exports = {
             let methodId = base.store('Methods').push(method);
             base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
             // store the method into the database
-            return this.get(base, methodId);
+            return self.getModel(base, methodId);
 
         } else {
             return { errors: { msg: `aggregateSubset: No subset with id=${id}` } };
         }
-    },
+    }
 
 
     /**
@@ -221,6 +232,7 @@ module.exports = {
      * @private
      */
     _aggregateByField(elements, field) {
+        let self = this;
         // TODO: check if field exists
         const fieldName = field.name;
         const aggregate = field.aggregate;
@@ -232,7 +244,7 @@ module.exports = {
             for (let id = 0; id < elements.length; id++) {
                 if (elements[id][fieldName]) {
                     const fieldVals = elements[id][fieldName].toArray();
-                    this._addChild(distribution, fieldVals[0], fieldVals.slice(1));
+                    self._addChild(distribution, fieldVals[0], fieldVals.slice(1));
                 }
             }
         } else {
@@ -251,13 +263,20 @@ module.exports = {
                 !distribution.keywords.length) {
                 distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
             } else if (aggregate === 'timeline') {
-                distribution.count = this._aggregateTimeline(distribution);
+                distribution.count = self._aggregateTimeline(distribution);
             }
         }
         return distribution;
-    },
+    }
 
     _aggregateTimeline(timeline) {
+        // prepare d3 libraries
+        let d3 = { };
+        d3 = Object.assign(d3, require('d3-time-format'));
+        d3 = Object.assign(d3, require('d3-scale'));
+        d3 = Object.assign(d3, require('d3-time'));
+
+
         let data = {
             days:   { values: [] },
             months: { values: [] },
@@ -307,26 +326,28 @@ module.exports = {
         data.years.values.push(year);
         data.months.values.push(month);
 
+
+        function _setInterpolation(tick) {
+            let tickDate = new Date(tick);
+            let tickCompare = null;
+            if (aggregate === 'days') {
+                tickCompare = d3.timeFormat('%Y-%m-%d')(tickDate);
+            } else if (aggregate === 'months') {
+                tickCompare = d3.timeFormat('%Y-%m')(tickDate);
+            } else if (aggregate === 'years') {
+                tickCompare = d3.timeFormat('%Y')(tickDate);
+            }
+            return data[aggregate].values.find(d => tickCompare === d.date) ||
+                    { date: tick, value: 0 };
+        }
+
         // interpolate through the values
         for (let aggregate of Object.keys(data)) {
             let ticks = d3.scaleTime()
                 .domain(data[aggregate].values.map(d => new Date(d.date)))
                 .nice().ticks(d3.timeDay);
 
-            let interpolate = ticks.map(tick => {
-                let tickDate = new Date(tick);
-                let tickCompare = null;
-                if (aggregate === 'days') {
-                    tickCompare = d3.timeFormat('%Y-%m-%d')(tickDate);
-                } else if (aggregate === 'months') {
-                    tickCompare = d3.timeFormat('%Y-%m')(tickDate);
-                } else if (aggregate === 'years') {
-                    tickCompare = d3.timeFormat('%Y')(tickDate);
-                }
-                return data[aggregate].values.find(el => {
-                    return tickCompare === el.date;
-                }) || { date: tick, value: 0 };
-            });
+            let interpolate = ticks.map(_setInterpolation);
             // store aggregates interpolated values
             data[aggregate].interpolate = interpolate;
             // store the maximum value
@@ -334,217 +355,111 @@ module.exports = {
                 .reduce((acc, curr) => Math.max(acc, curr), 0);
         }
         return data;
-    },
+    }
 
     /**
      * Cluster the subset using KMeans and save results in query.
      * @param {Object} base - The QMiner base object.
-     * @param {Object} query - Method parameters.
-     * @param {Object} subset - The subset object.
-     * @param {Object[]} fields - The fields in the database.
+     * @param {Function} createSubsetCb - How to create the subset.
      * @private
      */
-    _kmeansClustering(base, query, subset, fields) {
+    _clusteringKMeansCreateSubsets(base, hash, createSubsetCb) {
+        let self = this;
 
-        let features;
-        // set kmeans and features space parameters
-        switch (query.parameters.method.clusteringType) {
-            case 'text':
-                // set kmeans and features space parameters
-                query.parameters.method.distanceType = 'Cos';
-                features = [{
-                    type: 'text',
-                    field: query.parameters.fields,
-                    ngrams: 2,
-                    hashDimension: 20000
-                },{
-                    type: 'constant',
-                    const: 0.0001
-                }]; break;
-            case 'number':
-                query.parameters.method.distanceType = 'Euclid';
-                features = query.parameters.fields.map(fieldName => ({
-                    type: 'numeric',
-                    field: fieldName
-                })); break;
-        }
-        query.parameters.method.allowEmpty = false;
-        features.forEach(feature => { feature.source = 'Dataset'; });
+        return function ({ methodId, fields }) {
 
-        /////////////////////////////////////////
-        // Validate features object
-        /////////////////////////////////////////
-        if (!validator.validateSchema(features, validator.schemas.featureSchema)) {
-            // features object is not in correct schema - set query
-            // to Error and exit this function
-            return new Error('Features are not in correct schema');
-        }
+            // get the method that was created by the method
+            let method = base.store('Methods')[methodId];
 
-        /////////////////////////////////////////
-        // Validate KMeans parameter
-        /////////////////////////////////////////
-        if (!validator.validateSchema(query.parameters.method, validator.schemas.methodKMeansParams)) {
-            // method parameters are not in correct schema - set query
-            // to Error and exist this function
-            return new Error('KMeans parameters are not in correct schema');
-        }
+            let result = method.result;
 
-        // create the feature space using the validated features object
-        let featureSpace = new qm.FeatureSpace(base, features);
+            let subsetParams = [ ];
+            // for each cluster calculate the aggregates
+            for (let clusterId = 0; clusterId < result.clusters.length; clusterId++) {
 
-        // get subset elements and update the feature space
-        const documents = subset.hasElements;
-        featureSpace.updateRecords(documents);
+                // get elements in the cluster
+                const docIds = new qm.la.IntVector(result.clusters[clusterId].docIds);
+                const docs   = base.store('Dataset').newRecordSet(docIds);
 
-        // get matrix representation of the documents
-        const matrix = featureSpace.extractSparseMatrix(documents);
+                // iterate through the fields
+                for (let field of fields) {
+                    // get aggregate distribution
+                    if (field.aggregate) {
+                        // get the aggregate distribution
+                        let distribution = self._aggregateByField(docs, field);
 
-        // TODO: support dimensionality reduction
-
-        // create kmeans model and feed it the sparse document matrix
-        let kMeans = new qm.analytics.KMeans(query.parameters.method);
-        kMeans.fit(matrix);
-
-        // get the document-cluster affiliation
-        const idxv = kMeans.getModel().idxv;
-
-        // prepare clusters array in the results
-        query.result = {
-            clusters: Array.apply(null, Array(query.parameters.method.k))
-                .map(() => ({
-                    avgSimilarity: null,
-                    docIds: [ ],
-                    aggregates: [ ],
-                    subset: {
-                        created: false,
-                        id: null
+                        result.clusters[clusterId].aggregates.push({
+                            field: field.name,
+                            type: field.aggregate,
+                            distribution
+                        });
                     }
-                }))
+                }
+
+                // set cluster label out of the first keyword cloud
+                let label;
+                for (let aggregate of result.clusters[clusterId].aggregates) {
+                    if (method.parameters.fields.includes(aggregate.field) && aggregate.distribution) {
+
+                        if (method.parameters.method.clusteringType === 'text') {
+                            // get the aggregates keyword distribution
+                            label = aggregate.distribution.keywords.slice(0, 3)
+                                .map(keyword => keyword.keyword).join(', ');
+
+                            break;
+                        } else if (method.parameters.method.clusteringType === 'number') {
+                            // get the histogram distribution
+                            let min = aggregate.distribution.min;
+                            let max = aggregate.distribution.max;
+
+                            if (Math.abs(min) < 1 && min !== 0) { min = min.toFixed(2); }
+                            if (Math.abs(max) < 1 && max !== 0) { max = max.toFixed(2); }
+
+                            label = `${min} ≤ count ≤ ${max}`;
+                            break;
+                        }
+                    }
+                }
+
+                // if label was not assigned - set a lame label
+                if (!label) { label = `Cluster #${clusterId+1}`; }
+                subsetParams.push({ label, clusterId });
+
+            }
+
+            // store the aggregates to the method result attributes
+            base.store('Methods')[methodId].result = result;
+
+            // create all cluster subsets
+            for (let subsetParam of subsetParams) {
+
+                let {label, clusterId } = subsetParam;
+                // create subsets using the cluster information
+                let subset = {
+                    label: label,
+                    description: null,
+                    resultedIn: methodId,
+                    meta: { clusterId }
+                };
+
+                // create subset and get its id
+                let { subsets: { id } } = createSubsetCb(base, subset);
+
+                // aggregate the given subset
+                self.aggregateSubset(base, id, fields);
+
+                // join the produced subset with the method
+                base.store('Methods')[methodId].$addJoin('produced', id);
+            }
+
+            self._setModelStatus(hash, {
+                status: 'finished',
+                message: 'KMeans clustering finished',
+                methodId
+            });
+
         };
-
-        let clusterDocuments = { };
-        // populate the cluster results
-        for (let id = 0; id < idxv.length; id++) {
-            const clusterId = idxv[id];
-            const docId = documents[id].$id;
-            // store the document id in the correct cluster
-            query.result.clusters[clusterId].docIds.push(docId);
-
-            // save positions of documents of particular cluster
-            if (clusterDocuments[clusterId]) {
-                clusterDocuments[clusterId].push(id);
-            } else {
-                clusterDocuments[clusterId] = [id];
-            }
-        }
-
-        // calculate the average distance between cluster documents and centroid
-        for (let clusterId of Object.keys(clusterDocuments)) {
-            // get document submatrix
-            let positions = new qm.la.IntVector(clusterDocuments[clusterId]);
-            let submatrix = matrix.getColSubmatrix(positions);
-            let centroid = kMeans.centroids.getCol(parseInt(clusterId));
-            if (query.parameters.method.distanceType === 'Cos') {
-                // normalize the columns for cosine similiary
-                submatrix.normalizeCols();
-                centroid.normalize();
-            }
-            // get distances between documents and centroid
-            let distances = submatrix.multiplyT(centroid);
-            if (query.parameters.method.distanceType === 'Cos') {
-                query.result.clusters[clusterId].avgSimilarity = distances.sum() / submatrix.cols;
-            }
-
-            // sort distances with their indeces
-            let sort = distances.sortPerm(false);
-            let idVec = qm.la.IntVector();
-
-            let MAX_COUNT = 100;
-            // set number of documents were interested in
-            let maxCount = MAX_COUNT > sort.perm.length ? sort.perm.length : MAX_COUNT;
-
-            for (let i = 0; i < maxCount; i++) {
-                // get content id of (i+1)-th most similar content
-                let maxid = sort.perm[i];
-                // else remember the content and it's similarity
-                idVec.push(subset.hasElements[positions[maxid]].$id);
-            }
-            // get elements in the cluster
-            const documents = base.store('Dataset').newRecordSet(idVec);
-            // get document sample
-            query.result.clusters[clusterId].documentSample = documents.map(doc => formatter.document(doc));
-
-        }
-
-        let subsetLabels = [ ];
-        // for each cluster calculate the aggregates
-        for (let i = 0; i < query.result.clusters.length; i++) {
-            // get elements in the cluster
-            const documentIds = new qm.la.IntVector(query.result.clusters[i].docIds);
-            const documents = base.store('Dataset').newRecordSet(documentIds);
-            // iterate through the fields
-            for (let field of fields) {
-                // get aggregate distribution
-                if (field.aggregate) {
-                    let distribution = this._aggregateByField(documents, field);
-                    query.result.clusters[i].aggregates.push({
-                        field: field.name,
-                        type: field.aggregate,
-                        distribution
-                    });
-                }
-            }
-
-            // set cluster label out of the first keyword cloud
-            let label;
-            for (let aggregate of query.result.clusters[i].aggregates) {
-                if (query.parameters.fields.includes(aggregate.field) && aggregate.distribution) {
-                    if (query.parameters.method.clusteringType === 'text') {
-                        // get the aggregates keyword distribution
-                        label = aggregate.distribution.keywords.slice(0, 3)
-                            .map(keyword => keyword.keyword).join(', ');
-                        break;
-                    } else if (query.parameters.method.clusteringType === 'number') {
-                        // get the histogram distribution
-                        let min = aggregate.distribution.min;
-                        let max = aggregate.distribution.max;
-                        if (Math.abs(min) < 1 && min !== 0) { min = min.toFixed(2); }
-                        if (Math.abs(max) < 1 && max !== 0) { max = max.toFixed(2); }
-                        label = `${min} ≤ count ≤ ${max}`;
-                        break;
-                    }
-                }
-            }
-
-            // if label was not assigned - set a lame label
-            if (!label) { label = `Cluster #${i+1}`; }
-
-            // set the subset/cluster label
-            subsetLabels.push({ label, clusterId: i });
-        }
-
-        // join the created method with the applied subset
-        let methodId = base.store('Methods').push(query);
-        base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
-
-        // create subsets using the cluster information
-        for (let labelObj of subsetLabels) {
-            let subset = {
-                label: labelObj.label,
-                description: null,
-                resultedIn: methodId,
-                meta: { clusterId: labelObj.clusterId }
-            };
-            // create subset and get its id
-            let { subsets: { id } } = require('./subset-handler').create(base, subset);
-            // aggregate the given subset
-            this.aggregateSubset(base, id, fields);
-            // join the produced subset with the method
-            base.store('Methods')[methodId].$addJoin('produced', id);
-        }
-
-        return methodId;
-    },
+    }
 
     /**
      * Set the visualization method result.
@@ -560,7 +475,7 @@ module.exports = {
         let methodId = base.store('Methods').push(query);
         base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
         return methodId;
-    },
+    }
 
     /**
      * Set the filter method result.
@@ -618,7 +533,7 @@ module.exports = {
         let methodId = base.store('Methods').push(query);
         base.store('Methods')[methodId].$addJoin('appliedOn', subset.$id);
         return methodId;
-    },
+    }
 
     /**
      * Add the current value of the hierarchy to the children array.
@@ -628,6 +543,7 @@ module.exports = {
      * @private
      */
     _addChild(children, value, other) {
+        let self = this;
         if (other.length) {
             // check if there is already a child included with this value
             let object;
@@ -642,7 +558,7 @@ module.exports = {
                 let len = children.push({ name: value, children: [] });
                 object = children[len - 1];
             }
-            this._addChild(object.children, other[0], other.slice(1));
+            self._addChild(object.children, other[0], other.slice(1));
 
         } else {
             // value is the last in the array - add it and it's size to the
@@ -661,4 +577,86 @@ module.exports = {
         }
     }
 
-};
+    /**********************************
+     * Model Status functions
+     *********************************/
+
+
+    /**
+     * @description Creates a new model status mapping.
+     * @param {Object} model - The model to be mapped.
+     * @returns {String} The hash under which the model was stored.
+     */
+    _createModelStatus(model) {
+        const hash =  Math.random().toString(36).substring(2, 15) +
+                      Math.random().toString(36).substring(2, 15) +
+                      Date.now();
+        this._modelStatus[hash] = {
+            model,
+            status: 'processing',
+            message: 'Model is being processed'
+        };
+        return hash;
+    }
+
+
+    /**
+     * @description Get the model status mapping - with possible methodId.
+     * @param {String} hash - The hash under which the method was stored.
+     * @returns {Object} The object containing information about the status.
+     */
+    getModelStatus(hash) {
+        if (this._modelStatus[hash]) {
+            const { status, message, methodId } = this._modelStatus[hash];
+            return { status, message, methodId };
+        } else {
+            return {
+                status: 'error',
+                message: `No such process has been found for hash=${hash}`
+            };
+        }
+    }
+
+
+    /**
+     * @description Set the model status mapping - with possible methodId.
+     * @param {String} hash - The hash under which the method was stored.
+     * @param {Object} params - The parameters used to setup.
+     * @param {String} [params.status] - The status of the process.
+     * @param {String} [params.message] - The message of the process.
+     * @param {Number} [params.methodId] - The method id under which the model results are stored.
+     */
+    _setModelStatus(hash, params) {
+        if (this._modelStatus[hash]) {
+            // set the parameters of the status
+            const { status, message, methodId } = params;
+            if (status)   this._modelStatus[hash].status   = status;
+            if (message)  this._modelStatus[hash].message  = message;
+            if (methodId) this._modelStatus[hash].methodId = methodId;
+        }
+    }
+
+
+    /**
+     * @description Deletes the model found under the given hash.
+     * @param {String} hash - The hash under which the method was stored.
+     * @returns {Object} The status containing the success of the function.
+     */
+    _deleteModelStatus(hash) {
+        if (this._modelStatus[hash]) {
+            delete this._modelStatus[hash].model;
+            return {
+                status: 'finished',
+                message: `Model has been deleted for hash=${hash}`
+            };
+        } else {
+            return {
+                status: 'error',
+                message: `Nothing to delete. No model found for hash=${hash}`
+            };
+        }
+    }
+}
+
+
+module.exports = ModelsManager;

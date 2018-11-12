@@ -6,8 +6,6 @@ console.log('Starting child process, id= ' + process.pid);
 
 let interval_id = setInterval(() => { }, 10 * 1000);
 
-// internal modules
-const BaseDataset = require('../../lib/base-dataset');
 
 // json schema validator
 const validator = require('../../lib/validator')({
@@ -21,14 +19,30 @@ const validator = require('../../lib/validator')({
     createSubset:  require('../../schemas/child-messages/subset-create'),
     getSubset:     require('../../schemas/child-messages/subset-get'),
     editSubset:    require('../../schemas/child-messages/subset-edit'),
-    deleteSubset:    require('../../schemas/child-messages/subset-delete'),
+    deleteSubset:  require('../../schemas/child-messages/subset-delete'),
     getSubsetDocuments: require('../../schemas/child-messages/subset-get-documents'),
     // method message schemas
-    createMethod:  require('../../schemas/child-messages/method-create'),
-    getMethod:     require('../../schemas/child-messages/method-get'),
-    editMethod:    require('../../schemas/child-messages/method-edit'),
-    deleteMethod:    require('../../schemas/child-messages/method-delete')
+    createMethod: require('../../schemas/child-messages/method-create'),
+    getMethod:    require('../../schemas/child-messages/method-get'),
+    editMethod:   require('../../schemas/child-messages/method-edit'),
+    deleteMethod: require('../../schemas/child-messages/method-delete'),
+
+    // dataset schemas
+    constructorParams:  require('../../schemas/base-dataset/constructor-params'),
+    constructorFields:  require('../../schemas/base-dataset/constructor-fields'),
+    constructorStore:   require('../../schemas/base-dataset/constructor-store'),
+    editDatasetSchema:  require('../../schemas/base-dataset/edit-dataset-schema'),
+    featureSchema:      require('../../schemas/base-dataset/features-schema'),
+    methodKMeansParams: require('../../schemas/base-dataset/method-kmeans-params')
 });
+
+// the subsets and models manager classes
+const SubsetsM = require('../../lib/base-util/subsets-manager');
+const ModelsM = require('../../lib/base-util/models-manager');
+
+// internal modules
+const BaseDataset = require('../../lib/base-dataset');
+
 
 // database placeholder
 let database = null;
@@ -120,6 +134,9 @@ function handle(msg) {
     case 'delete_method':
         deleteMethod(msg);
         break;
+    case 'get_method_status':
+        getMethodStatus(msg);
+        break;
     default:
         break;
     }
@@ -177,8 +194,9 @@ function createDatabase(msg) {
         try {
             // get the constructor parameters
             let { filePath, fields, params, delimiter } = body.content;
+            // initialize for serving to the datasets
             // create the database
-            database = new BaseDataset(params, fields);
+            database = new BaseDataset(params, SubsetsM, ModelsM, validator, fields);
             // fill the database with the records
             let result = database.pushDocuments(filePath, delimiter, fields);
             database.aggregateSubset(result.subsets.id);
@@ -212,7 +230,8 @@ function openDatabase(msg) {
         try {
             // get the constructor parameters
             let { params } = body.content;
-            database = new BaseDataset(params); // create the database
+            // create the database
+            database = new BaseDataset(params, SubsetsM, ModelsM, validator);
             process.send({ reqId, content: { datasetId: database.getId() } });
         } catch (err) {
             console.log('openDatabase Error', err.message);
@@ -553,4 +572,27 @@ function deleteMethod(msg) {
             process.send({ reqId, error: err.message });
         }
     });
+}
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} [msg.body.content] - The content of the message.
+ * @param {Object} [msg.body.content.hash] - The id of the method.
+ */
+function getMethodStatus(msg) {
+    // validate message information
+    let { reqId, body } = msg;
+    try {
+        let hash = body.content ? body.content.hash : null;
+        let results = database.getMethodStatus(hash);
+        process.send({ reqId, results });
+    } catch (err) {
+        console.log('getMethod Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
 }

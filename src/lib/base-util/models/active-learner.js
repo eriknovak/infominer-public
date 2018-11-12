@@ -1,7 +1,5 @@
 /************************************************
- * The Nearest Neighbor recommendation model.
- * It returns documents similar to the query
- * parameter.
+ * The Active Learner model from QMiner.
  */
 
 // external modules

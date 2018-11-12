@@ -4,20 +4,8 @@ const path = require('path');
 // internal modules
 const fileManager = require('./file-manager');
 
-// schema validator
-const validator = require('./validator')({
-    // dataset schemas
-    constructorParams: require('../schemas/base-dataset/constructor-params'),
-    constructorFields: require('../schemas/base-dataset/constructor-fields'),
-    constructorStore:  require('../schemas/base-dataset/constructor-store'),
-    editDatasetSchema: require('../schemas/base-dataset/edit-dataset-schema')
-});
-
-// formatter function for subset, method and documents
-const formatter = require('./base-util/formatter');
-// handler for subset requests
-const subsetHandler = require('./base-util/subset-handler');
-const methodHandler = require('./base-util/method-handler');
+// the formatter for the output requests
+let formatter = require('./base-util/formatter');
 
 /**
  * The dataset field used in QMiner database.
@@ -43,16 +31,22 @@ class BaseDataset {
      * when `params.mode='createClean'`.
      * @constructor
      */
-    constructor(params, fields) {
+    constructor(params, SubsetsManager, ModelsManager, validator, fields) {
         let self = this;
 
+        // store validator
+        self._validator = validator;
         // validate constructor parameters
         if (validator.validateSchema(params, validator.schemas.constructorParams) &&
             validator.validateSchema(fields, validator.schemas.constructorFields)) {
-            // constructor parameters are valid - continue with database initialization
+            // continue with database initialization
             self.params = params;
+            self._subsetsManager = new SubsetsManager(formatter, validator);
+            self._modelsManager  = new ModelsManager(formatter, validator);
+
             // loads the base
             self._loadBase(fields);
+
         } else {
             // constructor parameters mismatch - something went wrong
             console.error('Constructor parameters are not in specified schema');
@@ -82,7 +76,7 @@ class BaseDataset {
             const schema = self._prepareSchema(fields);
 
             // validate first item in schema - the one created by the user
-            if (validator.validateSchema(schema[0], validator.schemas.constructorStore)) {
+            if (self._validator.validateSchema(schema[0], self._validator.schemas.constructorStore)) {
                 // schema is in valid form - continue with database creation
                 self.base = new qm.Base({
                     mode: self.params.mode,
@@ -139,20 +133,11 @@ class BaseDataset {
         for (let field of includedFields) {
             // string fields are used for keys
             if (field.type === 'string') {
-                keys.push({
-                    field: field.name,
-                    type: 'text_position'
-                });
+                keys.push({ field: field.name, type: 'text_position' });
             } else if (field.type === 'float' || field.type === 'datetime') {
-                keys.push({
-                    field: field.name,
-                    type: 'linear'
-                });
+                keys.push({ field: field.name, type: 'linear' });
             } else if (field.type === 'string_v') {
-                keys.push({
-                    field: field.name,
-                    type: 'value'
-                });
+                keys.push({ field: field.name, type: 'value' });
             }
         }
 
@@ -205,7 +190,7 @@ class BaseDataset {
             let recId = self.base.store('Dataset').push(rec);
             self.base.store('Dataset')[recId].$addJoin('inSubsets', self.base.store('Subsets')[subsetId]);
         }
-        // close the input stream - enable file manipulation
+        // close the input stream
         fileIn.close();
 
         // set dataset fields - and aggregates
@@ -328,7 +313,7 @@ class BaseDataset {
         let self = this;
 
         // validate input parameter schema
-        if (!validator.validateSchema(dataset, validator.schemas.editDatasetSchema)) {
+        if (!self._validator.validateSchema(dataset, self._validator.schemas.editDatasetSchema)) {
             // input parameter is not in correct format - return Error
             return {
                 error: {
@@ -393,7 +378,8 @@ class BaseDataset {
      * @param {Number[]} subset.documents - Array of document ids the subset contains.
      */
     createSubset(subset) {
-        return subsetHandler.create(this.base, subset);
+        let self = this;
+        return self._subsetsManager.createSubset(self.base, subset);
     }
 
     /**
@@ -402,7 +388,8 @@ class BaseDataset {
      * @returns {Object} An array of subset representation objects.
      */
     getSubset(id) {
-        return subsetHandler.get(this.base, id);
+        let self = this;
+        return self._subsetsManager.getSubset(self.base, id);
     }
 
     /**
@@ -412,7 +399,8 @@ class BaseDataset {
      * @param {String} [subset.description] - The new subset description.
      */
     editSubset(subset) {
-        return subsetHandler.set(this.base, subset);
+        let self = this;
+        return self._subsetsManager.updateSubset(self.base, subset);
     }
 
     /**
@@ -420,7 +408,9 @@ class BaseDataset {
      * @param {String | Number} id - The id of the subset.
      */
     deleteSubset(id) {
-        return subsetHandler.delete(this.base, id);
+        let self = this;
+        return self._subsetsManager.deleteSubset(self.base, id,
+            self._modelsManager.deleteModel.bind(self._modelsManager));
     }
 
     /**
@@ -436,7 +426,10 @@ class BaseDataset {
      * @returns {Object} The object containing the documents and it's metadata.
      */
     getSubsetDocuments(id, query) {
-        return subsetHandler.documents(this.base, id, query, this.fields);
+        let self = this;
+        return self._subsetsManager.getDocuments(self.base, id, query,
+            self._modelsManager._aggregateByField.bind(self._modelsManager),
+            self.fields);
     }
 
 
@@ -454,7 +447,9 @@ class BaseDataset {
      * @param {Number} method.appliedOn - The id of the subset the method was applied on.
      */
     createMethod(method) {
-        return methodHandler.create(this.base, method, this.fields);
+        let self = this;
+        return self._modelsManager.createModel(self.base, method, self.fields,
+            self._subsetsManager.createSubset.bind(self._subsetsManager));
     }
 
     /**
@@ -463,7 +458,8 @@ class BaseDataset {
      * @returns {Object} An object containing the array of method representation objects.
      */
     getMethod(id) {
-        return methodHandler.get(this.base, id);
+        let self = this;
+        return self._modelsManager.getModel(self.base, id);
     }
 
     /**
@@ -475,7 +471,8 @@ class BaseDataset {
      * @param {Number} method.appliedOn - The id of the subset the method was applied on.
      */
     editMethod(method) {
-        return methodHandler.set(this.base, method);
+        let self = this;
+        return self._modelsManager.updateModel(self.base, method);
     }
 
     /**
@@ -483,7 +480,9 @@ class BaseDataset {
      * @param {Number | String} id - The id of the method.
      */
     deleteMethod(id) {
-        return methodHandler.delete(this.base, id);
+        let self = this;
+        return self._modelsManager.deleteModel(self.base, id,
+            self._subsetsManager.deleteSubset.bind(self._subsetsManager));
     }
 
     /**
@@ -492,7 +491,18 @@ class BaseDataset {
      * @returns {Object} The subset aggregate method.
      */
     aggregateSubset(id) {
-        return methodHandler.aggregateSubset(this.base, id, this.fields);
+        let self = this;
+        return self._modelsManager.aggregateSubset(self.base, id, self.fields);
+    }
+
+    /**
+     * Gets information about the method in the database.
+     * @param {String} hash - The hash of the method.
+     * @returns {Object} An object containing the status of the method.
+     */
+    getMethodStatus(hash) {
+        let self = this;
+        return self._modelsManager.getModelStatus(hash);
     }
 
 }
