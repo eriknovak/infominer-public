@@ -51,14 +51,12 @@ class ModelsManager {
                 const hash = this._createModelStatus(clusteringKMeans);
                 clusteringKMeans.run(self._clusteringKMeansCreateSubsets(base, hash, createSubsetCb));
                 return { hash, status: 'processing' };
-                // methodId = self._kmeansClustering(base, qmMethod, subset, fields, createSubsetCb);
-                // break;
             case 'visualization':
                 methodId = self._visualizationSetup(base, qmMethod, subset, fields, createSubsetCb);
-                break;
+                return { status: 'finished', methodId };
             case 'filter.manual':
                 methodId = self._filterByQuery(base, qmMethod, subset, fields, createSubsetCb);
-                break;
+                return { status: 'finished', methodId };
             }
 
             if (methodId instanceof Error) {
