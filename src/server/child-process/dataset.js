@@ -137,6 +137,15 @@ function handle(msg) {
     case 'get_method_status':
         getMethodStatus(msg);
         break;
+    case 'create_method_active_learning':
+        createMethodActiveLearning(msg);
+        break;
+    case 'update_method_active_learning':
+        updateMethodActiveLearning(msg);
+        break;
+    case 'delete_method_active_learning':
+        deleteMethodActiveLearning(msg);
+        break;
     default:
         break;
     }
@@ -592,6 +601,84 @@ function getMethodStatus(msg) {
         process.send({ reqId, results });
     } catch (err) {
         console.log('getMethod Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+/**
+ * Creates a new method.
+ * @param {Object} msg - Message to create method.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.method - The subset object.
+ * @param {String} msg.body.content.method.methodType - The type of the method.
+ * @param {Object} msg.body.content.method.parameters - The parameters of the method.
+ * @param {Number} msg.body.content.method.appliedOn - The id of the subset the method was applied on.
+ */
+function createMethodActiveLearning(msg) {
+    // validate message information
+    let { reqId, body } = msg;
+    try {
+        let { method } = body.content;
+        let results = database.createMethodActiveLearning(method);
+        process.send({ reqId, results });
+    } catch (err) {
+        console.log('createMethodActiveLearning Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+/**
+ * Creates a new method.
+ * @param {Object} msg - Message to create method.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.method - The subset object.
+ * @param {String} msg.body.content.method.methodType - The type of the method.
+ * @param {Object} msg.body.content.method.parameters - The parameters of the method.
+ * @param {Number} msg.body.content.method.appliedOn - The id of the subset the method was applied on.
+ */
+function updateMethodActiveLearning(msg) {
+    // validate message information
+    let { reqId, body } = msg;
+    try {
+        let { method } = body.content;
+        let results = database.updateMethodActiveLearning(method);
+        process.send({ reqId, results });
+    } catch (err) {
+        console.log('updateMethodActiveLearning Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
+/**
+ * Creates a new method.
+ * @param {Object} msg - Message to create method.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Object} msg.body.content.method - The subset object.
+ * @param {String} msg.body.content.method.methodType - The type of the method.
+ * @param {Object} msg.body.content.method.parameters - The parameters of the method.
+ * @param {Number} msg.body.content.method.appliedOn - The id of the subset the method was applied on.
+ */
+function deleteMethodActiveLearning(msg) {
+    // validate message information
+    let { reqId, body } = msg;
+    try {
+        let { methodId } = body.content;
+        let results = database.deleteMethodActiveLearning(methodId);
+        process.send({ reqId, results });
+    } catch (err) {
+        console.log('deleteMethodActiveLearning Error', err.message);
         // notify parent process about the error
         process.send({ reqId, error: err.message });
     }

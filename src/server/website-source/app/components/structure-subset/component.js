@@ -21,7 +21,8 @@ export default Component.extend({
         return this.get('usedBy').filter(method => {
             return method.get('methodType') &&
                 (method.get('methodType').includes('clustering') ||
-                method.get('methodType').includes('filter'));
+                method.get('methodType').includes('filter') ||
+                method.get('methodType').includes('classify'));
         });
     }),
 

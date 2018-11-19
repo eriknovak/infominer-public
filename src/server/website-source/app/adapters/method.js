@@ -12,9 +12,7 @@ export default DS.RESTAdapter.extend(DataAdapterMixin, {
         let data = {};
         let serializer = store.serializerFor(type.modelName);
         let url = self.buildURL(type.modelName, null, snapshot, 'createRecord');
-
         serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
-
 
         function _checkStatus(params) {
             let { hash, status, methodId } = params;
@@ -27,11 +25,12 @@ export default DS.RESTAdapter.extend(DataAdapterMixin, {
 
                 // creates a promise request which waits for 10 seconds
                 const request = new Promise((resolve, reject) => {
-                    setTimeout(function () {
-                        // TODO: handle exceptions
-                        self.ajax(`${url}/status?hash=${hash}`, 'GET')
-                            .then(params => resolve(params));
-                    }, 10000);
+                    self.set('timeout', setTimeout(function () {
+                            // TODO: handle exceptions
+                            self.ajax(`${url}/status?hash=${hash}`, 'GET')
+                                .then(params => resolve(params));
+                        }, 10000)
+                    );
                 });
 
                 // return the request promise

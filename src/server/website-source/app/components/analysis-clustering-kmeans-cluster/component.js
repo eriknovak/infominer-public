@@ -5,6 +5,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     classNames: ['cluster-content'],
+
     fieldSelection: service('field-selection'),
     columnWidth: service('column-size'),
     store:       service('store'),

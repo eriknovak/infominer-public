@@ -88,8 +88,8 @@ class ClusteringKMeans extends AbstractModel {
 
     _createFeatureSpace() {
         let self = this;
-        // creates the feature space
 
+        // creates the feature space
         self.featureSpace = new qm.FeatureSpace(self.base, self.features);
         // update the feature space using the subset elements
         let documents = self.subset.hasElements;

@@ -1,0 +1,12 @@
+<label class="user-input-label">Statistics</label>
+<ul class="list-group list-group-flush active-learning-statistics">
+  <li class="list-group-item">
+    <span class="statistics-component"># positive examples:</span> {{examples-string}}
+  </li>
+</ul>
+
+{{
+  aggregate-keywords
+  field='Positive Examples'
+  distribution=statistics.predicted.positive.distribution
+}}

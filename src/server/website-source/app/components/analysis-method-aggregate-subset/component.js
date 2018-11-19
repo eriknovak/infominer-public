@@ -12,6 +12,10 @@ export default Component.extend({
     // Component Life Cycle
     ///////////////////////////////////////////////////////
 
+    header: computed('title', function () {
+        return this.get('title') ? this.get('title') : 'Data';
+    }),
+
     aggregates: computed('fieldSelection.fields.@each.showInVisual', 'method.result', function () {
         let result = this.get('method.result');
 

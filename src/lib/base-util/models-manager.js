@@ -2,6 +2,7 @@
 const qm = require('qminer');
 
 const ClusteringKMeans = require('./models/clustering-kmeans');
+const ActiveLearner = require('./models/active-learner');
 
 class ModelsManager {
 
@@ -47,25 +48,30 @@ class ModelsManager {
             let methodId;
             switch(qmMethod.type) {
             case 'clustering.kmeans':
+                // create new clustering process
                 let clusteringKMeans = new ClusteringKMeans(base, qmMethod, subset, fields, self._formatter);
+                // store and get the clustering model hash indentifier
                 const hash = this._createModelStatus(clusteringKMeans);
+                // run the clustering process
                 clusteringKMeans.run(self._clusteringKMeansCreateSubsets(base, hash, createSubsetCb));
+                // return the hash with the status report
                 return { hash, status: 'processing' };
             case 'visualization':
+                // save the methodId and return the status report
                 methodId = self._visualizationSetup(base, qmMethod, subset, fields, createSubsetCb);
                 return { status: 'finished', methodId };
             case 'filter.manual':
+                // save the methodId and return the status report
                 methodId = self._filterByQuery(base, qmMethod, subset, fields, createSubsetCb);
                 return { status: 'finished', methodId };
+            case 'classify.active-learning':
+                let { model } = self._modelStatus[method.parameters.hash];
+                methodId = model.run(self._saveActiveLearning(base, createSubsetCb));
+                return { status: 'finished', methodId };
             }
+            // something went wrong return an error
+            return { errors: { msg: 'createMethod: cannot initialize method - invalid method parameters' } };
 
-            if (methodId instanceof Error) {
-                // something went wrong return an error
-                return { errors: { msg: 'createMethod: cannot initialize method - invalid method parameters' } };
-            } else {
-                // store the method into the database
-                return self.getModel(base, methodId);
-            }
         } else {
             return { errors: { msg: `createMethod: No subset with id=${method.appliedOn}` } };
         }
@@ -174,7 +180,139 @@ class ModelsManager {
                 methods[id].deleted = true;
             }
         }
-        return  { };
+        return { };
+    }
+
+    /**********************************
+     * Active Learning Methods
+     *********************************/
+
+    createMethodActiveLearning(base, method, fields) {
+        let self = this;
+        // TODO: log activity
+
+        // get subset on which the method was used
+        let subset = base.store('Subsets')[method.appliedOn];
+
+        // create new clustering process
+        let activeLearner = new ActiveLearner(base, method, subset, fields, self._formatter);
+        // store and get the clustering model hash indentifier
+        const hash = this._createModelStatus(activeLearner);
+        const document = activeLearner.update({ hash });
+
+        method.id = hash;
+        method.currentDoc = { document, label: null };
+        method.parameters.labelledDocs = [];
+        // return the active learning object
+        return { activeLearning: method };
+    }
+
+
+    updateMethodActiveLearning(method) {
+        let self = this;
+        // TODO: log activity
+
+        // get the model using the method id
+        let { model } = self._modelStatus[method.id];
+        // get the next document to be labelled
+        const document = model.update(method);
+        if (model.isInitialized()) {
+            method.statistics = model.getStatistics();
+        }
+        // update the labelled documents
+        method.parameters.labelledDocs = model.params.parameters.labelledDocs;
+        // setup the next current documnet to be labelled
+        method.currentDoc = { document, label: null };
+        // return the active learning object
+        return { activeLearning: method };
+    }
+
+
+    deleteMethodActiveLearning(methodId) {
+        let self = this;
+        self._deleteModelStatus(methodId);
+        return { };
+    }
+
+
+    _saveActiveLearning(base, createSubsetCb) {
+        let self = this;
+        // returns the callback function
+        return function ({ methodId, fields }) {
+            // get the method that was created
+            let method = base.store('Methods')[methodId];
+            let result = method.result;
+
+            let subsetType = Object.keys(result);
+
+            let subsetParams = [];
+            // for each cluster calculate the aggregates
+            for (let type of subsetType) {
+                // get elements in the cluster
+                const docIds = new qm.la.IntVector(result[type].docIds);
+                const docs   = base.store('Dataset').newRecordSet(docIds);
+
+                result[type].aggregates = [];
+                // iterate through the fields
+                for (let field of fields) {
+                    // get aggregate distribution
+                    if (field.aggregate) {
+                        // get the aggregate distribution
+                        let distribution = self._aggregateByField(docs, field);
+
+                        result[type].aggregates.push({
+                            field: field.name,
+                            type: field.aggregate,
+                            distribution
+                        });
+                    }
+                }
+
+                // set cluster label out of the first keyword cloud
+                let label = '';
+                for (let aggregate of result[type].aggregates) {
+                    if (method.parameters.fields.includes(aggregate.field) && aggregate.distribution) {
+                        // get the aggregates keyword distribution
+                        label = aggregate.distribution.keywords.slice(0, 3)
+                            .map(keyword => keyword.keyword).join(', ');
+
+                        break;
+                    }
+                }
+
+                // if label was not assigned - set a lame label
+                label = `${type.toUpperCase()} - ${label}`;
+                subsetParams.push({ label, type });
+
+            }
+
+            // store the aggregates to the method result attributes
+            base.store('Methods')[methodId].result = result;
+
+            // create all cluster subsets
+            for (let subsetParam of subsetParams) {
+
+                let { label, type } = subsetParam;
+                // create subsets using the cluster information
+                let subset = {
+                    label: label,
+                    description: null,
+                    resultedIn: methodId,
+                    meta: { type }
+                };
+
+                // create subset and get its id
+                let { subsets: { id } } = createSubsetCb(base, subset);
+
+                // aggregate the given subset
+                self.aggregateSubset(base, id, fields);
+
+                // join the produced subset with the method
+                base.store('Methods')[methodId].$addJoin('produced', id);
+            }
+
+            return methodId;
+        };
     }
 
     /**

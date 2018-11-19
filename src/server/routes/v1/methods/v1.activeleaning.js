@@ -1,5 +1,5 @@
 // internal modules
-const validator = require('../../../lib/validator')();
+const validator = require('../../../../lib/validator')();
 
 /**
  * Adds api routes to .
@@ -11,11 +11,11 @@ const validator = require('../../../lib/validator')();
 module.exports = function (app, pg, processHandler, sendToProcess, logger) {
 
     /**
-     * GET subset of dataset with id=dataset_id
+     * POST active learning with id=dataset_id
      */
-    app.get('/api/datasets/:dataset_id/subsets/:subset_id/active_learning', (req, res) => {
+    app.post('/api/datasets/:dataset_id/methods/active-learning', (req, res) => {
         // log user request
-        logger.info('user requested for subset',
+        logger.info('user requested for active-learning',
             logger.formatRequest(req)
         );
 
@@ -23,52 +23,46 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
-            logger.error('error [route_parameter]: user request for subset failed',
+            logger.error('error [route_parameter]: user request for active-learning failed',
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
             return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
-        // check if subset_id is an integer
-        let subsetId = parseInt(req.params.subset_id);
-        if (!validator.validateInteger(subsetId)) {
-            // log error when subsetId is not an integer
-            logger.error('error [route_parameter]: user request for subset failed',
-                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
-            );
-            // send error object to user
-            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
-        }
+        // get the parameters of new active-learning method
+        let method = req.body.activeLearning;
+        method.type = method.methodType;
+        delete method.methodType;
 
         // get the user
         let owner = req.user ? req.user.id : 'development';
         // set the body info
-        let body = { cmd: 'get_subset', content: { subsetId } };
+        let body = { cmd: 'create_method_active_learning', content: { method } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             if (error) {
                 // log error on getting subset
-                logger.error('error [node_process]: user request for subset failed',
+                logger.error('error [node_process]: user request for active-learning failed',
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
                 return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
-            logger.info('user request for subset successful',
+            logger.info('user request for active-learning successful',
                 logger.formatRequest(req)
             );
             // send the data
             return res.json(results);
         });
-    }); // GET /api/datasets/:dataset_id/subsets/:subset_id
+    }); // POST /api/datasets/:dataset_id/methods/active-learning
 
     /**
-     * PUT subset of dataset with id=dataset_id
+     * PUT active learning with id=dataset_id
      */
-    app.put('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
+    app.put('/api/datasets/:dataset_id/methods/active-learning/:hash', (req, res) => {
         // log user request
-        logger.info('user requested to update subset',
+        logger.info('user requested to update active learning',
             logger.formatRequest(req)
         );
 
@@ -76,98 +70,86 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
-            logger.error('error [route_parameter]: user request to update subset failed',
+            logger.error('error [route_parameter]: user request to update active learning failed',
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
             return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
-        }
-
-        // check if subset_id is an integer
-        let subsetId = parseInt(req.params.subset_id);
-        if (!validator.validateInteger(subsetId)) {
-            // log error when subsetId is not an integer
-            logger.error('error [route_parameter]: user request to update subset failed',
-                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
-            );
-            // send error object to user
-            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
         }
 
         // get the user
         let owner = req.user ? req.user.id : 'development';
 
-        // get dataset information
-        let subset = req.body.subset;
-        let label = subset.label;
-        let description = subset.description;
+        // get the parameters of existing active-learning method
+        let method = req.body.activeLearning;
+        method.id = req.params.hash;
+        method.type = method.methodType;
+        delete method.methodType;
 
         // set the body info
-        let body = { cmd: 'edit_subset', content: { subsetId, label, description } };
+        let body = { cmd: 'update_method_active_learning', content: { method } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             if (error) {
                 // log error on updating subset
-                logger.error('error [node_process]: user request to update subset failed',
+                logger.error('error [node_process]: user request to update active learning failed',
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
                 return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
-            logger.info('user request to update subset successful',
+            logger.info('user request to update active learning successful',
                 logger.formatRequest(req)
             );
             // send the data
             return res.json(results);
         });
-    }); // PUT /api/datasets/:dataset_id/subsets/:subset_id
+    }); // PUT /api/datasets/:dataset_id/methods/active-learning/:hash
 
-    app.delete('/api/datasets/:dataset_id/subsets/:subset_id', (req, res) => {
-        // log user requests
-        logger.info('user requested to delete subset',
+    /**
+     * DELETE active learning with id=dataset_id
+     */
+    app.delete('/api/datasets/:dataset_id/methods/active-learning/:hash', (req, res) => {
+        // log user request
+        logger.info('user requested to delete active learning',
             logger.formatRequest(req)
         );
 
+        // check if dataset_id is an integer
         let datasetId = parseInt(req.params.dataset_id);
         if (!validator.validateInteger(datasetId)) {
             // log error when datasetId is not an integer
-            logger.error('error [route_parameter]: user request to delete subset failed',
+            logger.error('error [route_parameter]: user request to delete active learning failed',
                 logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
             );
             // send error object to user
             return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
         }
 
-        let subsetId = parseInt(req.params.subset_id);
-        if (!validator.validateInteger(subsetId)) {
-            // log error when subsetId is not an integer
-            logger.error('error [route_parameter]: user request to delete subset failed',
-                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
-            );
-            // send error object to user
-            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
-        }
-        // the user making the request
+        // get the user
         let owner = req.user ? req.user.id : 'development';
 
-        // send the request to the process
-        let body = { cmd: 'delete_subset', content: { subsetId } };
+        // get the id of existing active-learning method
+        let methodId = req.params.hash;
+
+        // set the body info
+        let body = { cmd: 'delete_method_active_learning', content: { methodId } };
         sendToProcess(datasetId, owner, body, function (error, results) {
             if (error) {
                 // log error on updating subset
-                logger.error('error [node_process]: user request to delete subset failed',
+                logger.error('error [node_process]: user request to delete active learning failed',
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error object to user
                 return res.status(500).json({ errors: { msg: error.message } });
             }
             // log request success
-            logger.info('user request to delete subset successful',
+            logger.info('user request to delete active learning successful',
                 logger.formatRequest(req)
             );
             // send the data
             return res.json(results);
         });
-    });
+    }); // DELETE /api/datasets/:dataset_id/methods/active-learning/:hash
 
 };

@@ -19,6 +19,7 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         // set the parameters of the method
+        this.set('type', { type: 'string' });
         this._setParameters();
     },
 

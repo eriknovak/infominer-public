@@ -42,6 +42,8 @@ export default Component.extend({
         if (method.get('parameters.fields')) {
             let selectedFields = method.get('parameters.fields').join(', ');
             this.set('selectedFields', selectedFields);
+            this.set('initialQuery', method.get('parameters.initQuery'));
+            this.set('clustering-k', method.get('parameters.method.k'));
         }
     },
 

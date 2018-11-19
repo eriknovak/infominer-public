@@ -13,10 +13,12 @@ export default DS.Model.extend({
     }),
 
     label: computed('methodType', function () {
-        if (this.get('methodType').includes('kmeans')) {
+        if (this.get('methodType').includes('clustering')) {
             return 'clustering';
         } else if (this.get('methodType').includes('filter.manual')) {
-            return 'query-filter';
+            return 'manual query';
+        } else if (this.get('methodType').includes('classify.active-learning')){
+            return 'manual labelling';
         } else {
             return this.get('methodType');
         }

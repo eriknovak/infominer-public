@@ -39,20 +39,42 @@ class SubsetsManager {
         }
 
         if(subset.meta) {
-            // use metadata to determine the documents in the subset
-            if (!isNaN(parseFloat(subset.meta.clusterId))) {
-                // subset contains documents that were in the cluster
-                let clusterId = subset.meta.clusterId;
-                subset.documents = method.result.clusters[clusterId].docIds;
-                // update cluster information
-                let clusters = method.result.clusters;
-                clusters[clusterId].label = subset.label;
-                clusters[clusterId].subset = {
-                    created: true,
-                    id: subsetId
-                };
-                method.result = { clusters };
+            switch (method.type) {
+            case 'clustering.kmeans':
+                // use metadata to determine the documents in the subset
+                if (!isNaN(parseFloat(subset.meta.clusterId))) {
+                    // subset contains documents that were in the cluster
+                    let clusterId = subset.meta.clusterId;
+                    subset.documents = method.result.clusters[clusterId].docIds;
+                    // update cluster information
+                    let clusters = method.result.clusters;
+                    clusters[clusterId].label = subset.label;
+                    clusters[clusterId].subset = {
+                        created: true,
+                        id: subsetId
+                    };
+                    method.result = { clusters };
+                }
+                break;
+            case 'classify.active-learning':
+                if (subset.meta.type) {
+
+                    let type = subset.meta.type;
+                    let result = method.result;
+                    subset.documents = result[type].docIds;
+                    //
+                    result[type].label = subset.label;
+                    result[type].subset = {
+                        created: true,
+                        id: subsetId
+                    };
+                    method.result = result;
+                }
+                break;
+            default:
+                break;
             }
+
         }
 
         // add joins to documents/elements

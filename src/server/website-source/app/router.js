@@ -18,6 +18,7 @@ Router.map(function() {
     });
   });
   this.route('login');
+  this.route('active-learning', { path: '/dataset/:dataset_id/subsets/:subset_id/active-learning' });
 });
 
 export default Router;

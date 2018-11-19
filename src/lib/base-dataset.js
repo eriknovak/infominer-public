@@ -227,9 +227,10 @@ class BaseDataset {
         let dataset = this.base.store('Dataset').allRecords;
         // set aggregate types for each field
         fields.forEach(field => {
-            // TODO: add editable configuration
             // for showing fields in tables
-            field.show = field.id < 4;
+            field.show = this.params.selectedFields ?
+                this.params.selectedFields.includes(field.name) :
+                field.id < 4;
             if (field.type === 'float') {
                 // aggregate field of type float with histogram
                 field.aggregate = 'histogram';
@@ -252,6 +253,10 @@ class BaseDataset {
                 field.aggregate = 'timeline';
             }
         });
+        if (!this.params.selectedFields) {
+            this.params.selectedFields = fields.filter(field => field.show)
+                .map(field => field.name);
+        }
         // return the fields with aggregates
         return fields;
     }
@@ -331,6 +336,14 @@ class BaseDataset {
             self.params.description = dataset.description;
         }
 
+        console.log(dataset);
+        if (dataset.selectedFields) {
+            self.params.selectedFields = dataset.selectedFields;
+
+        }
+
+        console.log(self.params.selectedFields);
+
         // return the new dataset info
         return { datasets: self._formatDataset() };
     }
@@ -349,6 +362,8 @@ class BaseDataset {
         let subsetIds = subsets.map(rec => rec.id);
         let methodIds = methods.map(rec => rec.id);
 
+        console.log(self.params.selectedFields);
+
         return {
             id: self.params.datasetId,
             label: self.params.label,
@@ -359,7 +374,8 @@ class BaseDataset {
             numberOfMethods: self.base.store('Methods').length,
             hasSubsets: subsetIds,
             hasMethods: methodIds,
-            fields: self.fields
+            fields: self.fields,
+            selectedFields: self.params.selectedFields
         };
     }
 
@@ -503,6 +519,37 @@ class BaseDataset {
     getMethodStatus(hash) {
         let self = this;
         return self._modelsManager.getModelStatus(hash);
+    }
+
+    /**
+     * Creates a method record in the database.
+     * @param {Object} method - The method to store.
+     * @param {String} method.type - The type of the method.
+     * @param {Object} method.parameters - The parameters of the method.
+     * @param {Object} method.result - The result of the method.
+     * @param {Number} method.appliedOn - The id of the subset the method was applied on.
+     */
+    createMethodActiveLearning(method) {
+        let self = this;
+        return self._modelsManager.createMethodActiveLearning(self.base, method, self.fields);
+    }
+
+    /**
+     * Creates a method record in the database.
+     * @param {Object} method - The method to store.
+     * @param {String} method.type - The type of the method.
+     * @param {Object} method.parameters - The parameters of the method.
+     * @param {Object} method.result - The result of the method.
+     * @param {Number} method.appliedOn - The id of the subset the method was applied on.
+     */
+    updateMethodActiveLearning(method) {
+        let self = this;
+        return self._modelsManager.updateMethodActiveLearning(method);
+    }
+
+    deleteMethodActiveLearning(id) {
+        let self = this;
+        return self._modelsManager.deleteMethodActiveLearning(id);
     }
 
 }

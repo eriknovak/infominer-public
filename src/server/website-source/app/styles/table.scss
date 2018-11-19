@@ -147,3 +147,20 @@
     background: $secondary-color;
     color: white;
 }
+
+.table {
+    td div {
+        &::-webkit-scrollbar {
+            width: 15px;
+        }
+        &::-webkit-scrollbar-track {
+            background: $primary-color;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: $tertiary-color;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+            background: darken($tertiary-color, 5%);
+        }
+    }
+}

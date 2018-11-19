@@ -1,0 +1,10 @@
+<div class="text-right mt-3">
+  <button class="btn btn-light btn-rounded" {{action deleteActiveLearning}}>
+    Cancel
+  </button>
+  <button class="btn btn-primary btn-rounded" disabled={{isDisabled}}
+    {{action 'saveActiveLearning'}}
+  >
+    Finish
+  </button>
+</div>

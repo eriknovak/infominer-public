@@ -81,6 +81,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // get method information
         let { method } = req.body;
 
+        console.log(method);
+
         // change the method type
         method.type = method.methodType;
         delete method.methodType;
@@ -330,5 +332,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         });
     }); // DELETE /api/datasets/:dataset_id/methods/:method_id
 
+    require('./methods/v1.activeleaning') (app, pg, processHandler, sendToProcess, logger);
 
 };

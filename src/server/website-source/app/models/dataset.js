@@ -13,7 +13,7 @@ export default DS.Model.extend({
     hasMethods: DS.hasMany('method', { inverse: null }),
 
     fields: DS.attr(),
-
+    selectedFields: DS.attr(),
     ready: computed('status', function () {
         return this.get('status') === 'finished';
     })

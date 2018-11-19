@@ -12,7 +12,9 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        this.set('visualizationType', this.get('method.parameters.method.type').replace(/-/g, ' '));
+        const visualizationType = this.get('method.parameters.method.type') === 'radial-tree' ?
+            'topic ontology' : '';
+        this.set('visualizationType', visualizationType);
     },
 
     actions: {

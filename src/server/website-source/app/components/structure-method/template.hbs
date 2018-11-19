@@ -14,7 +14,12 @@
   <!-- method type/label -->
   {{ method.label }}
   {{#if selectedFields}}
-    <small>k={{method.parameters.method.k}} ({{ selectedFields }})</small>
+    <small>
+      {{#if clustering-k}}
+        k={{clustering-k}}
+      {{/if}}
+      {{initialQuery}}
+      ({{ selectedFields }})</small>
   {{/if}}
   <small class="ml-1 delete" id="delete-method-{{method.id}}"
     data-toggle="modal"

@@ -16,7 +16,7 @@ const WordCloudComponent = GraphComponent.extend({
     classNames: ['wordcloud'],
 
     // wordcloud font size
-    maxFontSize: 36,
+    maxFontSize: 30,
     minFontSize: 10,
 
     ///////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ const WordCloudComponent = GraphComponent.extend({
         // get keywords data
         let data = keywords.map(function(d) {
             return {
-                text: d.keyword.toUpperCase(),
+                text: d.keyword ? d.keyword.toUpperCase() : '',
                 size: minWeight === maxWeight ?
                     maxFontSize : fontScale(d.weight),
                 colorClass: minWeight === maxWeight ?

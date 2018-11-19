@@ -1,24 +1,35 @@
 import Service from '@ember/service';
-import { set } from '@ember/object';
+import { observer, get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 
 export default Service.extend({
     store: service('store'),
 
+    dataset: null,
     fields: null,
 
     init() {
         this._super(...arguments);
-        let fields = this.get('store').peekAll('dataset')
-            .objectAt(0).get('fields');
+        let dataset = this.get('store').peekAll('dataset')
+            .objectAt(0);
 
+        let fields = dataset.get('fields');
         fields.forEach(field => {
             set(field, 'showInTable', field.show);
             set(field, 'showInVisual', field.show);
         });
 
+        this.set('dataset', dataset);
         this.set('fields', fields);
     },
+
+    fieldObserver: observer('fields.@each.showInVisual', function () {
+        let selectedFields = this.get('fields').filter(field => get(field, 'showInVisual'))
+            .map(field => field.name);
+
+        this.set('dataset.selectedFields', selectedFields);
+        this.get('dataset').save();
+    }),
 
     isShownInTable(fieldId) {
         for (let field of this.get('fields')) {
@@ -44,6 +55,8 @@ export default Service.extend({
         for (let field of this.get('fields')) {
             if (field.id === fieldId) { set(field, 'showInVisual', isShown); break; }
         }
+
+
     }
 
 });

@@ -495,43 +495,44 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         const owner = req.user ? req.user.id : 'development';
 
         // get dataset information
-        // TODO: check schema structure
-        let dataset = req.body.dataset;
+        let { label, description, selectedFields } = req.body.dataset;
 
-        let label = dataset.label;
-        let description = dataset.description;
-
-        // update the postgres dataset
-        pg.update({ label, description }, { id: datasetId }, 'infominer_datasets', function (error) {
-            if (error) {
-                // log error on deleting temporary file from postgres
-                logger.error('error [postgres.update]: user request to modify dataset failed',
-                    logger.formatRequest(req, { error: error.message })
-                );
-                // send error object to user
-                return res.status(500).json({ errors: { msg: error.message } });
-            }
-
-            // make update on the process
-            let body = { cmd: 'edit_dataset', content: { label, description } };
-            sendToProcess(datasetId, owner, body, function (xerror, results) {
-                if (xerror) {
-                    // log error when inserting dataset info
-                    logger.error('error [node_process]: user request to modify dataset failed',
-                        logger.formatRequest(req, { error: xerror.message })
+        pg.select({ id: datasetId, owner }, 'infominer_datasets', (error, results) => {
+            // get all parameters so that we avoid overriding
+            let parameters = results[0].parameters;
+            parameters.selectedFields = selectedFields;
+            // update the postgres dataset
+            pg.update({ label, description, parameters }, { id: datasetId }, 'infominer_datasets', function (error) {
+                if (error) {
+                    // log error on deleting temporary file from postgres
+                    logger.error('error [postgres.update]: user request to modify dataset failed',
+                        logger.formatRequest(req, { error: error.message })
                     );
                     // send error object to user
                     return res.status(500).json({ errors: { msg: error.message } });
                 }
-                // log request success
-                logger.info('user request to modify dataset successful',
-                    logger.formatRequest(req)
-                );
-                // send results
-                return res.json(results);
-            }); // sendToProcess
-        }); // pg.update({ label, description }, 'infominer_datasets')
 
+                // make update on the process
+                let body = { cmd: 'edit_dataset', content: { label, description, selectedFields } };
+                sendToProcess(datasetId, owner, body, function (xerror, results) {
+                    if (xerror) {
+                        // log error when inserting dataset info
+                        logger.error('error [node_process]: user request to modify dataset failed',
+                            logger.formatRequest(req, { error: xerror.message })
+                        );
+                        // send error object to user
+                        return res.status(500).json({ errors: { msg: error.message } });
+                    }
+                    // log request success
+                    logger.info('user request to modify dataset successful',
+                        logger.formatRequest(req)
+                    );
+                    // send results
+                    return res.json(results);
+                }); // sendToProcess
+            }); // pg.update({ label, description, parameters }, 'infominer_datasets')
+
+        });
     }); // PUT /api/datasets/:dataset_id
 
     /**

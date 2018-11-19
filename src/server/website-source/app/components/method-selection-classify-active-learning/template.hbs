@@ -25,4 +25,18 @@
 
 </div><!-- .row -->
 
+<div class="row">
+  <div class="col">
+    <label class="method-selection-label parameter">
+      Select fields used for clustering
+    </label>
+    {{
+      method-selection-fields
+      parameters=parameters
+      dataset=dataset
+      type=type
+    }}
+  </div>
+</div>
+
 {{yield}}

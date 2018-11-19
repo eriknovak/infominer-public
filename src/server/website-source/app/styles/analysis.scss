@@ -98,11 +98,6 @@
         background-color: white;
         @include analysis-border;
         border-top: none;
-
-        .aggregate-title {
-            margin: 10px 0px 4px;
-            text-transform: capitalize;
-        }
     }
 
     .parameter-label { font-weight: 500; }
@@ -118,7 +113,7 @@
             margin: 15px auto;
             .cluster-header {
                 color: $secondary-color;
-                margin-bottom: 0px;
+                margin-bottom: 1px;
                 @include collapse-toggle($secondary-color, 19px);
                 .edit-cluster-label {
                     display: none;
@@ -137,6 +132,13 @@
             }
         }
     }
+}
+
+.aggregate-title {
+    color: $tertiary-color;
+    margin: 10px 0px 4px;
+    text-transform: capitalize;
+    font-weight: 400;
 }
 
 .user-input-label {
