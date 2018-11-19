@@ -45,7 +45,8 @@ const RadialTreeComponent = GraphComponent.extend({
         let methods = subset.get('usedBy').filter(method => {
             if (!method.get('methodType')) { return false; }
             return method.get('methodType').includes('clustering') ||
-                   method.get('methodType').includes('filter');
+                   method.get('methodType').includes('filter') ||
+                   method.get('methodType').includes('classify');
         });
 
         // get number of sibling methods of parent
@@ -123,6 +124,28 @@ const RadialTreeComponent = GraphComponent.extend({
                 let subset = method.get('produced').objectAt(i);
                 this._addSubsetToHierarchy(subset, hierarchy);
             }
+        } else if (method.get('methodType').includes('classify')) {
+            // method does not have any results at the moment
+            if (!method.get('result')) { return; }
+            // method is a clustering method - get all results
+            const types = Object.keys(method.get('result'));
+            for (let type of types) {
+
+                let modelClass = method.get(`result.${type}`);
+                if (modelClass.subset.created) {
+                    let subset = this.get('store').peekRecord('subset', modelClass.subset.id);
+                    this._addSubsetToHierarchy(subset, hierarchy);
+                } else {
+                    let numberOfDocuments = modelClass.docIds.length;
+                    // if (!singleMethod) {
+                        hierarchy.push({ label: modelClass.label, type: 'subset',
+                            numberOfDocuments, id: `${id}-${i}`, parentId: id });
+                    // } else {
+                    //     hierarchy.push({ label: cluster.label, type: 'subset',
+                    //         numberOfDocuments, id: `${id}-${i}`, parentId: parentId });
+                    // }
+                }
+            }
         }
     },
 
@@ -144,7 +167,8 @@ const RadialTreeComponent = GraphComponent.extend({
         // filter out appropriate methods
         let methods = this.get('usedBy').filter(method => {
             return method.get('methodType').includes('clustering') ||
-                   method.get('methodType').includes('filter');
+                   method.get('methodType').includes('filter') ||
+                   method.get('methodType').includes('classify');
         });
 
         // iterate through all methods - add them and their children to the tree
@@ -265,7 +289,7 @@ const RadialTreeComponent = GraphComponent.extend({
             });
 
 
-            
+
         function relax() {
             let again = false;
             let spacev = 28;
