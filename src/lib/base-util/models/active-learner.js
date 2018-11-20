@@ -44,12 +44,9 @@ class ActiveLearner extends AbstractModel {
         if (currentDoc) {
             // get the document id and label
             let docIds = self.documents.map(rec => rec.$id);
-            console.log('number of documents', self.documents.length);
             const { document, label } = currentDoc;
-            console.log(document.id, docIds.includes(document.id), label);
             // get the position of the document with id = documentId
             for (let documentIdx = 0; documentIdx < self.documents.length; documentIdx++) {
-                console.log(self.documents[documentIdx].$id, document.id);
                 if (self.documents[documentIdx].$id === document.id) {
                     // update element label of the found document
                     self.activeLearner.setLabel(documentIdx, label);
@@ -160,13 +157,8 @@ class ActiveLearner extends AbstractModel {
         self.featureSpace = new qm.FeatureSpace(self.base, self.features);
         // update the feature space using the subset elements
         self.documents = self.subset.hasElements;
-
-        console.log('documents in feature Space', self.documents.length);
         self.featureSpace.updateRecords(self.documents);
-
         self.featureMatrix = self.featureSpace.extractSparseMatrix(self.documents);
-        console.log('number of columns in feature matrix', self.featureMatrix.cols);
-
     }
 
 
@@ -228,7 +220,6 @@ class ActiveLearner extends AbstractModel {
                 _offset += MAX_COUNT;
                 // format and return the documents
                 documents = qDocuments.map(document => self._formatter.document(document));
-                console.log(documents.map(doc => doc.id));
             }
 
             _iterationCount++;
