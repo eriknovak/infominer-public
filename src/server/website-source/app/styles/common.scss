@@ -75,10 +75,12 @@ a {
         font-weight: 400;
     }
     .nav-item {
+        .nav-link { padding: 15.5px; }
         a {
             @include navbar-link;
             &.active { background-color: lighten($secondary-color, 10%); }
         }
+
         &.user-info {
             &.show > a { background-color: lighten($secondary-color, 10%); }
             & > a {

@@ -26,7 +26,6 @@
 }
 
 .dropdown-toggle {
-    background-color: $quaternary-color !important;
     &:focus { background-color: darken($quaternary-color, 20%) !important; }
     &:focus { box-shadow: none !important; }
 }
