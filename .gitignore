@@ -69,11 +69,6 @@ typings/
 /src/config/pgconfig.js
 
 # ####################
-# website ignores
-
-/src/server/public
-
-# ####################
 # ember ignore files
 
 # compiled output
