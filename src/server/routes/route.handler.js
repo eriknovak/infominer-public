@@ -52,7 +52,6 @@ module.exports = function (app, pg, processHandler, logger) {
             }
             let datasetInfo = results[0];
             // initiate child process
-            console.log(datasetInfo.parameters);
             processHandler.createChild(childId);
             // open dataset in child process
             let openParams = {
@@ -65,7 +64,7 @@ module.exports = function (app, pg, processHandler, logger) {
                         created: datasetInfo.created,
                         mode: 'open',
                         dbPath: datasetInfo.dbpath,
-                        selectedFields: datasetInfo.parameters.selectedFields
+                        fields: datasetInfo.parameters.fields
                     }
                 }
             };

@@ -81,8 +81,6 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         // get method information
         let { method } = req.body;
 
-        console.log(method);
-
         // change the method type
         method.type = method.methodType;
         delete method.methodType;

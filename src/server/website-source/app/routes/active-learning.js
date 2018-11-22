@@ -67,6 +67,7 @@ export default Route.extend({
                 methodType: activeLearning.get('methodType'),
                 parameters: {
                     hash: activeLearning.get('id'),
+                    initQuery: activeLearning.get('parameters.initQuery'),
                     fields: activeLearning.get('parameters.fields')
                 },
                 appliedOn: subset

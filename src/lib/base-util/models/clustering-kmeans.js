@@ -132,7 +132,8 @@ class ClusteringKMeans extends AbstractModel {
                     aggregates: [],
                     subset: {
                         created: false,
-                        id: null
+                        id: null,
+                        deleted: false
                     }
                 }))
         };

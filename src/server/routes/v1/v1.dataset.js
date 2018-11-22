@@ -495,14 +495,27 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         const owner = req.user ? req.user.id : 'development';
 
         // get dataset information
-        let { label, description, selectedFields } = req.body.dataset;
+        let { label, description, fields } = req.body.dataset;
 
         pg.select({ id: datasetId, owner }, 'infominer_datasets', (error, results) => {
             // get all parameters so that we avoid overriding
-            let parameters = results[0].parameters;
-            parameters.selectedFields = selectedFields;
+            let dataset = results[0];
+
+            if (label) dataset.label = label;
+            if (description) dataset.description = description;
+
+            if (fields) {
+                let fieldParameters = { };
+                fields.forEach(field => {
+                    fieldParameters[field.name] = { };
+                    fieldParameters[field.name].showInVisual = field.showInVisual;
+                    fieldParameters[field.name].showInTable = field.showInTable;
+                });
+                dataset.parameters.fields = fieldParameters;
+            }
+
             // update the postgres dataset
-            pg.update({ label, description, parameters }, { id: datasetId }, 'infominer_datasets', function (error) {
+            pg.update(dataset, { id: datasetId, owner }, 'infominer_datasets', function (error) {
                 if (error) {
                     // log error on deleting temporary file from postgres
                     logger.error('error [postgres.update]: user request to modify dataset failed',
@@ -513,7 +526,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 }
 
                 // make update on the process
-                let body = { cmd: 'edit_dataset', content: { label, description, selectedFields } };
+                let body = { cmd: 'edit_dataset', content: { label, description, fields } };
                 sendToProcess(datasetId, owner, body, function (xerror, results) {
                     if (xerror) {
                         // log error when inserting dataset info

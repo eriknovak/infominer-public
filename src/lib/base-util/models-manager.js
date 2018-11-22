@@ -151,6 +151,10 @@ class ModelsManager {
                 for (let clusterId = 0; clusterId < result.clusters.length; clusterId++) {
                     result.clusters[clusterId].label = methodInfo.result.clusters[clusterId].label;
                 }
+            } else if (method.type === 'classify.active-learning') {
+                for (let type of Object.keys(methodInfo.result)) {
+                    result[type].label = methodInfo.result[type].label;
+                }
             }
             method.result = result;
         }
@@ -275,7 +279,6 @@ class ModelsManager {
                         // get the aggregates keyword distribution
                         label = aggregate.distribution.keywords.slice(0, 3)
                             .map(keyword => keyword.keyword).join(', ');
-
                         break;
                     }
                 }

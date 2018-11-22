@@ -10,24 +10,14 @@ export default Service.extend({
 
     init() {
         this._super(...arguments);
-        let dataset = this.get('store').peekAll('dataset')
-            .objectAt(0);
-
+        let dataset = this.get('store').peekAll('dataset').objectAt(0);
         let fields = dataset.get('fields');
-        fields.forEach(field => {
-            set(field, 'showInTable', field.show);
-            set(field, 'showInVisual', field.show);
-        });
-
         this.set('dataset', dataset);
         this.set('fields', fields);
     },
 
-    fieldObserver: observer('fields.@each.showInVisual', function () {
-        let selectedFields = this.get('fields').filter(field => get(field, 'showInVisual'))
-            .map(field => field.name);
-
-        this.set('dataset.selectedFields', selectedFields);
+    fieldObserver: observer('fields.@each.{showInVisual,showInTable}', function () {
+        this.set('dataset.fields', this.get('fields'));
         this.get('dataset').save();
     }),
 
@@ -55,8 +45,6 @@ export default Service.extend({
         for (let field of this.get('fields')) {
             if (field.id === fieldId) { set(field, 'showInVisual', isShown); break; }
         }
-
-
-    }
+    },
 
 });

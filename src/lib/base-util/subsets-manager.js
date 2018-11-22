@@ -51,7 +51,8 @@ class SubsetsManager {
                     clusters[clusterId].label = subset.label;
                     clusters[clusterId].subset = {
                         created: true,
-                        id: subsetId
+                        id: subsetId,
+                        deleted: false
                     };
                     method.result = { clusters };
                 }
@@ -62,11 +63,12 @@ class SubsetsManager {
                     let type = subset.meta.type;
                     let result = method.result;
                     subset.documents = result[type].docIds;
-                    //
+                    // update the subset parameters and labels
                     result[type].label = subset.label;
                     result[type].subset = {
                         created: true,
-                        id: subsetId
+                        id: subsetId,
+                        deleted: false
                     };
                     method.result = result;
                 }
@@ -191,7 +193,7 @@ class SubsetsManager {
                         for (let clusterId = 0; clusterId < clusters.length; clusterId++) {
                             let cluster = clusters[clusterId];
                             if (cluster.subset.id === id) {
-                                clusters.splice(clusterId, 1);
+                                cluster.subset.deleted = true;
                                 break;
                             }
                         }
@@ -199,6 +201,14 @@ class SubsetsManager {
                         if (!clusters.length) { parentMethod.deleted = true; }
                     } else if (parentMethod.type === 'filter.manual') {
                         parentMethod.deleted = true;
+                    } else if (parentMethod.type === 'classify.active-learning') {
+                        let result = parentMethod.result;
+                        for (let type of Object.keys(result)) {
+                            if (result[type].subset.id === id) {
+                                result[type].subset.deleted = true;
+                            }
+                        }
+                        parentMethod.result = result;
                     }
                     parentMethod.$delJoin('produced', subsets[id]);
                 }

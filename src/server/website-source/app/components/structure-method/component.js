@@ -38,13 +38,21 @@ export default Component.extend({
         const method = this.get('method');
         if (method.hasMany('produced').ids().length > 0) { this.set('parent', true); }
 
+        let selectedFields, initialQuery, clusteringK;
+
         // get the fields used for feature space creation
         if (method.get('parameters.fields')) {
-            let selectedFields = method.get('parameters.fields').join(', ');
-            this.set('selectedFields', selectedFields);
-            this.set('initialQuery', method.get('parameters.initQuery'));
-            this.set('clustering-k', method.get('parameters.method.k'));
+            selectedFields = method.get('parameters.fields').join(', ');
+            clusteringK = method.get('parameters.method.k');
+            initialQuery = method.get('parameters.initQuery');
+        } else if (method.get('methodType') === 'filter.manual') {
+            selectedFields = method.get('parameters.query.text.fields').join(', ');
+            initialQuery = method.get('parameters.query.text.keywords');
         }
+        // set the parameters
+        this.set('selectedFields', selectedFields);
+        this.set('initialQuery', initialQuery);
+        this.set('clustering-k', clusteringK);
     },
 
     didInsertElement() {

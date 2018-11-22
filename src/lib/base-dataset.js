@@ -227,10 +227,18 @@ class BaseDataset {
         let dataset = this.base.store('Dataset').allRecords;
         // set aggregate types for each field
         fields.forEach(field => {
+            let defaultShowOption = field.id < 4;
+
             // for showing fields in tables
-            field.show = this.params.selectedFields ?
-                this.params.selectedFields.includes(field.name) :
-                field.id < 4;
+            field.showInTable = this.params.fields ?
+                this.params.fields[field.name].showInTable :
+                defaultShowOption;
+
+            // for showing fields in tables
+            field.showInVisual = this.params.fields ?
+                this.params.fields[field.name].showInVisual :
+                defaultShowOption;
+
             if (field.type === 'float') {
                 // aggregate field of type float with histogram
                 field.aggregate = 'histogram';
@@ -253,9 +261,15 @@ class BaseDataset {
                 field.aggregate = 'timeline';
             }
         });
-        if (!this.params.selectedFields) {
-            this.params.selectedFields = fields.filter(field => field.show)
-                .map(field => field.name);
+        if (!this.params.fields) {
+            // store the showing values of the fields
+            this.params.fields = { };
+            fields.forEach(field => {
+                this.params.fields[field.name] = {
+                    showInTable:  field.showInTable,
+                    showInVisual: field.showInVisual
+                };
+            });
         }
         // return the fields with aggregates
         return fields;
@@ -314,11 +328,11 @@ class BaseDataset {
      * Set the dataset info.
      * @returns {Object} The dataset data info.
      */
-    editDataset(dataset) {
+    editDataset({ label, description, fields }) {
         let self = this;
 
         // validate input parameter schema
-        if (!self._validator.validateSchema(dataset, self._validator.schemas.editDatasetSchema)) {
+        if (!self._validator.validateSchema({ label, description, fields }, self._validator.schemas.editDatasetSchema)) {
             // input parameter is not in correct format - return Error
             return {
                 error: {
@@ -328,21 +342,17 @@ class BaseDataset {
         }
 
         // update dataset label
-        if (typeof dataset.label === 'string') {
-            self.params.label = dataset.label;
+        if (typeof label === 'string') {
+            self.params.label = label;
         }
         // update dataset description
-        if (typeof dataset.description === 'string') {
-            self.params.description = dataset.description;
+        if (typeof description === 'string') {
+            self.params.description = description;
         }
 
-        console.log(dataset);
-        if (dataset.selectedFields) {
-            self.params.selectedFields = dataset.selectedFields;
-
+        if (fields) {
+            self.fields = fields;
         }
-
-        console.log(self.params.selectedFields);
 
         // return the new dataset info
         return { datasets: self._formatDataset() };
@@ -362,8 +372,6 @@ class BaseDataset {
         let subsetIds = subsets.map(rec => rec.id);
         let methodIds = methods.map(rec => rec.id);
 
-        console.log(self.params.selectedFields);
-
         return {
             id: self.params.datasetId,
             label: self.params.label,
@@ -374,8 +382,7 @@ class BaseDataset {
             numberOfMethods: self.base.store('Methods').length,
             hasSubsets: subsetIds,
             hasMethods: methodIds,
-            fields: self.fields,
-            selectedFields: self.params.selectedFields
+            fields: self.fields
         };
     }
 

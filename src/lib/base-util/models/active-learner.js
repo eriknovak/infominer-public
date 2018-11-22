@@ -314,21 +314,19 @@ class ActiveLearner extends AbstractModel {
             }
         }
         // get positive and negative documents respectively
-        let positive = self.base.store('Dataset').newRecordSet(positiveIds);
-        let negative = self.base.store('Dataset').newRecordSet(negativeIds);
+        self.positive = self.base.store('Dataset').newRecordSet(positiveIds);
+        self.negative = self.base.store('Dataset').newRecordSet(negativeIds);
 
         // calculate the aggregates for the record set
-        let positiveKeywords = self._getKeywordDistribution(positive);
-        let negativeKeywords = self._getKeywordDistribution(negative);
+        let positiveKeywords = self._getKeywordDistribution(self.positive);
+        let negativeKeywords = self._getKeywordDistribution(self.negative);
 
         // return the document subsets
         return {
             positive: {
-                docIds: positive.map(rec => rec.$id),
                 keywords: positiveKeywords
             },
             negative: {
-                docIds: negative.map(rec => rec.$id),
                 keywords: negativeKeywords
             }
         };
@@ -381,8 +379,6 @@ class ActiveLearner extends AbstractModel {
         let self = this;
 
         // get the positive and negative documents
-        const { positive, negative } = self._getSubsetKeywordClouds();
-
         const { parameters } = self.params;
 
         // construct the parameter for method creation
@@ -390,8 +386,8 @@ class ActiveLearner extends AbstractModel {
             type: self.params.type,
             parameters,
             result: {
-                positive: { docIds: positive.docIds },
-                negative: { docIds: negative.docIds }
+                positive: { docIds: self.positive.map(rec => rec.$id) },
+                negative: { docIds: self.negative.map(rec => rec.$id) }
             }
         };
         // create the method
