@@ -1,18 +1,14 @@
 html {
     position: relative;
     min-height: 100%;
-}
-
-// common styles for all views
-html, body {
     font-family: $font-primary;
-    font-weight: 300;
     font-size: 13px;
     color: $font-color-dark;
 }
 
 body {
-    padding-top: 52px;
+    font-weight: 300;
+    padding-top: 60px;
     & > .ember-view {
         main {
             padding-bottom: 120px;
@@ -279,7 +275,6 @@ p.message {
 
     bottom: 0;
     width: 100%;
-    margin-bottom: 10px;
 
     background-color: transparent;
     color: $font-color-dark;
@@ -291,22 +286,19 @@ p.message {
  * Helper classes
  *************************************/
 
-.uppercase { text-transform: uppercase; }
 
 .warning { color: red; }
 
 .center { text-align: center; }
 
-.medium-size { font-size: 16px; }
 
-.highlight-text-only { font-weight: 500; }
-
-.bottom-space { margin-bottom: 10px; }
 
 .highlight {
-    background-color: darken($primary-color, 2%);
     font-weight: 500;
     padding: 0px 2px;
+    background-color: darken($primary-color, 2%);
+
+    &-text-only { font-weight: 500; }
 }
 
 #go-to-top {

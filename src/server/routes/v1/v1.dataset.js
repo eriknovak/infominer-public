@@ -534,7 +534,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                             logger.formatRequest(req, { error: xerror.message })
                         );
                         // send error object to user
-                        return res.status(500).json({ errors: { msg: error.message } });
+                        return res.status(500).json({ errors: { msg: xerror.message } });
                     }
                     // log request success
                     logger.info('user request to modify dataset successful',

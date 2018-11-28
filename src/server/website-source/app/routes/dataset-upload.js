@@ -18,6 +18,7 @@ const DatasetUploadRoute = ENV.environment === 'development' ?
 
 export default DatasetUploadRoute.extend({
     uploader: service('file-queue'),
+    datasetPending: false,
 
     model() {
         // the initial model is null
@@ -51,9 +52,10 @@ export default DatasetUploadRoute.extend({
                     });
                     return this._removeDataset();
                 }
-                // set all fields to valid - modify values in child components
+                // add a default value for fields
                 model.fieldList.forEach(field => { field.invalid = false; });
                 this.set('controller.model', model);
+                this.set('datasetPending', true);
             });
         },
 
@@ -67,15 +69,16 @@ export default DatasetUploadRoute.extend({
 
         /**
          * Pushes metadata and file blob to server.
-         * @param {Object} file - File blob.
          */
         submitDataset() {
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
 
-            if (fieldList.filter(field => field.included)
-                .map(field => field.invalid.length > 0).includes(true)) {
-                $('#submittion-error').addClass('show');
+            const fieldIsInvalid = fieldList.filter(field => field.included)
+                    .map(field => field.invalid.length > 0).includes(true);
+
+            if (fieldIsInvalid) {
+                $('.dataset-upload-info-container__actions--warning').addClass('show');
                 return;
             }
 
@@ -88,13 +91,20 @@ export default DatasetUploadRoute.extend({
                     fields: JSON.stringify(fieldList)
                 }
             }).then(() => {
-                run(() => { this.transitionTo('datasets'); });
+                run(() => {
+                    this.set('datasetPending', false);
+                    this.transitionTo('datasets');
+                });
             });
+
         },
 
-        willTransition(transition) {
+        willTransition() {
             // cancel task if still existant
             if (this.task) { this.task.cancel(); }
+            if (this.get('datasetPending')) {
+                this._removeDataset();
+            }
             return true;
         }
     },
@@ -122,7 +132,7 @@ export default DatasetUploadRoute.extend({
             queue.get('files').forEach((file) => file.set('queue', null));
             queue.set('files', A());
         }
-
+        this.set('datasetPending', false);
     }
 
 });

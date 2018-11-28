@@ -16,7 +16,11 @@
         overflow-y: auto;
     }
 }
-.description-header { margin-top: 15px; }
+.title {
+    margin-top: 15px;
+
+
+}
 
 .dataset-content {
     .container-fluid {
@@ -88,7 +92,10 @@
 }
 
 .new-subset {
-    label { @include label; }
+    label {
+        margin: 0;
+        font-weight: 300;
+     }
     .new-subset-information { margin-bottom: 10px; }
     .warning-content { margin-bottom: 5px; }
 }

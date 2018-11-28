@@ -18,8 +18,8 @@ export default LoginRoute.extend({
         this._super(...arguments);
         // set login authentication urls
         return {
-            googleAuth: `${this.get('hostnameURL')}/auth/google`,
-            twitterAuth: `${this.get('hostnameURL')}/auth/twitter`
+            'google-authentication': `${this.get('hostnameURL')}/auth/google`,
+            'twitter-authentication': `${this.get('hostnameURL')}/auth/twitter`
         };
     }
 

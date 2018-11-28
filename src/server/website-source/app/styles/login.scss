@@ -1,52 +1,53 @@
 .login-options {
-    margin: 50px 20px 0;
+
+    margin-top: 50px;
+    min-width: 270px;
     text-align: center;
     padding: 50px 0 250px;
     border: 1px solid darken($primary-color, 20%);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 4px 8px 0 rgba(0, 0, 0, 0.19);
-    .login-header { margin-bottom: 40px; }
-    a {
+
+    &__header { margin-bottom: 40px; }
+
+    @mixin login-button($color) {
         height: 42px;
         font-family: 'Roboto';
         font-size: 14px;
         font-weight: 500;
-        width: 240px;
         display: inline-block;
-
-        @mixin login-button($color) {
-            border: 1px solid $color;
-            background-color: $color;
-            -webkit-transition: background .4s;
-            transition: background .4s;
+        border: 1px solid $color;
+        background-color: $color;
+        -webkit-transition: background .4s;
+        transition: background .4s;
+        color: white;
+        padding: 0 50px 0 0;
+        &:hover,
+        &:focus,
+        &:active {
             color: white;
-            padding: 0 50px 0 0;
-            &:hover,
-            &:focus,
-            &:active {
-                color: white;
-                background-color: darken($color, 15%);
-            }
+            background-color: darken($color, 15%);
         }
+    }
 
 
-        &.google-login {
-            @include login-button($tertiary-color);
-            img {
-                padding: 10px;
-                margin-right: 25px;
-                background-color: white;
-            }
+
+    &--google {
+        @include login-button($tertiary-color);
+        img {
+            padding: 10px;
+            margin-right: 25px;
+            background-color: white;
         }
-        &.twitter-login {
-            margin-top: 20px;
-            @include login-button($quaternary-color);
-            .fa-twitter {
-                padding: 10px;
-                font-size: 20px;
-                margin-right: 25px;
-                width: 40px;
-                text-align: center;
-            }
+    }
+    &--twitter {
+        margin-top: 20px;
+        @include login-button($quaternary-color);
+        .fa-twitter {
+            padding: 10px;
+            font-size: 20px;
+            margin-right: 25px;
+            width: 40px;
+            text-align: center;
         }
     }
 }

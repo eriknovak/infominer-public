@@ -58,7 +58,7 @@ export default Route.extend({
         /**
          * Moves the window to the top of the page, smoothly.
          */
-        backToTop() {
+        goToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }

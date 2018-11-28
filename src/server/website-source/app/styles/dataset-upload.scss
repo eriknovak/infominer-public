@@ -1,30 +1,23 @@
-#database-container a:hover { background-color: $quaternary-color; }
-
 @mixin dataset-square {
-    margin-bottom: 10px;
     padding: 10px;
-    text-align: center;
+    margin-bottom: 10px;
     width: 100%;
+
+    text-align: center;
     font-size: 16px;
+
+    border-radius: 0.25rem;
     -webkit-transition: .4s;
     transition: .4s;
 }
 
-.dataset {
-    @include dataset-square;
-    color: white;
-    background-color: $quaternary-color;
-    &:hover { background-color: darken($quaternary-color, 10%); }
-    .fa {
-        margin: 20px;
-        font-size: 40px;
-    }
-    &.loading {
-        background-color: lighten($quaternary-color, 10%);
-        &:hover { background-color: lighten($quaternary-color, 10%); }
 
-    }
-    &.add-new {
+// dataset selection menu elements
+.dataset-container {
+
+    @include dataset-square;
+    // container for creating new datasets
+    &--create {
         border: 2px dashed $tertiary-color;
         padding: 8px;
         height: 166px;
@@ -35,67 +28,110 @@
             background-color: lighten($quaternary-color, 20%);
         }
     }
+    // container of created datasets
+    &--created {
+        color: white;
+        background-color: $quaternary-color;
+        &:hover {
+            background-color: darken($quaternary-color, 10%);
+        }
+    }
+    // container of still loading datasets
+    &--loading {
+        color: white;
+        background-color: lighten($quaternary-color, 10%);
+        &:hover {
+            background-color: lighten($quaternary-color, 10%);
+        }
+    }
+    // common variables and components
+    .dataset-container__icon {
+        margin: 20px;
+        font-size: 40px;
+    }
 
-    .dataset-label {
+    .dataset-container__label {
         font-weight: 400;
         text-transform: uppercase;
         margin-bottom: 4px;
     }
 }
 
-.dataset-upload {
+// dataset upload menu
 
-    .dropzone {
-        @include dataset-square;
-        padding: 50px 20px;
-        border: 2px dashed $tertiary-color;
-        label { margin-bottom: 0; }
-        #upload-dataset { font-weight: 400; }
+.file-dropzone-container {
+    @include dataset-square;
+    padding: 50px 20px;
+    border: 2px dashed $tertiary-color;
+    label { margin-bottom: 0; }
+    #upload-dataset { font-weight: 400; }
 
-        .progress {
-            width: 100%;
-            height: 24px;
-            border-radius: 0px;
-            margin: auto;
-            font-size: 10px;
-            .progress-bar { border-radius: 0px; }
-        }
+    .progress {
+        width: 100%;
+        height: 24px;
+        border-radius: 0px;
+        margin: auto;
+        font-size: 10px;
+    }
+}
+
+.dataset-upload-info-container {
+
+    &__params {
+        margin: 0;
+        font-weight: 300;
     }
 
-    .dataset-field-list {
+    &__table {
 
-        label { @include label; }
+        .table-field {
+            background-color: white !important;
+        }
 
-        .document-table {
-            .table td { vertical-align: top; }
-            .field.type select {
+        .table-field__name {
+            &--warning {
+                color: red;
+                height: 1px;
+            }
+        }
+
+        .table-field__type {
+            text-align: center;
+
+            .table-field__type--select {
                 margin: auto;
                 cursor: pointer;
             }
             @media (min-width: 880px) {
-                .field.type select { width: 40%; }
+                .table-field__type--select { width: 40%; }
             }
-            .table tr {
-                &:hover { background-color: transparent !important; }
-                &.disabled {
-                    select, input {
-                        border-color: $primary-color;
-                        color: $primary-color;
-                        background-color: transparent;
-                        cursor: not-allowed;
-                    }
-                }
-            }
+        }
 
-            .checkbox label { margin-top: 5px !important; }
+        .table-field__included {
+            text-align: center;
+        }
+
+        tr.disabled {
+            select, input {
+                border-color: $primary-color;
+                color: $primary-color;
+                background-color: transparent;
+                cursor: not-allowed;
+            }
         }
     }
 
-    #submittion-error {
-        color: red;
-        padding: 4.875px 0px;
-        visibility: hidden;
-        &.show { visibility: visible; }
+    &__actions {
+        text-align: right;
+        margin-top: 10px;
+        button { margin-left: 5px; }
+
+        &--warning {
+            color: red;
+            padding: 4.875px 0px;
+            visibility: hidden;
+            &.show { visibility: visible; }
+        }
     }
 
 }

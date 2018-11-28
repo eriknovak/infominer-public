@@ -17,6 +17,7 @@ export default DatasetsRoute.extend({
 
     model() {
         return this.get('store').findAll('dataset', { reload: true })
+            .then(datasets => datasets.filter(dataset => dataset.get('status') !== 'in_queue'))
             .then(datasets => datasets.sortBy('created'))
             .then(datasets => {
                 // add date to dataset
@@ -32,50 +33,49 @@ export default DatasetsRoute.extend({
                                 .then(response => {
                                     // if data status changes
                                     if (response.status === 'finished') {
-                                        // clear the interval
-                                        clearInterval(interval);
-                                        this.get('notify').info({
-                                            html: `<div class="notification">
-                                                    Dataset <span class="label">
-                                                        ${dataset.get('label')}
-                                                    </span> successfully uploaded!
-                                                </div>`
-                                        });
-
-                                        // set dataset loaded property
-                                        dataset.set('status', response.status);
+                                       this._ableToLoadDataset(dataset, interval, response);
                                     } else if (response.errors) {
-                                        // clear the interval
-                                        clearInterval(interval);
-
-                                        this.get('notify').alert({
-                                            html: `<div class="notification">
-                                                    Dataset <span class="label">
-                                                        ${dataset.get('label')}
-                                                    </span> was unable to load!
-                                                </div>`
-                                        });
-                                        // destroy the dataset
-                                        dataset.destroyRecord();
+                                        this._unableToLoadDataset(dataset, inverval);
                                     }
                                 }).catch(error => {
-                                    // clear the interval
-                                    clearInterval(interval);
-                                    this.get('notify').alert({
-                                        html: `<div class="notification">
-                                                Dataset <span class="label">
-                                                    ${dataset.get('label')}
-                                                </span> was unable to load!
-                                            </div>`
-                                    });
-                                    // destroy the dataset
-                                    dataset.destroyRecord();
+                                    this._unableToLoadDataset(dataset, inverval);
                                 });
                         }, 5000);
                     }
                 }
                 return datasets;
             });
+    },
+
+
+    _ableToLoadDataset(dataset, interval, response) {
+         // clear the interval
+         clearInterval(interval);
+         this.get('notify').info({
+             html: `<div class="notification">
+                     Dataset <span class="label">
+                         ${dataset.get('label')}
+                     </span> successfully uploaded!
+                 </div>`
+         });
+         // set dataset loaded property
+         dataset.set('status', response.status);
+    },
+
+
+    _unableToLoadDataset(dataset, interval) {
+        // clear the interval
+        clearInterval(interval);
+        this.get('notify').alert({
+            html: `<div class="notification">
+                    Dataset <span class="label">
+                        ${dataset.get('label')}
+                    </span> was unable to load!
+                </div>`
+        });
+        // destroy the dataset
+        dataset.destroyRecord();
     }
+
 
 });
