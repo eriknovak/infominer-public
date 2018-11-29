@@ -40,8 +40,11 @@ $font-secondary: 'Open Sans', sans-serif;
 
 // component style
 @import 'common.scss';
+@import 'checkbox.scss';
+@import 'modal-styles.scss';
 @import 'login.scss';
 @import 'tree-structure.scss';
+@import 'dataset-report.scss';
 @import 'dataset-architecture.scss';
 @import 'table.scss';
 @import 'analysis.scss';

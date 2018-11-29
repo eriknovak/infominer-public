@@ -117,54 +117,6 @@ a {
 p.modal-subtitle { margin-bottom: 0px; }
 .modal-content { border-radius: 0px; }
 
-/**************************************
- * Custom checkbox style - component 'checkbox-select'
- *************************************/
-
-.checkbox {
-    width: 20px;
-    height: 20px;
-    position: relative;
-    margin: auto;
-    font-size: 13px;
-
-    input[type=checkbox] {
-        display: none;
-    }
-
-    input[type=checkbox]:checked + label:after {
-        opacity: 1;
-    }
-
-    label {
-        cursor: pointer;
-        padding: 0px;
-        top: 0;
-        left: 0;
-        border: 1px solid darken($primary-color, 20%);
-        border-radius: 3px;
-        margin: 0px;
-        display: inline;
-        padding-right: 15px;
-
-        &:hover::after { opacity: 0.5; }
-
-        &:after {
-            opacity: 0;
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 6px;
-            background: transparent;
-            top: 4px;
-            left: 4px;
-            border: 3px solid #333;
-            border-top: none;
-            border-right: none;
-            transform: rotate(-50deg);
-        }
-    }
-}
 
 /**************************************
  * Global button styles
@@ -291,7 +243,7 @@ p.message {
 
 .center { text-align: center; }
 
-
+.title { margin-top: 15px; }
 
 .highlight {
     font-weight: 500;

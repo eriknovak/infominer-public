@@ -1,41 +1,4 @@
-.dataset-header {
 
-    .dataset-information {
-        margin-bottom: 10px;
-    }
-    .visualization-field-selection {
-        background-color: #f6f6f6;
-        padding-bottom: 5px;
-        padding-top: 5px;
-
-        border-bottom: 1px solid #e6e6e6;
-    }
-
-    .dataset-description {
-        max-height: 200px;
-        overflow-y: auto;
-    }
-}
-.title {
-    margin-top: 15px;
-
-
-}
-
-.dataset-content {
-    .container-fluid {
-        display:table;
-        width: 100%;
-        margin-top: -50px;
-        padding: 50px 0 0 0; /*set left/right padding according to needs*/
-        box-sizing: border-box;
-    }
-
-    .row {
-        height: 100%;
-        display: table-row;
-    }
-}
 
 @mixin link-style ($color) {
     font-weight: 500;

@@ -1,0 +1,31 @@
+.dataset-report {
+
+    &-info {
+        margin: 0px;
+        &__title {
+            text-transform: uppercase;
+        }
+        &__description {
+            margin-bottom: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        &__container {
+            margin-bottom: 10px;
+        }
+    }
+
+    &__settings {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        background-color: #f6f6f6;
+        border-bottom: 1px solid #e6e6e6;
+
+        &__label {
+            font-weight: 400;
+            margin-right: 5px;
+        }
+    }
+
+}

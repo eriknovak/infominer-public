@@ -1,7 +1,8 @@
 <div class="row">
   <div class="col">
 
-    <div class="dataset-upload-info-container__params">
+    {{! the dataset name }}
+    <div class="dataset-upload-container__params">
       <div class="row form-group">
         <label class="col-md-2 col-form-label">Dataset Name</label>
         <div class="col-md-10">
@@ -13,9 +14,10 @@
           }}
         </div>
       </div>
-    </div>{{! .dataset-label }}
+    </div>
 
-    <div class="dataset-upload-info-container__params">
+    {{! the dataset description }}
+    <div class="dataset-upload-container__params">
       <div class="row form-group">
         <label class="col-md-2 col-form-label">Description</label>
         <div class="col-md-10">
@@ -28,7 +30,7 @@
           }}
         </div>
       </div>
-    </div>{{! .dataset-description }}
+    </div>
 
   </div>{{! .col}}
 </div>{{! .row }}
@@ -36,7 +38,8 @@
 <div class="row">
   <div class="col">
 
-    <table class="table dataset-upload-info-container__table">
+    {{! setup the dataset field selection }}
+    <table class="table dataset-upload-container__table">
 
       <thead>
         <tr>
@@ -67,8 +70,9 @@
 
 <div class="row">
   <div class="col">
-    <div class="dataset-upload-info-container__actions">
-      <span class="dataset-upload-info-container__actions--warning">Invalid field names</span>
+    {{! setup the dataset upload actions }}
+    <div class="dataset-upload-container__actions">
+      <span class="dataset-upload-container__actions--warning">Invalid field names</span>
       <button {{action resetList}} class="btn btn-light btn-rounded">Cancel</button>
       <button {{action submitDataset}} class="btn btn-primary btn-rounded">Save Dataset</button>
     </div>

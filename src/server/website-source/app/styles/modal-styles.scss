@@ -1,0 +1,22 @@
+.modal-style {
+
+    &--edit {
+        &__title {
+            color: $secondary-color;
+            margin: auto;
+        }
+        &__warning {
+            margin: auto;
+            color: red;
+        }
+    }
+
+    &--delete {
+        &__title {
+            color: red;
+            margin: auto;
+        }
+    }
+
+
+}

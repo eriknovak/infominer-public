@@ -14,7 +14,7 @@ const DatasetRoute = ENV.environment === 'development' ?
 
 export default DatasetRoute.extend({
     fieldSelection: service('field-selection'),
-    unloadExtra: service('unload-extra'),
+    unloadExtra:    service('unload-extra'),
 
     model(params) {
         // unload subsets and methods
