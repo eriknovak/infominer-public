@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['modal', 'analysis-modal'],
+    classNames: ['modal', 'modal-style--analysis'],
     attributeBindings: ['tabindex', 'role'],
     tagName: 'div',
     tabindex: -1,
@@ -64,7 +64,7 @@ export default Component.extend({
                 });
             } else {
                 // there are no fields selected - warn the user
-                $('#analysis-warning').removeClass('d-none');
+                $(`${this.get('elementId')} .modal-style--analysis__warning`).removeClass('d-none');
             }
         }
     },

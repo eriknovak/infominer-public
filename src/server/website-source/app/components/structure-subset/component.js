@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['subset', 'child'],
+    classNames: ['tree-structure__subset', 'child'],
     classNameBindings: ['parent'],
 
     _parentState: observer('subset.usedBy.@each.produced', function () {

@@ -1,6 +1,5 @@
 import Component from '@ember/component';
-import { observer, set } from '@ember/object';
-import { once } from '@ember/runloop';
+import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
@@ -21,14 +20,6 @@ export default Component.extend({
         // set the parameters of the method
         this.set('type', { type: 'string' });
         this._setParameters();
-    },
-
-    ///////////////////////////////////////////////////////
-    // Actions
-    ///////////////////////////////////////////////////////
-
-    actions: {
-
     },
 
     ///////////////////////////////////////////////////////

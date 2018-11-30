@@ -1,28 +1,3 @@
-.analysis-modal {
-    .method-selection-container {
-        margin-bottom: 10px;
-    }
-
-    .method-selection-label {
-        font-weight: 400;
-        margin-right: 5px;
-        &.parameter {
-            font-weight: 400;
-            font-size: 12px;
-            margin-bottom: 2px;
-        }
-    }
-
-    .method-description {
-        text-align: justify;
-    }
-
-    #analysis-warning {
-        color: red;
-        font-weight: 400;
-    }
-}
-
 .feature-selection {
     width: 100%;
     height: 8px;
@@ -78,8 +53,29 @@
     }
 }
 
-@mixin analysis-border {
-    border: 1px solid #e6e6e6;
+@mixin collapse-toggle($color, $size) {
+    .btn {
+        color: $color;
+        width: $size;
+        height: $size;
+        padding: 0px;
+        border-radius: 50%;
+        text-align: center;
+        background-color: transparent;
+        &.rotate {
+            -webkit-transition: all .2s linear;
+            -moz-transition: all .2s linear;
+            transition: all .2s linear;
+            &.right{
+                -ms-transform: rotate(-90deg);
+                -moz-transform: rotate(-90deg);
+                -webkit-transform: rotate(-90deg);
+                transform: rotate(-90deg);
+            }
+        }
+        &:hover { background-color: $primary-color; }
+        i { margin: auto; }
+    }
 }
 
 // analysis results
@@ -96,7 +92,7 @@
     .analysis-component {
         padding: 10px;
         background-color: white;
-        @include analysis-border;
+        border: 1px solid #e6e6e6;
         border-top: none;
     }
 
@@ -147,9 +143,44 @@
     color: $tertiary-color;
 }
 
-.document-label {
-    font-size: 26px;
-    cursor: pointer;
-    margin-left: 1px;
-    margin-right: 1px;
+
+.subset-analysis-report {
+    background-color: #f6f6f6;
+
+    .analysis-selector {
+        margin-bottom: 15px;
+        &__link {
+            display: block;
+            padding: 10px;
+            text-align: center;
+
+            border: 1px dashed $primary-color;
+            background-color: white;
+
+            -webkit-transition: background .4s;
+            transition: background .4s;
+            &:hover {
+                border: 1px solid $primary-color;
+                background-color: lighten($quaternary-color, 20%);
+            }
+
+
+            &__content {
+                color: $tertiary-color;
+                margin: 89px 0;
+
+                &__icon {
+                    margin: 10px 20px;
+                    font-size: 40px;
+                }
+                &__label {
+                    font-weight: 400;
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
 }
+
+
+

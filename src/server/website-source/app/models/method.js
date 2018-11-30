@@ -16,9 +16,9 @@ export default DS.Model.extend({
         if (this.get('methodType').includes('clustering')) {
             return 'clustering';
         } else if (this.get('methodType').includes('filter.manual')) {
-            return 'manual query';
+            return 'document query';
         } else if (this.get('methodType').includes('classify.active-learning')){
-            return 'manual labelling';
+            return 'active learning';
         } else {
             return this.get('methodType');
         }

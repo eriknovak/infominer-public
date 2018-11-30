@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['method', 'child'],
+    classNames: ['tree-structure__method', 'child'],
     classNameBindings: ['parent'],
     parent: false,
     collapsed: false,

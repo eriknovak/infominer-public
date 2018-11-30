@@ -11,16 +11,16 @@
 
 {{! analysis selection button }}
 <div class="row">
-  <div class="col-lg-12 analysis">
-    <a class="method-selection" data-toggle="modal"
-      data-target="#select-analysis-modal">
-      <div class="content">
-        <i class="fa fa-plus fa-3x"></i>
-        <p>Select method analysis</p>
-      </div>{{! .content }}
+  <div class="col analysis-selector">
+    <a class="analysis-selector__link"
+      data-toggle="modal" data-target="#select-analysis-modal">
+      <div class="analysis-selector__link__content">
+        <i class="fa fa-plus analysis-selector__link__content__icon"></i>
+        <p class="analysis-selector__link__content__label">Select analysis method</p>
+      </div>
     </a>
-  </div>{{! .col-lg-12 }}
-</div>{{! .row }}
+  </div>{{! col }}
+</div>{{! row }}
 
 {{! method selection modal }}
 {{

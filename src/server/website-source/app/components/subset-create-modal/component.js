@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['modal'],
+    classNames: ['modal', 'modal-style--edit'],
     attributeBindings: ['tabindex', 'role'],
     tagName: 'div',
     tabindex: -1,
@@ -43,14 +43,14 @@ export default Component.extend({
          * Change subset name.
          */
         changeSubsetName() {
-            this.set('name', $(`#${this.get('id')} input`).val());
+            this.set('name', $(`#${this.get('id')} .modal-style--edit_description input`).val());
         },
 
         /**
          * Change subset description.
          */
         changeSubsetDescription() {
-            this.set('description', $(`#${this.get('id')} textarea`).val());
+            this.set('description', $(`#${this.get('id')} .modal-style--edit_description textarea`).val());
         },
 
         /**
@@ -58,9 +58,7 @@ export default Component.extend({
          */
         saveSubset() {
 
-            if (this.get('invalid')) {
-                return;
-            }
+            if (this.get('invalid')) { return; }
 
             // prepare subset info object
             const subset = {

@@ -17,7 +17,7 @@ export default Route.extend({
         startAnalysis(params) {
             let self = this;
             // toggle the modal - giving the user control
-            $('.modal.analysis-modal').modal('toggle');
+            $('.modal.modal-style--analysis').modal('toggle');
             // get parent subset - to save method
             let parentSubset = self.modelFor('dataset.subset');
             // create a new method
@@ -44,7 +44,7 @@ export default Route.extend({
 
         startActiveLearning(params) {
             // toggle the modal - giving the user control
-            $('.modal.analysis-modal').modal('toggle');
+            $('.modal.modal-style--analysis').modal('toggle');
             let model = this.modelFor(this.routeName);
             this.transitionTo('active-learning', model.dataset.id, model.subset.id, {
                 queryParams: params
