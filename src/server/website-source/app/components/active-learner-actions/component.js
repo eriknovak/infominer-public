@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 
 export default Component.extend({
+    classNames: ['active-learning__actions'],
 
     didReceiveAttrs() {
         this._super(...arguments);

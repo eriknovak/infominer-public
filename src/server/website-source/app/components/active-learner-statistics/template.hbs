@@ -1,12 +1,33 @@
-<label class="aggregate-title">Statistics</label>
-<ul class="list-group list-group-flush active-learning-statistics">
-  <li class="list-group-item">
-    <span class="statistics-component"># positive examples:</span> {{examples-string}}
-  </li>
-</ul>
 
-{{
-  aggregate-keywords
-  field='Positive Examples'
-  distribution=statistics.predicted.positive.distribution
-}}
+{{#if statistics}}
+
+  <label class="aggregate-title">Statistics</label>
+  <ul class="list-group list-group-flush active-learning-statistics">
+    <li class="list-group-item">
+      <span class="statistics-component"># positive examples:</span> {{examples-string}}
+    </li>
+  </ul>
+
+  {{
+    aggregate-keywords
+    field='Positive Examples'
+    distribution=statistics.predicted.positive.distribution
+  }}
+
+{{else}}
+  <div class="overview">
+
+    <h5 class="overview__title">
+      <p class="placeholder"></p>
+    </h5>
+
+    <p class="placeholder placeholder__document-number"></p>
+
+    <div class="content">
+      <h5 class="placeholder placeholder__title"></h5>
+      <div class="graph placeholder"></div>
+    </div>
+  </div>
+
+{{/if}}
+

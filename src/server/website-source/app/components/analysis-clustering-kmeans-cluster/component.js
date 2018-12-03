@@ -26,13 +26,13 @@ export default Component.extend({
         this._super(...arguments);
         let cluster = this.get('cluster');
 
-        const parentSubset = this.get('method.appliedOn');
+        const dataset = this.get('dataset');
         const clusterSubset = this.get('store').peekRecord('subset', cluster.subset.id);
 
         this.set('label', clusterSubset.get('label'));
 
         const clusterCount = clusterSubset.get('documentCount');
-        const allCount = parentSubset.get('documentCount');
+        const allCount = dataset.get('numberOfDocuments');
 
         const percentageCoverage = (clusterCount / allCount * 100).toFixed(1);
 

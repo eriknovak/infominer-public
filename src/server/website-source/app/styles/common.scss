@@ -98,7 +98,7 @@ a {
     .dropdown-menu {
         border: 0px;
         border-radius: 0px;
-        background-color: $quaternary-color;
+        background-color: $secondary-color;
         padding: 0px;
         margin: 0px;
         width: 100%;
@@ -108,7 +108,7 @@ a {
             padding: 10px 1em;
             &:hover {
                 color: $light-font-color;
-                background-color: darken($quaternary-color, 10%);
+                background-color: lighten($secondary-color, 10%);
             }
         }
     }
@@ -332,4 +332,10 @@ p.message {
 .field-warning {
     color: red;
     height: 10px;
+}
+
+.field-inform {
+    color: $quaternary-color;
+    text-transform: capitalize;
+    font-weight: 400;
 }

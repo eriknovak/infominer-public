@@ -28,9 +28,9 @@ export default Component.extend({
 
         this.set('label', classSubset.get('label'));
 
-        const parentSubset = this.get('method.appliedOn');
+        const dataset = this.get('dataset');
         const classCount = classSubset.get('documentCount');
-        const allCount = parentSubset.get('documentCount');
+        const allCount = dataset.get('numberOfDocuments');
 
         const percentageCoverage = (classCount / allCount * 100).toFixed(1);
 

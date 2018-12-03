@@ -13,7 +13,7 @@
         text-transform: capitalize;
         font-weight: 400;
         &.warning {
-            font-weight: 300;
+            font-weight: 400;
             text-transform: none;
             color: $font-color-dark;
             b { font-weight: 400; }
@@ -81,6 +81,7 @@
     &__method-type {
         border-bottom: 1px solid #cccccc;
         color: green;
+        text-transform: capitalize;
         @include collapse-toggle(green, 20px);
     }
 
