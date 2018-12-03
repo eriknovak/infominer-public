@@ -4,7 +4,7 @@ import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
-    classNames: ['analysis', 'classify'],
+    classNames: ['analysis__component', 'analysis__component--active-learning'],
 
     init() {
         this._super(...arguments);

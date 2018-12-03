@@ -1,6 +1,6 @@
 <div class="analysis">
-  <div class="analysis-component-header rounded-top">Query</div>
-  <div class="analysis-component">
+  <div class="analysis__header">Query Dashboard</div>
+  <div class="analysis__container">
     {{
       document-table
       documents=model.documents
@@ -10,25 +10,27 @@
       changePage=(route-action 'changePage')
       sortByField=(route-action 'sortByField')
     }}
-  </div>
-</div>
+  </div>{{! analysis__container }}
+</div>{{! analysis }}
 
 
 
 <div class="row">
-  <div class="col analysis">
+  <div class="col">
+
     {{#if model.documents.length}}
       {{
         analysis-method-aggregate-subset
         method=model.method
       }}
     {{else}}
-      <div class="analysis-component">
+      <div class="analysis__container">
         <p class="message">No query aggregates for query results</p>
       </div>
     {{/if}}
-  </div>
-</div>
+
+  </div>{{! col }}
+</div>{{! row }}
 
 {{
   subset-create-modal

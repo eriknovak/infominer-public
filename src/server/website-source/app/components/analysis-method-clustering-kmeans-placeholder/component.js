@@ -4,7 +4,7 @@ import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
-    classNames: ['analysis', 'clustering'],
+    classNames: ['analysis__component', 'analysis__component--clustering'],
 
     // services
     columnWidth: service('column-size'),

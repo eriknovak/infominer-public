@@ -14,7 +14,6 @@ Router.map(function() {
     this.route('subset', { path: '/subsets/:subset_id' }, function() {
       this.route('documents', { path: '/documents' });
       this.route('analysis');
-      this.route('active-learning');
     });
   });
   this.route('login');

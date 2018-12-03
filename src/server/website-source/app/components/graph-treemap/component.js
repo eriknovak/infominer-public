@@ -14,7 +14,7 @@ import { hierarchy, treemap, treemapResquarify } from 'd3-hierarchy';
 // declare new graph component
 const HierarchyComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['hierarchy'],
+    classNames: ['graph--hierarchy'],
 
     /**
      * Object containing the histogram information.

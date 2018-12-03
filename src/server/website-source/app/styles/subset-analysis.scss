@@ -1,45 +1,13 @@
-.feature-selection {
-    width: 100%;
-    height: 8px;
-    text-align: right;
-    border-bottom: 1px solid $tertiary-color;
-    line-height: 0.1em;
-    margin: 10px 0 0;
-    color: $tertiary-color;
-    font-size: 12px;
-
-    span {
-        background:white;
-        padding: 0 5px 0 7px;
-        margin-right: 10px;
-        height: 0px;
-
-        i {
-            border-radius: 50%;
-            padding: 2px;
-            cursor: pointer;
-            &:hover { background-color: $primary-color; }
-            &.rotate {
-                -webkit-transition: all .2s linear;
-                -moz-transition: all .2s linear;
-                transition: all .2s linear;
-                &.left {
-                    -ms-transform: rotate(90deg);
-                    -moz-transform: rotate(90deg);
-                    -webkit-transform: rotate(90deg);
-                    transform: rotate(90deg);
-                }
-            }
-        }
-    }
-}
-
-.field-features {
+.dataset-field {
     font-size: 12px;
     vertical-align: middle;
-    .include-field label.include-label { margin: 1px 5px 2px 0; }
 
-    .field-feature {
+    &__include {
+        float: right;
+        &-label { margin: 1px 5px 2px 0; }
+    }
+
+    .dataset-field__name {
         padding: 1px 0 4px;
         color: $quaternary-color;
         text-transform: capitalize;
@@ -80,75 +48,90 @@
 
 // analysis results
 .analysis {
-    margin: 10px auto;
+    margin: 15px auto;
 
-    .analysis-component-header {
+    &__header {
         background-color: $tertiary-color;
         padding: 1px 10px;
         font-weight: 400;
         color: white;
+
+        border-top-left-radius: 0.25rem !important;
+        border-top-right-radius: 0.25rem !important;
     }
 
-    .analysis-component {
+    &__container {
         padding: 10px;
         background-color: white;
         border: 1px solid #e6e6e6;
         border-top: none;
     }
 
-    .parameter-label { font-weight: 400; }
-    .analysis {
-        margin-top: 30px;
-        h3 {
-            border-bottom: 1px solid #cccccc;
-            color: green;
-            @include collapse-toggle(green, 20px);
+    &-parameter__name {
+        font-weight: 400;
+
+        &:not(:first-of-type) {
+            margin-left: 0.5rem;
         }
+        &:first-of-type {
+            margin-left: 25px;
+        }
+    }
 
-        .clusters .cluster-content {
-            margin: 15px auto;
-            .cluster-header {
-                color: $secondary-color;
-                margin-bottom: 1px;
-                @include collapse-toggle($secondary-color, 19px);
-                .edit-cluster-label {
-                    display: none;
-                    &.show { display: inline-block; }
+    &__method-type {
+        border-bottom: 1px solid #cccccc;
+        color: green;
+        @include collapse-toggle(green, 20px);
+    }
 
+    &__component {
+
+        margin-top: 30px;
+
+        &--clustering,
+        &--active-learning {
+
+            .overview {
+                margin: 15px auto;
+
+                &__title {
+                    color: $secondary-color;
+                    margin-bottom: 1px;
+                    @include collapse-toggle($secondary-color, 19px);
+
+                    &--edit {
+                        display: none;
+                        &.show { display: inline-block; }
+                    }
+                }
+
+                &__metadata {
+                    margin: 5px 0px 0px 25px;
+                }
+
+                &__aggregates {
+                    margin-top: 1em;
                 }
             }
 
-            .cluster-metadata {
-                margin-left: 25px;
-                margin-bottom: 0px;
-            }
-
-            .cluster-aggregates {
-                margin-top: 1em;
-            }
         }
     }
 }
 
 .aggregate-title {
     color: $tertiary-color;
+    font-size: 14px;
     margin: 10px 0px 4px;
     text-transform: capitalize;
     font-weight: 400;
 }
-
-.user-input-label {
-    text-transform: capitalize;
-    font-weight: 400;
-    color: $tertiary-color;
-}
-
 
 .subset-analysis-report {
     background-color: #f6f6f6;
 
     .analysis-selector {
         margin-bottom: 15px;
+
         &__link {
             display: block;
             padding: 10px;
@@ -157,8 +140,9 @@
             border: 1px dashed $primary-color;
             background-color: white;
 
-            -webkit-transition: background .4s;
             transition: background .4s;
+            -webkit-transition: background .4s;
+
             &:hover {
                 border: 1px solid $primary-color;
                 background-color: lighten($quaternary-color, 20%);
@@ -173,6 +157,7 @@
                     margin: 10px 20px;
                     font-size: 40px;
                 }
+
                 &__label {
                     font-weight: 400;
                     text-transform: uppercase;

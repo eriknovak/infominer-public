@@ -1,66 +1,66 @@
-<h3 class="method-type">
+<h3 class="analysis__method-type">
+
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleInformation'}}>
     <i class="fa fa-chevron-down"></i>
   </button>
+
   Active Learning
+
 </h3>
 
 <div class="row">
-  <div class="col-md-6 method-parameters">
+  <div class="col-md-6">
 
-    <div class="parameter">
-      <span class="parameter-label">Initial query: </span>
-      <span class="parameter-value">
-        {{method.parameters.initQuery}}
-      </span>
-    </div>
+    <span class="analysis-parameter__name">Initial query: </span>
+    <span class="analysis-parameter__value">
+      {{method.parameters.initQuery}}
+    </span>
 
-    <div class="parameter">
-      <span class="parameter-label">Selected fields: </span>
-      <span class="parameter-value">
-        {{selectedFields}}
-      </span>
-    </div>
+    <span class="analysis-parameter__name">Selected fields: </span>
+    <span class="analysis-parameter__value">
+      {{selectedFields}}
+    </span>
 
   </div>
 </div>
 
 {{#bs-collapse collapsed=collapsed}}
-  <div class="clusters">
-    {{#each clusters as |cluster index|}}
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="cluster-content">
+  {{#each clusters as |cluster index|}}
 
-            <div class="analysis-component-header rounded-top">Class Overview</div>
+    <div class="row">
+      <div class="col">
 
-            <div class="analysis-component">
-              <div class="subset-button pull-right placeholder"></div>
-              <div class="subset-button pull-right placeholder mr-2"></div>
+        <div class="overview">
 
-              <h5 class="cluster-header">
-                <p class="placeholder"></p>
-              </h5>
+          <div class="analysis__header">Class Overview</div>
 
-              <p class="document-number placeholder"></p>
+          <div class="analysis__container">
+            <div class="pull-right placeholder placeholder__subset-button"></div>
+            <div class="pull-right placeholder placeholder__subset-button"></div>
 
-              <div class="row">
-                {{#each cluster as |placeholder index|}}
-                  <div class="content {{concat placeholder.columnlg ' ' placeholder.columnsm}}">
-                    <h5 class="field-title placeholder"></h5>
-                    <div class="graph placeholder"></div>
-                  </div>
-                {{/each}}
-              </div>
+            <h5 class="overview__title">
+              <p class="placeholder"></p>
+            </h5>
+
+            <p class="placeholder placeholder__document-number"></p>
+
+            <div class="row">
+              {{#each cluster as |placeholder index|}}
+                <div class="content {{concat placeholder.columnlg ' ' placeholder.columnsm}}">
+                  <h5 class="placeholder placeholder__title"></h5>
+                  <div class="graph placeholder"></div>
+                </div>
+              {{/each}}
             </div>
+          </div>
 
-          </div><!-- .cluster-content -->
-        </div><!-- .col-lg-12 -->
-      </div><!-- .row -->
+        </div>{{! overview }}
 
-    {{/each}}
-  </div>
+      </div>{{! col }}
+    </div>{{! row }}
+
+  {{/each}}
 {{/bs-collapse}}
 
 {{yield}}

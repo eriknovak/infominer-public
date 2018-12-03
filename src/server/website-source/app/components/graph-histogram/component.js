@@ -15,7 +15,7 @@ import { line, curveStepAfter } from 'd3-shape';
 // declare new graph component
 const HistogramComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['histogram'],
+    classNames: ['graph--histogram'],
 
     /**
      * Object containing the histogram information.

@@ -2,7 +2,7 @@ import Component from '@ember/component';
 
 export default Component.extend({
     // component attributes
-    classNames: ['analysis'],
+    classNames: ['analysis__component', 'analysis__component--active-learner'],
 
     didReceiveAttrs() {
         this._super(...arguments);

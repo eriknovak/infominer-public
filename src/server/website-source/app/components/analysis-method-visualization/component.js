@@ -3,7 +3,7 @@ import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
-    classNames: ['analysis', 'visualization'],
+    classNames: ['analysis__component', 'analysis__component--visualization'],
 
     init() {
         this._super(...arguments);

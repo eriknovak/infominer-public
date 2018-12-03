@@ -13,7 +13,7 @@ import cloud from 'npm:d3-cloud';
 // declare new graph component
 const WordCloudComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['wordcloud'],
+    classNames: ['graph--wordcloud'],
 
     // wordcloud font size
     maxFontSize: 30,

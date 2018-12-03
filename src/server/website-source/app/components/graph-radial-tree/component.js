@@ -14,7 +14,7 @@ import { drag } from 'd3-drag';
 // declare new graph component
 const RadialTreeComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['radial-tree'],
+    classNames: ['graph--radial-tree'],
 
     // services
     store: service('store'),

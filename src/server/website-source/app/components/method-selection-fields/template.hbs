@@ -1,19 +1,27 @@
 {{#if parameters.features.length}}
-    {{#each parameters.features as |features index| }}
-        <div clas="field-features">
-            <span class="include-field pull-right">
-                <label class="include-label">include</label>
-                {{ checkbox-select class="pull-right"
-                    checkboxId=(concat "field-feature-" index)
-                    checked=features.included
-                }}
-            </span>
-            <div class="field-feature">
-                {{features.field}}
-            </div>
-        </div>
-    {{/each}}
+  {{#each parameters.features as |features index| }}
+
+    <div class="dataset-field">
+
+      <span class="dataset-field__include">
+        <label class="dataset-field__include-label">include</label>
+        {{ checkbox-select class="pull-right"
+            checkboxId=(concat "dataset-field-" index)
+            checked=features.included
+        }}
+      </span>{{! dataset-field__include  }}
+
+      <div class="dataset-field__name">
+        {{features.field}}
+      </div>
+
+    </div>{{! dataset-field }}
+
+  {{/each}}
 {{else}}
-    <div class="field-feature warning">No fields of type <b>{{type.name}}</b> found</div>
+
+  <div class="dataset-field__name warning">
+    No fields of type <b>{{type.name}}</b> found
+  </div>
+
 {{/if}}
-{{yield}}

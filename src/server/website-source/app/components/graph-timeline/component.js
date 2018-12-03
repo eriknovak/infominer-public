@@ -20,7 +20,7 @@ import { extent } from 'd3-array';
 // declare new graph component
 const TimelineComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['timeline'],
+    classNames: ['graph--timeline'],
 
     /**
      * Object containing the timeline information.

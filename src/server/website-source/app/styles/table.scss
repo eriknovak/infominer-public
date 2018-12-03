@@ -162,3 +162,30 @@
         }
     }
 }
+
+.table__query-options {
+    margin-top: 5px;
+
+    input.keywords-input {
+        border-radius: 50px 0 0 50px;
+    }
+    #query-by-fields {
+        border-radius: 0 50px 50px 0;
+    }
+    .col-form-label { line-height: 16px; }
+
+    .query-sliders {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+    .ui-slider {
+        .slider { height: 10px; }
+        .slider-track {
+            height: 5px;
+            .slider-handle {
+                height: 15px;
+                width: 15px;
+            }
+        }
+    }
+}

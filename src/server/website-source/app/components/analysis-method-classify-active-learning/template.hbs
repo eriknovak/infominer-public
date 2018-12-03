@@ -1,4 +1,5 @@
-<h3 class="method-type text-capitalize">
+<h3 class="analysis__method-type">
+
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleInformation'}}>
     <i class="fa fa-chevron-down"></i>
@@ -14,21 +15,17 @@
 </h3>
 
 <div class="row">
-  <div class="col-md-12 method-parameters">
+  <div class="col-md-12">
 
-    <div class="parameter">
-      <span class="parameter-label">Initial query: </span>
-      <span class="parameter-value">
-        {{method.parameters.initQuery}}
-      </span>
-    </div>
+    <span class="analysis-parameter__name">Initial query: </span>
+    <span class="analysis-parameter__value">
+      {{method.parameters.initQuery}}
+    </span>
 
-    <div class="parameter">
-      <span class="parameter-label">Selected fields: </span>
-      <span class="parameter-value">
-        {{selectedFields}}
-      </span>
-    </div>
+    <span class="analysis-parameter__name">Selected fields: </span>
+    <span class="analysis-parameter__value">
+      {{selectedFields}}
+    </span>
 
   </div>
 </div>

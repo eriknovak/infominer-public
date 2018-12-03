@@ -4,7 +4,7 @@ import { computed, get, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
-    classNames: ['cluster-content'],
+    classNames: ['overview'],
 
     fieldSelection: service('field-selection'),
     columnWidth: service('column-size'),
@@ -36,9 +36,9 @@ export default Component.extend({
         self._super(...arguments);
         const elementId = self.get('elementId');
         // on hover show edit button
-        $(`#${elementId} .cluster-header`).hover(
-          function () { $(`#${elementId} .edit-cluster-label`).addClass('show'); },
-          function () { $(`#${elementId} .edit-cluster-label`).removeClass('show'); }
+        $(`#${elementId} .overview__title`).hover(
+          function () { $(`#${elementId} .overview__title--edit`).addClass('show'); },
+          function () { $(`#${elementId} .overview__title--edit`).removeClass('show'); }
         );
     },
 
