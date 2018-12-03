@@ -25,7 +25,19 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         let cluster = this.get('cluster');
-        this.set('label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
+
+        const parentSubset = this.get('method.appliedOn');
+        const clusterSubset = this.get('store').peekRecord('subset', cluster.subset.id);
+
+        this.set('label', clusterSubset.get('label'));
+
+        const clusterCount = clusterSubset.get('documentCount');
+        const allCount = parentSubset.get('documentCount');
+
+        const percentageCoverage = (clusterCount / allCount * 100).toFixed(1);
+
+        this.set('numberOfDocuments', `${clusterCount} (${percentageCoverage}%)`);
+
         if (cluster.avgSimilarity) {
             set(cluster, 'avgSimProcent', (cluster.avgSimilarity * 100).toFixed(1));
         }

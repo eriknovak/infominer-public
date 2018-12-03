@@ -23,7 +23,18 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         let classExample = this.get('class');
-        this.set('label', this.get('store').peekRecord('subset', classExample.subset.id).get('label'));
+
+        const classSubset = this.get('store').peekRecord('subset', classExample.subset.id);
+
+        this.set('label', classSubset.get('label'));
+
+        const parentSubset = this.get('method.appliedOn');
+        const classCount = classSubset.get('documentCount');
+        const allCount = parentSubset.get('documentCount');
+
+        const percentageCoverage = (classCount / allCount * 100).toFixed(1);
+
+        this.set('numberOfDocuments', `${classCount} (${percentageCoverage}%)`);
     },
 
     didInsertElement() {
