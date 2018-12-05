@@ -402,7 +402,7 @@ class ModelsManager {
             if (method && method.parameters.stopwords) {
                 words = method.parameters.stopwords;
             }
-            console.log('calculate keywords ....')
+
             distribution = elements.aggr({
                 name: `${aggregate}_${fieldName}`,
                 field: fieldName,
@@ -414,7 +414,6 @@ class ModelsManager {
                 }
             })
 
-            // distribution = this._aggregateKeyword(base, elements, fieldName, words);
             if (distribution && distribution.keywords && !distribution.keywords.length) {
                 distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
             }

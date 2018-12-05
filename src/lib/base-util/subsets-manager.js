@@ -309,7 +309,7 @@ class SubsetsManager {
                 return field;
             });
 
-        const method = base.store('Subset').resultedIn;
+        const method = base.store('Subsets')[id].resultedIn;
 
         // document aggregates
         let aggregates = [];
