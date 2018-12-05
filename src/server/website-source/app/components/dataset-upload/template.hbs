@@ -4,7 +4,7 @@
     {{! the dataset name }}
     <div class="dataset-upload-container__params">
       <div class="row form-group">
-        <label class="col-md-2 col-form-label">Dataset Name</label>
+        <label class="col-md-2 highlight-text-only col-form-label">Dataset Name</label>
         <div class="col-md-10">
           {{
             input
@@ -19,7 +19,7 @@
     {{! the dataset description }}
     <div class="dataset-upload-container__params">
       <div class="row form-group">
-        <label class="col-md-2 col-form-label">Description</label>
+        <label class="col-md-2 highlight-text-only col-form-label">Description</label>
         <div class="col-md-10">
           {{
             textarea
@@ -67,6 +67,23 @@
 
   </div>{{! .col }}
 </div>{{! .row }}
+
+ <div class="dataset-upload-container__params">
+  <div class="row">
+    <div class="col">
+      <label class="highlight-text-only">
+        Stopwords that are added to the standard stopword array (optional)
+      </label>
+      {{
+        textarea
+        rows="5"
+        class="form-control editing"
+        value=dataset.parameters.stopwords
+        placeholder="Separate stopwords with a comma"
+      }}
+    </div>
+  </div>
+</div>
 
 <div class="row">
   <div class="col">

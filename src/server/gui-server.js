@@ -32,7 +32,6 @@ let processHandler = new ProcessHandler({
 
 // on manual process exit
 process.on('SIGINT', () => {
-    console.log(process.platform);
     if (process.platform === 'win32') {
         processHandler.closeAllProcesses(() => {
             pg.close(() => {

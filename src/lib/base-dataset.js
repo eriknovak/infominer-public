@@ -41,8 +41,17 @@ class BaseDataset {
             validator.validateSchema(fields, validator.schemas.constructorFields)) {
             // continue with database initialization
             self.params = params;
+            if (self.params.parameters.stopwords) {
+                // handle stopwords preparation
+                self.stopwords = self.params.parameters.stopwords.split(',')
+                    .map(word => word.trim())
+                    .map(word => word.toLowerCase());
+            }
+
             self._subsetsManager = new SubsetsManager(formatter, validator);
-            self._modelsManager  = new ModelsManager(formatter, validator);
+            self._modelsManager  = new ModelsManager(formatter, validator, {
+                stopwords: self.stopwords
+            });
 
             // loads the base
             self._loadBase(fields);

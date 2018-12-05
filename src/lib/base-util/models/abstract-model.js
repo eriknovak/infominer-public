@@ -1,10 +1,11 @@
 class AbstractModel {
 
-    constructor(base, params, subset, fields) {
+    constructor(base, params, subset, parameters) {
         this.base = base;
         this.params = params;
         this.subset = subset;
-        this.fields = fields;
+        this.fields = parameters.fields;
+        this.stopwords = parameters.stopwords;
     }
 
 

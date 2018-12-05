@@ -64,7 +64,10 @@ module.exports = function (app, pg, processHandler, logger) {
                         created: datasetInfo.created,
                         mode: 'open',
                         dbPath: datasetInfo.dbpath,
-                        fields: datasetInfo.parameters.fields
+                        fields: datasetInfo.parameters.fields,
+                        parameters: {
+                            stopwords: datasetInfo.parameters.stopwords
+                        }
                     }
                 }
             };

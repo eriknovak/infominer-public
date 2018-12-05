@@ -5,8 +5,8 @@ const util = require('util');
 const AbstractModel = require('./abstract-model');
 class ClusteringKMeans extends AbstractModel {
 
-    constructor(base, params, subset, fields, formatter) {
-        super(base, params, subset, fields);
+    constructor(base, params, subset, parameters, formatter) {
+        super(base, params, subset, parameters);
         this._formatter = formatter;
         this._prepareFeatureParameters();
     }
@@ -57,10 +57,14 @@ class ClusteringKMeans extends AbstractModel {
         switch(self.params.parameters.method.clusteringType) {
             case 'text':
                 // prepare stopwords for feature space
-                let stopwords = { language: 'en' };
+                let stopwords = { language: 'en', words: [''] };
+
+                if (self.stopwords) {
+                    stopwords.words = stopwords.words.concat(self.stopwords);
+                }
                 if (self.params.parameters.stopwords) {
                     let words = self.params.parameters.stopwords;
-                    stopwords.words = words;
+                    stopwords.words = stopwords.words.concat(words);
                 }
 
                 // bag-of-words ft-idf model

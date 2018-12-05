@@ -6,10 +6,11 @@ const ActiveLearner = require('./models/active-learner');
 
 class ModelsManager {
 
-    constructor(formatter, validator) {
+    constructor(formatter, validator, parameters) {
         this._modelStatus = { };
         this._formatter = formatter;
         this._validator = validator;
+        this._parameters = parameters;
     }
 
     setFormatter(formatter) {
@@ -49,6 +50,12 @@ class ModelsManager {
             result:     method.result
         };
 
+
+        let parameters = { fields };
+        if (this._parameters.stopwords) {
+            parameters.stopwords = this._parameters.stopwords;
+        }
+
         // get subset on which the method was used
         let subset = base.store('Subsets')[method.appliedOn];
         if (subset) {
@@ -56,21 +63,24 @@ class ModelsManager {
             switch(qmMethod.type) {
             case 'clustering.kmeans':
                 // create new clustering process
-                let clusteringKMeans = new ClusteringKMeans(base, qmMethod, subset, fields, self._formatter);
+                let clusteringKMeans = new ClusteringKMeans(base, qmMethod, subset, parameters, self._formatter);
                 // store and get the clustering model hash indentifier
                 const hash = this._createModelStatus(clusteringKMeans);
                 // run the clustering process
                 clusteringKMeans.run(self._clusteringKMeansCreateSubsets(base, hash, createSubsetCb));
                 // return the hash with the status report
                 return { hash, status: 'processing' };
+
             case 'visualization':
                 // save the methodId and return the status report
-                methodId = self._visualizationSetup(base, qmMethod, subset, fields, createSubsetCb);
+                methodId = self._visualizationSetup(base, qmMethod, subset, parameters, createSubsetCb);
                 return { status: 'finished', methodId };
+
             case 'filter.manual':
                 // save the methodId and return the status report
-                methodId = self._filterByQuery(base, qmMethod, subset, fields, createSubsetCb);
+                methodId = self._filterByQuery(base, qmMethod, subset, parameters, createSubsetCb);
                 return { status: 'finished', methodId };
+
             case 'classify.active-learning':
                 let { model } = self._modelStatus[method.parameters.hash];
                 methodId = model.run(self._saveActiveLearning(base, createSubsetCb));
@@ -205,8 +215,12 @@ class ModelsManager {
         // get subset on which the method was used
         let subset = base.store('Subsets')[method.appliedOn];
 
+        let parameters = { fields };
+        if (this._parameters.stopwords) {
+            parameters.stopwords = this._parameters.stopwords;
+        }
         // create new clustering process
-        let activeLearner = new ActiveLearner(base, method, subset, fields, self._formatter);
+        let activeLearner = new ActiveLearner(base, method, subset, parameters, self._formatter);
         // store and get the clustering model hash indentifier
         const hash = this._createModelStatus(activeLearner);
         const document = activeLearner.update({ hash });
@@ -399,8 +413,11 @@ class ModelsManager {
             // get stopwords if applicable
             let words = [''];
 
+            if (self._parameters.stopwords) {
+                words = words.concat(self._parameters.stopwords);
+            }
             if (method && method.parameters.stopwords) {
-                words = method.parameters.stopwords;
+                words = words.concat(method.parameters.stopwords);
             }
 
             distribution = elements.aggr({

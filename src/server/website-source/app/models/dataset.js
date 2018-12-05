@@ -12,6 +12,8 @@ export default DS.Model.extend({
     hasSubsets: DS.hasMany('subset', { inverse: null }),
     hasMethods: DS.hasMany('method', { inverse: null }),
 
+    parameters: DS.attr(),
+
     fields: DS.attr(),
     selectedFields: DS.attr(),
     ready: computed('status', function () {

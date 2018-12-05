@@ -335,7 +335,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                 label: dataset.label, // the user defined dataset label
                 dbPath: path.join(static.dataPath, owner.toString(), dbFolder.toString()), // dataset directory
                 description: dataset.description, // the description of the dataset
-                status: 'processing'
+                status: 'processing',
+
             };
 
             // update dataset value
@@ -370,7 +371,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                             description: datasetInfo.description,
                             created: datasetInfo.created,
                             mode: 'createClean',
-                            dbPath: datasetInfo.dbpath
+                            dbPath: datasetInfo.dbpath,
+                            parameters: dataset.parameters
                         }
                     }
                 };
@@ -394,7 +396,8 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
                             parameters: {
                                 filepath: null,
                                 filename: null,
-                                delimiter: datasetInfo.parameters.delimiter
+                                delimiter: datasetInfo.parameters.delimiter,
+                                stopwords: dataset.parameters.stopwords
                             }
                         };
 

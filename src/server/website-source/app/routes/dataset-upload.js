@@ -54,6 +54,7 @@ export default DatasetUploadRoute.extend({
                 }
                 // add a default value for fields
                 model.fieldList.forEach(field => { field.invalid = false; });
+                model.dataset.parameters = { stopwords: '' };
                 this.set('controller.model', model);
                 this.set('datasetPending', true);
             });

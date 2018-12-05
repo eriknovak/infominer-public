@@ -9,8 +9,8 @@ const AbstractModel = require('./abstract-model');
 class ActiveLearner extends AbstractModel {
 
 
-    constructor(base, params, subset, fields, formatter) {
-        super(base, params, subset, fields);
+    constructor(base, params, subset, parameters, formatter) {
+        super(base, params, subset, parameters);
         this._formatter = formatter;
 
         // set retrain threshold and learner initialized
@@ -139,10 +139,13 @@ class ActiveLearner extends AbstractModel {
         let self = this;
 
         // prepare stopwords for feature space
-        let stopwords = { language: 'en' };
+        let stopwords = { language: 'en', words: [''] };
+        if (self.stopwords) {
+            stopwords.words = stopwords.words.concat(self.stopwords);
+        }
         if (self.params.parameters.stopwords) {
             let words = self.params.parameters.stopwords;
-            stopwords.words = words;
+            stopwords.words = stopwords.words.concat(words);
         }
 
         self.features = [{
