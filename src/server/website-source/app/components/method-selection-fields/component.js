@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 
 export default Component.extend({
 
@@ -14,6 +15,10 @@ export default Component.extend({
         this.set('parameters.features', fields.filterBy('type', type).map(field =>
             ({ field: field.name, included: true })
         ));
-    }
+    },
+
+    areStringFeatures: computed('type.type', function () {
+        return this.get('type.type') === 'string';
+    })
 
 });

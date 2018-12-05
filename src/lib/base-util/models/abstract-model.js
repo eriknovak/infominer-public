@@ -26,7 +26,8 @@ class AbstractModel {
 
     _promiseSerial(funcs) {
         funcs.reduce((promise, func) =>
-            promise.then(result => func(result)),
+            promise.then(result => func(result))
+                .catch(error => console.log(error)),
             Promise.resolve([]));
     }
 

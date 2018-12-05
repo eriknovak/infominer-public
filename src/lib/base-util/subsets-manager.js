@@ -309,13 +309,15 @@ class SubsetsManager {
                 return field;
             });
 
+        const method = base.store('Subset').resultedIn;
+
         // document aggregates
         let aggregates = [];
         if (queryParams.calculateAggregates && queryParams.calculateAggregates === 'true') {
             for (let field of fields) {
                 // get aggregate distribution
                 if (field.aggregate) {
-                    let distribution = aggregateCb(subsetDocuments, field);
+                    let distribution = aggregateCb(base, subsetDocuments, method, field);
                     aggregates.push({
                         field: field.name,
                         type: field.aggregate,

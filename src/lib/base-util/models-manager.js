@@ -35,6 +35,13 @@ class ModelsManager {
         let self = this;
         // TODO: log activity
 
+        if (method.parameters.stopwords) {
+            let words = method.parameters.stopwords.split(',')
+                .map(word => word.trim())
+                .map(word => word.toLowerCase());
+            method.parameters.stopwords = words;
+        }
+
         // prepare method object
         let qmMethod = {
             type:       method.type,
@@ -262,7 +269,7 @@ class ModelsManager {
                     // get aggregate distribution
                     if (field.aggregate) {
                         // get the aggregate distribution
-                        let distribution = self._aggregateByField(docs, field);
+                        let distribution = self._aggregateByField(base, docs, method, field);
 
                         result[type].aggregates.push({
                             field: field.name,
@@ -329,9 +336,10 @@ class ModelsManager {
         let self = this;
         // TODO: log activity
         const subset = base.store('Subsets')[id];
+        const elements = subset.hasElements;
+        const parentMethod = subset.resultedIn;
+
         if (subset) {
-            // get dataset fields and subset elements
-            const elements = subset.hasElements;
 
             // store the method
             let method = {
@@ -343,7 +351,7 @@ class ModelsManager {
             for (let field of fields) {
                 // get aggregate distribution
                 if (field.aggregate) {
-                    let distribution = self._aggregateByField(elements, field);
+                    let distribution = self._aggregateByField(base, elements, parentMethod, field);
                     method.result.aggregates.push({
                         field: field.name,
                         type: field.aggregate,
@@ -370,7 +378,7 @@ class ModelsManager {
      * @returns The results of the aggregation.
      * @private
      */
-    _aggregateByField(elements, field) {
+    _aggregateByField(base, elements, method, field) {
         let self = this;
         // TODO: check if field exists
         const fieldName = field.name;
@@ -386,27 +394,108 @@ class ModelsManager {
                     self._addChild(distribution, fieldVals[0], fieldVals.slice(1));
                 }
             }
+
+        } else if (aggregate === 'keywords') {
+            // get stopwords if applicable
+            let words = [''];
+
+            if (method && method.parameters.stopwords) {
+                words = method.parameters.stopwords;
+            }
+            console.log('calculate keywords ....')
+            distribution = elements.aggr({
+                name: `${aggregate}_${fieldName}`,
+                field: fieldName,
+                type: aggregate,
+                stemmer: 'porter',
+                stopwords: {
+                    language: 'en',
+                    words
+                }
+            })
+
+            // distribution = this._aggregateKeyword(base, elements, fieldName, words);
+            if (distribution && distribution.keywords && !distribution.keywords.length) {
+                distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
+            }
+
         } else {
+
             // aggregate params
             let aggregateParams = {
                 name: `${aggregate}_${fieldName}`,
                 field: fieldName,
                 type: aggregate
             };
-
             // calculate the aggregates for the record set
             distribution = elements.aggr(aggregateParams);
-            if (aggregate === 'keywords' &&
-                distribution &&
-                distribution.keywords &&
-                !distribution.keywords.length) {
-                distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });
-            } else if (aggregate === 'timeline') {
+
+            if (aggregate === 'timeline') {
                 distribution.count = self._aggregateTimeline(distribution);
             }
         }
         return distribution;
     }
+
+
+    // _aggregateKeyword(base, elements, field, stopwords = ['']) {
+    //     let self = this;
+
+    //     // create placeholder for all of the text
+    //     let string = '';
+
+    //     // pull all text into one field
+    //     elements.each(rec => {
+    //         if (rec[field]) string += `${rec[field]} `;
+    //     });
+
+    //     const featureSpace = new qm.FeatureSpace(base, {
+    //         type: 'text',
+    //         source: 'Dataset',
+    //         field,
+    //         ngrams: 2,
+    //         tokenizer: {
+    //             type: 'simple',
+    //             stopwords: {
+    //                 language: 'en',
+    //                 words: stopwords
+    //             }
+    //         }
+    //     });
+    //     // update feature space
+    //     featureSpace.updateRecords(elements);
+
+    //     // get the tf-idf of the whole string
+    //     const record = { [field]: string };
+    //     const vector = featureSpace.extractVector(record);
+
+    //     // sort the vector
+    //     let sort = vector.sortPerm(false);
+
+    //     // setup placeholder for the distribution
+    //     let distribution = [ ];
+
+    //     let upperLimit = 100;
+    //     if (upperLimit > sort.perm.length) {
+    //         // the threshold is larger than the vector
+    //         upperLimit = sort.perm.length;
+    //     }
+
+    //     for (let i = 0; i < upperLimit; i++) {
+    //         // get content id of (i+1)-th terms with greatest weights
+    //         let maxid = sort.perm[i];
+    //         // remember the content and it's weights
+    //         const keyword = featureSpace.getFeature(maxid).toLowerCase();
+    //         const weight = vector[maxid];
+    //         distribution.push({ keyword , weight });
+    //     }
+
+    //     return {
+    //         type:'keywords',
+    //         keywords: distribution
+    //     }
+    // }
+
 
     _aggregateTimeline(timeline) {
         // prepare d3 libraries
@@ -466,18 +555,21 @@ class ModelsManager {
         data.months.values.push(month);
 
 
-        function _setInterpolation(tick) {
-            let tickDate = new Date(tick);
-            let tickCompare = null;
-            if (aggregate === 'days') {
-                tickCompare = d3.timeFormat('%Y-%m-%d')(tickDate);
-            } else if (aggregate === 'months') {
-                tickCompare = d3.timeFormat('%Y-%m')(tickDate);
-            } else if (aggregate === 'years') {
-                tickCompare = d3.timeFormat('%Y')(tickDate);
-            }
-            return data[aggregate].values.find(d => tickCompare === d.date) ||
-                    { date: tick, value: 0 };
+        function _setInterpolation(aggregate) {
+
+            return function(tick) {
+                let tickDate = new Date(tick);
+                let tickCompare = null;
+                if (aggregate === 'days') {
+                    tickCompare = d3.timeFormat('%Y-%m-%d')(tickDate);
+                } else if (aggregate === 'months') {
+                    tickCompare = d3.timeFormat('%Y-%m')(tickDate);
+                } else if (aggregate === 'years') {
+                    tickCompare = d3.timeFormat('%Y')(tickDate);
+                }
+                return data[aggregate].values.find(d => tickCompare === d.date) ||
+                        { date: tick, value: 0 };
+            };
         }
 
         // interpolate through the values
@@ -486,7 +578,7 @@ class ModelsManager {
                 .domain(data[aggregate].values.map(d => new Date(d.date)))
                 .nice().ticks(d3.timeDay);
 
-            let interpolate = ticks.map(_setInterpolation);
+            let interpolate = ticks.map(_setInterpolation(aggregate));
             // store aggregates interpolated values
             data[aggregate].interpolate = interpolate;
             // store the maximum value
@@ -525,7 +617,7 @@ class ModelsManager {
                     // get aggregate distribution
                     if (field.aggregate) {
                         // get the aggregate distribution
-                        let distribution = self._aggregateByField(docs, field);
+                        let distribution = self._aggregateByField(base, docs, method, field);
 
                         result.clusters[clusterId].aggregates.push({
                             field: field.name,

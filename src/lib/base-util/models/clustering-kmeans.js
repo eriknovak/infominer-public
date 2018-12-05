@@ -56,13 +56,25 @@ class ClusteringKMeans extends AbstractModel {
         // based on clustering type setup feature parameters
         switch(self.params.parameters.method.clusteringType) {
             case 'text':
+                // prepare stopwords for feature space
+                let stopwords = { language: 'en' };
+                if (self.params.parameters.stopwords) {
+                    let words = self.params.parameters.stopwords;
+                    stopwords.words = words;
+                }
+
                 // bag-of-words ft-idf model
                 self.params.parameters.method.distanceType = 'Cos';
                 features = [{
                     type: 'text',
                     field: self.params.parameters.fields,
                     ngrams: 2,
-                    hashDimension: 20000
+                    hashDimension: 20000,
+                    tokenizer: {
+                        type: 'simple',
+                        stemmer: 'porter',
+                        stopwords
+                    }
                 },{
                     type: 'constant',
                     const: 0.0001

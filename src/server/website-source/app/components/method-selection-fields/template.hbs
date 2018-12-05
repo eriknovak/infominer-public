@@ -1,4 +1,9 @@
 {{#if parameters.features.length}}
+
+  <label class="highlight-text-only parameter mt-3">
+      Select fields used for analysis
+  </label>
+
   {{#each parameters.features as |features index| }}
 
     <div class="dataset-field">
@@ -18,9 +23,24 @@
     </div>{{! dataset-field }}
 
   {{/each}}
+
+  {{#if areStringFeatures}}
+    <label class="highlight-text-only parameter mt-3">
+      Add additional stopwords (optional)
+    </label>
+
+    {{
+      input
+      value=parameters.stopwords
+      class="form-control editing"
+      placeholder="Separater stopwords with a comma"
+    }}
+
+  {{/if}}
+
 {{else}}
 
-  <div class="dataset-field__name warning">
+  <div class="dataset-field__name warning mt-2">
     No fields of type <b>{{type.name}}</b> found
   </div>
 

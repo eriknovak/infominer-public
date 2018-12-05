@@ -138,11 +138,23 @@ class ActiveLearner extends AbstractModel {
     _prepareFeatureParameters() {
         let self = this;
 
+        // prepare stopwords for feature space
+        let stopwords = { language: 'en' };
+        if (self.params.parameters.stopwords) {
+            let words = self.params.parameters.stopwords;
+            stopwords.words = words;
+        }
+
         self.features = [{
             type: 'text',
             source: 'Dataset',
             field: self.params.parameters.fields,
-            ngrams: 2
+            ngrams: 2,
+            tokenizer: {
+                type: 'simple',
+                stemmer: 'porter',
+                stopwords
+            }
         }];
 
          // specify the default field

@@ -50,18 +50,22 @@ export default Component.extend({
             } else if (methodType.includes('active-learning')) {
                 parameters = this._prepareClusteringParams();
             }
+
             // send the parameters to the route
             if (methodType.includes('clustering.kmeans') && parameters.fields.length ||
                 methodType.includes('visualization')) {
                 // parameters are set - make a method request
                 this.get('startAnalysis')({ methodType, parameters });
+
             } else if (methodType.includes('classify.active-learning') &&
                 parameters.method.queryText &&
                 parameters.fields.length) {
                 this.get('startActiveLearning')({
                     queryText: parameters.method.queryText,
+                    stopwords: parameters.stopwords,
                     selectedFields: parameters.fields
                 });
+
             } else {
                 // there are no fields selected - warn the user
                 $(`${this.get('elementId')} .modal-style--analysis__warning`).removeClass('d-none');
@@ -79,7 +83,7 @@ export default Component.extend({
         response.fields = fields;
         // get method parameters
         response.method = get(parameters, 'method');
-
+        response.stopwords = get(parameters, 'stopwords') || '';
         return response;
     },
 
