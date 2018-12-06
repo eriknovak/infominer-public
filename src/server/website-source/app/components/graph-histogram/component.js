@@ -96,7 +96,7 @@ const HistogramComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        this.set('buttonPosition', this.get('width') - 75);
+        this.set('buttonPosition', this.get('width') - 70);
         once(this, '_redrawGraph');
     }),
 

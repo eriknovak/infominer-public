@@ -66,7 +66,7 @@ const TimelineComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        this.set('buttonPosition', this.get('width') - 135);
+        this.set('buttonPosition', this.get('width') - 130);
         once(this, '_redrawGraph');
     }),
 

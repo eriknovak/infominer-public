@@ -50,7 +50,7 @@ const WordCloudComponent = GraphComponent.extend({
      * @param {Object[]} keywords - Array of `keyword` and `weight` values.
      */
     prepareText(keywords) {
-        keywords = keywords.slice(0, 50);
+        keywords = keywords.slice(0, 100);
         // get minimum and maximum weights
         let minWeight = min(keywords, d => d.weight);
         let maxWeight = max(keywords, d => d.weight);
@@ -152,12 +152,16 @@ const WordCloudComponent = GraphComponent.extend({
         // remove previous g components
         select(this.element).selectAll('g').remove();
 
+
+
+
         // create a new wordcloud
         select(this.element)
             .attr('width', width)
             .attr('height', height)
           .append('g')
-            .attr('transform', `translate(${width/2}, ${height/2})`)
+            .attr('transform', `translate(${width/2}, ${height/2})
+                scale(${Math.max(Math.min(width,height)/400, 1)})`)
           .selectAll('text')
             .data(words)
           .enter().append('text')

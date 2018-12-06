@@ -4,6 +4,7 @@ $height: 250px;
 .graph {
     width: 100%;
     height: $height;
+    background-color: white;
 
     &--wordcloud {
         border: 1px solid $primary-color;

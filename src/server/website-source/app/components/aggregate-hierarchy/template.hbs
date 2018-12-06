@@ -1,2 +1,6 @@
-<label class="aggregate-title">{{ field }} hierarchy</label>
+<div class="{{if maximize "analysis__header" "aggregate__title"}}">
+  {{ field }} hierarchy
+  <i class="fa {{unless maximize 'fa-arrows-alt' 'fa-times'}} ml-auto my-auto"
+    aria-hidden="true" {{action 'maximizeComponent'}}></i>
+</div>
 {{ graph-treemap distribution }}
