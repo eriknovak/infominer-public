@@ -13,7 +13,7 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         //set new dataset label & description
-        this.set('label', this.get('dataset.label'));
+        this.set('label',       this.get('dataset.label'));
         this.set('description', this.get('dataset.description'));
     },
 
@@ -31,7 +31,7 @@ export default Component.extend({
         });
     },
 
-    numberOfVisualizationFields: computed('fieldSelection.fields.@each.showInVisual', function () {
+    numberOfSelectedVisualFields: computed('fieldSelection.fields.@each.showInVisual', function () {
         return this.get('fieldSelection.fields').filter(field => get(field, 'showInVisual')).length;
     }),
 
@@ -60,12 +60,12 @@ export default Component.extend({
         updateDataset() {
 
             // get warning and clean container
-            let warning = $('#edit-dataset-modal div.warning');
+            let warning = $('#edit-dataset-modal .modal-style--edit__warning');
             warning.empty();
 
             if (this.get('label').length === 0) {
                 // TODO: notify the user the subset label is missing
-                warning.append('<p class="warning-content">Dataset label must be given!</p>');
+                warning.append('Dataset label must be given!');
             } else {
                 // update dataset attributes
                 this.set('dataset.label', this.get('label'));
@@ -80,7 +80,7 @@ export default Component.extend({
          * Remove the modal warnings.
          */
         removeWarnings() {
-            $('#edit-dataset-modal div.warning').empty();
+            $('#edit-dataset-modal .modal-style--edit__warning').empty();
         }
     },
 

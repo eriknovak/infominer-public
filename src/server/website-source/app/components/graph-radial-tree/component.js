@@ -14,7 +14,7 @@ import { drag } from 'd3-drag';
 // declare new graph component
 const RadialTreeComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['radial-tree'],
+    classNames: ['graph--radial-tree'],
 
     // services
     store: service('store'),
@@ -45,21 +45,12 @@ const RadialTreeComponent = GraphComponent.extend({
         let methods = subset.get('usedBy').filter(method => {
             if (!method.get('methodType')) { return false; }
             return method.get('methodType').includes('clustering') ||
-                   method.get('methodType').includes('filter');
+                   method.get('methodType').includes('filter') ||
+                   method.get('methodType').includes('classify');
         });
 
-        // get number of sibling methods of parent
-        // let parentSiblingsCount = subset.get('resultedIn').get('appliedOn').get('usedBy')
-        // .filter(method => {
-        //     return method.get('methodType').includes('clustering') ||
-        //         method.get('methodType').includes('filter');
-        // })
-        // .get('length');
-
         // get parent id
-        let parentId = /* parentSiblingsCount !== 1 ? */
-            `method-${subset.get('resultedIn').get('id')}`; /* : */
-            // `subset-${subset.get('resultedIn').get('appliedOn').get('id')}`;
+        let parentId = `method-${subset.get('resultedIn').get('id')}`;
         // push the subset information to the hierarchy tree
         let id = `subset-${subset.get('id')}`;
 
@@ -81,20 +72,11 @@ const RadialTreeComponent = GraphComponent.extend({
      */
     _addMethodToHierarchy(method, hierarchy) {
 
-        // const singleMethod = method.get('appliedOn').get('usedBy')
-        //     .filter(method => {
-        //         return method.get('methodType').includes('clustering') ||
-        //             method.get('methodType').includes('filter');
-        //     })
-        //     .get('length') === 1;
-
         // push the method information to the hierarchy tree
         let id = `method-${method.get('id')}`;
         let parentId = `subset-${method.get('appliedOn').get('id')}`;
 
-        // if (!singleMethod) {
-            hierarchy.push({ label: method.get('label'), type: 'method', id, parentId });
-        // }
+        hierarchy.push({ label: method.get('label'), type: 'method', id, parentId });
         // check the type of the method
         if (method.get('methodType').includes('clustering')) {
             // method does not have any results at the moment
@@ -103,18 +85,15 @@ const RadialTreeComponent = GraphComponent.extend({
             for (let i = 0; i < method.get('result.clusters').length; i++) {
 
                 let cluster = method.get('result.clusters').objectAt(i);
-                if (cluster.subset.created) {
-                    let subset = this.get('store').peekRecord('subset', cluster.subset.id);
-                    this._addSubsetToHierarchy(subset, hierarchy);
-                } else {
-                    let numberOfDocuments = cluster.documentCount;
-                    // if (!singleMethod) {
+                if (!cluster.subset.deleted) {
+                    if (cluster.subset.created) {
+                        let subset = this.get('store').peekRecord('subset', cluster.subset.id);
+                        this._addSubsetToHierarchy(subset, hierarchy);
+                    } else {
+                        let numberOfDocuments = cluster.documentCount;
                         hierarchy.push({ label: cluster.label, type: 'subset',
                             numberOfDocuments, id: `${id}-${i}`, parentId: id });
-                    // } else {
-                    //     hierarchy.push({ label: cluster.label, type: 'subset',
-                    //         numberOfDocuments, id: `${id}-${i}`, parentId: parentId });
-                    // }
+                    }
                 }
             }
         } else if (method.get('methodType').includes('filter')) {
@@ -122,6 +101,24 @@ const RadialTreeComponent = GraphComponent.extend({
             for (let i = 0; i < method.get('produced.length'); i++) {
                 let subset = method.get('produced').objectAt(i);
                 this._addSubsetToHierarchy(subset, hierarchy);
+            }
+        } else if (method.get('methodType').includes('classify')) {
+            // method does not have any results at the moment
+            if (!method.get('result')) { return; }
+            // method is a clustering method - get all results
+            const types = Object.keys(method.get('result'));
+            for (let type of types) {
+                let modelClass = method.get(`result.${type}`);
+                if (!modelClass.subset.deleted) {
+                    if (modelClass.subset.created) {
+                        let subset = this.get('store').peekRecord('subset', modelClass.subset.id);
+                        this._addSubsetToHierarchy(subset, hierarchy);
+                    } else {
+                        let numberOfDocuments = modelClass.docIds.length;
+                        hierarchy.push({ label: modelClass.label, type: 'subset',
+                            numberOfDocuments, id: `${id}-${i}`, parentId: id });
+                    }
+                }
             }
         }
     },
@@ -144,7 +141,8 @@ const RadialTreeComponent = GraphComponent.extend({
         // filter out appropriate methods
         let methods = this.get('usedBy').filter(method => {
             return method.get('methodType').includes('clustering') ||
-                   method.get('methodType').includes('filter');
+                   method.get('methodType').includes('filter') ||
+                   method.get('methodType').includes('classify');
         });
 
         // iterate through all methods - add them and their children to the tree
@@ -265,7 +263,7 @@ const RadialTreeComponent = GraphComponent.extend({
             });
 
 
-            
+
         function relax() {
             let again = false;
             let spacev = 28;

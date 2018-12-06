@@ -1,0 +1,46 @@
+<div class="row">
+  <div class="col">
+    {{! Fill the container with documents }}
+    <label class="aggregate__title" for="active-learning-current-doc">Label Document</label>
+    {{#if currentDoc }}
+      <div class="active-learning-label-container table-responsive">
+        <table id="active-learning-current-doc" class="table table-hover border">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+          {{#each documentFields as |field|}}
+            <tr>
+              <td class="field-inform align-top">{{field.name}}</td>
+              <td>
+                <div class="active-learning-doc-field-value">
+                  {{field.value}}
+                </div>
+              </td>
+            </tr>
+          {{/each}}
+          </tbody>
+        </table>
+      </div>{{! .container }}
+
+      <div class="text-center">
+        <button class="btn btn-success btn-rounded" {{action 'saveLabel' 1}}>
+          Positive <i class="fa fa-check ml-1" aria-hidden="true"></i>
+        </button>
+        <button class="btn btn-danger btn-rounded" {{action 'saveLabel' -1}}>
+          Negative <i class="fa fa-times ml-1" aria-hidden="true"></i>
+        </button>
+      </div>
+    {{else}}
+      <p>No more available documents to be labelled.</p>
+    {{/if}}
+
+  </div>
+
+</div>
+
+
+{{yield}}

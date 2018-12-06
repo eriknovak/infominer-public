@@ -4,7 +4,7 @@ import { computed } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
-    classNames: ['query-options'],
+    classNames: ['table__query-options'],
     columnWidth: service('column-size'),
 
     queryChanged: false,

@@ -1,0 +1,57 @@
+<div class="analysis__header">Class Overview</div>
+
+<div class="analysis__container">
+
+  {{#link-to 'dataset.subset' dataset class.subset.id class="btn btn-secondary btn-rounded pull-right" }}
+    Inspect
+  {{/link-to}}
+
+  {{#if class.subset.id}}
+    <button type="button" class="btn btn-light btn-rounded pull-right" data-toggle="modal"
+      data-target="#subset-delete-modal" data-subsetid="{{class.subset.id}}">
+      Delete
+    </button>
+  {{/if}}
+
+  <h4 class="overview__title">
+
+    {{! button for toggling collapse }}
+    <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
+      aria-expanded="false" onclick={{action 'toggleInformation'}}>
+      <i class="fa fa-chevron-down"></i>
+    </button>
+
+    {{#if editing-label}}
+      Label:
+      <input class="form-control editing title" type="text" value="{{label}}">
+      <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
+      <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
+    {{else}}
+      <span>Label: {{label}}</span>
+      <i class="fa fa-pencil edit overview__title--edit" aria-hidden="true" {{action 'editLabel'}}></i>
+    {{/if}}
+
+  </h4>
+
+  <p class="overview__metadata">
+    <b>Number of documents:</b> {{numberOfDocuments}}
+  </p>
+
+  {{#bs-collapse collapsed=collapsed}}
+
+    <div class="row overview__aggregates">
+      {{#each aggregates as |aggregate index|}}
+        {{#if aggregate.distribution}}
+          <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
+            {{ component
+                (concat "aggregate-" aggregate.type)
+                field=aggregate.field
+                distribution=aggregate.distribution
+            }}
+          </div>
+        {{/if}}
+      {{/each}}
+    </div>
+  {{/bs-collapse}}
+
+</div>

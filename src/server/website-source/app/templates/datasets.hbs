@@ -3,55 +3,49 @@
   {{! title }}
   <div class="row">
     <div class="col-sm-12">
-      <h2 class="description-header">Datasets</h2>
+      <h2 class="title">Datasets</h2>
       <p>Upload or select a dataset</p>
     </div>
   </div>
 
   {{! datasets list }}
-  <div id="datasets-container">
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="row">
+  <div class="row">
 
-          {{! Add new dataset }}
-          <div class="col-sm-6 col-md-4 col-lg-3">
-            {{! Button trigger modal }}
-            {{#link-to 'dataset-upload'}}
-              <div class="dataset rounded add-new">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-                <p>add new dataset</p>
-              </div>
-            {{/link-to}}
-          </div>
-
-          {{#each model as |dataset|}}
-            {{! Add new dataset }}
-            <div class="col-sm-6 col-md-4 col-lg-3">
-              {{#if dataset.loaded}}
-                {{! Button trigger modal }}
-                {{#link-to 'dataset.subset.analysis' dataset.id 0 }}
-                  <div class="dataset rounded {{unless dataset.loaded 'loading'}}">
-                    <i class="fa fa-database" aria-hidden="true"></i>
-                    <p class="dataset-label">{{ dataset.label }}</p>
-                    <p class="dataset-created">Created: {{ dataset.date }}</p>
-                  </div>
-                {{/link-to}}
-              {{else}}
-                <div class="dataset rounded loading">
-                  <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw" aria-hidden="true"></i>
-                  <p class="dataset-label">{{ dataset.label }}</p>
-                  <p class="dataset-created">Loading...</p>
-                </div>
-              {{/if}}
-            </div>
-          {{/each}}
-
-        </div>{{! .row }}
-      </div>
+    {{! add new dataset }}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      {{! Button trigger modal }}
+      {{#link-to 'dataset-upload'}}
+        <div class="dataset-container dataset-container--create">
+          <i class="fa fa-plus dataset-container__icon" aria-hidden="true"></i>
+          <p class="dataset-container__label">add new dataset</p>
+        </div>
+      {{/link-to}}
     </div>
 
-  </div>{{! .datasets-container }}
+    {{#each model as |dataset|}}
+      {{! Add new dataset }}
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        {{#if dataset.ready}}
+          {{! Button trigger modal }}
+          {{#link-to 'dataset.subset.analysis' dataset.id 0 }}
+            <div class="dataset-container dataset-container--created">
+              <i class="fa fa-database dataset-container__icon" aria-hidden="true"></i>
+              <p class="dataset-container__label">{{ dataset.label }}</p>
+              <p class="dataset-container__date">Created: {{ dataset.date }}</p>
+            </div>
+          {{/link-to}}
+        {{else}}
+          <div class="dataset-container dataset-container--loading">
+            <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw dataset-container__icon" aria-hidden="true"></i>
+            <p class="dataset-container__label">{{ dataset.label }}</p>
+            <p class="dataset-container__date">Loading...</p>
+          </div>
+        {{/if}}
+      </div>
+    {{/each}}
+
+  </div>
+
 
 </div>{{! .container-fluid }}
 

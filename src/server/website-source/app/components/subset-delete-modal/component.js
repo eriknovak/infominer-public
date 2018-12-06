@@ -7,7 +7,7 @@ export default Component.extend({
     store: service('store'),
 
     // component attributes
-    classNames: ['modal'],
+    classNames: ['modal', 'modal-style--delete'],
     attributeBindings: ['tabindex', 'role', 'backdrop:data-backdrop'],
     tagName: 'div',
     tabindex: -1,
@@ -35,7 +35,7 @@ export default Component.extend({
             self.set('derivedFrom', subset.get('resultedIn.appliedOn.label'));
             self.set('createdUsing', subset.get('resultedIn.label'));
             $(`#${self.get('elementId')} .modal-footer .btn-danger`)
-                .html('Yes, delete subset');
+                .html('Yes, Delete Subset');
         });
     },
 

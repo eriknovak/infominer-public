@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="col">
+
+    <p class="method-description">
+      <span class="highlight-text-only">Active learning</span> is a semi-supervised
+      machine learning when the system queries the users to obtain the desired outputs.
+    </p>
+
+  </div>{{! col }}
+</div>{{! row }}
+
+<div class="row">
+  <div class="col">
+
+    <div class="form-group">
+      {{
+        textarea
+        class="form-control editing"
+        rows="5"
+        value=parameters.method.queryText
+        placeholder="Input text about content you wish to extract"
+      }}
+    </div>{{! form-group }}
+
+  </div>{{! col }}
+</div>{{! row }}
+
+<div class="row">
+  <div class="col">
+
+    {{
+      method-selection-fields
+      parameters=parameters
+      dataset=dataset
+      type=type
+    }}
+
+  </div>{{! col }}
+</div>{{! row }}

@@ -1,0 +1,33 @@
+.active-learning {
+
+
+    &__actions {
+        margin-top: 15px;
+        text-align: right;
+    }
+}
+
+.active-learning-label-container {
+
+    .table thead tr th {
+        background-color: #6699FF;
+        border: 1px solid #6699FF;
+        font-weight: 500;
+        color: white;
+    }
+
+    .active-learning-doc-field-value {
+        max-height: 200px;
+        overflow: auto;
+        padding-right: 16px;
+    }
+}
+
+.active-learning-statistics {
+    li {
+        padding: 5px 10px 5px 0px;
+        border: 0px;
+
+        .statistics-component { font-weight: 400; }
+    }
+}

@@ -9,12 +9,14 @@
     {{! Fill the container with documents }}
     <div class="document-info-container">
       {{#each documentValues as |value|}}
+
         <div class="document-attribute">
-          <div class="user-input-label">{{value.field}}</div>
+          <div class="aggregate__title">{{value.field}}</div>
           <div>{{{if value.value value.value 'not available'}}}</div>
         </div>
-      {{/each}}
-    </div>{{! .container }}
 
-  </div>{{! .collapse }}
+      {{/each}}
+    </div>{{! document-info-container }}
+
+  </div>{{! document-attributes }}
 </td>

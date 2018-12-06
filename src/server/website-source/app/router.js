@@ -14,10 +14,10 @@ Router.map(function() {
     this.route('subset', { path: '/subsets/:subset_id' }, function() {
       this.route('documents', { path: '/documents' });
       this.route('analysis');
-      this.route('active-learning');
     });
   });
   this.route('login');
+  this.route('active-learning', { path: '/dataset/:dataset_id/subsets/:subset_id/active-learning' });
 });
 
 export default Router;

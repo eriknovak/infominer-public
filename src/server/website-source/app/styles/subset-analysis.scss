@@ -1,0 +1,202 @@
+.dataset-field {
+    font-size: 12px;
+    vertical-align: middle;
+
+    &__include {
+        float: right;
+        &-label { margin: 1px 5px 2px 0; }
+    }
+
+    .dataset-field__name {
+        padding: 1px 0 4px;
+        color: $quaternary-color;
+        text-transform: capitalize;
+        font-weight: 400;
+        &.warning {
+            font-weight: 400;
+            text-transform: none;
+            color: $font-color-dark;
+            b { font-weight: 400; }
+        }
+    }
+}
+
+@mixin collapse-toggle($color, $size) {
+    .btn {
+        color: $color;
+        width: $size;
+        height: $size;
+        padding: 0px;
+        border-radius: 50%;
+        text-align: center;
+        background-color: transparent;
+        &.rotate {
+            -webkit-transition: all .2s linear;
+            -moz-transition: all .2s linear;
+            transition: all .2s linear;
+            &.right{
+                -ms-transform: rotate(-90deg);
+                -moz-transform: rotate(-90deg);
+                -webkit-transform: rotate(-90deg);
+                transform: rotate(-90deg);
+            }
+        }
+        &:hover { background-color: $primary-color; }
+        i { margin: auto; }
+    }
+}
+
+// analysis results
+.analysis {
+    margin: 15px auto;
+
+    &__header {
+        background-color: $tertiary-color;
+        padding: 1px 10px;
+        font-weight: 400;
+        text-transform: capitalize;
+        color: white;
+
+        border-top-left-radius: 0.25rem !important;
+        border-top-right-radius: 0.25rem !important;
+        display: flex;
+    }
+
+    &__container {
+        padding: 10px;
+        background-color: white;
+        border: 1px solid #e6e6e6;
+        border-top: none;
+    }
+
+    &-parameter__name {
+        font-weight: 400;
+
+        &:not(:first-of-type) {
+            margin-left: 0.5rem;
+        }
+        &:first-of-type {
+            margin-left: 25px;
+        }
+    }
+
+    &__method-type {
+        border-bottom: 1px solid #cccccc;
+        color: green;
+        text-transform: capitalize;
+        @include collapse-toggle(green, 20px);
+    }
+
+    &__component {
+
+        margin-top: 30px;
+
+        &--clustering,
+        &--active-learning {
+
+            .overview {
+                margin: 15px auto;
+
+                &__title {
+                    color: $secondary-color;
+                    margin-bottom: 1px;
+                    @include collapse-toggle($secondary-color, 19px);
+
+                    &--edit {
+                        display: none;
+                        &.show { display: inline-block; }
+                    }
+                }
+
+                &__metadata {
+                    margin: 5px 0px 0px 25px;
+                }
+
+                &__aggregates {
+                    margin-top: 1em;
+                }
+            }
+
+        }
+    }
+}
+
+.aggregate {
+    &__title {
+        color: $tertiary-color;
+        font-size: 14px;
+        margin: 10px 0px 4px;
+        text-transform: capitalize;
+        font-weight: 400;
+        display: flex;
+    }
+
+    &.maximize {
+        z-index: 1200;
+        position: fixed;
+        width:  70%;
+        height: 60%;
+        top:  20%;
+        left: 15%;
+
+        .graph {
+            height: 100%;
+            padding: 10px;
+            border-top: 0px;
+            border: 1px solid $primary-color;
+        }
+    }
+
+    .fa { cursor: pointer; }
+    .fa-arrows-alt {
+        display: none;
+    }
+    &:hover .fa-arrows-alt {
+        display: inherit;
+    }
+}
+
+
+.subset-analysis-report {
+    background-color: #f6f6f6;
+
+    .analysis-selector {
+        margin-bottom: 15px;
+
+        &__link {
+            display: block;
+            padding: 10px;
+            text-align: center;
+
+            border: 1px dashed $primary-color;
+            background-color: white;
+
+            transition: background .4s;
+            -webkit-transition: background .4s;
+
+            &:hover {
+                border: 1px solid $primary-color;
+                background-color: lighten($quaternary-color, 20%);
+            }
+
+
+            &__content {
+                color: $tertiary-color;
+                margin: 89px 0;
+
+                &__icon {
+                    margin: 10px 20px;
+                    font-size: 40px;
+                }
+
+                &__label {
+                    font-weight: 400;
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
+}
+
+
+

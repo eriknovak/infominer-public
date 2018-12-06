@@ -4,16 +4,16 @@ $height: 250px;
 .graph {
     width: 100%;
     height: $height;
+    background-color: white;
 
-    &.wordcloud {
+    &--wordcloud {
         border: 1px solid $primary-color;
-        font-weight: 500;
         text.small  { fill: darken($primary-color, 35%); }
         text.medium { fill: $tertiary-color; }
         text.large  { fill: $font-color-dark; }
     }
 
-    &.timeline {
+    &--timeline {
 
         .domain { stroke: $font-color-dark; }
         .tick {
@@ -22,7 +22,7 @@ $height: 250px;
         }
     }
 
-    &.histogram {
+    &--histogram {
         .percent {
             rect { fill: $tertiary-color; }
             .frequency {
@@ -40,7 +40,7 @@ $height: 250px;
         }
     }
 
-    &.radial-tree {
+    &--radial-tree {
         height: 2.5*$height;
 
         .node {
@@ -79,7 +79,9 @@ $height: 250px;
 /**************************************
  * analysis results
  *************************************/
-.clustering .graph { height: calc(#{$height} - 50px); }
+.analysis__component--clustering .graph {
+    height: calc(#{$height} - 50px);
+}
 
 /**************************************
  * placeholder style
@@ -87,27 +89,31 @@ $height: 250px;
 
  @keyframes pulse {
     0%   { background-color: lighten($primary-color, 5%); }
-    50%  { background-color: $primary-color; }
+    50%  { background-color:         $primary-color;      }
     100% { background-color: lighten($primary-color, 5%); }
 }
 
 .placeholder {
     animation: pulse 2s infinite ease-in-out;
-    &.field-title {
+    &__title {
         width: 144px;
         height: 19px;
         margin-top: 3px;
         margin: 10px 0px 4px;
     }
-    &.document-number { width: 120px; height: 13px; }
-    .cluster-header & { width: 104px; height: 19px; }
-    &.subset-button   {
+    &__document-number { width: 120px; height: 13px; }
+    .overview__title & { width: 104px; height: 19px; }
+    &__subset-button {
         width: 114px;
         height: 31px;
         border-radius: 50px;
-        &.spacing { margin-right: 10px; }
+
+        &:not(:first-of-type) {
+            margin-right: 0.5rem;
+        }
+
     }
-    &.document-table {
+    &__document-table {
         height: $height;
         margin-top: 10px;
     }

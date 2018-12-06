@@ -7,7 +7,7 @@ export default Component.extend({
     store: service('store'),
 
     // component attributes
-    classNames: ['modal'],
+    classNames: ['modal', 'modal-style--delete'],
     attributeBindings: ['tabindex', 'role', 'backdrop:data-backdrop'],
     tagName: 'div',
     tabindex: -1,
@@ -37,7 +37,7 @@ export default Component.extend({
 
             // prepare delete button text
             $(`#${self.get('elementId')} .modal-footer .btn-danger`)
-                .html('Yes, delete method');
+                .html('Yes, Delete Method');
         });
     },
 

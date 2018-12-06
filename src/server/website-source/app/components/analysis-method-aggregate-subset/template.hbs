@@ -1,6 +1,7 @@
-<div class="analysis-component-header rounded-top">Aggregates</div>
+<div class="analysis__header">{{header}} Overview</div>
 
-<div class="analysis-component">
+<div class="analysis__container">
+
   <div class="row">
     {{#each aggregates as |aggregate|}}
       <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
@@ -11,5 +12,6 @@
         }}
       </div>
     {{/each}}
-  </div>
-</div>
+  </div>{{! row }}
+
+</div>{{! analysis__container }}

@@ -1,74 +1,96 @@
-<div class="row subset-information">
-  <div class="col-lg-12">
+<div class="subset-info-container">
 
     <div class="row">
       <div class="col-lg-10">
-        <h3 class="description-header text-uppercase">{{ model.label }}
+
+        <h3 class="title text-uppercase">{{ model.label }}
           <button class="btn btn-secondary btn-rounded edit pull-right" data-toggle="modal"
           data-target="#edit-subset-modal" {{action 'removeModalWarnings'}}>Edit</button>
         </h3>
 
         <div class="row">
+
           <div class="col-lg-3">
-            <p class="subset-basic-information">
-              <span class="dataset-documents-number">{{ model.documentCount }} documents</span><br/>
-              Derived from: <span class="subset">{{if model.resultedIn model.resultedIn.appliedOn.label 'none' }}</span><br/>
-              Created using:
-              <span class="method">
-                {{#if model.resultedIn }}
-                  {{model.resultedIn.label}}
-                {{else}}
-                  none
-                {{/if}}
-              </span><br/>
-            </p>
-          </div>
+            <div class="subset-info-container__statistics">
+
+              <p class="subset-info-container__statistics__value">
+                {{ model.documentCount }} documents
+              </p>
+
+              <p class="subset-info-container__statistics__value">
+                Derived from:
+                <span class="subset">
+                  {{if model.resultedIn model.resultedIn.appliedOn.label 'none' }}
+                </span>
+              </p>
+
+              <p class="subset-info-container__statistics__value">
+                Created using:
+                <span class="method">
+                  {{#if model.resultedIn }}
+                    {{model.resultedIn.label}}
+                  {{else}}
+                    none
+                  {{/if}}
+                </span>
+              </p>
+
+            </div>{{! subset-info-container__statistics }}
+          </div>{{! col-lg-3 }}
+
           {{#if model.description }}
             <div class="col-lg-9">
               <h5>Description</h5>
-              <p class="dataset-description">{{ model.description }}</p>
+              <p class="subset-info-container__description">
+                {{ model.description }}
+              </p>
             </div>
           {{/if}}
-        </div>
 
-      </div>
-    </div>
+        </div> {{! row }}
+
+      </div>{{! col-lg-10 }}
+    </div>{{! row }}
 
     <div class="row">
-      <div class="col-lg-10 subset-navigation">
+      <div class="col-lg-10 subset-info-container__navigation">
         {{#link-to "dataset.subset.analysis" model class="btn"}}Analysis{{/link-to}}
-        {{!-- {{#link-to "dataset.subset.active-learning" model class="btn"}}Active Learning{{/link-to}} --}}
         {{#link-to "dataset.subset.documents" model class="btn"}}Documents{{/link-to}}
       </div>
     </div>
-  </div>
-</div>
 
-<!-- subset statistics and documents -->
+</div>{{! subset-info-container }}
+
+{{! subset statistics and documents }}
 <div class="row">
-  <div class="col-lg-10 subset-information-container">
+  <div class="col-lg-10 subset-analysis-report">
     {{outlet}}
   </div>
 </div>
 
 
-<!-- Edit subset modal -->
-<div class="modal" id="edit-subset-modal" tabindex="-1" role="dialog" aria-hidden="true">
+{{! Edit subset modal }}
+<div class="modal modal-style--edit" id="edit-subset-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" role="document">
+
     <div class="modal-content">
-      <!-- modal header -->
+
+      {{! modal header containing the title }}
       <div class="modal-header">
-        <h4 class="modal-title">Edit subset</h4>
-        <button type="button" class="btn btn-light rounded-circle" data-dismiss="modal" aria-label="Close">
+        <h4 class="modal-style--edit__title">Edit Subset</h4>
+
+        <button type="button" class="btn btn-light rounded-circle"
+          data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <!-- modal title -->
-      </div>
-      <div class="modal-body new-subset">
-        <div class="container-fluid">
 
-          <!-- subset label -->
-          <div class="form-group row new-subset-information">
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid modal-style--edit_description">
+
+          {{! edit the subset label }}
+          <div class="form-group row">
             <label class="col-md-3 col-form-label">Label</label>
             <div class="col-md-9">
               <input type="text" class="form-control editing emphasize"
@@ -77,8 +99,8 @@
             </div>
           </div>
 
-          <!-- subset description -->
-          <div class="form-group  row new-subset-information">
+          {{! edit the subset description }}
+          <div class="form-group row">
             <label class="col-sm-3 col-form-label">Description</label>
             <div class="col-sm-9">
               <textarea class="form-control editing" rows="5"
@@ -87,20 +109,12 @@
               </textarea>
             </div>
           </div>
+        </div>{{! modal-style--edit_description }}
 
-          <!-- warning placeholder -->
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="warning">
-              </div>
-            </div>
-          </div>
-
-        </div><!-- .container-fluid -->
-
-      </div><!-- .modal-body -->
+      </div>{{! modal-body }}
 
       <div class="modal-footer">
+
         {{#unless model.isRoot}}
           <button type="button" class="btn btn-light btn-rounded mr-auto"
             data-toggle="modal" data-target="#subset-delete-modal"
@@ -108,16 +122,20 @@
             Delete
           </button>
         {{/unless}}
-        <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary btn-rounded" {{action "editSubset"}}>Save</button>
+
+        <span class="modal-style--edit__warning"></span>
+        <button type="button" class="btn btn-light   btn-rounded" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-rounded" {{action "editSubset"}}>
+          Save Changes
+        </button>
       </div>
 
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    </div>{{! modal-content }}
+  </div>{{! modal-dialog }}
+</div>{{! modal }}
 
 
-<button id="go-to-top" class="btn btn-light btn-rounded d-md-none d-lg-block"
-  {{action 'backToTop'}}>
-  Back to Top
+{{! go to top button }}
+<button id="go-to-top" class="btn btn-light btn-rounded d-md-none d-lg-block" {{action 'goToTop'}}>
+  <i class="fa fa-angle-up" aria-hidden="true"></i>
 </button>

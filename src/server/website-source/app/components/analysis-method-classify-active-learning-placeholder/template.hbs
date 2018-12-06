@@ -1,0 +1,66 @@
+<h3 class="analysis__method-type">
+
+  <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
+    aria-expanded="false" onclick={{action 'toggleInformation'}}>
+    <i class="fa fa-chevron-down"></i>
+  </button>
+
+  Active Learning
+
+</h3>
+
+<div class="row">
+  <div class="col-md-6">
+
+    <span class="analysis-parameter__name">Initial query: </span>
+    <span class="analysis-parameter__value">
+      {{method.parameters.initQuery}}
+    </span>
+
+    <span class="analysis-parameter__name">Selected fields: </span>
+    <span class="analysis-parameter__value">
+      {{selectedFields}}
+    </span>
+
+  </div>
+</div>
+
+{{#bs-collapse collapsed=collapsed}}
+  {{#each clusters as |cluster index|}}
+
+    <div class="row">
+      <div class="col">
+
+        <div class="overview">
+
+          <div class="analysis__header">Class Overview</div>
+
+          <div class="analysis__container">
+            <div class="pull-right placeholder placeholder__subset-button"></div>
+            <div class="pull-right placeholder placeholder__subset-button"></div>
+
+            <h5 class="overview__title">
+              <p class="placeholder"></p>
+            </h5>
+
+            <p class="placeholder placeholder__document-number"></p>
+
+            <div class="row">
+              {{#each cluster as |placeholder index|}}
+                <div class="content {{concat placeholder.columnlg ' ' placeholder.columnsm}}">
+                  <h5 class="placeholder placeholder__title"></h5>
+                  <div class="graph placeholder"></div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+
+        </div>{{! overview }}
+
+      </div>{{! col }}
+    </div>{{! row }}
+
+  {{/each}}
+{{/bs-collapse}}
+
+{{yield}}

@@ -4,7 +4,8 @@ import { computed, get, set } from '@ember/object';
 import $ from 'jquery';
 
 export default Component.extend({
-    classNames: ['cluster-content'],
+    classNames: ['overview'],
+
     fieldSelection: service('field-selection'),
     columnWidth: service('column-size'),
     store:       service('store'),
@@ -24,7 +25,19 @@ export default Component.extend({
     didReceiveAttrs() {
         this._super(...arguments);
         let cluster = this.get('cluster');
-        this.set('label', this.get('store').peekRecord('subset', cluster.subset.id).get('label'));
+
+        const dataset = this.get('dataset');
+        const clusterSubset = this.get('store').peekRecord('subset', cluster.subset.id);
+
+        this.set('label', clusterSubset.get('label'));
+
+        const clusterCount = clusterSubset.get('documentCount');
+        const allCount = dataset.get('numberOfDocuments');
+
+        const percentageCoverage = (clusterCount / allCount * 100).toFixed(1);
+
+        this.set('numberOfDocuments', `${clusterCount} (${percentageCoverage}%)`);
+
         if (cluster.avgSimilarity) {
             set(cluster, 'avgSimProcent', (cluster.avgSimilarity * 100).toFixed(1));
         }
@@ -35,9 +48,9 @@ export default Component.extend({
         self._super(...arguments);
         const elementId = self.get('elementId');
         // on hover show edit button
-        $(`#${elementId} .cluster-header`).hover(
-          function () { $(`#${elementId} .edit-cluster-label`).addClass('show'); },
-          function () { $(`#${elementId} .edit-cluster-label`).removeClass('show'); }
+        $(`#${elementId} .overview__title`).hover(
+          function () { $(`#${elementId} .overview__title--edit`).addClass('show'); },
+          function () { $(`#${elementId} .overview__title--edit`).removeClass('show'); }
         );
     },
 

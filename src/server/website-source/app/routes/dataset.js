@@ -14,7 +14,7 @@ const DatasetRoute = ENV.environment === 'development' ?
 
 export default DatasetRoute.extend({
     fieldSelection: service('field-selection'),
-    unloadExtra: service('unload-extra'),
+    unloadExtra:    service('unload-extra'),
 
     model(params) {
         // unload subsets and methods
@@ -23,14 +23,23 @@ export default DatasetRoute.extend({
         // modify namespace for subset and method model
         let subsetAdapter = this.get('store').adapterFor('subset');
         let methodAdapter = this.get('store').adapterFor('method');
+        let activeLearningAdapter = this.get('store').adapterFor('active-learning');
 
         // check if the namespace has changed
         if (subsetAdapter.get('namespace') !== namespace) {
+            clearTimeout(methodAdapter.get('timeout'));
+            let methods = this.get('store').peekAll('method');
+            methods.forEach(record => {
+                if (record.get('currentState.isSaving')) {
+                    record.send('becameInvalid');
+                }
+            });
             // unload all data
             this.get('store').unloadAll();
             // set new namespace
             subsetAdapter.set('namespace', namespace);
             methodAdapter.set('namespace', namespace);
+            activeLearningAdapter.set('namespace', `${namespace}/methods`);
         }
         return this.get('store').findRecord('dataset', params.dataset_id)
             .then(dataset => {

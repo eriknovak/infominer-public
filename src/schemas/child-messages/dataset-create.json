@@ -48,7 +48,8 @@
                                 "mode": {
                                     "constant": ["createClean", "open"]
                                 },
-                                "dbPath": { "type": "string" }
+                                "dbPath": { "type": "string" },
+                                "parameters": { "type": "object" }
                             },
                             "required": ["datasetId", "label", "created", "mode", "dbPath"]
                         }

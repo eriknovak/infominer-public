@@ -1,118 +1,162 @@
-<div class="container-fluid dataset-header">
+<div class="container-fluid dataset-report">
+
   <div class="row">
+    <div class="offset-lg-1 col-lg-11">
+      <h2 class="title dataset-report-info__title">
+        {{dataset.label}}
+      </h2>
+
+      <div class="row">
+        <div class="col-md-4 col-lg-3">
+
+          {{! dataset information container }}
+          <div class="dataset-report-info__container">
+
+            <button class="btn btn-secondary btn-rounded pull-right" data-toggle="modal"
+              data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
+
+            <button class="btn btn-light btn-rounded pull-right" data-toggle="modal"
+              data-target="#delete-dataset-modal">Delete</button>
+
+            <p class="dataset-report-info dataset-report-info__documents">
+              {{dataset.numberOfDocuments}} documents
+            </p>
+
+            <p class="dataset-report-info dataset-report-info__created">
+              Created: {{dataset.date}}
+            </p>
+
+          </div>{{! dataset-report-info__container }}
+
+        </div>{{! col-md-4 col-lg-3 }}
+
+        {{! dataset description }}
+        <div class="col-md-8 col-lg-9">
+          <div class="row">
+            <div class="col-lg-10">
+
+              {{#if dataset.description}}
+                <h4>Description</h4>
+                <p class="dataset-report-info dataset-report-info__description">
+                  {{dataset.description}}
+                </p>
+              {{/if}}
+
+            </div>{{! col-lg-10 }}
+          </div>{{! row }}
+        </div>{{! col-md-8 col-lg-9 }}
+
+      </div>{{! row }}
+
+    </div>{{! offset-lg-1 col-lg-11 }}
+  </div>{{! row }}
+
+
+
+  <div class="row dataset-report__settings">
     <div class="col-sm-12 offset-lg-1 col-lg-11">
-      <div class="row dataset-information">
-        <div class="col-sm-5 col-md-4 col-lg-3">
-          {{! Dataset title and information }}
-          <h2 class="description-header text-uppercase">{{dataset.label}}</h2>
 
-          <button class="btn btn-secondary btn-rounded pull-right" data-toggle="modal"
-            data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
+      <div class="row">
+        <div class="offset-sm-0 col-sm-12 offset-md-4 col-md-8 offset-lg-3 col-lg-9">
 
-          <button class="btn btn-light btn-rounded pull-right" data-toggle="modal"
-            data-target="#delete-dataset-modal">Delete</button>
+          <div class="row">
+            <div class="col-lg-10">
 
-          <span class="dataset-documents-number">{{dataset.numberOfDocuments}} documents</span><br/>
-          <span class="dataset-created">Created: {{dataset.date}}</span>
-        </div>{{! .col-sm-5.col-md-4.col-lg-3 }}
+              {{! settings label }}
+              <span class="dataset-report__settings__label"> Settings: </span>
 
-          <div class="col-sm-7 col-md-8 col-lg-9">
-            {{! Dataset description }}
-            <div class="row">
-              <div class="col-lg-10">
-                {{#if dataset.description}}
-                  <h4 class="description-header">Description</h4>
-                  <p class="dataset-description">{{dataset.description}}</p>
-                {{/if}}
-              </div>{{! .col-lg-10 }}
-            </div>{{! .row }}
-          </div>{{! .col-sm-7.col-md-8.col-lg-9 }}
+              {{! field visualization selection dropdown }}
+              <button class="btn btn-secondary btn-sm btn-rounded dropdown-toggle" type="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Field visualization selection
+                <span class="number-circle">{{numberOfSelectedVisualFields}}</span>
+              </button>
 
-      </div>{{! .row }}
-    </div>{{! .col-sm-12.offset-lg-1.col-lg-11 }}
-  </div>{{! .row }}
+              <div class="dropdown-menu dropdown-menu-left">
+                {{#each fieldSelection.fields as |field index|}}
+                  <div class="dropdown-item">
+                    {{
+                      checkbox-select
+                      checkboxId=(concat 'field-visual-' index)
+                      checked=field.showInVisual
+                    }}
+                    <label class="query-field-selection">{{field.name}}</label>
+                  </div>
+                {{/each}}
+              </div>
 
-  <div class="row visualization-field-selection">
-    <div class="col-sm-12 offset-lg-1 col-lg-11">
-      <div class="offset-sm-0 col-sm-12 offset-md-4 col-md-8 offset-lg-3 col-lg-9">
-        <div class="row">
-          <div class="col-lg-10 pl-0">
+            </div>{{! col-lg-10 }}
+          </div>{{! row }}
 
-            <button class="btn btn-secondary btn-sm btn-rounded dropdown-toggle" type="button"
-              id="visualization-field-selection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Field visualization selection
-              <span class="number-circle">{{numberOfVisualizationFields}}</span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-left">
-              {{#each fieldSelection.fields as |field index|}}
-                <div class="dropdown-item">
-                  {{
-                    checkbox-select
-                    checkboxId=(concat 'field-visual-' index)
-                    checked=field.showInVisual
-                  }}
-                  <label class="query-field-selection">{{field.name}}</label>
-                </div>
-              {{/each}}
-            </div>
+        </div>{{! offset-sm-0 col-sm-12 offset-md-4 col-md-8 offset-lg-3 col-lg-9 }}
+      </div>{{! row }}
 
-          </div>{{! .col-lg-10 }}
-        </div>{{! .row }}
-      </div>{{! .col-sm-7.col-md-8.col-lg-9 }}
-    </div>
-  </div>
-</div>{{! .container-fluid }}
+    </div>{{! col-sm-12 offset-lg-1 col-lg-11 }}
+  </div>{{! row dataset-report__settings }}
 
-{{! Delete dataset warning }}
-<div class="modal" id="delete-dataset-modal" tabindex="-1" role="dialog">
+</div>{{! dataset-report }}
+
+
+
+
+{{! delete dataset popup }}
+<div class="modal modal-style--delete" id="delete-dataset-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" role="document">
+
     <div class="modal-content">
-      {{! modal header }}
+
+      {{! modal header containing the title }}
       <div class="modal-header">
-        {{! modal title }}
-        <h4 class="modal-title warning m-auto">Deleting dataset</h4>
+        <h4 class="modal-style--delete__title">Delete Dataset</h4>
       </div>
-      {{! modal body }}
+
+      {{! modal body containing warning message }}
       <div class="modal-body">
-        <p>
+        <p class="modal-style--delete__description">
           Are you sure you want to delete dataset <b class="uppercase">{{dataset.label}}</b>?
           You will not be able to revert this action.
         </p>
       </div>
 
+      {{! modal footer containing actions }}
       <div class="modal-footer">
-        <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger btn-rounded" onclick={{action deleteDataset}}>
-          Yes, delete dataset
+        <button type="button" class="btn btn-light  btn-rounded" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger btn-rounded" {{action deleteDataset}}>
+          Yes, Delete Dataset
         </button>
       </div>
 
-    </div>{{! /.modal-content }}
-  </div>{{! /.modal-dialog }}
-</div>{{! /.modal }}
+    </div>{{! modal-content }}
+
+  </div>{{! modal-dialog }}
+</div>{{! modal }}
 
 
-{{! Edit dataset }}
-<div class="modal" id="edit-dataset-modal" tabindex="-1" role="dialog">
+
+
+{{! edit dataset popup }}
+<div class="modal modal-style--edit" id="edit-dataset-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" role="document">
+
     <div class="modal-content">
-      {{! modal header }}
+
+      {{! modal header containing the title }}
       <div class="modal-header">
-        {{! modal title }}
-        <h4 class="modal-title">Edit dataset</h4>
+        <h4 class="modal-style--edit__title">Edit Dataset</h4>
+
         <button type="button" class="btn btn-light rounded-circle"
           data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        {{! modal title }}
 
       </div>
-      <div class="modal-body new-subset">
-        <div class="container-fluid">
 
-          {{! dataset label }}
-          <div class="form-group row new-subset-information">
-            <label class="col-md-3 col-form-label">Dataset Label</label>
+      <div class="modal-body">
+        <div class="container-fluid modal-style--edit__description">
+
+          {{! edit the dataset title }}
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label">Title</label>
             <div class="col-md-9">
               <input type="text" class="form-control editing emphasize"
                 oninput={{action 'editLabel'}}
@@ -121,8 +165,8 @@
             </div>
           </div>
 
-          {{! dataset description }}
-          <div class="form-group row new-subset-information">
+          {{! edit the dataset description }}
+          <div class="form-group row">
             <label class="col-sm-3 col-form-label">Description</label>
             <div class="col-sm-9">
               <textarea class="form-control editing" rows="5"
@@ -133,24 +177,19 @@
             </div>
           </div>
 
-          {{! warning placeholder }}
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="warning"></div>
-            </div>{{! .col-lg-12 }}
-          </div>{{! .row }}
-
         </div>
-
-      </div>{{! .modal-body }}
+      </div>{{! modal-body }}
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary btn-rounded" {{action 'updateDataset'}}>Save</button>
+        <span class="modal-style--edit__warning"></span>
+        <button type="button" class="btn btn-light   btn-rounded" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-rounded" {{action 'updateDataset'}}>
+          Save Changes
+        </button>
       </div>
 
-    </div>{{! .modal-content }}
-  </div>{{! .modal-dialog }}
-</div>{{! .modal }}
+    </div>{{! modal-content }}
+  </div>{{! modal-dialog }}
+</div>{{! modal }}
 
 {{yield}}

@@ -1,18 +1,14 @@
 html {
     position: relative;
     min-height: 100%;
-}
-
-// common styles for all views
-html, body {
     font-family: $font-primary;
-    font-weight: 300;
     font-size: 13px;
     color: $font-color-dark;
 }
 
 body {
-    padding-top: 52px;
+    font-weight: 300;
+    padding-top: 60px;
     & > .ember-view {
         main {
             padding-bottom: 120px;
@@ -75,10 +71,12 @@ a {
         font-weight: 400;
     }
     .nav-item {
+        .nav-link { padding: 15.5px; }
         a {
             @include navbar-link;
             &.active { background-color: lighten($secondary-color, 10%); }
         }
+
         &.user-info {
             &.show > a { background-color: lighten($secondary-color, 10%); }
             & > a {
@@ -100,7 +98,7 @@ a {
     .dropdown-menu {
         border: 0px;
         border-radius: 0px;
-        background-color: $quaternary-color;
+        background-color: $secondary-color;
         padding: 0px;
         margin: 0px;
         width: 100%;
@@ -110,7 +108,7 @@ a {
             padding: 10px 1em;
             &:hover {
                 color: $light-font-color;
-                background-color: darken($quaternary-color, 10%);
+                background-color: lighten($secondary-color, 10%);
             }
         }
     }
@@ -119,54 +117,6 @@ a {
 p.modal-subtitle { margin-bottom: 0px; }
 .modal-content { border-radius: 0px; }
 
-/**************************************
- * Custom checkbox style - component 'checkbox-select'
- *************************************/
-
-.checkbox {
-    width: 20px;
-    height: 20px;
-    position: relative;
-    margin: auto;
-    font-size: 13px;
-
-    input[type=checkbox] {
-        display: none;
-    }
-
-    input[type=checkbox]:checked + label:after {
-        opacity: 1;
-    }
-
-    label {
-        cursor: pointer;
-        padding: 0px;
-        top: 0;
-        left: 0;
-        border: 1px solid darken($primary-color, 20%);
-        border-radius: 3px;
-        margin: 0px;
-        display: inline;
-        padding-right: 15px;
-
-        &:hover::after { opacity: 0.5; }
-
-        &:after {
-            opacity: 0;
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 6px;
-            background: transparent;
-            top: 4px;
-            left: 4px;
-            border: 3px solid #333;
-            border-top: none;
-            border-right: none;
-            transform: rotate(-50deg);
-        }
-    }
-}
 
 /**************************************
  * Global button styles
@@ -215,6 +165,43 @@ p.modal-subtitle { margin-bottom: 0px; }
 
     &.pull-right { margin-left: 10px; }
     &.btn-rounded { border-radius: 50px; }
+}
+
+.show > .btn-secondary.dropdown-toggle {
+    background-color: $quaternary-color;
+}
+
+/**************************************
+ * Dropdown toggle
+ *************************************/
+
+.dropdown-toggle {
+    background-color: $quaternary-color;
+    &:focus,
+    &:active {
+        background-color: darken($quaternary-color, 5%) !important;
+        box-shadow: none !important;
+     }
+}
+
+.dropdown-item {
+    text-transform: capitalize;
+    &:hover {
+        background-color: white;
+        color: $font-color-dark;
+    }
+    label.query-field-selection {
+        margin-left: 5px;
+    }
+}
+
+.number-circle {
+    display: inline-block;
+    border-radius: 50%;
+    width: 19px;
+    height: 19px;
+    background: $secondary-color;
+    color: white;
 }
 
 /**************************************
@@ -277,7 +264,6 @@ p.message {
 
     bottom: 0;
     width: 100%;
-    margin-bottom: 10px;
 
     background-color: transparent;
     color: $font-color-dark;
@@ -289,22 +275,19 @@ p.message {
  * Helper classes
  *************************************/
 
-.uppercase { text-transform: uppercase; }
 
 .warning { color: red; }
 
 .center { text-align: center; }
 
-.medium-size { font-size: 16px; }
-
-.highlight-text-only { font-weight: 500; }
-
-.bottom-space { margin-bottom: 10px; }
+.title { margin-top: 15px; }
 
 .highlight {
-    background-color: darken($primary-color, 2%);
     font-weight: 500;
     padding: 0px 2px;
+    background-color: darken($primary-color, 2%);
+
+    &-text-only { font-weight: 500; }
 }
 
 #go-to-top {
@@ -330,6 +313,7 @@ p.message {
             font-size: 1.5rem;
             line-height: 0 !important;
             padding: 0px;
+            margin: -3px 0px;
             color: $secondary-color;
         }
         &.emphasize { color: $secondary-color; }
@@ -348,4 +332,10 @@ p.message {
 .field-warning {
     color: red;
     height: 10px;
+}
+
+.field-inform {
+    color: $quaternary-color;
+    text-transform: capitalize;
+    font-weight: 400;
 }

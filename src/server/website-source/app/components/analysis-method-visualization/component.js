@@ -3,7 +3,7 @@ import { set } from '@ember/object';
 
 export default Component.extend({
     // component attributes
-    classNames: ['analysis', 'visualization'],
+    classNames: ['analysis__component', 'analysis__component--visualization'],
 
     init() {
         this._super(...arguments);
@@ -12,7 +12,9 @@ export default Component.extend({
 
     didReceiveAttrs() {
         this._super(...arguments);
-        this.set('visualizationType', this.get('method.parameters.method.type').replace(/-/g, ' '));
+        const visualizationType = this.get('method.parameters.method.type') === 'radial-tree' ?
+            'topic ontology' : '';
+        this.set('visualizationType', visualizationType);
     },
 
     actions: {

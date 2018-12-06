@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['subset', 'child'],
+    classNames: ['tree-structure__subset', 'child'],
     classNameBindings: ['parent'],
 
     _parentState: observer('subset.usedBy.@each.produced', function () {
@@ -21,7 +21,8 @@ export default Component.extend({
         return this.get('usedBy').filter(method => {
             return method.get('methodType') &&
                 (method.get('methodType').includes('clustering') ||
-                method.get('methodType').includes('filter'));
+                method.get('methodType').includes('filter') ||
+                method.get('methodType').includes('classify'));
         });
     }),
 

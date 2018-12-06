@@ -1,5 +1,5 @@
 // colors
-$primary-color: #e7e7e7;
+$primary-color: #e6e6e6;
 $secondary-color: #003399;
 $tertiary-color: #3366CC;
 $quaternary-color: #6699FF;
@@ -9,49 +9,23 @@ $font-color-dark: #2C3539;
 $font-primary: 'Roboto', sans-serif;
 $font-secondary: 'Open Sans', sans-serif;
 
-
-// mixins
-@mixin label {
-    margin: 0;
-    font-weight: 300;
-}
-
-@mixin collapse-toggle($color, $size) {
-    .btn {
-        color: $color;
-        width: $size;
-        height: $size;
-        padding: 0px;
-        border-radius: 50%;
-        text-align: center;
-        background-color: transparent;
-        &.rotate {
-            -webkit-transition: all .2s linear;
-            -moz-transition: all .2s linear;
-            transition: all .2s linear;
-            &.right{
-                -ms-transform: rotate(-90deg);
-                -moz-transform: rotate(-90deg);
-                -webkit-transform: rotate(-90deg);
-                transform: rotate(-90deg);
-            }
-        }
-        &:hover { background-color: $primary-color; }
-        i { margin: auto; }
-    }
-}
-
 // import bootstrap library
 @import "ember-bootstrap/bootstrap";
 
 // component style
 @import 'common.scss';
+@import 'checkbox.scss';
 @import 'login.scss';
-@import 'tree-structure.scss';
-@import 'dataset-upload.scss';
-@import 'dataset-architecture.scss';
 @import 'table.scss';
-@import 'analysis.scss';
 @import 'graph.scss';
-@import 'query.scss';
 
+@import 'modal-styles.scss';
+@import 'tree-structure.scss';
+
+@import 'subset-report.scss';
+@import 'subset-analysis.scss';
+
+@import 'active-learning.scss';
+
+@import 'dataset-report.scss';
+@import 'dataset-upload.scss';

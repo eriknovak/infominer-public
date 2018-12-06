@@ -18,7 +18,7 @@ const DatasetUploadRoute = ENV.environment === 'development' ?
 
 export default DatasetUploadRoute.extend({
     uploader: service('file-queue'),
-    notify: service('notify'),
+    datasetPending: false,
 
     model() {
         // the initial model is null
@@ -37,7 +37,7 @@ export default DatasetUploadRoute.extend({
         uploadDataset(file) {
             // set the options and upload
             this.task = file.upload({
-                url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file`,
+                url: `${ENV.APP.HOSTNAME}/api/datasets/`,
             }).then(response => {
                 let model = response.body;
                 // set dataset model for storing information
@@ -52,9 +52,11 @@ export default DatasetUploadRoute.extend({
                     });
                     return this._removeDataset();
                 }
-                // set all fields to valid - modify values in child components
+                // add a default value for fields
                 model.fieldList.forEach(field => { field.invalid = false; });
+                model.dataset.parameters = { stopwords: '' };
                 this.set('controller.model', model);
+                this.set('datasetPending', true);
             });
         },
 
@@ -68,84 +70,42 @@ export default DatasetUploadRoute.extend({
 
         /**
          * Pushes metadata and file blob to server.
-         * @param {Object} file - File blob.
          */
         submitDataset() {
             // get route model values
             let { dataset, fieldList } = this.get('controller.model');
 
-            if (fieldList.filter(field => field.included)
-                .map(field => field.invalid.length > 0).includes(true)) {
-                $('#submittion-error').addClass('show');
+            const fieldIsInvalid = fieldList.filter(field => field.included)
+                    .map(field => field.invalid.length > 0).includes(true);
+
+            if (fieldIsInvalid) {
+                $('.dataset-upload-info-container__actions--warning').addClass('show');
                 return;
             }
 
             // filter out the included fields and prepare the array as
             // set the options and upload
             $.post({
-                url: `${ENV.APP.HOSTNAME}/api/datasets`,
+                url: `${ENV.APP.HOSTNAME}/api/datasets/${dataset.id}`,
                 data: {
                     dataset: JSON.stringify(dataset),
                     fields: JSON.stringify(fieldList)
                 }
-            }).then(data => {
-                // continuously check if dataset is loaded
-                let interval = setInterval(() => {
-                    $.get(`${ENV.APP.HOSTNAME}/api/datasets/${data.datasetId}/check`)
-                        .then(response => {
-                            // if data loaded change state
-                            if (response.loaded) {
-                                // clear the interval
-                                clearInterval(interval);
-                                this.get('notify').info({
-                                    html: `<div class="notification">
-                                            Dataset <span class="label">
-                                                ${response.label}
-                                            </span> successfully loaded!
-                                        </div>`
-                                });
-
-                                // set dataset loaded property
-                                let dataset = this.get('store').peekRecord('dataset', response.id);
-                                dataset.set('loaded', response.loaded);
-                            } else if (response.errors) {
-                                // clear the interval
-                                clearInterval(interval);
-                                let dataset = this.get('store').peekRecord('dataset', data.datasetId);
-
-                                this.get('notify').alert({
-                                    html: `<div class="notification">
-                                            Dataset <span class="label">
-                                                ${dataset.label}
-                                            </span> was unable to load!
-                                        </div>`
-                                });
-                                // destroy the dataset
-                                dataset.destroyRecord();
-                            }
-                        }).catch(error => {
-                            // clear the interval
-                            clearInterval(interval);
-                            let dataset = this.get('store').peekRecord('dataset', data.datasetId);
-
-                            this.get('notify').alert({
-                                html: `<div class="notification">
-                                        Dataset <span class="label">
-                                            ${dataset.label}
-                                        </span> was unable to load!
-                                    </div>`
-                            });
-                            // destroy the dataset
-                            dataset.destroyRecord();
-                        });
-                }, 3000);
-                run(() => { this.transitionTo('datasets'); });
+            }).then(() => {
+                run(() => {
+                    this.set('datasetPending', false);
+                    this.transitionTo('datasets');
+                });
             });
+
         },
 
-        willTransition(transition) {
+        willTransition() {
             // cancel task if still existant
             if (this.task) { this.task.cancel(); }
+            if (this.get('datasetPending')) {
+                this._removeDataset();
+            }
             return true;
         }
     },
@@ -161,19 +121,19 @@ export default DatasetUploadRoute.extend({
             // get dataset information
             let { dataset } = this.get('controller.model');
             $.ajax({
-                url: `${ENV.APP.HOSTNAME}/api/datasets/temporary_file?filename=${dataset.filename}`,
+                url: `${ENV.APP.HOSTNAME}/api/datasets/${dataset.id}`,
                 type: 'DELETE'
             });
             this.set('controller.model', null);
         }
         // get the dataset queue and set them all to null
         const uploader = this.get('uploader');
-        let queue = uploader.find("dataset");
+        let queue = uploader.find('dataset');
         if (queue) {
             queue.get('files').forEach((file) => file.set('queue', null));
             queue.set('files', A());
         }
-
+        this.set('datasetPending', false);
     }
 
 });

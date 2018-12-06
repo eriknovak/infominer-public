@@ -1,0 +1,63 @@
+{{
+  dataset-header
+  dataset=model.dataset
+  deleteDataset=(route-action "deleteDataset")
+}}
+
+<div class="container-fluid">
+
+  <div class="row">
+    <div class="offset-lg-1 col-lg-10">
+
+      <div class="active-learning">
+
+        <h3 class="title">Active Learning</h3>
+
+        <div class="row">
+
+          <div class="col-md-12 col-lg-2">
+            <label class="aggregate__title" for="active-learning__user-input">
+              User Input
+            </label>
+            {{
+              textarea
+              id="active-learning__user-input"
+              class="form-control editing"
+              disabled=true
+              rows="5"
+              value=model.activeLearning.parameters.initQuery
+              placeholder="Input text about content you wish to extract"
+            }}
+          </div>
+
+          <div class="col-md-8 col-lg-7">
+            {{
+              active-learner-selector
+              currentDoc=model.activeLearning.currentDoc
+              updateActiveLearning=(route-action "updateActiveLearning")
+            }}
+          </div>
+
+          <div class="col-md-4 col-lg-3">
+            {{
+              active-learner-statistics
+              statistics=model.activeLearning.statistics
+            }}
+
+            {{
+              active-learner-actions
+              dataset=model.dataset
+              statistics=model.activeLearning.statistics
+              deleteActiveLearning=(route-action "deleteActiveLearning")
+              saveActiveLearning=(route-action "saveActiveLearning")
+            }}
+          </div>
+
+        </div>{{! row }}
+
+      </div>{{! active-learning }}
+
+    </div>{{! offset-lg-1 col-lg-10 }}
+  </div>{{! row }}
+
+</div>{{! container-fluid }}

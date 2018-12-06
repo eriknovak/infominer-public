@@ -1,6 +1,6 @@
-<div class="analysis-component-header rounded-top">Cluster</div>
+<div class="analysis__header">Cluster Overview</div>
 
-<div class="analysis-component">
+<div class="analysis__container">
 
   {{#link-to 'dataset.subset' dataset cluster.subset.id class="btn btn-secondary btn-rounded pull-right" }}
     Inspect
@@ -13,25 +13,32 @@
     </button>
   {{/if}}
 
-  <h4 class="cluster-header">
+  <h4 class="overview__title">
+
     {{! button for toggling collapse }}
     <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
       aria-expanded="false" onclick={{action 'toggleInformation'}}>
       <i class="fa fa-chevron-down"></i>
     </button>
+
     {{#if editing-label}}
+
       Label:
       <input class="form-control editing title" type="text" value="{{label}}">
       <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
       <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
+
     {{else}}
-      <span class="cluster-label">Label: {{label}}</span>
-      <i class="fa fa-pencil edit edit-cluster-label" aria-hidden="true" {{action 'editLabel'}}></i>
+
+      <span>Label: {{label}}</span>
+      <i class="fa fa-pencil edit overview__title--edit" aria-hidden="true" {{action 'editLabel'}}></i>
+
     {{/if}}
 
   </h4>
-  <p class="cluster-metadata">
-    <b>Number of documents:</b> {{cluster.documentCount}}
+
+  <p class="overview__metadata">
+    <b>Number of documents:</b> {{numberOfDocuments}}
     {{#if cluster.avgSimProcent}}
       <b class="ml-2">Average similarity:</b> {{cluster.avgSimProcent}}%
     {{/if}}
@@ -39,7 +46,7 @@
     </p>
 
   {{#bs-collapse collapsed=collapsed}}
-    <div class="row cluster-aggregates">
+    <div class="row overview__aggregates">
       {{#each aggregates as |aggregate index|}}
         {{#if aggregate.distribution}}
           <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">
@@ -55,7 +62,7 @@
 
     <div class="row">
       <div class="col mt-1">
-        <h5 class="aggregate-title">Sample Documents</h5>
+        <label class="aggregate__title">Sample Documents</label>
         {{
           document-table
           documents=documents

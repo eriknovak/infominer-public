@@ -1,4 +1,5 @@
-<h3 class="method-type text-capitalize">
+<h3 class="analysis__method-type">
+
   <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
     aria-expanded="false" onclick={{action 'toggleInformation'}}>
     <i class="fa fa-chevron-down"></i>
@@ -14,40 +15,39 @@
 </h3>
 
 <div class="row">
-  <div class="col-md-12 method-parameters">
+  <div class="col">
 
-    <div class="parameter">
-      <span class="parameter-label">Type: </span>
-      <span class="parameter-value">
-        {{method.parameters.method.clusteringType}}
-        ({{selectedFields}})
-        </span>
-    </div>
+    <span class="analysis-parameter__name">Number of clusters: </span>
+    <span class="analysis-parameter__value">{{method.parameters.method.k}}</span>
 
-    <div class="parameter">
-      <span class="parameter-label">Number of clusters: </span>
-      <span class="parameter-value">{{method.parameters.method.k}}</span>
-    </div>
+    <span class="analysis-parameter__name">Type: </span>
+    <span class="analysis-parameter__value">
+      {{method.parameters.method.clusteringType}}
+      ({{selectedFields}})
+    </span>
 
-  </div>
-</div>
+  </div>{{! col }}
+</div>{{! row }}
 
 {{#bs-collapse collapsed=collapsed}}
-  <div class="clusters">
-    {{#each method.result.clusters as |cluster index|}}
+
+  {{#each method.result.clusters as |cluster index|}}
+    {{#unless cluster.subset.deleted}}
+
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col">
           {{ analysis-clustering-kmeans-cluster
             dataset=dataset
             method=method
             cluster=cluster
             index=index
           }}
-        </div><!-- .col-lg-12 -->
-      </div><!-- .row -->
+        </div>{{! col }}
+      </div>{{! row }}
 
-    {{/each}}
-  </div>
+    {{/unless}}
+  {{/each}}
+
 {{/bs-collapse}}
 
 {{yield}}

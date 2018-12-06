@@ -1,42 +1,46 @@
 <div class="row">
   <div class="col">
 
-    <div class="dataset-label">
+    {{! the dataset name }}
+    <div class="dataset-upload-container__params">
       <div class="row form-group">
-        <label class="col-md-2 col-form-label" for="dataset-label">Dataset Name</label>
+        <label class="col-md-2 highlight-text-only col-form-label">Dataset Name</label>
         <div class="col-md-10">
           {{
             input
-            class="form-control editing emphasize"
             value=dataset.label
+            class="form-control editing emphasize"
             placeholder="Add dataset name"
           }}
         </div>
       </div>
-    </div>{{! .dataset-label }}
+    </div>
 
-    <div class="dataset-description">
+    {{! the dataset description }}
+    <div class="dataset-upload-container__params">
       <div class="row form-group">
-        <label class="col-md-2 col-form-label" for="dataset-description">Description</label>
+        <label class="col-md-2 highlight-text-only col-form-label">Description</label>
         <div class="col-md-10">
           {{
             textarea
-            class="form-control editing"
             rows="5"
+            class="form-control editing"
             value=dataset.description
             placeholder="Add dataset description (optional)"
           }}
         </div>
       </div>
-    </div>{{! .dataset-description }}
+    </div>
 
   </div>{{! .col}}
 </div>{{! .row }}
 
 <div class="row">
-  <div class="col document-table">
+  <div class="col">
 
-    <table class="table">
+    {{! setup the dataset field selection }}
+    <table class="table dataset-upload-container__table">
+
       <thead>
         <tr>
           <th style="width:50%">field name</th>
@@ -44,6 +48,7 @@
           <th style="width:10%" class="center">included</th>
         </tr>
       </thead>
+
       <tbody>
         {{#each fieldList as |field index|}}
           {{
@@ -57,16 +62,37 @@
           }}
         {{/each}}
       </tbody>
+
     </table>
 
   </div>{{! .col }}
 </div>{{! .row }}
 
+ <div class="dataset-upload-container__params">
+  <div class="row">
+    <div class="col">
+      <label class="highlight-text-only">
+        Stopwords that are added to the standard stopword array (optional)
+      </label>
+      {{
+        textarea
+        rows="5"
+        class="form-control editing"
+        value=dataset.parameters.stopwords
+        placeholder="Separate stopwords with a comma"
+      }}
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col">
-    <button {{action submitDataset}} class="btn btn-primary btn-rounded pull-right">Save Dataset</button>
-    <button {{action resetList}} class="btn btn-light btn-rounded pull-right">Cancel</button>
-    <div id="submittion-error" class="pull-right">Invalid field names</div>
+    {{! setup the dataset upload actions }}
+    <div class="dataset-upload-container__actions">
+      <span class="dataset-upload-container__actions--warning">Invalid field names</span>
+      <button {{action resetList}} class="btn btn-light btn-rounded">Cancel</button>
+      <button {{action submitDataset}} class="btn btn-primary btn-rounded">Save Dataset</button>
+    </div>
   </div>{{! .col }}
 </div>{{! .row }}
 

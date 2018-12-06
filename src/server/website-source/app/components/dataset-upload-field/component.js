@@ -17,7 +17,7 @@ export default Component.extend({
     ///////////////////////////////////////////////////////
     // Component Life Cycle
     ///////////////////////////////////////////////////////
-    
+
     init() {
         this._super(...arguments);
         this.set('fieldTypes', [
@@ -33,11 +33,11 @@ export default Component.extend({
         let validFieldTypes = [];
         for (let i = 0; i < this.get('fieldTypes.length'); i++) {
             let obj = this.get('fieldTypes').objectAt(i);
-            if (get(obj, 'type') === type) { 
+            if (get(obj, 'type') === type) {
                 set(obj, 'selected', true);
                 // modify fieldTypes to reflect the possible type options
                 validFieldTypes.push(obj);
-                break; 
+                break;
             }
         }
         validFieldTypes.push({ name: 'text', type: 'string', selected: !validFieldTypes.length });
@@ -101,7 +101,7 @@ export default Component.extend({
         const numberOfSameName = this.get('fieldList').filterBy('included', true)
             .map(field => field.name === this.get('name') ? 1 : 0)
             .reduce((total, number) => total + number, 0);
-            
+
         this.set('multipleNames', numberOfSameName !== 1);
 
         // check if there are invalid characters in field

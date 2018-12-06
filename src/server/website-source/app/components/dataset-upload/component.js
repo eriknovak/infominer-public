@@ -2,5 +2,5 @@ import Component from '@ember/component';
 
 export default Component.extend({
     // component attributes
-    classNames: ['dataset-field-list']
+    classNames: ['dataset-upload-info-container']
 });

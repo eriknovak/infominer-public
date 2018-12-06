@@ -1,116 +1,163 @@
-.dataset-navigation {
-
-    .tree-structure {
-
-        margin: 0;
-        padding: 0 0 15px 0;
-        display: block;
-        overflow-x: auto;
-        @include collapse-toggle($secondary-color, 19px);
-
-        &::-webkit-scrollbar {
-            height: 10px;
-        }
-
-        &::-webkit-scrollbar-track {
-            background: $primary-color;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: $tertiary-color;
-        }
-
-        &::-webkit-scrollbar-thumb:hover {
-            background: darken($tertiary-color, 5%);
-        }
-
-        a { padding: 1px 5px; }
-
-        .tree-branch {
-            padding-left: 20px;
-        }
-        .subset-structure-placeholder {
-            padding: 0 5px;
-        }
-        .navigation-button-placeholder {
-            display: inline-block;
-            text-align: center;
-            width: 20px;
-        }
-
-        & > .child:first-child {
-            &:after { border-left: 0px solid; }
-            &:before { border-top: 0px solid; }
-        }
-
-        .parent,
-        .child {
-            position: relative;
-            & .tree-branch > .child:last-child:after {
-                height: 8px;
-            }
-        }
-
-        .child {
-            position: relative;
-
-            &:before,
-            &:after {
-                content: '';
-                position: absolute;
-                left: -11px;
-            }
-
-            &.method:after,
-            &.method:before { border-color: $tertiary-color; }
-
-            &.subset:after,
-            &.subset:before { border-color: green; }
-
-            &:before {
-                border-top: 1px solid;
-                top: 10px;
-                width: 8px;
-                height: 0;
-                &.method { color: $tertiary-color; }
-            }
-
-            &:after {
-                border-left: 1px solid;
-                height: 100%;
-                width: 0px;
-                top: 2px;
-            }
-        }
-
-        .method, .subset, .unsaved {
-            font-family: $font-primary;
-            white-space: nowrap;
-            display: grid;
-            padding: 1px;
-        }
-
-        .method > div > button > .fa { color: green; }
-        .subset > div > button > .fa { color: $tertiary-color; }
-        .unsaved {
-            padding: 0px 5px;
-            .label { color: black }
-        }
-
-        .delete {
-            visibility: hidden;
-            display: inline-block;
-            width: 15px;
-            height: 15px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 50%;
+@mixin collapse-toggle($color, $size) {
+    .btn {
+        color: $color;
+        width: $size;
+        height: $size;
+        padding: 0px;
+        border-radius: 50%;
+        text-align: center;
+        background-color: transparent;
+        &.rotate {
             -webkit-transition: all .2s linear;
             -moz-transition: all .2s linear;
             transition: all .2s linear;
-            &.show { visibility: visible; }
-            &:hover { background-color: $primary-color; }
+            &.right{
+                -ms-transform: rotate(-90deg);
+                -moz-transform: rotate(-90deg);
+                -webkit-transform: rotate(-90deg);
+                transform: rotate(-90deg);
+            }
+        }
+        &:hover { background-color: $primary-color; }
+        i { margin: auto; }
+    }
+}
+
+@mixin link-style ($color) {
+    font-weight: 500;
+    color: $color;
+    a {
+        padding: 0 5px;
+        color: $color;
+        background-color: white;
+        -webkit-transition: background .4s;
+        transition: background .4s;
+        &:hover { background-color: $primary-color; }
+
+        &.active {
+            background-color: $color;
+            color: white;
+        }
+    }
+}
+
+.method { @include link-style(green); }
+.subset { @include link-style($tertiary-color); }
+
+.tree-structure {
+
+    margin: 0;
+    padding: 0 0 15px 0;
+    display: block;
+    overflow-x: auto;
+    @include collapse-toggle($secondary-color, 19px);
+
+    &__button-placeholder {
+        display: inline-block;
+        text-align: center;
+        width: 20px;
+    }
+
+    &__method {
+        @include link-style(green);
+    }
+
+    &__subset {
+        @include link-style($tertiary-color);
+        &__placeholder {
+            padding: 0 5px;
+        }
+    }
+
+    & .child,
+    & .parent {
+        position: relative;
+        & .tree-branch > .child:last-child:after {
+            height: 8px;
+        }
+    }
+
+    a { padding: 1px 5px; }
+
+    .tree-branch {
+        padding-left: 20px;
+    }
+
+    & > .child:first-child {
+        &:after { border-left: 0px solid; }
+        &:before { border-top: 0px solid; }
+    }
+
+    .child {
+        position: relative;
+
+        &:before,
+        &:after {
+            content: '';
+            position: absolute;
+            left: -11px;
         }
 
+        &.tree-structure__method:after,
+        &.tree-structure__method:before { border-color: $tertiary-color; }
+
+        &.tree-structure__subset:after,
+        &.tree-structure__subset:before { border-color: green; }
+
+        &:before {
+            border-top: 1px solid;
+            top: 10px;
+            width: 8px;
+            height: 0;
+            &.method { color: $tertiary-color; }
+        }
+
+        &:after {
+            border-left: 1px solid;
+            height: 100%;
+            width: 0px;
+            top: 2px;
+        }
+    }
+
+    &__subset,
+    &__method {
+        font-family: $font-primary;
+        white-space: nowrap;
+        display: grid;
+        padding: 1px;
+    }
+
+    &__method > div > button > .fa { color: green; }
+    &__subset > div > button > .fa { color: $tertiary-color; }
+
+    .delete {
+        visibility: hidden;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 50%;
+        -webkit-transition: all .2s linear;
+        -moz-transition: all .2s linear;
+        transition: all .2s linear;
+        &.show { visibility: visible; }
+        &:hover { background-color: $primary-color; }
+    }
+
+
+    // navigation scrollbar
+    &::-webkit-scrollbar {
+        height: 10px;
+    }
+    &::-webkit-scrollbar-track {
+        background: $primary-color;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $tertiary-color;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: darken($tertiary-color, 5%);
     }
 }

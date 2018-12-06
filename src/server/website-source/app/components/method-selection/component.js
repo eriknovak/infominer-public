@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
-    classNames: ['modal', 'analysis-modal'],
+    classNames: ['modal', 'modal-style--analysis'],
     attributeBindings: ['tabindex', 'role'],
     tagName: 'div',
     tabindex: -1,
@@ -18,7 +18,7 @@ export default Component.extend({
         this._super(...arguments);
         set(this, 'availableMethods', [
             { method: 'clustering.kmeans', name: 'clustering' },
-            // { method: 'clustering.activelearning', name: 'active learning' },
+            { method: 'classify.active-learning', name: 'active learning' },
             { method: 'visualization', name: 'visualization' },
         ]);
         set(this, 'selectedMethod', this.get('availableMethods').objectAt(0).method);
@@ -47,17 +47,28 @@ export default Component.extend({
                 parameters = this._prepareClusteringParams();
             } else if (methodType.includes('visualization')) {
                 parameters = this._prepareVisualizationParams();
+            } else if (methodType.includes('active-learning')) {
+                parameters = this._prepareClusteringParams();
             }
+
             // send the parameters to the route
             if (methodType.includes('clustering.kmeans') && parameters.fields.length ||
                 methodType.includes('visualization')) {
                 // parameters are set - make a method request
                 this.get('startAnalysis')({ methodType, parameters });
-            } else if (methodType.includes('clustering.activelearning') && parameters.method.queryText) {
-                this.get('startActiveLearning')({ queryText: parameters.method.queryText });
+
+            } else if (methodType.includes('classify.active-learning') &&
+                parameters.method.queryText &&
+                parameters.fields.length) {
+                this.get('startActiveLearning')({
+                    queryText: parameters.method.queryText,
+                    stopwords: parameters.stopwords,
+                    selectedFields: parameters.fields
+                });
+
             } else {
                 // there are no fields selected - warn the user
-                $('#analysis-warning').removeClass('d-none');
+                $(`${this.get('elementId')} .modal-style--analysis__warning`).removeClass('d-none');
             }
         }
     },
@@ -66,21 +77,18 @@ export default Component.extend({
         const parameters = this.get('parameters');
         // get feature parameters
         let response = { };
-        if (this.get('selectedMethod') !== 'clustering.activelearning') {
-            let fields = get(parameters, 'features')
-                .filterBy('included', true)
-                .map(param => get(param, 'field'));
-            response.fields = fields;
-        }
+        let fields = get(parameters, 'features')
+            .filterBy('included', true)
+            .map(param => get(param, 'field'));
+        response.fields = fields;
         // get method parameters
         response.method = get(parameters, 'method');
-
+        response.stopwords = get(parameters, 'stopwords') || '';
         return response;
     },
 
     _prepareVisualizationParams() {
         const parameters = this.get('parameters');
-        // get method parameters
         let method = get(parameters, 'method');
         return { method };
     }

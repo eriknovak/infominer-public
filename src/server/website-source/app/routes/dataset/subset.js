@@ -25,12 +25,12 @@ export default Route.extend({
             let description = $('#edit-subset-modal textarea').val();
 
             // get warning and clean container
-            let warningContent = $('#edit-subset-modal div.warning');
+            let warningContent = $('#edit-subset-modal .modal-style--edit__warning');
             warningContent.empty();
 
             if (label.length === 0) {
                 // TODO: handle data omitence
-                warningContent.append('<p class="warning-content">Subset label must be given!</p>');
+                warningContent.append('Subset label must be given!');
             } else {
                 $('#edit-subset-modal').modal('toggle');
                 // get the current subset
@@ -50,7 +50,7 @@ export default Route.extend({
          */
         removeModalWarnings() {
             // get warning container
-            let warningContent = $('#edit-subset-modal div.warning');
+            let warningContent = $('#edit-subset-modal .modal-style--edit__warning');
             // empty warning container
             warningContent.empty();
         },
@@ -58,7 +58,7 @@ export default Route.extend({
         /**
          * Moves the window to the top of the page, smoothly.
          */
-        backToTop() {
+        goToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }

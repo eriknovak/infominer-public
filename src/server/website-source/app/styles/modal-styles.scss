@@ -1,0 +1,54 @@
+.modal-style {
+
+    &--edit {
+        &__title {
+            color: $secondary-color;
+            margin: auto;
+        }
+        &__warning {
+            color: red;
+            margin: auto;
+            &--small {
+                height: 1px;
+            }
+        }
+    }
+
+    &--delete {
+        &__title {
+            color: red;
+            margin: auto;
+        }
+    }
+
+    &--analysis {
+        &__title {
+            color: $secondary-color;
+            margin: auto;
+        }
+
+        &__method {
+            margin-bottom: 10px;
+            &--label {
+                font-weight: 400;
+                margin-right: 5px;
+            }
+        }
+
+        &__parameters {
+            font-weight: 400;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        &__warning {
+            color: red;
+            margin: auto;
+        }
+    }
+
+}
+
+.modal-backdrop+.modal-backdrop {
+    z-index: 1070;
+}

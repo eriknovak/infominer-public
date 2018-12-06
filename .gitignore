@@ -63,15 +63,15 @@ typings/
 /data
 
 # ####################
+# public folder
+
+/src/server/public
+
+# ####################
 # configuration ignores
 
 /src/config/auth*.js
 /src/config/pgconfig.js
-
-# ####################
-# website ignores
-
-/src/server/public
 
 # ####################
 # ember ignore files

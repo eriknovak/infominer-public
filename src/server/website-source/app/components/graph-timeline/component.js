@@ -20,7 +20,7 @@ import { extent } from 'd3-array';
 // declare new graph component
 const TimelineComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['timeline'],
+    classNames: ['graph--timeline'],
 
     /**
      * Object containing the timeline information.
@@ -66,7 +66,7 @@ const TimelineComponent = GraphComponent.extend({
     },
 
     dataObserver: observer('data', 'width', 'height', function () {
-        this.set('buttonPosition', this.get('width') - 135);
+        this.set('buttonPosition', this.get('width') - 130);
         once(this, '_redrawGraph');
     }),
 

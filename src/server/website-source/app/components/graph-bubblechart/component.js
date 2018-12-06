@@ -11,7 +11,7 @@ import { pack, hierarchy } from 'd3-hierarchy';
 // declare new graph component
 const WordCloudComponent = GraphComponent.extend({
     // component attributes
-    classNames: ['bubblechart'],
+    classNames: ['graph--bubblechart'],
 
     /**
      * Object containing the histogram information.
@@ -40,12 +40,12 @@ const WordCloudComponent = GraphComponent.extend({
         let self = this;
         scheduleOnce('afterRender', function () { self.drawGraph(); });
     }),
-    
+
     _setBubbleData(bubblechart) {
         this.set('data', bubblechart);
     },
 
-    
+
     drawGraph() {
         // get the container size
         let totalWidth = this.get('width');
@@ -82,7 +82,7 @@ const WordCloudComponent = GraphComponent.extend({
         const colorBubble = scaleThreshold()
             .domain([100/3, 200/3])
             .range(["#e7e7e7", "#3366CC", "#000000"]);
-        
+
         // color scale for text
         const colorText = scaleThreshold()
             .domain([100/3, 200/3])
@@ -95,13 +95,13 @@ const WordCloudComponent = GraphComponent.extend({
 
         const root = hierarchy({ children: data })
             .sum(d => d.precent);
-            
+
         let node = content.selectAll(".node")
           .data(dataPack(root).leaves())
           .enter().append("g")
             .attr("class", "node")
             .attr("transform", d => `translate(${d.x},${d.y})`);
-      
+
         node.append("circle")
             .attr("id", d => d.data.value)
             .attr("r", d => d.r)

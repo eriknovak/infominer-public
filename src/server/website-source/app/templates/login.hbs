@@ -3,13 +3,13 @@
     <div class="offset-sm-3 col-sm-6 offset-md-4 col-md-4">
 
       <div class="login-options">
-        <h2 class="login-header">Login</h2>
-        <a href="{{model.googleAuth}}" class="btn btn-default google-login">
+        <h2 class="login-options__header">Login</h2>
+        <a href="{{model.google-authentication}}" class="btn login-options--google">
           <img src="images/login/g-logo.png" alt="google logo" height="40" width="40">
           Sign in with Google
         </a>
 
-        <a href="{{model.twitterAuth}}" class="btn btn-default twitter-login">
+        <a href="{{model.twitter-authentication}}" class="btn login-options--twitter">
           <i class="fa fa-twitter" aria-hidden="true"></i>
           Sign in with Twitter
         </a>
@@ -18,4 +18,5 @@
     </div>
   </div>
 </div>
+
 {{outlet}}

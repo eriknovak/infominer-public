@@ -1,2 +1,6 @@
-<h5 class="aggregate-title">{{ field }} keywords</h5>
+<div class="{{if maximize "analysis__header" "aggregate__title"}}">
+  {{ field }} keywords
+  <i class="fa {{unless maximize 'fa-arrows-alt' 'fa-times'}} ml-auto my-auto"
+    aria-hidden="true" {{action 'maximizeComponent'}}></i>
+</div>
 {{ graph-wordcloud distribution.keywords }}
