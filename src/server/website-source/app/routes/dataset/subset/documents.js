@@ -76,6 +76,7 @@ export default Route.extend({
                 return {
                     documents,
                     metadata: documents.meta,
+                    subset: this.modelFor('dataset.subset'),
                     method: { result: { aggregates: this.get('aggregates') } },
                     parameters: {
                         label: this.get('query.text.keywords'),
@@ -199,6 +200,21 @@ export default Route.extend({
             this.set('sortTarget', null);
             // update model
             this._updateModel();
+        },
+
+        moveDocuments(movement) {
+            // get destinations
+            const { from, to } = movement;
+            // get documents that would be moved
+            const documents = this.get('store').peekAll('document').filterBy('selected')
+                .map(doc => doc.get('id'));
+            // do nothing if no documents are selected
+            if (!documents.length) {
+                console.log('No documents selected');
+                return;
+            }
+            // show the actions
+            console.log(from, to, documents);
         }
 
     },

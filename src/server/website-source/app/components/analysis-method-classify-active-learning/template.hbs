@@ -15,7 +15,7 @@
 </h3>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col">
 
     <span class="analysis-parameter__name">Initial query: </span>
     <span class="analysis-parameter__value">
@@ -33,7 +33,7 @@
 {{#bs-collapse collapsed=collapsed}}
   <div class="clusters">
     <div class="row">
-      <div class="col-lg-12">
+      <div class="col">
         {{#unless method.result.positive.subset.deleted}}
           {{
             analysis-classify-active-learning-class
@@ -42,11 +42,11 @@
             class=method.result.positive
           }}
         {{/unless}}
-      </div><!-- .col-lg-12 -->
+      </div><!-- .col -->
     </div><!-- .row -->
 
     <div class="row">
-      <div class="col-lg-12">
+      <div class="col">
         {{#unless method.result.negative.subset.deleted}}
           {{
             analysis-classify-active-learning-class
@@ -55,7 +55,7 @@
             class=method.result.negative
           }}
         {{/unless}}
-      </div><!-- .col-lg-12 -->
+      </div><!-- .col -->
     </div><!-- .row -->
 
   </div>

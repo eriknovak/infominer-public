@@ -5,7 +5,7 @@
         {{ query-options fields=metadata.fields query=query action=changeQuery }}
       {{/if}}
 
-      <span class="table-options-show">
+      <span class="table-options__show">
         Show
         <select class="rounded" id="table-show-limit" onchange={{action 'changeLimit'}}>
           {{#each possibleLimits as |limit|}}
@@ -17,13 +17,13 @@
 
       <span class="dropdown pull-right">
         <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
-          id="document-table-{{elementId}}" aria-haspopup="true" aria-expanded="false">
+          id="show-columns-{{elementId}}" aria-haspopup="true" aria-expanded="false">
           Show columns
           <span class="number-circle">{{numberOfFieldsShown}}</span>
         </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-table-{{elementId}}">
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="show-columns-{{elementId}}">
           {{#each metadata.fields as |field index|}}
-            <div class="dropdown-item">
+            <div class="dropdown-item no-background">
               {{
                 checkbox-select
                 checkboxId=(concat "table-" elementId "-field-selection-checkbox-" index)
@@ -35,6 +35,29 @@
         </div>
       </span>
 
+      <span class="dropdown pull-right">
+        <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
+          id="document-actions-{{elementId}}" aria-haspopup="true" aria-expanded="false">
+          document actions
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-actions-{{elementId}}">
+
+          {{#if siblingSubsets }}
+            <h6 class="dropdown-header">Move To Subset</h6>
+
+            {{#each siblingSubsets as |sibling index|}}
+              <a class="dropdown-item documents__move" onclick={{action 'moveDocuments' sibling.id}}>{{sibling.label}}</a>
+            {{/each}}
+
+            <div class="dropdown-divider"></div>
+          {{/if}}
+
+          <a class="dropdown-item documents__delete">Delete</a>
+        </div>
+      </span>
+
+
     </div>
   </div>
 
@@ -43,7 +66,7 @@
       {{! table header }}
       <thead>
         <tr>
-          {{! <th class="checkbox-header" style="width:1%;"></th> }}
+          <th class="checkbox-header" style="width:1%;"></th>
           {{#each metadata.fields as |field index|}}
             {{#if field.showInTable}}
               <th class="{{field.name}} header" scope="col" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>

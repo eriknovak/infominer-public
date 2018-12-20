@@ -9,6 +9,7 @@ export default Component.extend({
     classNames: ['row', 'document-table'],
 
     fieldSelection: service('field-selection'),
+    store: service('store'),
 
     ///////////////////////////////////////////////////////
     // Component Life Cycle
@@ -126,6 +127,16 @@ export default Component.extend({
         return this.get('metadata.fields').filter(field => field.showInTable).length;
     }),
 
+    siblingSubsets: computed('subset', function () {
+        const subset = this.get('subset');
+        if (!subset) return null;
+        if (!subset.belongsTo('resultedIn').value()) return null;
+
+        // return the sibling subsets
+        return subset.get('resultedIn').get('produced')
+            .filter(sibling => sibling.get('id') !== subset.get('id'));
+    }),
+
     ///////////////////////////////////////////////////////
     // Actions
     ///////////////////////////////////////////////////////
@@ -167,6 +178,14 @@ export default Component.extend({
             let newLimit = parseInt(this.$('#table-show-limit').find(':selected').val());
             // execute new search
             this.get('changeLimit')(newLimit);
+        },
+
+        moveDocuments(subsetId) {
+
+            const from = this.get('subset').get('id');
+            let to = subsetId;
+
+            this.get('moveDocuments')({ from, to });
         }
 
     }
