@@ -135,8 +135,13 @@ const RadialTreeComponent = GraphComponent.extend({
         // push the subset information to the hierarchy tree
          let id = `subset-${subset.get('id')}`;
         // first iteration need to have parentId = null
-         hierarchy.push({ label: subset.get('label'), type: 'subset',
-            numberOfDocuments: subset.get('documentCount'), id, parentId: null });
+         hierarchy.push({
+            label: subset.get('label'),
+            type: 'subset',
+            numberOfDocuments: subset.get('documentCount'),
+            id,
+            parentId: null
+        });
 
         // filter out appropriate methods
         let methods = this.get('usedBy').filter(method => {
@@ -240,7 +245,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 if (!d.parent) { return radialPoint(d.x, d.y)[1]; }
                 return !(d.x < Math.PI / 2 || Math.PI * 3 / 2 < d.x) === !d.children ? 0 : -25;
             })
-            .attr('width', 150)
+            .attr('width', 250)
             .call(drag().on('drag', function () {
                 let obj = select(this);
                 obj.attr('x', parseFloat(obj.attr('x')) + event.movementX);
