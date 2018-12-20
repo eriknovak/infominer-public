@@ -163,9 +163,10 @@ p.modal-subtitle { margin-bottom: 0px; }
         @include button-type(lightgray);
     }
 
-    &.pull-right { margin-left: 10px; }
     &.btn-rounded { border-radius: 50px; }
 }
+
+.pull-right { margin-left: 10px; }
 
 .show > .btn-secondary.dropdown-toggle {
     background-color: $quaternary-color;
@@ -186,7 +187,7 @@ p.modal-subtitle { margin-bottom: 0px; }
 
 .dropdown-item {
     text-transform: capitalize;
-    &:hover {
+    &.no-background:hover {
         background-color: white;
         color: $font-color-dark;
     }

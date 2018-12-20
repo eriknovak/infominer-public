@@ -24,7 +24,7 @@
 
 .table-options {
     padding-bottom: 10px;
-    .table-options-show {
+    &__show {
         margin-top: 5px;
         display: inline-block;
     }
@@ -187,5 +187,16 @@
                 width: 15px;
             }
         }
+    }
+}
+
+.documents {
+    &__move {
+        color: $secondary-color !important;
+    }
+
+    &__delete {
+        font-weight: 500;
+        color: red !important;
     }
 }
