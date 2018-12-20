@@ -8,11 +8,14 @@ export default Route.extend({
         },
         selectedFields: {
             refreshModel: true
+        },
+        stopwords: {
+            refreshModel: true
         }
     },
 
     model(params) {
-        const { dataset_id, subset_id, queryText, selectedFields } = params;
+        const { dataset_id, subset_id, queryText, selectedFields, stopwords } = params;
         let dataset = this.get('store').peekRecord('dataset', dataset_id);
         let subset  = this.get('store').peekRecord('subset', subset_id);
         const activeLearning = this.get('store').createRecord('active-learning', {
@@ -20,7 +23,8 @@ export default Route.extend({
             appliedOn: subset,
             parameters: {
                 initQuery: queryText,
-                fields: selectedFields.split(',')
+                fields: selectedFields.split(','),
+                stopwords: stopwords.split(',')
             }
         });
 
@@ -68,7 +72,8 @@ export default Route.extend({
                 parameters: {
                     hash: activeLearning.get('id'),
                     initQuery: activeLearning.get('parameters.initQuery'),
-                    fields: activeLearning.get('parameters.fields')
+                    fields: activeLearning.get('parameters.fields'),
+                    stopwords: activeLearning.get('parameters.stopwords')
                 },
                 appliedOn: subset
             });

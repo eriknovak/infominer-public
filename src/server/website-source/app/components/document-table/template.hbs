@@ -35,7 +35,7 @@
         </div>
       </span>
 
-      <span class="dropdown pull-right">
+      {{!-- <span class="dropdown pull-right">
         <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
           id="document-actions-{{elementId}}" aria-haspopup="true" aria-expanded="false">
           document actions
@@ -55,7 +55,7 @@
 
           <a class="dropdown-item documents__delete">Delete</a>
         </div>
-      </span>
+      </span> --}}
 
 
     </div>
@@ -66,7 +66,7 @@
       {{! table header }}
       <thead>
         <tr>
-          <th class="checkbox-header" style="width:1%;"></th>
+          {{!-- <th class="checkbox-header" style="width:1%;"></th> --}}
           {{#each metadata.fields as |field index|}}
             {{#if field.showInTable}}
               <th class="{{field.name}} header" scope="col" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>

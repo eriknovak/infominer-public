@@ -17,13 +17,18 @@
 <div class="row">
   <div class="col">
 
-    <span class="analysis-parameter__name">Number of clusters: </span>
+    <span class="analysis-parameter__name">Number of Clusters: </span>
     <span class="analysis-parameter__value">{{method.parameters.method.k}}</span>
 
     <span class="analysis-parameter__name">Type: </span>
     <span class="analysis-parameter__value">
       {{method.parameters.method.clusteringType}}
       ({{selectedFields}})
+    </span>
+
+    <span class="analysis-parameter__name">Stopwords: </span>
+    <span class="analysis-parameter__value">
+      {{stopwords}}
     </span>
 
   </div>{{! col }}

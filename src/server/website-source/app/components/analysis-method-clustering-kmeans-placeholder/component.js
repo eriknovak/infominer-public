@@ -19,6 +19,8 @@ export default Component.extend({
         this._super(...arguments);
         this._setClusters();
         this._setSelectedFields();
+        this._setStopwords();
+
     },
 
     _setClusters() {
@@ -44,6 +46,11 @@ export default Component.extend({
     _setSelectedFields() {
         const selectedFields = this.get('method.parameters.fields').join(', ');
         this.set('selectedFields', selectedFields);
+    },
+
+    _setStopwords() {
+        const stopwords = this.get('method.parameters.stopwords');
+        this.set('stopwords', stopwords ? stopwords.join(', ') : 'None');
     },
 
     actions: {

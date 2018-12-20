@@ -37,7 +37,7 @@ class ModelsManager {
         // TODO: log activity
 
         if (method.parameters.stopwords) {
-            let words = method.parameters.stopwords.split(',')
+            let words = method.parameters.stopwords
                 .map(word => word.trim())
                 .map(word => word.toLowerCase());
             method.parameters.stopwords = words;
@@ -429,7 +429,7 @@ class ModelsManager {
                     language: 'en',
                     words
                 }
-            })
+            });
 
             if (distribution && distribution.keywords && !distribution.keywords.length) {
                 distribution.keywords.push({ keyword: elements[0][fieldName], weight: 1 });

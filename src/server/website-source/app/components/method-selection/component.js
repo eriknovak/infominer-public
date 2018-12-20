@@ -83,7 +83,7 @@ export default Component.extend({
         response.fields = fields;
         // get method parameters
         response.method = get(parameters, 'method');
-        response.stopwords = get(parameters, 'stopwords') || '';
+        response.stopwords = (get(parameters, 'stopwords') || '').split(',');
         return response;
     },
 

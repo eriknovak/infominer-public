@@ -19,6 +19,7 @@ export default Component.extend({
         this._super(...arguments);
         this._setClasses();
         this._setSelectedFields();
+        this._setStopwords();
     },
 
     _setClasses() {
@@ -42,6 +43,11 @@ export default Component.extend({
     _setSelectedFields() {
         const selectedFields = this.get('method.parameters.fields').join(', ');
         this.set('selectedFields', selectedFields);
+    },
+
+    _setStopwords() {
+        const stopwords = this.get('method.parameters.stopwords');
+        this.set('stopwords', stopwords ? stopwords.join(', ') : 'None');
     },
 
     actions: {
