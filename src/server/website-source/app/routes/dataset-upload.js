@@ -1,22 +1,12 @@
 import Route from '@ember/routing/route';
 import ENV from '../config/environment';
-import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 import { inject as service } from '@ember/service';
 import { run } from '@ember/runloop';
 import { A } from '@ember/array';
 import $ from 'jquery';
 
-/**
- * For development do not use authentication.
- * for other environments (production) user authentication.
- */
-const DatasetUploadRoute = ENV.environment === 'development' ?
-    Route.extend({ }) :
-    Route.extend(AuthenticatedRouteMixin);
-
-
-export default DatasetUploadRoute.extend({
+export default Route.extend({
     uploader: service('file-queue'),
     datasetPending: false,
 

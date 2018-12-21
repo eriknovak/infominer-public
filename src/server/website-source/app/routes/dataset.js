@@ -1,18 +1,9 @@
 import Route from '@ember/routing/route';
-import ENV from '../config/environment';
-import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
-/**
- * For development do not use authentication.
- * for other environments (production) user authentication.
- */
-const DatasetRoute = ENV.environment === 'development' ?
-    Route.extend({ }) :
-    Route.extend(AuthenticatedRouteMixin);
 
-export default DatasetRoute.extend({
+export default Route.extend({
     fieldSelection: service('field-selection'),
     unloadExtra:    service('unload-extra'),
 

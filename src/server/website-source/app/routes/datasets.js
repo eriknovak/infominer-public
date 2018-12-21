@@ -1,18 +1,10 @@
 import Route from '@ember/routing/route';
 import ENV from '../config/environment';
-import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 import { inject as service } from '@ember/service';
 
-/**
- * For development do not use authentication.
- * for other environments (production) user authentication.
- */
-const DatasetsRoute = ENV.environment === 'development' ?
-    Route.extend({ }) :
-    Route.extend(AuthenticatedRouteMixin);
 
-export default DatasetsRoute.extend({
+export default Route.extend({
     notify: service('notify'),
 
     model() {

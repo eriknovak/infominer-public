@@ -4,7 +4,6 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const passport = require('passport'); // the main authentication module
 const session = require('express-session'); // maintaining sessions
 
 // internal modules
@@ -69,18 +68,10 @@ app.use(session({
     cookie: { secure: false } // if secure: `true` will make req.user = undefined if not in 'https' protocol
 }));
 
-// passport configuration
-require('../lib/passport')(passport);
-
-// initialize authentication
-app.use(passport.initialize());
-app.use(passport.session());
-
 // set where are public files
 app.use(express.static(__dirname + '/public/'));
 
 // set login & API routes
-require('./routes/login')(app, passport, argv.ignoreSecurity);
 require('./routes/route.handler')(app, pg, processHandler, logger);
 
 // handle ember web application

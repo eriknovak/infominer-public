@@ -63,11 +63,6 @@ typings/
 /data
 
 # ####################
-# public folder
-
-/src/server/public
-
-# ####################
 # configuration ignores
 
 /src/config/auth*.js

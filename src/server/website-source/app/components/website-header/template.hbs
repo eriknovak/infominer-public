@@ -20,26 +20,6 @@
       </li>
     </ul>
 
-    {{#if session.isAuthenticated}}
-      <div class="nav-item user-info dropdown">
-        <!-- user information and logout -->
-        <a class="nav-link dropdown-toggle rounded" id="accountDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-exanded="false">
-          <img src="{{ session.data.authenticated.userImage }}"
-            onError="this.src='images/login/blank-profile.png'" alt="user image" height="30" width="30">
-          {{ session.data.authenticated.username }}
-        </a>
-        <div class="dropdown-menu" aria-labelledby="accountDropdown">
-          <a class="dropdown-item" {{action 'invalidateSession'}}>Logout</a>
-        </div>
-      </div>
-    {{else}}
-      <div class="nav-item login">
-        {{#link-to "login" class="nav-link btn rounded"}}
-          Sign In
-        {{/link-to}}
-      </div>
-    {{/if}}
-
   </div><!-- .navbar-collapse -->
 </div>
 {{yield}}
