@@ -1,64 +1,70 @@
 # InfoMiner
 
-InfoMiner is an exploration service for textual data.
+InfoMiner is an semi-automatic exploration tool. It enables the user to create topic
+ontologies by clustering, labelling and querying textual documents. If works as a web application, but will run only on the local machine.
 
-## Building the Project
+## Prerequisites
 
-- Clone the project using web URL `https://github.com/ErikNovak/InfoMiner.git`
+To use the InfoMiner service, you must first install the following software on your machine:
+
+- **Node.js**. This engine enables running JavaScript files and is required for running the InfoMiner service. The installation file is available [here](https://nodejs.org/en/download/). By installing Node.js you will also install the Node Package Manager (npm) which is used to install node modules (similar as pip in Python).
+
+- **PostgresQL**. This is an open source object-relational database system. It is used to store the metadata of the datasets uploaded to InfoMiner. The installation files are found [here](https://www.postgresql.org/download/).
+
+- **Git** (optional). Git is a free and open source distributed version control system. It is used to acquire and update InfoMiner.
+
+## Setting Up the Service
+
+1. `Clone` or download the service source code (in .zip) onto your computer.
+
+    **Git**. Run the following command to clone the project repository unto your computer.
     ```bash
-    git clone https://github.com/ErikNovak/InfoMiner.git
+    git clone https://github.com/ErikNovak/infominer-public.git
     ```
-- Run `npm install` to install project dependencies, e.g. `qminer`, `express`, `path` etc.
+
+2. Install all project dependencies, e.g. `qminer`, `express`, `path` etc, by running the following command.
     ```bash
     npm install
     ```
-    - Running `npm install` will automatically run `npm run preinstall` which installs global npm dependencies, e.g. `ember-cli` used for Ember web application development
-        ```bash
-        # installing global ember-cli
-        npm run preinstall
-        # same as running
-        npm list ember-cli@2.16.2 -g || npm install ember-cli@2.16.2 -g
-        ```
-    - Additionally, it will automatically run `npm run postinstall` and install local ember dependencies. It is same as navigating to `src/server/website-source` and running `npm install`
-        ```bash
-        # running the command
-        npm run postinstall
-        # same as
-        cd src/website/website-source
-        npm install
-        ```
 
-### PostgresQL configuration
+3. Create a postgresQL database called infominer.
 
-- Create a new PostgresQL database called `infominer` on development computer.
-- Configure `./src/config/pgconfig.js` with your own credentials.
-- Run `npm run postgres:create` to create postgres tables.
+    **Windows**. In the command line (cmd) run the following command.
     ```bash
-    # creates tables and indeces
-    npm run postgres:create
+    createdb infominer
+    ```
+    **Linux**. In bash you must first change the user to `postgres` and then create the database.
+    ```bash
+    sudo su - postgres
+    createdb infominer
+    exit
     ```
 
-## Authentication parameters
+4. Create a file named `pgconfig.js` in the `/src/config` folder which contains the following configuration
+    ```javascript
+    module.exports = {
+        user: 'postgres',        // insert user name
+        database: 'infominer',
+        password: '###########', // insert user password
+        host: 'localhost',
+        port: 5432,              // insert port specified when you installed postgresQL
+        max: 10,
+        idleTimeoutMillis: 30000
+    };
+    ```
 
-The application uses the [passport.js](http://www.passportjs.org/) middleware for user authentication. The service supports `google` and `twitter` authentication - both of them use their own configuration parameters such as `secretKey`, `clientId` and other. These parameters are for security reasons not provided in the repository.
+5. Create the required postgresQL tables. This is done by executing the following command.
+    ```bash
+    npm run postgres:create
+    ```
+    The command shown executes the file `/src/load/create-postgres-tables.js`.
 
-Contact your fellow developers so that they can give you the appropriate configuration files.
+6. Run InfoMiner by executing the following command in the command line.
+    ```bash
+    npm run server:gui
+    ```
+    The service will then be available in the browser at the address `localhost:3000`.
 
-## Helpful commands
+    - **Stopping the Service**. To stop the service you press `ctrl+c` to stop the server running InfoMiner. *Important:* you must wait until the service closes all of the datasets before completely stopping. It will notify the user in the command line when a dataset has been closed.
 
-These commands can be used inside the project folder for quick use.
 
-| command | description |
-| ------- | ----------- |
-| `npm test` | Runs unit tests. Command must be run in `bash`! |
-| `npm run server:gui` | Runs `gui-server` located in `src/server`. The server is available on `PORT=3000`. |
-| `npm run server:guiDebug`| Runs `gui-server` in `debug` mode. |
-
-### Ember custom commands
-
-Ember commands are here for easier Ember application development and building.
-
-| command | description |
-| ------- | ----------- |
-| `npm run ember:serve` | Runs a development instance of `Ember` application on `http://localhost:4200`. The instance is in `development` environment and supports `live-reload`. |
-| `npm run ember:build` | Builds the `Ember` application in `production` environment and saves it in `src/server/public` directory. |

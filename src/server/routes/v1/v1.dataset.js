@@ -104,7 +104,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         );
 
         // TODO: get username of creator and handle empty user
-        const owner = req.user ? req.user.id : 'development';
+        const owner = 'user';
         // get user datasets
         pg.select({ owner }, 'infominer_datasets', (error, results) => {
             if (error) {
@@ -160,7 +160,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             // the file was successfully uploaded
             let file = req.file;
             // TODO: get username of creator
-            const owner = req.user ? req.user.id : 'development'; // temporary placeholder
+            const owner = 'user'; // temporary placeholder
 
             // get the delimiter within the
             let delimiter = detectDelimiter(file.path);
@@ -312,7 +312,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         fields = JSON.parse(fields);
 
         // TODO: get username of creator
-        const owner = req.user ? req.user.id : 'development'; // temporary placeholder
+        const owner = 'user'; // temporary placeholder
 
         // get number of datasets the users already has
         pg.select({ owner }, 'infominer_datasets', (error, results) => {
@@ -451,7 +451,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        const owner = req.user ? req.user.id : 'development';
+        const owner = 'user';
 
         let body = { cmd: 'get_dataset' };
         sendToProcess(datasetId, owner, body, function (error, results) {
@@ -495,7 +495,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        const owner = req.user ? req.user.id : 'development';
+        const owner = 'user';
 
         // get dataset information
         let { label, description, fields } = req.body.dataset;
@@ -572,7 +572,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // get the user
-        const owner = req.user ? req.user.id : 'development';
+        const owner = 'user';
 
         if (processHandler.childExist(datasetId)) {
             // process is already running - just delete from table and
@@ -686,7 +686,7 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
         }
 
         // TODO: get username of creator and handle empty user
-        const owner = req.user ? req.user.id : 'development';
+        const owner = 'user';
 
         pg.select({ id: datasetId, owner }, 'infominer_datasets', (error, results) => {
             if (error) {
