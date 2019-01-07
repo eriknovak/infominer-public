@@ -50,7 +50,8 @@ export default Component.extend({
 
     _setStopwords() {
         const stopwords = this.get('method.parameters.stopwords');
-        this.set('stopwords', stopwords ? stopwords.join(', ') : 'None');
+        const empty = stopwords.length === 1 && stopwords[0] === '';
+        this.set('stopwords', !empty ? stopwords.join(', ') : '(not provided)');
     },
 
     actions: {

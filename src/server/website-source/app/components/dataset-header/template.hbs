@@ -12,11 +12,7 @@
           {{! dataset information container }}
           <div class="dataset-report-info__container">
 
-            <button class="btn btn-secondary btn-rounded pull-right" data-toggle="modal"
-              data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
 
-            <button class="btn btn-light btn-rounded pull-right" data-toggle="modal"
-              data-target="#delete-dataset-modal">Delete</button>
 
             <p class="dataset-report-info dataset-report-info__documents">
               {{dataset.numberOfDocuments}} documents
@@ -24,6 +20,14 @@
 
             <p class="dataset-report-info dataset-report-info__created">
               Created: {{dataset.date}}
+            </p>
+
+            <p class="dataset-report-info text-right">
+              <button class="btn btn-light btn-rounded" data-toggle="modal"
+                data-target="#delete-dataset-modal">Delete</button>
+
+              <button class="btn btn-secondary btn-rounded" data-toggle="modal"
+              data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
             </p>
 
           </div>{{! dataset-report-info__container }}

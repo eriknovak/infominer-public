@@ -12,7 +12,9 @@
 
         <div class="document-attribute">
           <div class="aggregate__title">{{value.field}}</div>
-          <div>{{{if value.value value.value 'not available'}}}</div>
+          <div class="aggregate__value">
+            {{{if value.value value.value '(not available)'}}}
+          </div>
         </div>
 
       {{/each}}

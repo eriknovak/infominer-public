@@ -74,6 +74,9 @@
             padding: 0px !important;
             border-bottom: 1px solid #dddddd;
             vertical-align: top !important;
+            max-height: 200px;
+            overflow: auto;
+            padding-right: 16px;
         }
         .document-attributes {
             & > .document-info-container {

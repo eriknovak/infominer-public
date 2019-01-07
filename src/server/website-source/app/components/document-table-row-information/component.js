@@ -17,6 +17,8 @@ export default Component.extend({
         let numberOfColumns = /*1 +*/ fields.length;
         this.set('numberOfColumns', numberOfColumns);
 
+        const linkRegex = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&\'\(\)\*\+,;=.]+$/, 'g');
+
         // get query parameters
         const query = this.get('query');
 
@@ -31,6 +33,11 @@ export default Component.extend({
                     value = value.join(' 🡒 ');
                 } else if (field.type == 'datetime') {
                     value = (new Date(value)).toUTCString();
+                }
+                if (value.match(linkRegex)) {
+                    // the value follows the link address pattern - make it a link to the address
+                    const address = value.match(/http(s)?/g) ? value : `http://${value}`;
+                    value = `<a href="${address}" target="_blank">${value}</a>`;
                 }
                 if (query && query.text && query.text.fields.includes(field.name)) {
                     const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');

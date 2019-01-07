@@ -1,6 +1,21 @@
 # InfoMiner
 
-InfoMiner is an exploration service for textual data.
+InfoMiner is an semi-automatic exploration tool. It enables the user to create topic
+ontologies by clustering, labelling and querying textual documents. If works as a web application, but will run only on the local machine.
+
+## Prerequisites
+
+To use the InfoMiner service, you must first install the following software on your machine:
+
+- **Node.js**. This engine enables running JavaScript files and is required for running the InfoMiner service. The installation file is available [here](https://nodejs.org/en/download/). By installing Node.js you will also install the Node Package Manager (npm) which is used to install node modules (similar as pip in Python).
+
+- **PostgresQL**. This is an open source object-relational database system. It is used to store the metadata of the datasets uploaded to InfoMiner. The installation files are found [here](https://www.postgresql.org/download/).
+
+- **Git** (optional). Git is a free and open source distributed version control system. It is used to acquire and update InfoMiner.
+
+## Setting Up the Service
+
+1. `Clone` or download the service source code (in .zip) onto your computer.
 
 ## Building the Project
 
@@ -34,15 +49,8 @@ InfoMiner is an exploration service for textual data.
 - Configure `./src/config/pgconfig.js` with your own credentials.
 - Run `npm run postgres:create` to create postgres tables.
     ```bash
-    # creates tables and indeces
     npm run postgres:create
     ```
-
-## Authentication parameters
-
-The application uses the [passport.js](http://www.passportjs.org/) middleware for user authentication. The service supports `google` and `twitter` authentication - both of them use their own configuration parameters such as `secretKey`, `clientId` and other. These parameters are for security reasons not provided in the repository.
-
-Contact your fellow developers so that they can give you the appropriate configuration files.
 
 ## Helpful commands
 
@@ -53,12 +61,3 @@ These commands can be used inside the project folder for quick use.
 | `npm test` | Runs unit tests. Command must be run in `bash`! |
 | `npm run server:gui` | Runs `gui-server` located in `src/server`. The server is available on `PORT=3000`. |
 | `npm run server:guiDebug`| Runs `gui-server` in `debug` mode. |
-
-### Ember custom commands
-
-Ember commands are here for easier Ember application development and building.
-
-| command | description |
-| ------- | ----------- |
-| `npm run ember:serve` | Runs a development instance of `Ember` application on `http://localhost:4200`. The instance is in `development` environment and supports `live-reload`. |
-| `npm run ember:build` | Builds the `Ember` application in `production` environment and saves it in `src/server/public` directory. |
