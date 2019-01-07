@@ -87,14 +87,14 @@ $height: 250px;
  * placeholder style
  *************************************/
 
- @keyframes pulse {
+ @keyframes subset-analysis-pulse {
     0%   { background-color: lighten($primary-color, 5%); }
     50%  { background-color:         $primary-color;      }
     100% { background-color: lighten($primary-color, 5%); }
 }
 
 .placeholder {
-    animation: pulse 2s infinite ease-in-out;
+    animation: subset-analysis-pulse 2s infinite ease-in-out;
     &__title {
         width: 144px;
         height: 19px;

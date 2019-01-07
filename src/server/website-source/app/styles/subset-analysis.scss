@@ -131,6 +131,12 @@
         display: flex;
     }
 
+    &__value {
+        max-height: 200px;
+        overflow: auto;
+        padding-right: 16px;
+    }
+
     &.maximize {
         z-index: 1200;
         position: fixed;

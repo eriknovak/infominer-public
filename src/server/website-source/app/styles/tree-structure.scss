@@ -41,6 +41,37 @@
     }
 }
 
+@mixin component-pulse ($size, $color) {
+
+    @keyframes method-loading-pulse {
+        0% {
+          -moz-box-shadow: 0 0 0 0 rgba($color, 0.6);
+          box-shadow: 0 0 0 0 rgba($color, 0.6);
+        }
+        70% {
+            -moz-box-shadow: 0 0 0 5px rgba($color, 0);
+            box-shadow: 0 0 0 5px rgba($color, 0);
+        }
+        100% {
+            -moz-box-shadow: 0 0 0 0 rgba($color, 0);
+            box-shadow: 0 0 0 0 rgba($color, 0);
+        }
+    }
+
+    .method-loading-pulse {
+        width: $size;
+        height: $size;
+        padding: 0px;
+        margin: auto;
+        display: inline-block;
+        border-radius: 50%;
+        background-color: $color;
+        box-shadow: 0 0 0 $color;
+        animation: method-loading-pulse 2s infinite;
+    }
+}
+
+
 .method { @include link-style(green); }
 .subset { @include link-style($tertiary-color); }
 
@@ -56,14 +87,17 @@
         display: inline-block;
         text-align: center;
         width: 20px;
+        height: 12px;
     }
 
     &__method {
         @include link-style(green);
+        @include component-pulse(10px, green);
     }
 
     &__subset {
         @include link-style($tertiary-color);
+        @include component-pulse(10px, green);
         &__placeholder {
             padding: 0 5px;
         }
@@ -161,3 +195,4 @@
         background: darken($tertiary-color, 5%);
     }
 }
+
