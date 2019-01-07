@@ -46,7 +46,7 @@ To use the InfoMiner service, you must first install the following software on y
         user: 'postgres',        // insert user name
         database: 'infominer',
         password: '###########', // insert user password
-        host: 'localhost',
+        host: '127.0.0.1',       // better than 'localhost' - mapping sometimes does not work
         port: 5432,              // insert port specified when you installed postgresQL
         max: 10,
         idleTimeoutMillis: 30000
