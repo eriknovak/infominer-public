@@ -15,10 +15,12 @@
     <div class="form-group">
       {{
         textarea
+
+        value=parameters.method.queryText
         class="form-control editing"
         rows="5"
-        value=parameters.method.queryText
         placeholder="Input text about content you wish to extract"
+        autocomplete="false"
       }}
     </div>{{! form-group }}
 

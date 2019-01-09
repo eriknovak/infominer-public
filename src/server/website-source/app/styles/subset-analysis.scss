@@ -69,14 +69,15 @@
         border-top: none;
     }
 
+    &-parameter__container {
+        margin-left: 25px;
+    }
+
     &-parameter__name {
         font-weight: 400;
 
         &:not(:first-of-type) {
             margin-left: 0.5rem;
-        }
-        &:first-of-type {
-            margin-left: 25px;
         }
     }
 
@@ -154,10 +155,10 @@
     }
 
     .fa { cursor: pointer; }
-    .fa-arrows-alt {
+    .fa-expand {
         display: none;
     }
-    &:hover .fa-arrows-alt {
+    &:hover .fa-expand {
         display: inherit;
     }
 }
