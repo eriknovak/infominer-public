@@ -373,8 +373,8 @@ class ActiveLearner extends AbstractModel {
         };
 
         // calculate the aggregates for the record set
-        let positiveKeywordDistribution = positiveRecords.aggr(aggregateParams).keywords;
-        let negativeKeywordDistribution = negativeRecords.aggr(aggregateParams).keywords;
+        let positiveKeywordDistribution = positiveRecords.aggr(aggregateParams);
+        let negativeKeywordDistribution = negativeRecords.aggr(aggregateParams);
 
         // return the document subsets
         return {
