@@ -175,7 +175,7 @@ export default Component.extend({
          */
         changeLimit() {
             // get new limit and use it
-            let newLimit = parseInt(this.$('#table-show-limit').find(':selected').val());
+            let newLimit = parseInt($('#table-show-limit').find(':selected').val());
             // execute new search
             this.get('changeLimit')(newLimit);
         },

@@ -31,7 +31,7 @@ export default Component.extend({
         this.set('selected', this.get('document.selected'));
 
         // set link with expanded info
-        this.set('dataTarget', `#document-${this.get('document.id')}`);
+        this.set('dataTarget', `#${this.get('tableId')}-document-${this.get('document.id')}`);
     },
 
     documentValues: computed('fields.@each.showInTable', 'query', function () {

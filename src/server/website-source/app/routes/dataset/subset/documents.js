@@ -6,6 +6,7 @@ import $ from 'jquery';
 export default Route.extend({
 
     fieldSelection: service('field-selection'),
+    notify: service('notify'),
 
     // default parameters
     defaultPage: 1,
@@ -174,13 +175,24 @@ export default Route.extend({
                             self.modelFor('dataset').get('hasMethods').pushObject(_method);
                         });
                     });
-
-                    // hide modal and transition to new route
-                    $('#subset-create-modal').modal('toggle');
-                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
+                    // transition to new route
                     self.transitionTo('dataset.subset', self.modelFor('dataset'), subset.id);
                 }).catch(error => {
-                    console.log(error.message);
+
+                    // notify user about the status
+                    this.get('notify').info({
+                        html: `<div class="notification">
+                                Infominer was unable to save subset
+                                <span class="label">
+                                    ${params.label}
+                                </span>. Please try again.
+                            </div>`
+                    });
+
+                }).finally(() => {
+                    // hide subset creation modal
+                    $('#subset-create-modal').modal('toggle');
+                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
                 });
             });
 
@@ -210,11 +222,11 @@ export default Route.extend({
                 .map(doc => doc.get('id'));
             // do nothing if no documents are selected
             if (!documents.length) {
-                console.log('No documents selected');
+                // console.log('No documents selected');
                 return;
             }
             // show the actions
-            console.log(from, to, documents);
+            // console.log(from, to, documents);
         }
 
     },

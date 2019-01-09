@@ -23,13 +23,14 @@ export default DS.RESTAdapter.extend(DataAdapterMixin, {
 
             } else if (status === 'processing') {
 
-                // creates a promise request which waits for 10 seconds
+                // creates a promise request which waits for 30 seconds
                 const request = new Promise((resolve, reject) => {
                     self.set('timeout', setTimeout(function () {
                             // TODO: handle exceptions
                             self.ajax(`${url}/status?hash=${hash}`, 'GET')
-                                .then(params => resolve(params));
-                        }, 10000)
+                                .then(params => resolve(params))
+                                .catch(error => reject(error));
+                        }, 30000)
                     );
                 });
 
