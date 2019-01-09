@@ -11,21 +11,23 @@
 
 <div class="row">
   <div class="col">
+    <div class="analysis-parameter__container">
 
-    <span class="analysis-parameter__name">Number of Clusters: </span>
-    <span class="analysis-parameter__value">{{clusters.length}}</span>
+      <span class="analysis-parameter__name">Number of Clusters: </span>
+      <span class="analysis-parameter__value">{{clusters.length}}</span>
 
-    <span class="analysis-parameter__name">Type: </span>
-    <span class="analysis-parameter__value">
-      {{method.parameters.method.clusteringType}}
-      ({{selectedFields}})
-    </span>
+      <span class="analysis-parameter__name">Type: </span>
+      <span class="analysis-parameter__value">
+        {{method.parameters.method.clusteringType}}
+        ({{selectedFields}})
+      </span>
 
-    <span class="analysis-parameter__name">Stopwords: </span>
-    <span class="analysis-parameter__value">
-      {{stopwords}}
-    </span>
+      <span class="analysis-parameter__name">Stopwords: </span>
+      <span class="analysis-parameter__value">
+        {{stopwords}}
+      </span>
 
+    </div>{{! .analysis-parameter__container }}
   </div>
 </div>
 
