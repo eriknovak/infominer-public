@@ -67,10 +67,3 @@ To use the InfoMiner service, you must first install the following software on y
     The service will then be available in the browser at the address `localhost:3000`.
 
     - **Stopping the Service**. To stop the service you press `ctrl+c` to stop the server running InfoMiner. *Important:* you must wait until the service closes all of the datasets before completely stopping. It will notify the user in the command line when a dataset has been closed.
-
-| command | description |
-| ------- | ----------- |
-| `npm test` | Runs unit tests. Command must be run in `bash`! |
-| `npm run server:gui` | Runs `gui-server` located in `src/server`. The server is available on `PORT=3000`. |
-| `npm run server:guiDebug`| Runs `gui-server` in `debug` mode. |
-
