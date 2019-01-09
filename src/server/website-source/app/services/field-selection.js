@@ -1,5 +1,5 @@
 import Service from '@ember/service';
-import { observer, get, set } from '@ember/object';
+import { observer, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 
 export default Service.extend({

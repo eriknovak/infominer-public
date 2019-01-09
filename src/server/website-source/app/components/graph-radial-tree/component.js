@@ -116,7 +116,7 @@ const RadialTreeComponent = GraphComponent.extend({
                     } else {
                         let numberOfDocuments = modelClass.docIds.length;
                         hierarchy.push({ label: modelClass.label, type: 'subset',
-                            numberOfDocuments, id: `${id}-${i}`, parentId: id });
+                            numberOfDocuments, id: `${id}-${type}`, parentId: id });
                     }
                 }
             }

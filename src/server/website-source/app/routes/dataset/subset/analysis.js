@@ -77,10 +77,11 @@ export default Route.extend({
                             self.modelFor('dataset').get('hasMethods').pushObject(method);
                         });
                     });
+                self.transitionTo('dataset.subset', subset);
+            }).finally(() => {
                 // toggle the modal - giving the user control
                 $('#subset-create-modal').modal('toggle');
                 $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
-                self.transitionTo('dataset.subset', subset);
             });
         }
     }

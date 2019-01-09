@@ -34,21 +34,27 @@ export default Component.extend({
                 } else if (field.type == 'datetime') {
                     value = (new Date(value)).toUTCString();
                 }
+
                 if (value.match(linkRegex)) {
                     // the value follows the link address pattern - make it a link to the address
                     const address = value.match(/http(s)?/g) ? value : `http://${value}`;
+                    if (query && query.text && query.text.fields.includes(field.name)) {
+                        const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');
+                        value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
+                    }
                     value = `<a href="${address}" target="_blank">${value}</a>`;
-                }
-                if (query && query.text && query.text.fields.includes(field.name)) {
+                } else if (query && query.text && query.text.fields.includes(field.name)) {
                     const pattern = new RegExp(query.text.keywords.replace(/\s/g, '[\\s\\-\\+]'), 'gi');
                     value = value.replace(pattern, str => `<span class="highlight">${str}</span>`);
                 }
+
+
             }
             documentValues.push({ value, field: field.name });
         }
         // save values
         this.set('documentValues', documentValues);
-        this.set('collapseId', `document-${this.get('document.id')}`);
+        this.set('collapseId', `${this.get('tableId')}-document-${this.get('document.id')}`);
     },
 
     ///////////////////////////////////////////////////////

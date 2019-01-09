@@ -2,6 +2,7 @@ import Route from '@ember/routing/route';
 import ENV from '../config/environment';
 
 import { inject as service } from '@ember/service';
+import $ from 'jquery';
 
 
 export default Route.extend({
@@ -35,13 +36,13 @@ export default Route.extend({
                                         this._setupLoadedDataset(dataset, interval, results.status);
                                     } else if (results.errors) {
                                         // notify the user about the dataset error
-                                        this._unableToLoadDataset(dataset, inverval);
+                                        this._unableToLoadDataset(dataset, interval);
                                     }
                                 }).catch(error => {
                                     // notify the user about the dataset error
-                                    this._unableToLoadDataset(dataset, inverval);
+                                    this._unableToLoadDataset(dataset, interval);
                                 });
-                        }, 5000);
+                        }, 10000);
                     }
                 });
 
@@ -58,18 +59,18 @@ export default Route.extend({
      * @param {Object} status - The dataset loading status.
      */
     _setupLoadedDataset(dataset, interval, status) {
-         // clear the interval
-         clearInterval(interval);
+        // clear the interval
+        clearInterval(interval);
         // notify user about the status
-         this.get('notify').info({
-             html: `<div class="notification">
-                     Dataset <span class="label">
-                         ${dataset.get('label')}
-                     </span> successfully uploaded!
-                 </div>`
-         });
-         // set dataset loaded property
-         dataset.set('status', status);
+        this.get('notify').info({
+            html: `<div class="notification">
+                    Dataset <span class="label">
+                        ${dataset.get('label')}
+                    </span> successfully uploaded!
+                </div>`
+        });
+        // set dataset loaded property
+        dataset.set('status', status);
     },
 
     /**

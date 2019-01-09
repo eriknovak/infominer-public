@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+import $ from 'jquery';
 
 export default Route.extend({
 
@@ -66,7 +67,7 @@ export default Route.extend({
         saveActiveLearning() {
             let self = this;
             let { dataset, subset, activeLearning } = self.modelFor(self.routeName);
-                // create a new method
+            // create a new method
             const method = self.get('store').createRecord('method', {
                 methodType: activeLearning.get('methodType'),
                 parameters: {
@@ -77,6 +78,7 @@ export default Route.extend({
                 },
                 appliedOn: subset
             });
+
             self.modelFor('dataset').get('hasMethods').pushObject(method);
             self.transitionTo('dataset.subset', dataset, subset);
             // save the method
