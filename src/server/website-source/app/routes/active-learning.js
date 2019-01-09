@@ -98,13 +98,6 @@ export default Route.extend({
                     activeLearning.destroyRecord();
                 });
 
-        },
-
-        willTransition() {
-            let self = this;
-            let { activeLearning } = self.modelFor(self.routeName);
-            activeLearning.destroyRecord();
-            return true;
         }
 
     }
