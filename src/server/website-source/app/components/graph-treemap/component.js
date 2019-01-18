@@ -128,7 +128,7 @@ const HierarchyComponent = GraphComponent.extend({
             .attr('xlink:href', d => `#${this.get('elementId')}-${d.data.id}`);
 
         cell.append('text')
-            .attr('clip-path', d => `url(#clip-${this.get('elementId')}-${d.data.id}`)
+            .attr('clip-path', d => `url(#clip-${this.get('elementId')}-${d.data.id})`)
           .selectAll('tspan')
             .data(d => `${d.data.id}.${d.data.size}`.split('.').slice(1))
           .enter().append('tspan')

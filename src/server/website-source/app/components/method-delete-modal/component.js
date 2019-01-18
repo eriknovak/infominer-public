@@ -21,6 +21,8 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         this.set('methodId', null);
+        this.set('loadingStatus', false);
+
     },
 
     didInsertElement() {
@@ -34,10 +36,6 @@ export default Component.extend({
             const method = self.get('store').peekRecord('method', methodId);
             self.set('label', method.get('label'));
             self.set('appliedOn', method.get('appliedOn.label'));
-
-            // prepare delete button text
-            $(`#${self.get('elementId')} .modal-footer .btn-danger`)
-                .html('Yes, Delete Method');
         });
     },
 
@@ -50,8 +48,18 @@ export default Component.extend({
         delete() {
             const methodId = this.get('methodId');
             if (methodId) {
+                this.set('loadingStatus', true);
+
                 this.set('methodId', null);
-                return this.get('deleteMethod')(methodId);
+                this.get('deleteMethod')(methodId).then(() => {
+                    // revert loading status
+                    this.set('loadingStatus', false);
+                    // toggle this modal
+                    $(`#${this.elementId}`).modal('toggle');
+                });
+
+
+
             }
         }
     }

@@ -464,6 +464,22 @@ class BaseDataset {
             self.fields);
     }
 
+    /**
+     * Gets documents that are part of the subset.
+     * @param {Number} id - Subset id.
+     * @param {Object} [query] - Query for retrieving documents.
+     * @param {Number} [query.limit=10] - The number of documents it retrieves.
+     * @param {Number} [query.offset=0] - The retrieval starting point.
+     * @param {Number} [query.page] - The page number based on the limit.
+     * @param {Object} [query.sort] - The sort parameters.
+     * @param {String} query.sort.fieldName - The field by which the sorting is done.
+     * @param {String} [query.sort.sortType] - The flag specifiying is sort is done. Possible: `asc` or `desc`.
+     * @returns {Object} The object containing the documents and it's metadata.
+     */
+    updateSubsetDocument(subsetId, document) {
+        let self = this;
+        return self._subsetsManager.updateDocument(self.base, subsetId, document);
+    }
 
 
     /**********************************
@@ -504,7 +520,7 @@ class BaseDataset {
      */
     editMethod(method) {
         let self = this;
-        return self._modelsManager.updateModel(self.base, method);
+        return self._modelsManager.updateModel(self.base, method, self.fields);
     }
 
     /**

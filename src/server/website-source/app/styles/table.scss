@@ -38,10 +38,10 @@
     margin-bottom: 0px;
     tbody > tr {
         &.selected {
-            background-color: $primary-color;
+            background-color: #ededed;
             & + .document-information-row td,
             &:hover + .document-information-row td {
-                background-color: $primary-color !important;
+                background-color: #ededed !important;
             }
         }
 
@@ -105,9 +105,8 @@
         }
         // sorting icons
         .sorting {
-            padding: 3px 0;
-            font-size: 12px;
             position: absolute;
+            top: 12px;
             right: 0;
         }
     }
@@ -200,7 +199,6 @@
     }
 
     &__delete {
-        font-weight: 500;
         color: red !important;
     }
 }

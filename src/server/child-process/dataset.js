@@ -122,6 +122,9 @@ function handle(msg) {
     case 'get_subset_documents':
         getSubsetDocuments(msg);
         break;
+    case 'update_subset_document':
+        updateSubsetDocument(msg);
+        break;
     case 'get_method':
         getMethod(msg);
         break;
@@ -439,6 +442,33 @@ function deleteSubset(msg) {
         }
     });
 }
+
+/**
+ * Gets the database info.
+ * @param {Object} msg - Message to open database.
+ * @param {Number} msg.reqId - The request id - used for for getting the callback
+ * what to do with the results.
+ * @param {Object} msg.body - The body of the message.
+ * @param {Object} msg.body.content - The content of the message.
+ * @param {Number} msg.body.content.subsetId - The subset object.
+ * @param {Number} msg.body.content.documentId - The document unique id.
+ * @param {Number} msg.body.content.document - The document attributes.
+ */
+function updateSubsetDocument(msg) {
+    // validate message information
+    let { reqId, body } = msg;
+    try {
+        let subsetId = body.content.subsetId;
+        let document = body.content.document;
+        let results = database.updateSubsetDocument(subsetId, document);
+        process.send({ reqId, results });
+    } catch (err) {
+        console.log('updateSubsetDocument Error', err.message);
+        // notify parent process about the error
+        process.send({ reqId, error: err.message });
+    }
+}
+
 
 /**
  * Gets the database info.

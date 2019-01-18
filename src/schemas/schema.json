@@ -9,7 +9,8 @@
     "fields": [
         { "name": "label", "type": "string" },
         { "name": "description", "type": "string", "null": true },
-        { "name": "deleted", "type": "bool", "default": false }
+        { "name": "deleted", "type": "bool", "default": false },
+        { "name": "modified", "type": "bool", "default": false }
     ],
     "joins": [
         { "name": "hasElements", "type": "index", "store": "Dataset", "inverse": "inSubsets" },
@@ -22,7 +23,8 @@
         { "name": "type", "type": "string" },
         { "name": "parameters", "type": "json" },
         { "name": "result", "type": "json", "null": true },
-        { "name": "deleted", "type": "bool", "default": false }
+        { "name": "deleted", "type": "bool", "default": false },
+        { "name": "outOfDate", "type": "bool", "default": false }
     ],
     "joins": [
         { "name": "produced", "type": "index", "store": "Subsets", "inverse": "resultedIn" },

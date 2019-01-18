@@ -24,10 +24,14 @@
 
     {{! modal footer containing actions }}
     <div class="modal-footer">
-      <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
-      <button type="button" class="btn btn-danger btn-rounded" {{action 'delete'}}>
-        Yes, Delete Subset
-      </button>
+      {{#if loadingStatus}}
+        <span class="loading-pulse"></span>
+      {{else}}
+        <button type="button" class="btn btn-light btn-rounded" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger btn-rounded" {{action 'delete'}}>
+            Yes, Delete Subset
+        </button>
+      {{/if}}
     </div>
 
   </div>{{! modal-content }}

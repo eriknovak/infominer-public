@@ -5,10 +5,30 @@
 // external modules
 const qm = require('qminer');
 
+// internal modules
 const AbstractModel = require('./abstract-model');
+
+/**
+ * The Active Learner class.
+ */
 class ActiveLearner extends AbstractModel {
 
 
+    /**
+     *
+     * @param {Object} base - The qminer database in which the analysis is performed.
+     * @param {Object} params - The parameters used to initialize the active learner model.
+     * @param {Object} subset - The QMiner record set containing the records on which the
+     * active learner is performed.
+     * @param {Object} parameters - The global parameters containing information about the
+     * database configuration.
+     * @param {Object} parameters.fields - The fields in the database.
+     * @param {String[]} parameters.stopwords - The global stopwords specified for the
+     * whole dataset.
+     * @param {Object} formatter - The formatter object containing the method for formatting
+     * database object.s
+     * @param {Function} formatter.document - The function specifying how to format a record.
+     */
     constructor(base, params, subset, parameters, formatter) {
         super(base, params, subset, parameters);
         this._formatter = formatter;
@@ -20,12 +40,17 @@ class ActiveLearner extends AbstractModel {
             this.params.parameters.labelledDocs = [];
         }
 
+        // count the number of positive and negative labels
+        this._labelCount = { positive: 0, negative: 0 };
+        // store the document ids based on their label
+        this._positivelyLabelledDocs = [];
+        this._negativelyLabelledDocs = [];
+
         // active learning parameter preparations
         this._prepareFeatureParameters();
         this._createFeatureSpace();
         this._createActiveLearnerModel();
-        // count the number of positive and negative labels
-        this._labelCount = { positive: 0, negative: 0 };
+
         // set an iterator for retrieving documents to be labelled
         this._documentIterator = this._makeDocumentIterator();
     }
@@ -43,18 +68,25 @@ class ActiveLearner extends AbstractModel {
 
         if (currentDoc) {
             // get the document id and label
-            let docIds = self.documents.map(rec => rec.$id);
             const { document, label } = currentDoc;
             // get the position of the document with id = documentId
             for (let documentIdx = 0; documentIdx < self.documents.length; documentIdx++) {
                 if (self.documents[documentIdx].$id === document.id) {
+
                     // update element label of the found document
                     self.activeLearner.setLabel(documentIdx, label);
-                    // update the label count
-                    let labelField = label > 0 ? 'positive' : label < 0 ? 'negative' : null;
-                    if (labelField) self._labelCount[labelField]++;
+
                     // update the document label parameters
                     self.params.parameters.labelledDocs.push({ document, label });
+
+                    // update the label count and store document id
+                    if (label > 0) {
+                        self._labelCount.positive++;
+                        self._positivelyLabelledDocs.push(document.id);
+                    } else if (label < 0) {
+                        self._labelCount.negative++;
+                        self._negativelyLabelledDocs.push(document.id);
+                    }
                     break;
                 }
             }
@@ -98,29 +130,16 @@ class ActiveLearner extends AbstractModel {
     getStatistics() {
         let self = this;
 
-        // get the model and predict labels for the documents
-        const model = self.activeLearner.getSVC();
-        let predictions = model.predict(self.featureMatrix);
-
-        let predicted = {
-            positive: { count: 0 },
-            negative: { count: 0 },
-            get all () { return this.positive.count + this.negative.count; }
-        };
-        for (let id = 0; id < predictions.length; id++) {
-            const label = predictions[id] > 0 ? 'positive' : 'negative';
-            predicted[label].count++;
-        }
-
         // get the keyword clouds of positive and negative subsets
-        const { positive, negative } = self._getSubsetKeywordClouds();
-        predicted.positive.distribution = positive;
-        predicted.negative.distribution = negative;
-
+        const { positive, negative } = self._getSubsetKeywords();
         // number of negative and positive predictions
         let statistics = {
             labelled: self._labelCount,
-            predicted
+            predicted: {
+                positive,
+                negative,
+                get all () { return this.positive.count + this.negative.count; }
+            }
         };
 
         // return statistics
@@ -139,13 +158,14 @@ class ActiveLearner extends AbstractModel {
         let self = this;
 
         // prepare stopwords for feature space
-        let stopwords = { language: 'en', words: [''] };
+        self._stopwordsAL = { language: 'en', words: [''] };
+
         if (self.stopwords) {
-            stopwords.words = stopwords.words.concat(self.stopwords);
+            self._stopwordsAL.words = self._stopwordsAL.words.concat(self.stopwords);
         }
         if (self.params.parameters.stopwords) {
             let words = self.params.parameters.stopwords;
-            stopwords.words = stopwords.words.concat(words);
+            self._stopwordsAL.words = self._stopwordsAL.words.concat(words);
         }
 
         self.features = [{
@@ -156,7 +176,7 @@ class ActiveLearner extends AbstractModel {
             tokenizer: {
                 type: 'simple',
                 stemmer: 'porter',
-                stopwords
+                stopwords: self._stopwordsAL
             }
         }];
 
@@ -174,13 +194,30 @@ class ActiveLearner extends AbstractModel {
         self.documents = self.subset.hasElements;
         self.featureSpace.updateRecords(self.documents);
         self.featureMatrix = self.featureSpace.extractSparseMatrix(self.documents);
+
     }
 
 
     _createActiveLearnerModel() {
         let self = this;
 
-        self.activeLearner = new qm.analytics.ActiveLearner();
+        self.activeLearner = new qm.analytics.ActiveLearner({
+            learner: { disableAsserts: true },
+            SVC: {
+                algorithm: 'LIBSVM',
+                c: 2,   // cost parameter
+                j: 2,   // unbalance parameter
+                eps: 1e-3, // epsilon insensitive loss parameter
+                batchSize: 1000,
+                maxIterations: 10000,
+                maxTime: 1, // maximum runtime in seconds
+                minDiff: 1e-6, // stopping criterion tolerance
+                type: 'C_SVC',
+                kernel: 'RBF',  // radial basis function kernel (makes loops)
+                gamma: 2.0, // designates the tail of the normal distribution
+                coef0: 2.0  // scaling parameter
+            }
+        });
         // set matrix values
         self.activeLearner.setX(self.featureMatrix);
 
@@ -193,13 +230,12 @@ class ActiveLearner extends AbstractModel {
     /**
      * Gets the seed documents - those that are most and least similar to
      * the query text.
+     * @param {Number} [MAX_COUNT=20] - The number of documents in the document list.
      * @returns {Object[]} The most and least similar documents, randomly
      * sorted.
      */
-    * _makeDocumentIterator() {
+    * _makeDocumentIterator(MAX_COUNT=20) {
         let self = this;
-        // number of max documents
-        const MAX_COUNT = 20;
 
         // set the query parameters
         const initQuery = self.params.parameters.initQuery;
@@ -224,7 +260,7 @@ class ActiveLearner extends AbstractModel {
                 _ascendingOrder = true;
                 _offset = 0;
             }
-
+            // did we went through all documents of the first search?
             let position = _iterationCount % MAX_COUNT;
 
             // calculate the next position of interest
@@ -294,13 +330,13 @@ class ActiveLearner extends AbstractModel {
 
     /**
      * Gets the next border document.
-     * @param {Number} [num=1] - The number of uncertain documents to get.
+     * @param {Number} [numberOfUncertain=1] - The number of uncertain documents to get.
      * @returns {Object} The border document.
      */
-    _getNextUncertainDocument(num=1) {
+    _getNextUncertainDocument(numberOfUncertain=1) {
         let self = this;
         // get the next uncertain document id
-        let idx = self.activeLearner.getQueryIdx(num)[0];
+        let idx = self.activeLearner.getQueryIdx(numberOfUncertain)[0];
         let document = self._formatter.document(self.documents[idx]);
         return document;
     }
@@ -311,7 +347,7 @@ class ActiveLearner extends AbstractModel {
      * @returns {Object} The object containing the record sets labelled as
      * positive and negative.
      */
-    _getSubsetKeywordClouds() {
+    _getSubsetKeywords() {
         let self = this;
 
         // get the model and predict labels for the documents
@@ -319,76 +355,104 @@ class ActiveLearner extends AbstractModel {
         let predictions = model.predict(self.featureMatrix);
 
         // get the document subset for positive and negative labels
-        let positiveIds = new qm.la.IntVector();
-        let negativeIds = new qm.la.IntVector();
+        self._predictedPositiveIds = new qm.la.IntVector();
+        self._predictedNegativeIds = new qm.la.IntVector();
+
+        // get the positions of positive and negative examples
+        let predictedPositivePositions = new qm.la.IntVector();
+        let predictedNegativePositions = new qm.la.IntVector();
+
+        // iterate through predictions - manually labelled documents have greater priority
         for (let position = 0; position < predictions.length; position++) {
-            if (predictions[position] > 0) {
-                positiveIds.push(self.documents[position].$id);
+
+            let documentId = self.documents[position].$id;
+            if (self._positivelyLabelledDocs.includes(documentId)) {
+                // store already positively labelled document
+                self._predictedPositiveIds.push(documentId);
+                predictedPositivePositions.push(position);
+            } else if (self._negativelyLabelledDocs.includes(documentId)) {
+                // store already negatively labelled document
+                self._predictedNegativeIds.push(documentId);
+                predictedNegativePositions.push(position);
+
+            } else if (predictions[position] > 0) {
+                // store positively predicted document
+                self._predictedPositiveIds.push(documentId);
+                predictedPositivePositions.push(position);
             } else {
-                negativeIds.push(self.documents[position].$id);
+                // store negatively predicted document
+                self._predictedNegativeIds.push(documentId);
+                predictedNegativePositions.push(position);
+
             }
         }
         // get positive and negative documents respectively
-        self.positive = self.base.store('Dataset').newRecordSet(positiveIds);
-        self.negative = self.base.store('Dataset').newRecordSet(negativeIds);
+        const positiveRecords = self.base.store('Dataset').newRecordSet(self._predictedPositiveIds);
+        const negativeRecords = self.base.store('Dataset').newRecordSet(self._predictedNegativeIds);
+
+        // prepare aggregation parameters
+        // used to calculate positive and negative keywords
+        const aggregateParams = {
+            name: `aggregate_${self._defaultField}`,
+            field: self._defaultField,
+            type: 'keywords',
+            sample: 1000,
+            tokenize: true,
+            stemmer: false,
+            stopwords: {
+                language: 'en',
+                stopwords: self._stopwordsAL
+            }
+        };
 
         // calculate the aggregates for the record set
-        let positiveKeywords = self._getKeywordDistribution(self.positive);
-        let negativeKeywords = self._getKeywordDistribution(self.negative);
+        let positiveKeywordDistribution = positiveRecords.aggr(aggregateParams);
+        let negativeKeywordDistribution = negativeRecords.aggr(aggregateParams);
+
+        /**
+         * @description Calculates the average similarity of the documents based on the
+         * generated feature space.
+         * @param {Object} documentPositions - The integer vector of document position ids.
+         * @returns {Number} The average similarity between documents.
+         */
+        function _averageSimilarityOfClass(documentPositions) {
+            // number of documents
+            const length = documentPositions.length;
+            // get the feature submatrix for the given documents
+            const submatrix = self.featureMatrix.getColSubmatrix(documentPositions);
+
+            // generate vector of length number of features and calculate the centroid
+            const onesArray = new Array(length).fill(1);
+            const onesVector = new qm.la.Vector(onesArray);
+            // get centroid of the given document subset
+            const centroid = submatrix.multiply(onesVector).multiply(1 / length);
+
+            // calculate the average distance
+            const averageSimilarity = 1 / length * submatrix.multiplyT(centroid).sum();
+            // return the average similarity of documents
+            return averageSimilarity;
+
+        }
+
+        self._positiveAverageSimilarity = _averageSimilarityOfClass(predictedPositivePositions);
+        self._negativeAverageSimilarity = _averageSimilarityOfClass(predictedNegativePositions);
 
         // return the document subsets
         return {
             positive: {
-                keywords: positiveKeywords
+                count: self._predictedPositiveIds.length,
+                distribution: positiveKeywordDistribution,
+                avgSimilarity: self._positiveAverageSimilarity
             },
             negative: {
-                keywords: negativeKeywords
+                count: self._predictedNegativeIds.length,
+                distribution: negativeKeywordDistribution,
+                avgSimilarity: self._negativeAverageSimilarity
+
             }
         };
 
     }
-
-    _getKeywordDistribution(dataset) {
-        let self = this;
-
-        // create placeholder for all of the text
-        let string = '';
-
-        // pull all text into one field
-        dataset.each(rec => {
-            for (let field of self.params.parameters.fields) {
-                if (rec[field]) string += `${rec[field]} `;
-            }
-        });
-
-        // get the tf-idf of the whole string
-        const record = { [self._defaultField]: string };
-        const vector = self.featureSpace.extractVector(record);
-
-        // sort the vector
-        let sort = vector.sortPerm(false);
-
-        // setup placeholder for the distribution
-        let distribution = [ ];
-
-        let upperLimit = 100;
-        if (upperLimit > sort.perm.length) {
-            // the threshold is larger than the vector
-            upperLimit = sort.perm.length;
-        }
-
-        for (let i = 0; i < upperLimit; i++) {
-            // get content id of (i+1)-th terms with greatest weights
-            let maxid = sort.perm[i];
-            // remember the content and it's weights
-            const keyword = self.featureSpace.getFeature(maxid);
-            const weight = vector[maxid];
-            distribution.push({ keyword , weight });
-        }
-
-        return distribution;
-    }
-
 
     _createMethod() {
         let self = this;
@@ -401,8 +465,14 @@ class ActiveLearner extends AbstractModel {
             type: self.params.type,
             parameters,
             result: {
-                positive: { docIds: self.positive.map(rec => rec.$id) },
-                negative: { docIds: self.negative.map(rec => rec.$id) }
+                positive: {
+                    docIds: self._predictedPositiveIds.toArray(),
+                    avgSimilarity: self._positiveAverageSimilarity
+                },
+                negative: {
+                    docIds: self._predictedNegativeIds.toArray(),
+                    avgSimilarity: self._negativeAverageSimilarity
+                }
             }
         };
         // create the method

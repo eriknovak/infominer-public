@@ -1,6 +1,18 @@
 <div class="{{if maximize "analysis__header" "aggregate__title"}}">
   {{ field }} histogram
-  <i class="fa {{unless maximize 'fa-arrows-alt' 'fa-times'}} ml-auto my-auto"
-    aria-hidden="true" {{action 'maximizeComponent'}}></i>
+
+  <span class="ml-auto my-auto save-graph fa-fw" {{action 'saveImage'}}>
+    {{fa-icon 'save' size='lg'}}
+  </span>
+
+  <span class="ml-2 my-auto fa-fw" {{action 'maximizeComponent'}}>
+    {{#unless maximize}}
+      {{fa-icon 'expand' size='lg' class="expand-graph" }}
+    {{else}}
+      {{fa-icon 'times' size='lg' class="reduce-graph" }}
+    {{/unless}}
+  </span>
+
 </div>
+
 {{ graph-histogram distribution }}

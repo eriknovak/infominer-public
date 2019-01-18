@@ -67,6 +67,32 @@
         background-color: white;
         border: 1px solid #e6e6e6;
         border-top: none;
+
+        &__information {
+            margin-bottom: 5px;
+            font-size: 13px;
+
+            .method-status,
+            .method-status-update {
+                font-size: 12px;
+                font-weight: 500;
+            }
+
+            .method-status-update {
+                color: white;
+                background-color: $tertiary-color;
+
+                transition: background .4s;
+                -webkit-transition: background .4s;
+                &:hover {
+                    background-color: darken($tertiary-color, 10%);
+                }
+            }
+        }
+    }
+
+    &-parameter__container {
+        margin-left: 25px;
     }
 
     &-parameter__name {
@@ -75,15 +101,12 @@
         &:not(:first-of-type) {
             margin-left: 0.5rem;
         }
-        &:first-of-type {
-            margin-left: 25px;
-        }
     }
 
     &__method-type {
-        border-bottom: 1px solid #cccccc;
         color: green;
         text-transform: capitalize;
+        border-bottom: 1px solid #cccccc;
         @include collapse-toggle(green, 20px);
     }
 
@@ -105,6 +128,11 @@
                     &--edit {
                         display: none;
                         &.show { display: inline-block; }
+                    }
+
+                    &-container {
+                        display: inline-block;
+                        width: calc(100% - 70px);
                     }
                 }
 
@@ -153,11 +181,18 @@
         }
     }
 
-    .fa { cursor: pointer; }
-    .fa-arrows-alt {
+    [class*='-graph'] { cursor: pointer; }
+
+    .expand-graph,
+    .save-graph {
         display: none;
     }
-    &:hover .fa-arrows-alt {
+
+    .analysis__header .save-graph { display: inherit; }
+
+
+    &:hover .expand-graph,
+    &:hover .save-graph {
         display: inherit;
     }
 }

@@ -3,9 +3,13 @@
     <div class="row">
       <div class="col-lg-10">
 
-        <h3 class="title text-uppercase">{{ model.label }}
-          <button class="btn btn-secondary btn-rounded edit pull-right" data-toggle="modal"
-          data-target="#edit-subset-modal" {{action 'removeModalWarnings'}}>Edit</button>
+        <h3 class="title text-uppercase">
+            <a class="fa-layers fa-lg fa-pull-right edit edit-subset-button" tabindex="0" data-toggle="modal"
+              data-target="#edit-subset-modal" {{action 'removeModalWarnings'}}>
+                {{fa-icon 'pencil-alt' transform='shrink-9' mask='circle' }}
+            </a>
+
+          {{ model.label }}
         </h3>
 
         <div class="row">
@@ -34,6 +38,14 @@
                   {{/if}}
                 </span>
               </p>
+
+              {{#if model.modified }}
+                <p class="subset-info-container__statistics__value">
+                  <span class="badge badge-warning subset-status">modified</span>
+                </p>
+              {{else}}
+                <p class="subset-info-container__statistics__value mb-5"></p>
+              {{/if}}
 
             </div>{{! subset-info-container__statistics }}
           </div>{{! col-lg-3 }}

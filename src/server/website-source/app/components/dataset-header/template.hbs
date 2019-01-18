@@ -12,8 +12,6 @@
           {{! dataset information container }}
           <div class="dataset-report-info__container">
 
-
-
             <p class="dataset-report-info dataset-report-info__documents">
               {{dataset.numberOfDocuments}} documents
             </p>
@@ -27,7 +25,10 @@
                 data-target="#delete-dataset-modal">Delete</button>
 
               <button class="btn btn-secondary btn-rounded" data-toggle="modal"
-              data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>Edit</button>
+                data-target="#edit-dataset-modal" {{action 'removeWarnings'}}>
+                Edit {{fa-icon 'pencil-alt' transform='shrink-3' }}
+              </button>
+
             </p>
 
           </div>{{! dataset-report-info__container }}

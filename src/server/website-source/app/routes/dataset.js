@@ -61,9 +61,7 @@ export default Route.extend({
          */
         deleteSubset(subsetId) {
             let self = this;
-            $('#subset-delete-modal .modal-footer .btn-danger').html(
-                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
-            );
+
             let subset = this.get('store').peekRecord('subset', subsetId);
             self.modelFor('dataset').get('hasSubsets').removeObject(subset);
             // remove the subset from its creator method
@@ -80,7 +78,7 @@ export default Route.extend({
                 _methodDeleted = true;
             }
 
-            subset.destroyRecord().then(() => {
+            return subset.destroyRecord().then(() => {
                 if (!_methodDeleted) {
                     this.get('store').peekRecord('method', method.get('id')).reload();
                 }
@@ -89,7 +87,6 @@ export default Route.extend({
                     $('#edit-subset-modal').modal('toggle');
                 }
                 // hide the subset-delete-modal
-                $('#subset-delete-modal').modal('toggle');
                 self.transitionTo('dataset.subset', self.modelFor('dataset').get('id'), 0);
             });
         },
@@ -99,16 +96,12 @@ export default Route.extend({
          * @param {Number | String} methodId - The method id.
          */
         deleteMethod(methodId) {
-
             let self = this;
-            $('#method-delete-modal .modal-footer .btn-danger').html(
-                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
-            );
+
             let method = this.get('store').peekRecord('method', methodId);
             method.set('appliedOn', null);
-            method.destroyRecord().then(() => {
-                // hide the method-delete-modal
-                $('#method-delete-modal').modal('toggle');
+
+            return method.destroyRecord().then(() => {
                 self.transitionTo('dataset.subset', self.modelFor('dataset').get('id'), 0);
             });
         }

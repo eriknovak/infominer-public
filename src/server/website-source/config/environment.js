@@ -31,7 +31,11 @@ module.exports = function(environment) {
     contentSecurityPolicy: {
       'font-src': "'self' fonts.gstatic.com",
       'style-src': "'self' fonts.googleapis.com"
-    }
+    },
+    // Add options here
+    fontawesome: {
+      defaultPrefix: 'fas' // solid icons
+    },
 
   };
 

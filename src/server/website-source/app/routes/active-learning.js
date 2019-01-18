@@ -94,7 +94,7 @@ export default Route.extend({
                         });
                     });
                 })
-                .then(() => {
+                .finally(() => {
                     activeLearning.destroyRecord();
                 });
 

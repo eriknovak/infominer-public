@@ -14,10 +14,10 @@ export default Component.extend({
 
         // get document valueObject and fields
         const fields = this.get('fields');
-        let numberOfColumns = /*1 +*/ fields.length;
+        let numberOfColumns = this.get('documentActionsEnabled') ? 1 + fields.length : fields.length;
         this.set('numberOfColumns', numberOfColumns);
 
-        const linkRegex = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&\'\(\)\*\+,;=.]+$/, 'g');
+        const linkRegex = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/, 'g');
 
         // get query parameters
         const query = this.get('query');
@@ -35,7 +35,7 @@ export default Component.extend({
                     value = (new Date(value)).toUTCString();
                 }
 
-                if (value.match(linkRegex)) {
+                if (field.type === 'string' && value.match(linkRegex)) {
                     // the value follows the link address pattern - make it a link to the address
                     const address = value.match(/http(s)?/g) ? value : `http://${value}`;
                     if (query && query.text && query.text.fields.includes(field.name)) {

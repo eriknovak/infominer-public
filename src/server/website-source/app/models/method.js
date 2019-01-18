@@ -4,9 +4,10 @@ import { computed } from '@ember/object';
 export default DS.Model.extend({
     methodType: DS.attr('string'),
     parameters: DS.attr('object', { defaultValue: null }),
-    result: DS.attr('object', { defaultValue: null }),
-    produced: DS.hasMany('subset', { inverse: 'resultedIn' }),
-    appliedOn: DS.belongsTo('subset', { inverse: 'usedBy' }),
+    result:     DS.attr('object', { defaultValue: null }),
+    produced:   DS.hasMany('subset', { inverse: 'resultedIn' }),
+    appliedOn:  DS.belongsTo('subset', { inverse: 'usedBy' }),
+    outOfDate:  DS.attr('boolean', { defaultValue: false }),
 
     analysisAppropriate: computed('methodType', function () {
         return this.get('methodType') ? !this.get('methodType').includes('filter') : true;

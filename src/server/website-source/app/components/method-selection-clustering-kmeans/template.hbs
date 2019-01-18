@@ -19,11 +19,12 @@
       <input
         type="number"
         class="form-control"
+        value={{k}}
+        placeholder="Input number of clusters"
+        autocomplete="false"
         min="2"
         step="1"
-        value={{k}}
         oninput={{action 'selectNumberOfClusters' value='target.value'}}
-        placeholder="Input number of clusters"
       />
 
     </div>{{! form-group }}
