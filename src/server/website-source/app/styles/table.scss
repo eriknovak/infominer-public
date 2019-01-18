@@ -38,10 +38,10 @@
     margin-bottom: 0px;
     tbody > tr {
         &.selected {
-            background-color: $primary-color;
+            background-color: #ededed;
             & + .document-information-row td,
             &:hover + .document-information-row td {
-                background-color: $primary-color !important;
+                background-color: #ededed !important;
             }
         }
 
