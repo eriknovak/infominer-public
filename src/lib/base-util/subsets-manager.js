@@ -348,6 +348,69 @@ class SubsetsManager {
         return documents;
     }
 
+    updateDocument(base, subsetId, document) {
+        let self = this;
+
+        if (subsetId < 0 || base.store('Subsets').length <= subsetId) {
+            // TODO: log error
+            return { errors: { msg: 'The subset id does not match with any existing subsets' } };
+        }
+
+        const documentId = document.id;
+        if (documentId < 0 || base.store('Dataset').length <= documentId) {
+            // TODO: log error
+            return { errors: { msg: 'The subset id does not match with any existing subsets' } };
+        }
+
+        // get old document in store
+        let oldDocument = base.store('Dataset')[documentId];
+        // get old in-subsets values
+        let oldInSubsetIds = oldDocument.inSubsets.map(subset => subset.$id);
+
+        // get new in-subsets values
+        const newInSubsetIds = document.subsets;
+
+        // first delete joins of all subsets that are not in newDocument
+        for (let oldId of oldInSubsetIds) {
+            // check if oldId is in the new in-subsets. If not remove join
+            if (!newInSubsetIds.includes(oldId)) {
+                let subset = base.store('Subsets')[oldId];
+                oldDocument.$delJoin('inSubsets', subset);
+
+                if (typeof subset.modified !== 'undefined') {
+                    // update modified variable of
+                    subset.modified = true;
+                }
+                if (subset.usedBy[0] && typeof subset.usedBy[0].outOfDate !== 'undefined') {
+                    // update outOfDate for the general statistics method
+                    subset.usedBy[0].outOfDate = true;
+                }
+            }
+        }
+        // update oldInSubsetIds to get current subsets
+        oldInSubsetIds = oldDocument.inSubsets.map(subset => subset.$id);
+        for (let newId of newInSubsetIds) {
+            // check if newId is not in the old in-subsets and add the join
+            if (!oldInSubsetIds.includes(newId)) {
+                let subset = base.store('Subsets')[newId];
+                oldDocument.$addJoin('inSubsets', subset);
+
+                if (typeof subset.modified !== 'undefined') {
+                    // update modified variable of
+                    subset.modified = true;
+                }
+                if (subset.usedBy[0] && typeof subset.usedBy[0].outOfDate !== 'undefined') {
+                    // update outOfDate for the general statistics method
+                    subset.usedBy[0].outOfDate = true;
+                }
+            }
+        }
+
+        // return the updated document values
+        return { documents: self._formatter.document(oldDocument) };
+    }
+
+
 }
 
 module.exports = SubsetsManager;

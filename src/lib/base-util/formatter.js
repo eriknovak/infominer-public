@@ -23,7 +23,8 @@ module.exports = {
             description: record.description,
             resultedIn: record.resultedIn ? record.resultedIn.$id : null,
             usedBy: !record.usedBy.empty ? undeletedRecords(record, 'usedBy') : null,
-            documentCount: !record.hasElements.empty ? record.hasElements.length : null
+            documentCount: !record.hasElements.empty ? record.hasElements.length : null,
+            modified: record.modified
         };
     },
 
@@ -56,7 +57,8 @@ module.exports = {
             parameters: record.parameters,
             result: this._methodResults(record.type, record.result),
             produced: !record.produced.empty ? undeletedRecords(record, 'produced') : null,
-            appliedOn: !record.appliedOn.empty ? undeletedRecords(record, 'appliedOn') : null
+            appliedOn: !record.appliedOn.empty ? undeletedRecords(record, 'appliedOn') : null,
+            outOfDate: record.outOfDate
         };
     },
 

@@ -153,29 +153,55 @@ class ModelsManager {
     /**
      * Edit a method record in the database.
      * @param {Object} base - The QMiner base object.
-     * @param {Object} methodInfo - The method data used to update.
+     * @param {Object} newMethod - The method data used to update.
      * @returns {Object} The updated method object.
      */
-    updateModel(base, methodInfo) {
+    updateModel(base, newMethod, fields) {
         let self = this;
-        // TODO: log activity
         // get method information and update state
-        let method = base.store('Methods')[methodInfo.methodId];
+        let oldMethod = base.store('Methods')[newMethod.methodId];
 
-        if (methodInfo.result) {
-            let result = method.result;
-            if (method.type === 'clustering.kmeans') {
-                for (let clusterId = 0; clusterId < result.clusters.length; clusterId++) {
-                    result.clusters[clusterId].label = methodInfo.result.clusters[clusterId].label;
+        if (newMethod.result) {
+            let result = oldMethod.result;
+
+            if (oldMethod.type === 'aggregate.subset') {
+
+                const subsetId = oldMethod.parameters.id;
+                const subset = base.store('Subsets')[subsetId];
+                // get elements of the method
+                const elements = subset.hasElements;
+                const parentMethod = subset.resultedIn;
+
+                // make the results empty again
+                result = { aggregates: [ ] };
+
+                // iterate through the fields
+                for (let field of fields) {
+                    // get aggregate distribution
+                    if (field.aggregate) {
+                        let distribution = self._aggregateByField(base, elements, parentMethod, field);
+                        result.aggregates.push({
+                            field: field.name,
+                            type:  field.aggregate,
+                            distribution
+                        });
+                    }
                 }
-            } else if (method.type === 'classify.active-learning') {
-                for (let type of Object.keys(methodInfo.result)) {
-                    result[type].label = methodInfo.result[type].label;
+                // the aggregate has been updated
+                oldMethod.outOfDate = false;
+
+            } else if (oldMethod.type === 'clustering.kmeans') {
+                for (let clusterId = 0; clusterId < result.clusters.length; clusterId++) {
+                    result.clusters[clusterId].label = newMethod.result.clusters[clusterId].label;
+                }
+            } else if (oldMethod.type === 'classify.active-learning') {
+                for (let type of Object.keys(newMethod.result)) {
+                    result[type].label = newMethod.result[type].label;
                 }
             }
-            method.result = result;
+            oldMethod.result = result;
         }
-        return { methods: self._formatter.method(method) };
+        return { methods: self._formatter.method(oldMethod) };
     }
 
     /**
@@ -452,65 +478,6 @@ class ModelsManager {
         }
         return distribution;
     }
-
-
-    // _aggregateKeyword(base, elements, field, stopwords = ['']) {
-    //     let self = this;
-
-    //     // create placeholder for all of the text
-    //     let string = '';
-
-    //     // pull all text into one field
-    //     elements.each(rec => {
-    //         if (rec[field]) string += `${rec[field]} `;
-    //     });
-
-    //     const featureSpace = new qm.FeatureSpace(base, {
-    //         type: 'text',
-    //         source: 'Dataset',
-    //         field,
-    //         ngrams: 2,
-    //         tokenizer: {
-    //             type: 'simple',
-    //             stopwords: {
-    //                 language: 'en',
-    //                 words: stopwords
-    //             }
-    //         }
-    //     });
-    //     // update feature space
-    //     featureSpace.updateRecords(elements);
-
-    //     // get the tf-idf of the whole string
-    //     const record = { [field]: string };
-    //     const vector = featureSpace.extractVector(record);
-
-    //     // sort the vector
-    //     let sort = vector.sortPerm(false);
-
-    //     // setup placeholder for the distribution
-    //     let distribution = [ ];
-
-    //     let upperLimit = 100;
-    //     if (upperLimit > sort.perm.length) {
-    //         // the threshold is larger than the vector
-    //         upperLimit = sort.perm.length;
-    //     }
-
-    //     for (let i = 0; i < upperLimit; i++) {
-    //         // get content id of (i+1)-th terms with greatest weights
-    //         let maxid = sort.perm[i];
-    //         // remember the content and it's weights
-    //         const keyword = featureSpace.getFeature(maxid).toLowerCase();
-    //         const weight = vector[maxid];
-    //         distribution.push({ keyword , weight });
-    //     }
-
-    //     return {
-    //         type:'keywords',
-    //         keywords: distribution
-    //     }
-    // }
 
 
     _aggregateTimeline(timeline) {

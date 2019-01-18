@@ -320,4 +320,72 @@ module.exports = function (app, pg, processHandler, sendToProcess, logger) {
             return res.json(results);
         });
     }); // GET /api/datasets/:dataset_id/subsets/:subset_id/documents
+
+    /**
+     * put subset documents
+     */
+    app.put('/api/datasets/:dataset_id/subsets/:subset_id/documents/:document_id', (req, res) => {
+        // log user request
+        logger.info('user requested to update document in subset',
+            logger.formatRequest(req)
+        );
+
+        // check if dataset_id is an integer
+        let datasetId = parseInt(req.params.dataset_id);
+        if (!validator.validateInteger(datasetId)) {
+            // log error when datasetId is not an integer
+            logger.error('error [route_parameter]: user request to update document in subset failed',
+                logger.formatRequest(req, { error: 'Parameter dataset_id is not an integer' })
+            );
+            // send error object to user
+            return res.status(500).json({ errors: { msg: 'Parameter dataset_id is not an integer' } });
+        }
+
+        // check if subset_id is an integer
+        let subsetId = parseInt(req.params.subset_id);
+        if (!validator.validateInteger(subsetId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request to update document in subset failed',
+                logger.formatRequest(req, { error: 'Parameter subset_id is not an integer' })
+            );
+            // send error object to user
+            return res.status(500).json({ errors: { msg: 'Parameter subset_id is not an integer' } });
+        }
+
+        // check if subset_id is an integer
+        let documentId = parseInt(req.params.document_id);
+        if (!validator.validateInteger(documentId)) {
+            // log error when subsetId is not an integer
+            logger.error('error [route_parameter]: user request to update document in subset failed',
+                logger.formatRequest(req, { error: 'Parameter document_id is not an integer' })
+            );
+            // send error object to user
+            return res.status(500).json({ errors: { msg: 'Parameter document_id is not an integer' } });
+        }
+
+        // get the document
+        const document = req.body.document;
+
+        // get the user
+        let owner = req.user ? req.user.id : 'development';
+
+        // set the body info
+        let body = { cmd: 'update_subset_document', content: { subsetId, document } };
+        sendToProcess(datasetId, owner, body, function (error, results) {
+            // if error notify user
+            if (error) {
+                // log error on getting subset documents
+                logger.error('error [node_process]: user request to update document in subset failed',
+                    logger.formatRequest(req, { error: error.message })
+                );
+                return res.status(500).json({ errors: { msg: error.message } });
+            }
+            // log request success
+            logger.info('user request to update document in subset successful',
+                logger.formatRequest(req)
+            );
+            // send the data
+            return res.json(results);
+        });
+    }); // GET /api/datasets/:dataset_id/subsets/:subset_id/documents
 };
