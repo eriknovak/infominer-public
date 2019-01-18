@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-lg-12 table-options">
       {{#if changeQuery}}
-        {{ query-options fields=metadata.fields query=query action=changeQuery }}
+        {{ query-options fields=fields query=query action=changeQuery }}
       {{/if}}
 
       <span class="table-options__show">
@@ -22,7 +22,7 @@
           <span class="number-circle">{{numberOfFieldsShown}}</span>
         </button>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="show-columns-{{elementId}}">
-          {{#each metadata.fields as |field index|}}
+          {{#each fields as |field index|}}
             <div class="dropdown-item no-background">
               {{
                 checkbox-select
@@ -71,7 +71,7 @@
             <th class="checkbox-header" style="width:1%;"></th>
           {{/if}}
 
-          {{#each metadata.fields as |field index|}}
+          {{#each fields as |field index|}}
             {{#if field.showInTable}}
               <th class="{{field.name}} header" scope="col" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>
                 {{field.name}}
@@ -89,8 +89,8 @@
         {{#if documents.length}}
           {{! if documents are available show them }}
           {{#each documents as |document| }}
-            {{ document-table-row             tableId=elementId document=document fields=metadata.fields query=query documentActionsEnabled=documentActionsEnabled }}
-            {{ document-table-row-information tableId=elementId document=document fields=metadata.fields query=query documentActionsEnabled=documentActionsEnabled }}
+            {{ document-table-row             tableId=elementId document=document fields=fields query=query documentActionsEnabled=documentActionsEnabled }}
+            {{ document-table-row-information tableId=elementId document=document fields=fields query=query documentActionsEnabled=documentActionsEnabled }}
           {{/each}}
         {{else if (eq documents.length 0)}}
           <tr>
