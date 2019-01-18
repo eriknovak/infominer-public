@@ -35,28 +35,29 @@
         </div>
       </span>
 
-      {{!-- <span class="dropdown pull-right">
-        <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
-          id="document-actions-{{elementId}}" aria-haspopup="true" aria-expanded="false">
-          document actions
-        </button>
+      {{#if documentActionsEnabled}}
+        <span class="dropdown pull-right">
+          <button class="btn btn-secondary {{unless changeQuery 'btn-sm'}} dropdown-toggle btn-rounded" type="button" data-toggle="dropdown"
+            id="document-actions-{{elementId}}" aria-haspopup="true" aria-expanded="false">
+            Document actions
+          </button>
 
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-actions-{{elementId}}">
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="document-actions-{{elementId}}">
 
-          {{#if siblingSubsets }}
-            <h6 class="dropdown-header">Move To Subset</h6>
+            {{#if siblingSubsets }}
+              <h6 class="dropdown-header">Move To subset</h6>
+              {{#each siblingSubsets as |sibling index|}}
+                <a class="dropdown-item documents__move" onclick={{action 'moveDocuments' sibling.id}}>{{sibling.label}}</a>
+              {{/each}}
+              <div class="dropdown-divider"></div>
+            {{/if}}
 
-            {{#each siblingSubsets as |sibling index|}}
-              <a class="dropdown-item documents__move" onclick={{action 'moveDocuments' sibling.id}}>{{sibling.label}}</a>
-            {{/each}}
-
-            <div class="dropdown-divider"></div>
-          {{/if}}
-
-          <a class="dropdown-item documents__delete">Delete</a>
-        </div>
-      </span> --}}
-
+            <a class="dropdown-item documents__delete" onclick={{action 'deleteDocuments'}}>
+              Delete from subset
+            </a>
+          </div>
+        </span>
+      {{/if}}
 
     </div>
   </div>
@@ -66,17 +67,21 @@
       {{! table header }}
       <thead>
         <tr>
-          {{!-- <th class="checkbox-header" style="width:1%;"></th> --}}
+          {{#if documentActionsEnabled}}
+            <th class="checkbox-header" style="width:1%;"></th>
+          {{/if}}
+
           {{#each metadata.fields as |field index|}}
             {{#if field.showInTable}}
               <th class="{{field.name}} header" scope="col" style="{{columnWidth}}" onclick={{if field.sortable (action 'sortBy' index)}}>
                 {{field.name}}
                 {{#if field.sortable }}
-                  <i class="fa fa-sort{{if field.sortType (concat "-" field.sortType)}} sorting" aria-hidden="true"></i>
+                  {{fa-icon (if field.sorting_order (concat "sort-amount-" field.sorting_order) 'sort') class="sorting" fixedWidth=true }}
                 {{/if}}
               </th>
             {{/if}}
           {{/each}}
+
         </tr>
       </thead>
       {{! table body }}
@@ -84,8 +89,8 @@
         {{#if documents.length}}
           {{! if documents are available show them }}
           {{#each documents as |document| }}
-            {{ document-table-row             tableId=elementId document=document fields=metadata.fields query=query }}
-            {{ document-table-row-information tableId=elementId document=document fields=metadata.fields query=query }}
+            {{ document-table-row             tableId=elementId document=document fields=metadata.fields query=query documentActionsEnabled=documentActionsEnabled }}
+            {{ document-table-row-information tableId=elementId document=document fields=metadata.fields query=query documentActionsEnabled=documentActionsEnabled }}
           {{/each}}
         {{else if (eq documents.length 0)}}
           <tr>
@@ -97,7 +102,7 @@
           <tr>
             <td colspan="{{loading-row-width}}">
               <div class="loading">
-                <i class="page-loader fa fa-hourglass-o fa-spin fa-3x fa-fw"></i>
+                {{fa-icon 'sync-alt' spin=true fixedWidth=true class="page-loader"}}
               </div>
             </td>
           </tr>
@@ -120,13 +125,13 @@
         {{! Go to first page }}
         <button class="btn btn-secondary rounded-left {{if onFirstPage 'disabled'}}"
           onclick={{if onFirstPage null (action 'getDocuments' firstPage)}}>
-          <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+          {{fa-icon 'angle-double-left'}}
         </button>
 
         {{! Go to previous page }}
         <button class="btn btn-secondary {{if onFirstPage 'disabled'}}"
           onclick={{if onFirstPage null (action 'getDocuments' prevPage)}}>
-          <i class="fa fa-angle-left" aria-hidden="true"></i>
+          {{fa-icon 'angle-left'}}
         </button>
 
         {{! Set buttons to navigate through pages }}
@@ -140,13 +145,13 @@
         {{! Go to next page }}
         <button class="btn btn-secondary {{if onLastPage 'disabled'}}"
           onclick={{if onLastPage null (action 'getDocuments' nextPage)}}>
-          <i class="fa fa-angle-right" aria-hidden="true"></i>
+          {{fa-icon 'angle-right'}}
         </button>
 
         {{! Go to last page }}
         <button class="btn btn-secondary rounded-right {{if onLastPage 'disabled'}}"
           onclick={{if onLastPage null (action 'getDocuments' lastPage)}}>
-          <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+          {{fa-icon 'angle-double-right'}}
         </button>
       </div>
     </div>

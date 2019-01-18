@@ -14,7 +14,7 @@ export default Component.extend({
 
         // get document valueObject and fields
         const fields = this.get('fields');
-        let numberOfColumns = /*1 +*/ fields.length;
+        let numberOfColumns = this.get('documentActionsEnabled') ? 1 + fields.length : fields.length;
         this.set('numberOfColumns', numberOfColumns);
 
         const linkRegex = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/, 'g');

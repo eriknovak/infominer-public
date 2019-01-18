@@ -16,7 +16,7 @@
       {{! Button trigger modal }}
       {{#link-to 'dataset-upload'}}
         <div class="dataset-container dataset-container--create">
-          <i class="fa fa-plus dataset-container__icon" aria-hidden="true"></i>
+          {{fa-icon 'folder-plus' class="dataset-container__icon" }}
           <p class="dataset-container__label">add new dataset</p>
         </div>
       {{/link-to}}
@@ -29,14 +29,14 @@
           {{! Button trigger modal }}
           {{#link-to 'dataset.subset.analysis' dataset.id 0 }}
             <div class="dataset-container dataset-container--created">
-              <i class="fa fa-database dataset-container__icon" aria-hidden="true"></i>
+              {{fa-icon 'database' class="dataset-container__icon" }}
               <p class="dataset-container__label">{{ dataset.label }}</p>
               <p class="dataset-container__date">Created: {{ dataset.date }}</p>
             </div>
           {{/link-to}}
         {{else}}
           <div class="dataset-container dataset-container--loading">
-            <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw dataset-container__icon" aria-hidden="true"></i>
+            {{fa-icon 'sync-alt' spin=true fixedWidth=true class="dataset-container__icon"}}
             <p class="dataset-container__label">{{ dataset.label }}</p>
             <p class="dataset-container__date">Loading...</p>
           </div>

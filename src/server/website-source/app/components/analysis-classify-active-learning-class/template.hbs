@@ -1,41 +1,61 @@
-<div class="analysis__header">Class Overview</div>
+<div class="analysis__header">
+  Class Overview
+  {{#if class.subset.id}}
+    <span class="close-window my-auto ml-auto" data-toggle="modal"
+      data-target="#subset-delete-modal" data-subsetid="{{class.subset.id}}">
+      {{fa-icon 'times' }}
+    </span>
+  {{/if}}
+</div>
 
 <div class="analysis__container">
 
-  {{#link-to 'dataset.subset' dataset class.subset.id class="btn btn-secondary btn-rounded pull-right" }}
-    Inspect <i class="fa fa-search" aria-hidden="true"></i>
-  {{/link-to}}
-
-  {{#if class.subset.id}}
-    <button type="button" class="btn btn-light btn-rounded pull-right" data-toggle="modal"
-      data-target="#subset-delete-modal" data-subsetid="{{class.subset.id}}">
-      Delete
-    </button>
-  {{/if}}
-
   <h4 class="overview__title">
+
+    <span class="fa-lg pull-right">
+      {{#link-to 'dataset.subset' dataset class.subset.id class="fa-layers inspect-subset-button" }}
+        {{fa-icon 'search' transform='shrink-7' mask='circle' }}
+      {{/link-to}}
+    </span>
 
     {{! button for toggling collapse }}
     <button class="btn btn-xs rotate {{if collapsed 'right'}}" data-toggle="collapse"
       aria-expanded="false" onclick={{action 'toggleInformation'}}>
-      <i class="fa fa-chevron-down"></i>
+      {{fa-icon 'chevron-down'}}
     </button>
 
-    {{#if editing-label}}
-      Label:
-      <input class="form-control editing title" type="text" value="{{label}}">
-      <i class="fa fa-check edit confirm-editing" aria-hidden="true" {{action 'saveLabel'}}></i>
-      <i class="fa fa-times edit cancel-editing" aria-hidden="true" {{action 'editLabel'}}></i>
-    {{else}}
-      <span>Label: {{label}}</span>
-      <i class="fa fa-pencil edit overview__title--edit" aria-hidden="true" {{action 'editLabel'}}></i>
-    {{/if}}
+    <span class="overview__title-container">
+      {{#if editing-label}}
 
+        Label:
+        <input class="form-control editing title" type="text" value="{{label}}">
+
+        <span class="fa-layers edit" onclick={{action 'saveLabel'}}>
+          {{fa-icon 'check-square'  class="edit confirm-editing" }}
+        </span>
+
+        <span class="fa-layers edit" onclick={{action 'editLabel'}}>
+          {{fa-icon 'times-circle' class="edit cancel-editing" }}
+        </span>
+
+      {{else}}
+
+        <span>Label: {{label}}</span>
+        <span class="fa-layers edit" onclick={{action 'editLabel'}}>
+          {{fa-icon 'pen-square' class="edit overview__title--edit" }}
+        </span>
+      {{/if}}
+    </span>
   </h4>
+
 
   <p class="overview__metadata">
     <b>Number of documents:</b> {{numberOfDocuments}}
+    {{#if class.avgSimProcent}}
+      <b class="ml-2">Average similarity:</b> {{class.avgSimProcent}}%
+    {{/if}}
   </p>
+
 
   {{#bs-collapse collapsed=collapsed}}
 

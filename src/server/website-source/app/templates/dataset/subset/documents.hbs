@@ -6,11 +6,16 @@
       documents=model.documents
       metadata=model.metadata
       subset=model.subset
+
+      documentActionsEnabled=true
       moveDocuments=(route-action 'moveDocuments')
+      deleteDocuments=(route-action 'deleteDocuments')
+
       changeQuery=(route-action 'changeQuery')
       changeLimit=(route-action 'changeLimit')
       changePage=(route-action 'changePage')
       sortByField=(route-action 'sortByField')
+
     }}
   </div>{{! analysis__container }}
 </div>{{! analysis }}

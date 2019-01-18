@@ -27,7 +27,6 @@ export default Route.extend({
         this._super(...arguments);
         this.set('defaultQuery', { calculateAggregates: true });
         this.set('query', this.get('defaultQuery'));
-
     },
 
     beforeModel(transition) {
@@ -167,7 +166,7 @@ export default Route.extend({
             self.modelFor('dataset').get('hasSubsets').pushObject(subset);
 
             // save method
-            method.save().then(() => {
+            return method.save().then(() => {
                 subset.save().then(_subset => {
                     // save methods created at subset creation
                     _subset.get('usedBy').then(_methods => {
@@ -188,11 +187,6 @@ export default Route.extend({
                                 </span>. Please try again.
                             </div>`
                     });
-
-                }).finally(() => {
-                    // hide subset creation modal
-                    $('#subset-create-modal').modal('toggle');
-                    $(`#subset-create-modal .modal-footer .btn-primary`).html('Save');
                 });
             });
 
@@ -214,24 +208,231 @@ export default Route.extend({
             this._updateModel();
         },
 
-        moveDocuments(movement) {
-            // get destinations
-            const { from, to } = movement;
+        /**
+         * @description Moves the selected documents to the target subset.
+         * @param {Number} subsetId - The target subset from where we would like
+         * to move the document.
+         */
+        moveDocuments(subsetId) {
+
             // get documents that would be moved
-            const documents = this.get('store').peekAll('document').filterBy('selected')
-                .map(doc => doc.get('id'));
-            // do nothing if no documents are selected
+            const documents = this.get('store').peekAll('document').filterBy('selected');
+
+            // check if at least one document is selected
             if (!documents.length) {
-                // console.log('No documents selected');
-                return;
+                // notify the user about the error of his actions
+                return this.get('notify').alert({
+                    html: `<div class="notification">
+                            No documents selected.
+                        </div>`
+                });
             }
-            // show the actions
-            // console.log(from, to, documents);
-        }
+
+            // get current and target subsets
+            let currentSubset = this.modelFor('dataset.subset');
+            let targetSubset = this.get('store').peekRecord('subset', subsetId);
+
+            // promise container
+            let promises = [];
+
+            documents.forEach(document => {
+                // remove subset from the document subsets array
+                document.get('subsets').removeObject(currentSubset);
+                document.get('subsets').addObject(targetSubset);
+                // appropriately increment/decrement documentCount
+                currentSubset.decrementProperty('documentCount');
+                targetSubset.incrementProperty('documentCount');
+                // remove the selected flag from the document
+                document.set('selected', false);
+                // save the modified document
+                promises.push(document.save());
+            });
+
+            // update the subset modified state
+            currentSubset.set('modified', true);
+            targetSubset.set('modified', true);
+
+            currentSubset.get('usedBy').get('firstObject').set('outOfDate', true);
+            targetSubset.get('usedBy').get('firstObject').set('outOfDate', true);
+
+            // get document unique identifiers
+            const documentIds = documents.map(doc => doc.get('id')).join(',');
+
+            // wait for all of the documents to be updated
+            Promise.all(promises).then(() => {
+
+                // notify the user that documents were deleted
+                let message = this.get('notify').info({
+                    html: `<div class="notification">
+                            ${documents.length} documents moved.
+                            <a class="label label-undo"
+                              data-document-ids="${documentIds}"
+                              data-target-subset=${subsetId}>
+                                UNDO
+                            </a>
+                           </div>`
+                }, { closeAfter: 20000 });
+
+                $('.ember-notify-default').on('click', 'a.label-undo', function () {
+                    // get the modified documents and target subset
+                    const documentIds  = $(this).data('documentIds').split(',');
+                    const targetSubset = $(this).data('targetSubset');
+                    // hide the notification message
+                    message.set('visible', false);
+                    // undo the document movement
+                    self._undoMoveDocuments(documentIds, targetSubset);
+                });
+
+                // once updated update the model
+                this._updateModel();
+            });
+        },
+
+
+        /**
+         * @description Delete the selected documents from the subset.
+         */
+        deleteDocuments() {
+            let self = this;
+            // get documents that would be deleted
+            const documents = this.get('store').peekAll('document').filterBy('selected');
+
+            // check if some documetns were selected
+            if (!documents.length) {
+                // notify the user about the error of his actions
+                return this.get('notify').alert({
+                    html: `<div class="notification">
+                            No documents selected.
+                        </div>`
+                });
+            }
+
+            // get current subset
+            let subset = this.modelFor('dataset.subset');
+
+            // promise container
+            let promises = [];
+
+            // delete records from the subset
+            documents.forEach(document => {
+                // remove subset from the document subsets array
+                document.get('subsets').removeObject(subset);
+                subset.decrementProperty('documentCount');
+                document.set('selected', false);
+                // save the modified document
+                promises.push(document.save());
+            });
+
+            // update the subset modified state
+            subset.set('modified', true);
+            subset.get('usedBy').get('firstObject').set('outOfDate', true);
+
+            // get document unique identifiers
+            const documentIds = documents.map(doc => doc.get('id')).join(',');
+
+            // wait for all of the documents to be updated
+            Promise.all(promises).then(() => {
+
+                // notify the user that documents were deleted
+                let message = this.get('notify').info({
+                    html: `<div class="notification">
+                            ${documents.length} documents deleted.
+                            <a class="label label-undo" data-document-ids="${documentIds}">
+                              UNDO
+                            </a>
+                           </div>`
+                }, { closeAfter: 20000 });
+
+                $('.ember-notify-default').on('click', 'a.label-undo', function () {
+                    // get the modified documents
+                    const documentIds  = $(this).data('documentIds').split(',');
+                    // remove the notify message
+                    message.set('visible', false);
+                    // undo the delete documents action
+                    self._undoDeleteDocuments(documentIds);
+                });
+
+                // once updated update the model
+                this._updateModel();
+            });
+        },
 
     },
 
-    // helper functions
+
+    /**
+     * @description Undo the document deletion action.
+     * @param {String[]} documentIds - Deleted document ids.
+     */
+    _undoDeleteDocuments(documentIds) {
+
+        // get documents from the provided ids
+        let documents = documentIds.map(id => this.get('store').peekRecord('document', id));
+
+        // get current subset
+        let subset = this.modelFor('dataset.subset');
+
+        // promise container
+        let promises = [];
+        // undo changes of the documents
+        documents.forEach(document => {
+            // remove subset from the document subsets array
+            document.get('subsets').addObject(subset);
+            subset.incrementProperty('documentCount');
+            // save the modified document
+            promises.push(document.save());
+        });
+
+        // wait for all of the documents to be updated
+        Promise.all(promises).then(() => {
+            // once updated update the model
+            this._updateModel();
+        });
+
+    },
+
+    /**
+     * @description Undo the action of moving documents to another subset.
+     * @param {String[]} documentIds - The moved document ids.
+     * @param {String} targetSubsetId - The target subset id, where the documents were moved.
+     */
+    _undoMoveDocuments(documentIds, targetSubsetId) {
+
+            // get documents from the provided ids
+            let documents = documentIds.map(id => this.get('store').peekRecord('document', id));
+
+            // get current subset
+            let currentSubset = this.modelFor('dataset.subset');
+            let targetSubset = this.get('store').peekRecord('subset', targetSubsetId);
+
+            // promise container
+            let promises = [];
+            documents.forEach(document => {
+                // remove subset from the document subsets array
+                document.get('subsets').addObject(currentSubset);
+                document.get('subsets').removeObject(targetSubset);
+                // appropriately increment/decrement documentCount
+                currentSubset.incrementProperty('documentCount');
+                targetSubset.decrementProperty('documentCount');
+
+                // save the modified document
+                promises.push(document.save());
+            });
+
+            // update the subset modified state
+            currentSubset.set('modified', true);
+            targetSubset.set('modified', true);
+
+
+            Promise.all(promises).then(() => {
+                // once updated update the model
+                this._updateModel();
+            });
+    },
+
+    /**
+     * @description Update the model.
+     */
     _updateModel() {
         // request for data and update the model
         set(this.get('controller.model'), 'documents', null);

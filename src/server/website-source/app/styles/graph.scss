@@ -101,11 +101,12 @@ $height: 250px;
         margin-top: 3px;
         margin: 10px 0px 4px;
     }
-    &__document-number { width: 120px; height: 13px; }
-    .overview__title & { width: 104px; height: 19px; }
+    &__document-number { width: 380px; height: 15px; }
+    .overview__title & { width: 330px; height: 27px; }
+
     &__subset-button {
-        width: 114px;
-        height: 31px;
+        width: 26px;
+        height: 26px;
         border-radius: 50px;
 
         &:not(:first-of-type) {

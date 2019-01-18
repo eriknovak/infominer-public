@@ -34,10 +34,14 @@ export default Component.extend({
         // set documents, fields and pagination values
         this.get('metadata.fields').forEach(field => {
             set(field, 'sortable', field.type !== 'string_v');
+
+            const sorting_order = field.sortType === 'desc' ? 'down' : field.sortType === 'asc' ? 'up' : null;
+            set(field, 'sorting_order', sorting_order);
         });
         this.set('query', this.get('metadata.query'));
         // table content rows
-        this.set('loading-row-width', 1 + this.get('metadata.fields').filter(field => field.showInTable).length);
+        this.set('loading-row-width', 1 + this.get('metadata.fields')
+            .filter(field => field.showInTable).length);
 
         /*************************************
          * pagination navigation parameters
@@ -153,7 +157,7 @@ export default Component.extend({
             // sort parameters
             let field = selectedField.name;
             // switch the sort type of the selected field
-            let sortType = selectedField.sortType === 'desc' ?
+            let sortType = selectedField.sorting_order === 'down' ?
                 this.get('sortOptions')[1] :
                 this.get('sortOptions')[0];
 
@@ -181,11 +185,12 @@ export default Component.extend({
         },
 
         moveDocuments(subsetId) {
+            this.get('moveDocuments')(subsetId);
+        },
 
-            const from = this.get('subset').get('id');
-            let to = subsetId;
-
-            this.get('moveDocuments')({ from, to });
+        deleteDocuments() {
+            // activate the route action
+            this.get('deleteDocuments')();
         }
 
     }

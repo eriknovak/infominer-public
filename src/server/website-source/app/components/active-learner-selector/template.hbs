@@ -28,10 +28,10 @@
 
       <div class="text-center">
         <button class="btn btn-success btn-rounded" {{action 'saveLabel' 1}}>
-          Positive <i class="fa fa-check ml-1" aria-hidden="true"></i>
+          Positive {{fa-icon 'check' class="ml-1"}}
         </button>
         <button class="btn btn-danger btn-rounded" {{action 'saveLabel' -1}}>
-          Negative <i class="fa fa-times ml-1" aria-hidden="true"></i>
+          Negative {{fa-icon 'times' class="ml-1"}}
         </button>
       </div>
     {{else}}

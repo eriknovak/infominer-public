@@ -18,6 +18,7 @@ export default Component.extend({
         this._super(...arguments);
         this.set('name', 'Subset');
         this.set('description', '');
+        this.set('loading-status', false);
     },
 
     didReceiveAttrs() {
@@ -60,6 +61,9 @@ export default Component.extend({
 
             if (this.get('invalid')) { return; }
 
+            // set loading status
+            this.set('loadingStatus', true);
+
             // prepare subset info object
             const subset = {
                 label: this.get('name'),
@@ -67,13 +71,15 @@ export default Component.extend({
                 parameters: this.get('parameters')
             };
 
-            // make it loading
-            $(`#${this.elementId} .modal-footer .btn-primary`).html(
-                '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>'
-            );
-
             // invoke the route action on subset info
-            this.get('createSubset')(subset);
+            this.get('createSubset')(subset).then(() => {
+                // revert loading status
+                this.set('loadingStatus', false);
+                // toggle the modal
+                $(`#${this.elementId}`).modal('toggle');
+            });
+
+
         }
     }
 

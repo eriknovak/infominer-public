@@ -44,7 +44,6 @@ export default DatasetUploadRoute.extend({
                 if (model.errors) {
                     this.get('notify').info({
                         html: `<div class="notification">
-                                <span class="fa fa-exclamation-circle"></span>
                                 Error when uploading file <span class="label">
                                     ${model.errors.filename}
                                 </span>: ${model.errors.msg}!
