@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { set } from '@ember/object';
 
@@ -22,7 +23,7 @@ export default Component.extend({
         this._setStopwords();
     },
 
-    _setClasses() {
+    classes: computed('fieldSelection.fields.@each.showInVisual', function () {
         // get number of clusters
         let fieldInfo = this.get('fieldSelection.fields').filter(field => field.showInVisual)
             .map(field => ({ field: field.field, type: field.type }));
@@ -37,8 +38,8 @@ export default Component.extend({
             this.get('columnWidth.setColumnsWidth')(placeholders[i], 2, 'sm');
         }
         // set placeholders
-        this.set('classes', placeholders);
-    },
+        return placeholders;
+    }),
 
     _setSelectedFields() {
         const selectedFields = this.get('method.parameters.fields').join(', ');

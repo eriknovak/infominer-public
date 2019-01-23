@@ -236,7 +236,15 @@ const RadialTreeComponent = GraphComponent.extend({
         node.append('circle')
             .attr('r', d => d.data.numberOfDocuments ? nodeSize(d.data.numberOfDocuments) : 3);
 
-        let foreignObjects = node.append('foreignObject')
+        let labels = content.selectAll('.label')
+            .data(root.descendants())
+            .enter().append('g')
+            .attr('class', d => `label ${(d.children ? 'node-internal' : 'node-leaf')} ${d.data.type}`)
+            .attr('x', d => radialPoint(d.x, d.y)[0])
+            .attr('y', d => radialPoint(d.x, d.y)[1])
+            .attr('transform', d => `translate(${radialPoint(d.x, d.y)})`);
+
+        let foreignObjects = labels.append('foreignObject')
             .attr('x', d => {
                 if (!d.parent) { return radialPoint(d.x, d.y)[0]; }
                 return d.x < Math.PI === !d.children ? 8 : -100;
@@ -274,7 +282,7 @@ const RadialTreeComponent = GraphComponent.extend({
             let spacev = 28;
             let alpha = 0.5;
 
-            node.each(function (d1) {
+            labels.each(function (d1) {
                 let a = this;
                 let da = select(a);
                 let radial_a = radialPoint(d1.x, d1.y);
@@ -284,7 +292,7 @@ const RadialTreeComponent = GraphComponent.extend({
                 // get object height
                 let da_height = dac.select('body').style('height');
 
-                node.each(function (d2) {
+                labels.each(function (d2) {
                     let b = this;
                     // a & b are the same element and don't collide.
                     if (a == b) return;

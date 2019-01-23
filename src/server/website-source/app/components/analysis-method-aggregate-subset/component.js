@@ -36,6 +36,8 @@ export default Component.extend({
     actions: {
 
         updateStatistics() {
+            this.get('method').set('outOfDate', false);
+            this.get('method').set('result', null);
             this.get('method').save();
         }
 
