@@ -21,6 +21,7 @@ export default Component.extend({
     init() {
         this._super(...arguments);
         this.set('subsetId', null);
+        this.set('loadingStatus', false);
     },
 
     didInsertElement() {
@@ -30,12 +31,11 @@ export default Component.extend({
             const trigger = $(event.relatedTarget);
             const subsetId = trigger.data('subsetid');
             self.set('subsetId', subsetId);
+
             const subset = self.get('store').peekRecord('subset', subsetId);
             self.set('subsetLabel', subset.get('label'));
             self.set('derivedFrom', subset.get('resultedIn.appliedOn.label'));
             self.set('createdUsing', subset.get('resultedIn.label'));
-            $(`#${self.get('elementId')} .modal-footer .btn-danger`)
-                .html('Yes, Delete Subset');
         });
     },
 
@@ -48,8 +48,16 @@ export default Component.extend({
         delete() {
             const subsetId = this.get('subsetId');
             if (subsetId) {
+                // set loading status to true
+                this.set('loadingStatus', true);
                 this.set('subsetId', null);
-                return this.get('deleteSubset')(subsetId);
+                this.get('deleteSubset')(subsetId).then(() => {
+                    // revert loading status
+                    this.set('loadingStatus', false);
+                    // toggle this modal
+                    $(`#${this.elementId}`).modal('toggle');
+                });
+
             }
         }
     }

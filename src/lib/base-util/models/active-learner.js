@@ -5,10 +5,30 @@
 // external modules
 const qm = require('qminer');
 
+// internal modules
 const AbstractModel = require('./abstract-model');
+
+/**
+ * The Active Learner class.
+ */
 class ActiveLearner extends AbstractModel {
 
 
+    /**
+     *
+     * @param {Object} base - The qminer database in which the analysis is performed.
+     * @param {Object} params - The parameters used to initialize the active learner model.
+     * @param {Object} subset - The QMiner record set containing the records on which the
+     * active learner is performed.
+     * @param {Object} parameters - The global parameters containing information about the
+     * database configuration.
+     * @param {Object} parameters.fields - The fields in the database.
+     * @param {String[]} parameters.stopwords - The global stopwords specified for the
+     * whole dataset.
+     * @param {Object} formatter - The formatter object containing the method for formatting
+     * database object.s
+     * @param {Function} formatter.document - The function specifying how to format a record.
+     */
     constructor(base, params, subset, parameters, formatter) {
         super(base, params, subset, parameters);
         this._formatter = formatter;
@@ -20,15 +40,17 @@ class ActiveLearner extends AbstractModel {
             this.params.parameters.labelledDocs = [];
         }
 
-        // active learning parameter preparations
-        this._prepareFeatureParameters();
-        this._createFeatureSpace();
-        this._createActiveLearnerModel();
         // count the number of positive and negative labels
         this._labelCount = { positive: 0, negative: 0 };
         // store the document ids based on their label
         this._positivelyLabelledDocs = [];
         this._negativelyLabelledDocs = [];
+
+        // active learning parameter preparations
+        this._prepareFeatureParameters();
+        this._createFeatureSpace();
+        this._createActiveLearnerModel();
+
         // set an iterator for retrieving documents to be labelled
         this._documentIterator = this._makeDocumentIterator();
     }
@@ -172,6 +194,7 @@ class ActiveLearner extends AbstractModel {
         self.documents = self.subset.hasElements;
         self.featureSpace.updateRecords(self.documents);
         self.featureMatrix = self.featureSpace.extractSparseMatrix(self.documents);
+
     }
 
 
@@ -335,6 +358,10 @@ class ActiveLearner extends AbstractModel {
         self._predictedPositiveIds = new qm.la.IntVector();
         self._predictedNegativeIds = new qm.la.IntVector();
 
+        // get the positions of positive and negative examples
+        let predictedPositivePositions = new qm.la.IntVector();
+        let predictedNegativePositions = new qm.la.IntVector();
+
         // iterate through predictions - manually labelled documents have greater priority
         for (let position = 0; position < predictions.length; position++) {
 
@@ -342,15 +369,21 @@ class ActiveLearner extends AbstractModel {
             if (self._positivelyLabelledDocs.includes(documentId)) {
                 // store already positively labelled document
                 self._predictedPositiveIds.push(documentId);
+                predictedPositivePositions.push(position);
             } else if (self._negativelyLabelledDocs.includes(documentId)) {
                 // store already negatively labelled document
                 self._predictedNegativeIds.push(documentId);
+                predictedNegativePositions.push(position);
+
             } else if (predictions[position] > 0) {
                 // store positively predicted document
                 self._predictedPositiveIds.push(documentId);
+                predictedPositivePositions.push(position);
             } else {
                 // store negatively predicted document
                 self._predictedNegativeIds.push(documentId);
+                predictedNegativePositions.push(position);
+
             }
         }
         // get positive and negative documents respectively
@@ -376,15 +409,46 @@ class ActiveLearner extends AbstractModel {
         let positiveKeywordDistribution = positiveRecords.aggr(aggregateParams);
         let negativeKeywordDistribution = negativeRecords.aggr(aggregateParams);
 
+        /**
+         * @description Calculates the average similarity of the documents based on the
+         * generated feature space.
+         * @param {Object} documentPositions - The integer vector of document position ids.
+         * @returns {Number} The average similarity between documents.
+         */
+        function _averageSimilarityOfClass(documentPositions) {
+            // number of documents
+            const length = documentPositions.length;
+            // get the feature submatrix for the given documents
+            const submatrix = self.featureMatrix.getColSubmatrix(documentPositions);
+
+            // generate vector of length number of features and calculate the centroid
+            const onesArray = new Array(length).fill(1);
+            const onesVector = new qm.la.Vector(onesArray);
+            // get centroid of the given document subset
+            const centroid = submatrix.multiply(onesVector).multiply(1 / length);
+
+            // calculate the average distance
+            const averageSimilarity = 1 / length * submatrix.multiplyT(centroid).sum();
+            // return the average similarity of documents
+            return averageSimilarity;
+
+        }
+
+        self._positiveAverageSimilarity = _averageSimilarityOfClass(predictedPositivePositions);
+        self._negativeAverageSimilarity = _averageSimilarityOfClass(predictedNegativePositions);
+
         // return the document subsets
         return {
             positive: {
                 count: self._predictedPositiveIds.length,
-                distribution: positiveKeywordDistribution
+                distribution: positiveKeywordDistribution,
+                avgSimilarity: self._positiveAverageSimilarity
             },
             negative: {
                 count: self._predictedNegativeIds.length,
-                distribution: negativeKeywordDistribution
+                distribution: negativeKeywordDistribution,
+                avgSimilarity: self._negativeAverageSimilarity
+
             }
         };
 
@@ -401,8 +465,14 @@ class ActiveLearner extends AbstractModel {
             type: self.params.type,
             parameters,
             result: {
-                positive: { docIds: self._predictedPositiveIds.toArray() },
-                negative: { docIds: self._predictedNegativeIds.toArray() }
+                positive: {
+                    docIds: self._predictedPositiveIds.toArray(),
+                    avgSimilarity: self._positiveAverageSimilarity
+                },
+                negative: {
+                    docIds: self._predictedNegativeIds.toArray(),
+                    avgSimilarity: self._negativeAverageSimilarity
+                }
             }
         };
         // create the method

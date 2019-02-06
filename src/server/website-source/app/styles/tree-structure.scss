@@ -41,37 +41,6 @@
     }
 }
 
-@mixin component-pulse ($size, $color) {
-
-    @keyframes method-loading-pulse {
-        0% {
-          -moz-box-shadow: 0 0 0 0 rgba($color, 0.6);
-          box-shadow: 0 0 0 0 rgba($color, 0.6);
-        }
-        70% {
-            -moz-box-shadow: 0 0 0 5px rgba($color, 0);
-            box-shadow: 0 0 0 5px rgba($color, 0);
-        }
-        100% {
-            -moz-box-shadow: 0 0 0 0 rgba($color, 0);
-            box-shadow: 0 0 0 0 rgba($color, 0);
-        }
-    }
-
-    .method-loading-pulse {
-        width: $size;
-        height: $size;
-        padding: 0px;
-        margin: auto;
-        display: inline-block;
-        border-radius: 50%;
-        background-color: $color;
-        box-shadow: 0 0 0 $color;
-        animation: method-loading-pulse 2s infinite;
-    }
-}
-
-
 .method { @include link-style(green); }
 .subset { @include link-style($tertiary-color); }
 
@@ -81,7 +50,6 @@
     padding: 0 0 15px 0;
     display: block;
     overflow-x: auto;
-    @include collapse-toggle($secondary-color, 19px);
 
     &__button-placeholder {
         display: inline-block;
@@ -92,12 +60,14 @@
 
     &__method {
         @include link-style(green);
-        @include component-pulse(10px, green);
+        @include component-pulse(green, 10px);
+        @include collapse-toggle(green, 19px);
     }
 
     &__subset {
         @include link-style($tertiary-color);
-        @include component-pulse(10px, green);
+        @include component-pulse($secondary-color, 10px);
+        @include collapse-toggle($secondary-color, 19px);
         &__placeholder {
             padding: 0 5px;
         }
@@ -141,15 +111,15 @@
         &:before {
             border-top: 1px solid;
             top: 10px;
-            width: 8px;
-            height: 0;
+            width: 6px;
+            height: 2px;
             &.method { color: $tertiary-color; }
         }
 
         &:after {
             border-left: 1px solid;
             height: 100%;
-            width: 0px;
+            width: 2px;
             top: 2px;
         }
     }
@@ -162,8 +132,17 @@
         padding: 1px;
     }
 
-    &__method > div > button > .fa { color: green; }
-    &__subset > div > button > .fa { color: $tertiary-color; }
+    &__method > div > button > [class*='fa'] { color: green; }
+    &__subset > div > button > [class*='fa'] { color: $tertiary-color; }
+
+    &__method > div > span > .loading-pulse {
+        background-color: green;
+        box-shadow: 0 0 0 green;
+     }
+    &__subset > div > span > .loading-pulse {
+        background-color: $tertiary-color;
+        box-shadow: 0 0 0 $tertiary-color;
+    }
 
     .delete {
         visibility: hidden;

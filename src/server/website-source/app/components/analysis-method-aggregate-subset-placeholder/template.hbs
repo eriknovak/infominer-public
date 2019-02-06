@@ -1,0 +1,20 @@
+<div class="analysis__header">{{header}} Overview</div>
+
+<div class="analysis__container">
+
+  <p class="analysis__container__information">
+    Data overview status
+    <span class="badge badge-warning method-status">out-of-date</span>
+  </p>
+
+  <div class="row">
+    {{#each overview as |placeholder|}}
+      <div class="content {{placeholder.columnlg}} {{placeholder.columnsm}}">
+        <h5 class="placeholder placeholder__title"></h5>
+        <div class="graph placeholder"></div>
+      </div>
+    {{/each}}
+  </div>
+
+
+</div>{{! analysis__container }}

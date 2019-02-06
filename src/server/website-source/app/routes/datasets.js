@@ -66,7 +66,7 @@ export default Route.extend({
             html: `<div class="notification">
                     Dataset <span class="label">
                         ${dataset.get('label')}
-                    </span> successfully uploaded!
+                    </span> successfully uploaded.
                 </div>`
         });
         // set dataset loaded property
@@ -86,7 +86,7 @@ export default Route.extend({
             html: `<div class="notification">
                     Dataset <span class="label">
                         ${dataset.get('label')}
-                    </span> was unable to load!
+                    </span> was unable to load.
                 </div>`
         });
         // destroy the dataset

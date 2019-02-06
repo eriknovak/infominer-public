@@ -2,6 +2,17 @@
 
 <div class="analysis__container">
 
+    <p class="analysis__container__information">
+      Data overview status
+      {{#if method.outOfDate }}
+        <span class="badge badge-warning method-status">out-of-date</span>
+        <a class="badge badge-primary method-status-update"
+          tabindex="0" {{action 'updateStatistics'}}>update results</a>
+      {{else}}
+        <span class="badge badge-primary method-status">up-of-date</span>
+      {{/if}}
+    </p>
+
   <div class="row">
     {{#each aggregates as |aggregate|}}
       <div class="{{concat aggregate.columnlg ' ' aggregate.columnsm}}">

@@ -9,6 +9,39 @@ $font-color-dark: #2C3539;
 $font-primary: 'Roboto', sans-serif;
 $font-secondary: 'Open Sans', sans-serif;
 
+
+// mixins
+@mixin component-pulse ($color, $size) {
+
+    @keyframes loading-pulse {
+        0% {
+          -moz-box-shadow: 0 0 0 0 rgba($color, 0.6);
+          box-shadow: 0 0 0 0 rgba($color, 0.6);
+        }
+        70% {
+            -moz-box-shadow: 0 0 0 5px rgba($color, 0);
+            box-shadow: 0 0 0 5px rgba($color, 0);
+        }
+        100% {
+            -moz-box-shadow: 0 0 0 0 rgba($color, 0);
+            box-shadow: 0 0 0 0 rgba($color, 0);
+        }
+    }
+
+    .loading-pulse {
+        width: $size;
+        height: $size;
+        padding: 0px;
+        margin: auto;
+        display: inline-block;
+        border-radius: 50%;
+        background-color: $color;
+        box-shadow: 0 0 0 $color;
+        animation: loading-pulse 2s infinite;
+    }
+}
+
+
 // import bootstrap library
 @import "ember-bootstrap/bootstrap";
 

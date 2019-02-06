@@ -85,6 +85,9 @@ const TimelineComponent = GraphComponent.extend({
         let totalHeight = this.get('height');
         let margin = this.get('margin');
 
+        // the total dimensions of component are invalid
+        if (!totalWidth || !totalHeight) { return; }
+
         // set content dimensions
         let width = totalWidth - margin.left - margin.right;
         let height = totalHeight - margin.top - margin.bottom;

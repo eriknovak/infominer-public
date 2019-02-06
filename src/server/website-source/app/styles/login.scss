@@ -29,7 +29,10 @@
         }
     }
 
-
+    &__text {
+        display: inline-block;
+        padding-top: 9px;
+    }
 
     &--google {
         @include login-button($tertiary-color);
@@ -42,11 +45,13 @@
     &--twitter {
         margin-top: 20px;
         @include login-button($quaternary-color);
+
         .fa-twitter {
             padding: 10px;
             font-size: 20px;
             margin-right: 25px;
             width: 40px;
+            height: 40px;
             text-align: center;
         }
     }

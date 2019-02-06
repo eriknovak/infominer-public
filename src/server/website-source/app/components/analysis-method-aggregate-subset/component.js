@@ -30,6 +30,18 @@ export default Component.extend({
         this.get('columnWidth.setColumnsWidth')(aggregates, 2, 'sm');
 
         return aggregates;
-    })
+    }),
+
+
+    actions: {
+
+        updateStatistics() {
+            this.get('method').set('outOfDate', false);
+            this.get('method').set('result', null);
+            this.get('method').save();
+        }
+
+    }
+
 
 });

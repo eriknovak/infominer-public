@@ -1,11 +1,13 @@
 {{! document selection checkbox }}
-{{!-- <td>
-  {{ checkbox-select
-    checkboxId=(concat "checkbox-" index)
-    checked=selected
-    checkboxAction=(action 'selectDocument')
-  }}
-</td> --}}
+{{#if documentActionsEnabled }}
+  <td>
+    {{ checkbox-select
+      checkboxId=(concat "checkbox-" index)
+      checked=selected
+      checkboxAction=(action 'selectDocument')
+    }}
+  </td>
+{{/if}}
 
 {{! document values }}
 {{#each documentValues as |value|}}

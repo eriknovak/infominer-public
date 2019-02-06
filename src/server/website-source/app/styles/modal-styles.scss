@@ -10,8 +10,10 @@
             margin: auto;
             &--small {
                 height: 1px;
+                font-size: 11px;
             }
         }
+        @include component-pulse($secondary-color, 28.75px);
     }
 
     &--delete {
@@ -19,6 +21,7 @@
             color: red;
             margin: auto;
         }
+        @include component-pulse(red, 28.75px);
     }
 
     &--analysis {
@@ -49,6 +52,6 @@
 
 }
 
-.modal-backdrop+.modal-backdrop {
+.modal-backdrop + .modal-backdrop {
     z-index: 1070;
 }

@@ -1,4 +1,6 @@
 import Component from '@ember/component';
+import saveSvg from 'npm:save-svg-as-png';
+import $ from 'jquery';
 
 export default Component.extend({
     // component attributes
@@ -29,6 +31,16 @@ export default Component.extend({
                 let cover = this.get('cover');
                 document.body.removeChild(cover);
             }
+        },
+
+        saveImage() {
+            // save the component
+            saveSvg.saveSvgAsPng(
+                $(`#${this.get('elementId')} svg.graph`)[0],
+                `aggregate-hierarchy-${this.get('elementId')}`,
+                { backgroundColor: 'white' }
+            );
         }
+
     }
 });

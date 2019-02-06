@@ -33,8 +33,11 @@ export default Component.extend({
         const allCount = dataset.get('numberOfDocuments');
 
         const percentageCoverage = (classCount / allCount * 100).toFixed(1);
-
         this.set('numberOfDocuments', `${classCount} (${percentageCoverage}%)`);
+
+        if (classExample.avgSimilarity) {
+            set(classExample, 'avgSimProcent', (classExample.avgSimilarity * 100).toFixed(1));
+        }
     },
 
     didInsertElement() {
@@ -42,9 +45,9 @@ export default Component.extend({
         self._super(...arguments);
         const elementId = self.get('elementId');
         // on hover show edit button
-        $(`#${elementId} .overview__title`).hover(
-          function () { $(`#${elementId} .overview__title--edit`).addClass('show'); },
-          function () { $(`#${elementId} .overview__title--edit`).removeClass('show'); }
+        $(`#${elementId} .overview__title-container`).hover(
+            function () { $(`#${elementId} .overview__title--edit`).addClass('show'); },
+            function () { $(`#${elementId} .overview__title--edit`).removeClass('show'); }
         );
     },
 
